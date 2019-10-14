@@ -1,0 +1,46 @@
+---
+---
+doctype html
+html.mdc-typography
+  head
+    meta content='text/html; charset=UTF-8' http-equiv='Content-Type'
+    meta charset='utf-8'
+    meta content='width=device-width,initial-scale=1' name='viewport'
+
+    title Biochemical Inference
+
+    meta content='#3d3530' name='theme-color'
+
+    link href='https://unpkg.com/material-components-web@0.17.0/dist/material-components-web.min.css' rel='stylesheet'
+    link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500' rel='stylesheet'
+    link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'
+
+    css:
+      body {
+        margin: 0;
+        --mdc-theme-primary: #00BEB7 !important;
+      }
+
+  body
+
+    / third party libraries
+    script src='https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js'
+    script src='https://cdn.jsdelivr.net/es6-promise/4.1.0/es6-promise.auto.min.js'
+    script src='https://cdn.jsdelivr.net/fetch/2.0.1/fetch.min.js'
+    script src='https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js'
+    script src='https://cdn.jsdelivr.net/npm/qs@6.9.0/dist/qs.js'
+    script src='https://cdn.jsdelivr.net/momentjs/2.18.1/moment.min.js'
+    script src='https://cdn.jsdelivr.net/js-cookie/2.2.0/js.cookie.js'
+
+    / internal libraries
+    script type='text/javascript' src='js/lib/app.es6'
+
+    / components
+    script type='riot' src='tags/biochemical-inference.riot.html'
+    script src='https://cdn.jsdelivr.net/npm/riot@4.6/riot+compiler.min.js'
+
+    javascript:
+      mdc.autoInit()
+
+    |{{ content }}
+

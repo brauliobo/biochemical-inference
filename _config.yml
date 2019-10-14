@@ -1,0 +1,9 @@
+source:      .
+destination: ./docs
+layouts:     ./_layouts
+
+gems:
+
+slim:
+  pretty: true
+
