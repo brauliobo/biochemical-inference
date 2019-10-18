@@ -6,3 +6,4 @@ window.app = {
   },
 
 }
+window.w = window
