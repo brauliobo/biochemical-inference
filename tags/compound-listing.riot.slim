@@ -1,9 +1,24 @@
 ---
 ---
 compound-listing
+  div Compounds
+
+  div each='{ c in state.l }'
+    '{c.names[0]}
 
   javascript:
-    gh.ls('compound').then((p) => {
-      jsyaml.load()
-    })
-
+    export default {
+      onBeforeMount() {
+        this.root.riot = this
+        this.state = {
+          l: [],
+        }
+        gh.ls('compound').then((l) => {
+          _.each(l, (p) => {
+            gh.file(p.path).then((f) => {
+              this.update({l: [...this.state.l, jsyaml.load(f)]})
+            })
+          })
+        })
+      }
+    }
