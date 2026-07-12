@@ -4,3 +4,11 @@
 # editors
 *.swp
 
+# Modern application
+node_modules/
+dist/
+server-dist/
+coverage/
+playwright-report/
+test-results/
+.env

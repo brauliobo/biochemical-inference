@@ -1,3 +1,76 @@
----
-permalink: /index.html
----
+# Biochemical Inference
+
+A controlled, inspectable demonstration of one-carbon metabolism simulation. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+
+This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
+
+## Requirements
+
+- Node.js 22
+- npm 10 or newer
+- Python 3.12 and `uv` for the sibling `../biochemical-db` service
+
+## Start
+
+```sh
+cd ../biochemical-db/service
+uv sync --frozen
+uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000
+```
+
+In another shell, from this repository:
+
+```sh
+npm install
+npm run dev
+```
+
+The workbench is served at `http://localhost:5173`; Vite proxies `/api` to the inference API at `http://localhost:3000`.
+
+For production-like local operation:
+
+```sh
+npm run build
+npm start
+```
+
+`npm start` serves the API and built client on `http://localhost:3000`.
+
+## Knowledge source
+
+By default, the service fails closed against the local biochemical-db API and pins its canonical release:
+
+```sh
+BIOCHEMICAL_DB_URL=http://127.0.0.1:8000
+BIOCHEMICAL_DB_RELEASE_ID=one-carbon-human-mouse-v1.0.0
+BIOCHEMICAL_DB_EXPECTED_DIGEST=b72d00c072551a6babd348cf88302788e9a7b547cca17f9fb834e7e0cddbeef1
+```
+
+The upstream must expose the biochemical-db 1.0 catalog and network contracts. The client validates those responses with strict upstream Zod schemas, verifies the release and digest, sends URL-encoded canonical taxon identifiers such as `NCBITaxon%3A9606`, and then adapts the response into the workbench contract. Any unsupported schema, release mismatch, digest mismatch, or unavailable service disables simulation; there is no production fixture fallback.
+
+The bundled fixture is available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`.
+
+### Identifier integrity
+
+The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
+
+Optional server settings are `PORT` (default `3000`) and `HOST` (default `127.0.0.1`).
+
+## Verification
+
+```sh
+npm run check
+npm run test:e2e
+```
+
+Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. The Playwright configuration starts the real sibling biochemical-db API on port 8000 and the inference development servers; it does not enable the fixture.
+
+## API
+
+- `GET /api/v1/health`
+- `GET /api/v1/releases`
+- `GET /api/v1/releases/:releaseId/network?taxon_id=9606`
+- `GET /api/v1/models/one-carbon`
+- `POST /api/v1/models/one-carbon/simulations`
+
+Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.

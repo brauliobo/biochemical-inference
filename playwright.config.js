@@ -1,0 +1,30 @@
+import { defineConfig, devices } from '@playwright/test'
+
+const useFixture = process.env.E2E_USE_FIXTURE === 'true'
+
+export default defineConfig({
+  testDir: 'tests/e2e',
+  fullyParallel: true,
+  retries: process.env.CI ? 2 : 0,
+  reporter: 'html',
+  use: { baseURL: 'http://127.0.0.1:5173', trace: 'on-first-retry' },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile', use: { ...devices['Galaxy S9+'], viewport: { width: 360, height: 740 } } }
+  ],
+  webServer: [
+    ...useFixture ? [] : [{
+      command: 'uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000',
+      cwd: '../biochemical-db/service',
+      url: 'http://127.0.0.1:8000/healthz',
+      reuseExistingServer: false,
+      timeout: 120_000
+    }],
+    {
+      command: useFixture ? 'BIOCHEMICAL_INFERENCE_USE_FIXTURE=true npm run dev' : 'npm run dev',
+      url: 'http://127.0.0.1:5173',
+      reuseExistingServer: false,
+      timeout: 120_000
+    }
+  ]
+})
