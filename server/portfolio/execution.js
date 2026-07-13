@@ -28,8 +28,13 @@ export function validateExperimentForModel(model, rawExperiment) {
     for (const intervention of experiment.interventions) {
       const unit = targets.get(intervention.targetId)
       if (!unit || !dimensionsEqual(unit.dimension, intervention.unit.dimension)) throw new PortfolioRequestError('intervention_unit_mismatch', `Intervention ${intervention.targetId} has incompatible units.`)
+      if (intervention.value < 0) throw new PortfolioRequestError('intervention_value_invalid', `Intervention ${intervention.targetId} must assign a non-negative value.`)
+      if (model.engine.type === 'ssa' && model.definition.species.some((item) => item.id === intervention.targetId) && !Number.isInteger(intervention.value)) throw new PortfolioRequestError('intervention_value_invalid', `SSA state intervention ${intervention.targetId} must assign an integer molecule count.`)
+      if (model.engine.type === 'fba') {
+        const reaction = model.definition.reactions.find((item) => item.id === intervention.targetId)
+        if (reaction && intervention.value < reaction.lowerBound) throw new PortfolioRequestError('intervention_value_invalid', `FBA upper-bound intervention ${intervention.targetId} cannot be below its lower bound.`)
+      }
     }
-    throw new PortfolioRequestError('unsupported_intervention', 'The Goal 4 benchmark profile declares intervention units but does not execute interventions.')
   }
   return experiment
 }
@@ -113,7 +118,10 @@ export function executeInWorker(model, experiment, options = {}) {
   })
   child.on('error', (error) => finish(boundedFailure(model, experiment, runId, 'failed', 'worker_error', error.message)))
   child.on('exit', (code, signal) => {
-    if (!settled) finish(boundedFailure(model, experiment, runId, signal === 'SIGKILL' ? 'resource-exhausted' : 'failed', 'worker_exit', `Worker exited before returning a result (${signal ?? code}).`))
+    if (!settled) {
+      const exhausted = signal !== null || code === 134 || code === 137
+      finish(boundedFailure(model, experiment, runId, exhausted ? 'resource-exhausted' : 'failed', exhausted ? 'worker_resource_limit' : 'worker_exit', `Worker exited before returning a result (${signal ?? code}).`))
+    }
   })
   const request = JSON.stringify({ type: 'run', model, experiment, runId })
   if (Buffer.byteLength(request) > 1_000_000) throw new PortfolioRequestError('input_limit', 'Validated worker input exceeds 1 MB.', 413)

@@ -34,6 +34,8 @@ import {
   bundledAtlasSubgraph
 } from './atlas-fixture.js'
 import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from './fixture.js'
+import { bundledKnowledgeSnapshot, verifyKnowledgeSnapshot } from './snapshot.js'
+import { canonicalJson } from '../../shared/canonical-json.js'
 
 export const DEFAULT_BIOCHEMICAL_DB_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_RELEASE_ID = 'one-carbon-human-mouse-v1.0.0'
@@ -59,6 +61,9 @@ export function createKnowledgeClient(env = process.env) {
       async provenance(releaseId) {
         if (releaseId !== BUNDLED_RELEASE.id) throw new KnowledgeCompatibilityError(`Unknown release ${releaseId}`)
         return BUNDLED_PROVENANCE
+      },
+      async snapshot(taxonId) {
+        return bundledKnowledgeSnapshot(taxonId)
       },
       async atlasReleases() { return [BUNDLED_ATLAS_RELEASE] },
       async atlasRelease(releaseId) {
@@ -116,6 +121,21 @@ export function createKnowledgeClient(env = process.env) {
     }
   }
 
+  async function fetchCanonicalJson(path) {
+    try {
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+      if (!response.ok) throw new Error(`biochemical-db returned ${response.status} for ${path}`)
+      const text = await response.text()
+      const payload = JSON.parse(text)
+      if (text !== canonicalJson(payload)) throw new KnowledgeCompatibilityError('biochemical-db snapshot response is not RFC 8785 canonical JSON')
+      return { payload, headers: response.headers }
+    } catch (error) {
+      const name = error && typeof error === 'object' && 'name' in error ? error.name : undefined
+      if (name === 'TimeoutError' || name === 'AbortError') throw new KnowledgeCompatibilityError(`biochemical-db timed out after ${timeoutMs} ms for ${path}`)
+      throw error
+    }
+  }
+
   async function verifiedRelease() {
     const payload = await fetchJson('/api/v1/releases')
     const parsed = BiochemicalDbCatalogSchema.safeParse(payload)
@@ -163,6 +183,20 @@ export function createKnowledgeClient(env = process.env) {
 
   return {
     async releases() { return [await verifiedRelease()] },
+    async snapshot(taxonId) {
+      const release = await verifiedRelease()
+      const upstreamTaxonId = canonicalTaxonId(taxonId)
+      const path = `/api/v1/releases/${encodeURIComponent(releaseId)}/snapshots/network?taxon_id=${encodeURIComponent(upstreamTaxonId)}`
+      const { payload, headers } = await fetchCanonicalJson(path)
+      let snapshot
+      try {
+        snapshot = verifyKnowledgeSnapshot(payload, { expectedReleaseId: releaseId, expectedReleaseDigest: release.digest.slice('sha256:'.length), expectedTaxonId: upstreamTaxonId })
+      } catch (error) {
+        throw new KnowledgeCompatibilityError(error instanceof Error ? error.message : 'biochemical-db knowledge snapshot is invalid')
+      }
+      if (headers.get('x-snapshot-digest') !== snapshot.snapshot_digest || headers.get('x-release-digest') !== snapshot.release.digest) throw new KnowledgeCompatibilityError('biochemical-db snapshot headers do not match the verified body')
+      return snapshot
+    },
     async provenance(requestedReleaseId) {
       if (requestedReleaseId !== releaseId) throw new KnowledgeCompatibilityError(`Only pinned release ${releaseId} is available`)
       await verifiedRelease()

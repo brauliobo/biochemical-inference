@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, a durable local experiment workspace, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, Three.js, and Node 22 `node:sqlite`. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -51,6 +51,8 @@ BIOCHEMICAL_DB_EXPECTED_DIGEST=b72d00c072551a6babd348cf88302788e9a7b547cca17f9fb
 ```
 
 The upstream must expose the biochemical-db 1.0 catalog, network, and provenance contracts. The client validates those responses with strict upstream Zod schemas, verifies the pinned release and digest across the catalog, endpoint envelope, and provenance closure, sends URL-encoded canonical taxon identifiers such as `NCBITaxon%3A9606`, and then adapts the responses into workbench contracts. An unsupported catalog or network schema, release mismatch, digest mismatch, or unavailable knowledge service disables simulation; there is no production fixture fallback.
+
+Goal 9 also consumes the deterministic `/api/v1/releases/{release_id}/snapshots/network` route. It validates canonical RFC 8785 bytes, recomputes the snapshot digest, verifies response headers and the complete taxon/release/record closure, and stores the snapshot with each immutable experiment revision.
 
 The contextual atlas is pinned and verified independently from the simulation release:
 
@@ -131,6 +133,12 @@ Pass the same runtime `BIOCHEMICAL_DERIVED_WRITE_TOKEN` only to the inference se
 
 The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
 
+### Controlled experiment workspace
+
+Goal 9 stores metadata in SQLite WAL and artifacts in a staged, atomically published SHA-256 object store. Set `BIOCHEMICAL_WORKSPACE_ROOT` to a path outside the repository; it defaults to `$HOME/.local/share/biochemical-inference/workspace-v1`. `BIOCHEMICAL_WORKSPACE_CONCURRENCY` controls concurrent durable attempts. Resource profiles further bound portfolio worker concurrency, V8 heap, wall time, IPC output, GPU policy, and retained storage.
+
+The v7 workspace distinguishes immutable revisions, scientific run identity, and attempt identity. Process recovery never claims engine continuation: interrupted work is terminalized and a new attempt is explicitly labeled `restart` and `from-specification` after all specification, model, engine, and snapshot digests are checked. Portable ZIP bundles include a manifest, content-addressed objects, and the verified knowledge snapshot; imports reject traversal, duplicates, digest mismatch, and expansion bombs. Imported runs execute offline and must meet their exported exact or tolerance contract. See `docs/EXPERIMENT_WORKSPACE.md`.
+
 Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), explicit comma-separated `CORS_ORIGINS`, and `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` when a trusted development reverse proxy gives the browser a different origin. The development script pins that value to `http://127.0.0.1:5173`; production same-origin serving needs no override.
 
 ## Verification
@@ -142,7 +150,7 @@ E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
-Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and the inference development servers. Evidence uses run-isolated index and candidate workspace paths below `/tmp`; real E2E exercises non-vector search and document retrieval and has no generation dependency. Fixture mode enables both explicit inference and evidence fixtures and exercises deterministic candidate extraction.
+Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and the inference development servers. Evidence and Goal 9 use run-isolated sibling runtime paths outside the source tree; real E2E exercises the canonical network snapshot, non-vector search, and document retrieval and has no generation dependency. Fixture mode enables explicit inference, evidence, and deterministic workspace fixtures.
 
 ## API
 
@@ -199,6 +207,21 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `POST /api/v6/derived/query`
 - `POST /api/v6/derived/impact`
 - `POST /api/v6/derived/measurements/compare`
+- `GET/POST /api/v7/workspace/resource-profiles`
+- `GET/POST /api/v7/workspace/experiments`
+- `GET /api/v7/workspace/experiments/:experimentId`
+- `POST /api/v7/workspace/experiments/:experimentId/revisions`
+- `POST /api/v7/workspace/experiments/:experimentId/clone`
+- `GET /api/v7/workspace/experiments/:experimentId/export`
+- `POST /api/v7/workspace/experiments/import`
+- `GET/POST /api/v7/workspace/runs`
+- `GET /api/v7/workspace/runs/:attemptId`
+- `GET /api/v7/workspace/runs/:attemptId/{events|checkpoints|artifacts}`
+- `POST /api/v7/workspace/runs/:attemptId/cancel`
+- `POST /api/v7/workspace/checkpoints/:checkpointId/restart`
+- `GET /api/v7/workspace/artifacts/:artifactId`
+- `GET/POST /api/v7/workspace/comparisons`
+- `GET/POST /api/v7/workspace/reports`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -215,3 +238,5 @@ See `docs/APAP_BENCHMARK.md` for APAP equations, context parameter bindings, det
 See `docs/SPATIAL_WORKBENCH.md` for spatial release integrity, range proxy behavior, linked selections, visual encoding, fallback behavior, and HRA limitations.
 
 See `docs/DERIVED_KNOWLEDGE.md` for canonical bundle identity, APAP assertion lineage, review transitions, reproduction, layer separation, security, and limitations.
+
+See `docs/EXPERIMENT_WORKSPACE.md` for durable identity, queue recovery, resource profiles, specification checkpoints, portable bundle safety, offline rerun verification, report CSP, and limitations.

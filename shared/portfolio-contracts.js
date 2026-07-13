@@ -210,7 +210,14 @@ export const ExperimentSchema = z.union([
   ExperimentBaseSchema.extend({ engine: EngineSchema.extend({ type: z.literal('ode') }), controls: OdeControlsSchema }).strict(),
   ExperimentBaseSchema.extend({ engine: EngineSchema.extend({ type: z.literal('ssa') }), controls: SsaControlsSchema }).strict(),
   ExperimentBaseSchema.extend({ engine: EngineSchema.extend({ type: z.literal('fba') }), controls: FbaControlsSchema }).strict()
-])
+]).superRefine((experiment, context) => {
+  const ordered = [...experiment.interventions].sort((left, right) => left.time - right.time || left.targetId.localeCompare(right.targetId))
+  if (ordered.some((item, index) => item !== experiment.interventions[index])) context.addIssue({ code: z.ZodIssueCode.custom, path: ['interventions'], message: 'interventions must be ordered by time and targetId' })
+  const keys = experiment.interventions.map((item) => `${item.time}:${item.targetId}`)
+  if (new Set(keys).size !== keys.length) context.addIssue({ code: z.ZodIssueCode.custom, path: ['interventions'], message: 'an intervention target may be assigned only once at a time' })
+  if (experiment.engine.type === 'fba' && experiment.interventions.some((item) => item.time !== 0)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['interventions'], message: 'FBA bound interventions must occur at time zero' })
+  if (experiment.engine.type !== 'fba' && experiment.interventions.some((item) => item.time > experiment.controls.duration)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['interventions'], message: 'interventions cannot occur after the experiment duration' })
+})
 
 export const RunLifecycleSchema = z.enum(['queued', 'running', 'terminal'])
 export const RunOutcomeSchema = z.enum(['successful', 'failed', 'non-converged', 'infeasible', 'unbounded', 'resource-exhausted', 'cancelled'])

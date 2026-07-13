@@ -96,6 +96,20 @@ shared APAP time / field / lobule bin
         +-- lazy Three.js instancing with context-loss fallback
         v
 SpatialTissueWorkbench
+
+biochemical-db deterministic network snapshot
+        | strict schema + RFC 8785 digest verification
+        v
+Goal 9 workspace root outside source
+        |
+        +-- SQLite WAL metadata + immutable revision/event/checkpoint triggers
+        +-- staged/fsynced SHA-256 object store
+        +-- durable queue -> existing bounded portfolio child workers
+        +-- specification-only restart recovery
+        +-- safe portable ZIP import/export + offline rerun contract
+        +-- static HTML/JSON/CSV/SVG reports with no network
+        v
+ExperimentWorkspace + /api/v7/workspace
 ```
 
 ## Active Application
@@ -119,6 +133,8 @@ Goal 5 adds `shared/parameter-contracts.js`, `server/parameters/`, `server/studi
 Goal 6 adds `shared/apap-contracts.js`, `server/apap/`, and `src/components/APAPBenchmarkWorkbench.vue`. APAP producer payloads and internal runs have separate strict contracts. Context binding occurs before a single equation evaluator with no taxon branches. Fixed-step RK4 fails on invalid intermediate state, and every terminal result includes mass, cell-state, and limiting-case diagnostics.
 
 Goal 7 adds `shared/spatial-contracts.js`, `server/spatial/`, `src/spatial.js`, `SpatialTissueWorkbench`, and the lazy `TissueScene`. Spatial trust is independent of the APAP simulation release. Metadata and content are fail-closed at the server boundary; the browser receives only same-origin content IDs. The scene has no placement operation, and the explicit unavailable human HRA mapping cannot become a mouse target. WebGL is an optional projection over the same time, field, bin, values, provenance, and encoding policy exposed semantically.
+
+Goal 9 adds `shared/workspace-contracts.js`, `shared/snapshot-contracts.js`, `server/workspace/`, and `src/components/ExperimentWorkspace.vue`. Metadata is SQLite WAL with foreign keys; specifications, snapshots, results, bundles, and reports are content-addressed objects under `BIOCHEMICAL_WORKSPACE_ROOT`. Scientific run identity is independent of attempt identity. Restart recovery creates a new attempt from a digest-verified specification checkpoint because current engines expose no serializable mid-state. Portable imports validate every ZIP name, size, ratio, and digest before publication and can rerun from the embedded verified snapshot without an upstream service.
 
 ## Service Contract
 

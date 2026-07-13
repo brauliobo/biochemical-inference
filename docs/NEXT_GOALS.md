@@ -190,6 +190,8 @@ Allow simulations and analyses to grow the database without corrupting source tr
 
 ## Goal 9: Controlled Experiment Workspace
 
+Status: delivered in the active inference application. See `docs/EXPERIMENT_WORKSPACE.md` for storage, identity, recovery, bundle, report, resource, and explicit no-stateful-continuation contracts.
+
 Turn the MVP page into a complete local research workbench.
 
 ### Scope

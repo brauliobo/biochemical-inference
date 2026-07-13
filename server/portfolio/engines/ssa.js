@@ -39,11 +39,10 @@ function quantile(sorted, fraction) {
 export function runSsa(model, experiment) {
   const species = model.definition.species
   const speciesIndex = new Map(species.map((item, index) => [item.id, index]))
-  const parameters = new Map(model.definition.parameters.map((item) => [item.id, item.value]))
   const reactions = model.definition.reactions.map((reaction) => ({
     reactant: speciesIndex.get(reaction.reactant),
     products: reaction.products.map((product) => ({ index: speciesIndex.get(product.speciesId), stoichiometry: product.stoichiometry })),
-    rate: parameters.get(reaction.rateConstantId)
+    rateConstantId: reaction.rateConstantId
   }))
   const controls = experiment.controls
   const times = sampleSchedule(controls.duration, controls.outputInterval)
@@ -55,19 +54,39 @@ export function runSsa(model, experiment) {
   for (let replicate = 0; replicate < controls.replicates; replicate += 1) {
     const random = createXoshiro128StarStar((experiment.seed + Math.imul(replicate, 0x9e3779b9)) >>> 0)
     const state = species.map((item) => item.initial)
-    const sampled = species.map((item) => [item.initial])
+    const parameters = new Map(model.definition.parameters.map((item) => [item.id, item.value]))
+    const sampled = species.map(() => [])
     const initialTotal = state.reduce((sum, value) => sum + value, 0)
     let time = 0
     let sampleIndex = 1
     let events = 0
+    let interventionIndex = 0
+    const applyInterventions = () => {
+      while (interventionIndex < experiment.interventions.length && Math.abs(experiment.interventions[interventionIndex].time - time) <= 1e-12) {
+        const intervention = experiment.interventions[interventionIndex]
+        const stateIndex = speciesIndex.get(intervention.targetId)
+        if (stateIndex === undefined) parameters.set(intervention.targetId, intervention.value)
+        else state[stateIndex] = intervention.value
+        interventionIndex += 1
+      }
+    }
+    applyInterventions()
+    state.forEach((value, index) => sampled[index].push(value))
     while (time < controls.duration) {
-      const propensities = reactions.map((reaction) => reaction.rate * state[reaction.reactant])
+      const propensities = reactions.map((reaction) => parameters.get(reaction.rateConstantId) * state[reaction.reactant])
       const total = propensities.reduce((sum, value) => sum + value, 0)
-      if (total <= 0) break
-      const eventTime = time - Math.log(random()) / total
-      while (sampleIndex < times.length && times[sampleIndex] < eventTime) {
+      const nextIntervention = experiment.interventions[interventionIndex]?.time ?? Number.POSITIVE_INFINITY
+      if (total <= 0 && nextIntervention > controls.duration) break
+      const eventTime = total <= 0 ? Number.POSITIVE_INFINITY : time - Math.log(random()) / total
+      const boundary = Math.min(eventTime, nextIntervention, controls.duration)
+      while (sampleIndex < times.length && times[sampleIndex] < boundary) {
         state.forEach((value, index) => sampled[index].push(value))
         sampleIndex += 1
+      }
+      if (nextIntervention <= eventTime && nextIntervention <= controls.duration) {
+        time = nextIntervention
+        applyInterventions()
+        continue
       }
       if (eventTime > controls.duration) break
       let threshold = random() * total
@@ -119,7 +138,10 @@ export function runSsa(model, experiment) {
     },
     iterations: totalEvents,
     residuals: { conservedMolecules: conservationResidual },
-    warnings: ['Replicate moments are Monte Carlo estimates and depend on the pinned seed, PRNG, and replicate count.'],
+    warnings: [
+      'Replicate moments are Monte Carlo estimates and depend on the pinned seed, PRNG, and replicate count.',
+      ...experiment.interventions.length > 0 ? ['Scheduled assignments are applied exactly at declared times and each replicate restarts its stochastic waiting time after an assignment.'] : []
+    ],
     failure: null
   }
 }

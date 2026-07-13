@@ -69,6 +69,24 @@ import {
   ReproduceRequestSchema,
   ReviewEventRequestSchema
 } from '../shared/derived-contracts.js'
+import {
+  ArtifactRecordSchema,
+  AttemptDetailSchema,
+  AttemptRecordSchema,
+  BundleExportResponseSchema,
+  ComparisonRecordSchema,
+  ComparisonRequestSchema,
+  ExperimentCreateRequestSchema,
+  ExperimentDetailSchema,
+  ExperimentRecordSchema,
+  HistoryResponseSchema,
+  ReportRecordSchema,
+  ResourceProfileSchema,
+  RevisionCreateRequestSchema,
+  RevisionRecordSchema,
+  SpecificationCheckpointSchema,
+  WorkspaceEventSchema
+} from '../shared/workspace-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -416,4 +434,120 @@ export async function loadEvidenceCandidates(release, signal) {
 export async function loadEvidenceCandidate(release, candidateId, signal) {
   const payload = EvidenceCandidateResponseSchema.parse(await requestJson(`/api/v3/evidence/candidates/${encodeURIComponent(candidateId)}`, withSignal(signal)))
   return verifyEvidenceEnvelope(payload, release)
+}
+
+export async function loadWorkspaceResourceProfiles(signal) {
+  return ResourceProfileSchema.array().parse(await requestJson('/api/v7/workspace/resource-profiles', withSignal(signal)))
+}
+
+export async function loadWorkspaceExperiments(signal) {
+  return ExperimentRecordSchema.array().parse(await requestJson('/api/v7/workspace/experiments', withSignal(signal)))
+}
+
+export async function createWorkspaceExperiment(input, signal) {
+  const request = ExperimentCreateRequestSchema.parse(input)
+  return ExperimentDetailSchema.parse(await requestJson('/api/v7/workspace/experiments', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadWorkspaceExperiment(experimentId, signal) {
+  return ExperimentDetailSchema.parse(await requestJson(`/api/v7/workspace/experiments/${encodeURIComponent(experimentId)}`, withSignal(signal)))
+}
+
+export async function createWorkspaceRevision(experimentId, input, signal) {
+  const request = RevisionCreateRequestSchema.parse(input)
+  return RevisionRecordSchema.parse(await requestJson(`/api/v7/workspace/experiments/${encodeURIComponent(experimentId)}/revisions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function cloneWorkspaceExperiment(experimentId, name, signal) {
+  return ExperimentDetailSchema.parse(await requestJson(`/api/v7/workspace/experiments/${encodeURIComponent(experimentId)}/clone`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(name ? { name } : {}),
+    ...withSignal(signal)
+  }))
+}
+
+export async function queueWorkspaceRun(revisionId, resourceProfileId, signal) {
+  return AttemptRecordSchema.parse(await requestJson('/api/v7/workspace/runs', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ revisionId, ...(resourceProfileId ? { resourceProfileId } : {}) }),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadWorkspaceHistory(filters = {}, signal) {
+  const query = queryString(filters)
+  return HistoryResponseSchema.parse(await requestJson(`/api/v7/workspace/runs${query ? `?${query}` : ''}`, withSignal(signal)))
+}
+
+export async function loadWorkspaceAttempt(attemptId, signal) {
+  return AttemptDetailSchema.parse(await requestJson(`/api/v7/workspace/runs/${encodeURIComponent(attemptId)}`, withSignal(signal)))
+}
+
+export async function loadWorkspaceEvents(attemptId, signal) {
+  return WorkspaceEventSchema.array().parse(await requestJson(`/api/v7/workspace/runs/${encodeURIComponent(attemptId)}/events`, withSignal(signal)))
+}
+
+export async function cancelWorkspaceAttempt(attemptId, signal) {
+  return AttemptRecordSchema.parse(await requestJson(`/api/v7/workspace/runs/${encodeURIComponent(attemptId)}/cancel`, { method: 'POST', body: '{}', headers: { 'content-type': 'application/json' }, ...withSignal(signal) }))
+}
+
+export async function loadWorkspaceCheckpoints(attemptId, signal) {
+  return SpecificationCheckpointSchema.array().parse(await requestJson(`/api/v7/workspace/runs/${encodeURIComponent(attemptId)}/checkpoints`, withSignal(signal)))
+}
+
+export async function restartWorkspaceCheckpoint(checkpointId, resourceProfileId, signal) {
+  return AttemptRecordSchema.parse(await requestJson(`/api/v7/workspace/checkpoints/${encodeURIComponent(checkpointId)}/restart`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(resourceProfileId ? { resourceProfileId } : {}),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadWorkspaceArtifacts(attemptId, signal) {
+  return ArtifactRecordSchema.array().parse(await requestJson(`/api/v7/workspace/runs/${encodeURIComponent(attemptId)}/artifacts`, withSignal(signal)))
+}
+
+export async function compareWorkspaceAttempts(input, signal) {
+  const request = ComparisonRequestSchema.parse(input)
+  return ComparisonRecordSchema.parse(await requestJson('/api/v7/workspace/comparisons', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function createWorkspaceReport(attemptId, signal) {
+  return ReportRecordSchema.parse(await requestJson('/api/v7/workspace/reports', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ attemptId }),
+    ...withSignal(signal)
+  }))
+}
+
+export async function exportWorkspaceExperiment(experimentId, signal) {
+  return BundleExportResponseSchema.parse(await requestJson(`/api/v7/workspace/experiments/${encodeURIComponent(experimentId)}/export`, withSignal(signal)))
+}
+
+export async function importWorkspaceExperiment(bundleBase64, signal) {
+  return ExperimentDetailSchema.parse(await requestJson('/api/v7/workspace/experiments/import', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ bundleBase64 }),
+    ...withSignal(signal)
+  }))
 }

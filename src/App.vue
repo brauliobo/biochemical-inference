@@ -8,6 +8,7 @@ import AtlasExplorer from './components/AtlasExplorer.vue'
 import EvidencePanel from './components/EvidencePanel.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import PortfolioWorkbench from './components/PortfolioWorkbench.vue'
+import ExperimentWorkspace from './components/ExperimentWorkspace.vue'
 import ParameterStudyWorkbench from './components/ParameterStudyWorkbench.vue'
 import APAPBenchmarkWorkbench from './components/APAPBenchmarkWorkbench.vue'
 import ReviewWorkbench from './components/ReviewWorkbench.vue'
@@ -326,6 +327,8 @@ main#main
     EvidencePanel(:suggested-query="evidenceQuery")
 
     PortfolioWorkbench
+
+    ExperimentWorkspace
 
     ParameterStudyWorkbench
 

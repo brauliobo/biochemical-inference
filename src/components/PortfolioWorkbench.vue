@@ -63,7 +63,7 @@ function experiment() {
     engine: { ...selected.engine, algorithm: controls.method, algorithmVersion: '1.0.0' },
     seed: seed.value,
     assumptions: ['Registry values are used without parameter substitution.'],
-    limitations: ['Goal 4 execution completes synchronously; persistent queues and resume are deferred to Goal 9.'],
+    limitations: ['This v2 compatibility run completes synchronously; durable queueing and specification restarts are available only through the v7 workspace.'],
     interventions: [],
     controls
   }

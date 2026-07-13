@@ -7,14 +7,16 @@ function system(model) {
   const reactions = model.definition.reactions.map((reaction) => ({
     reactant: speciesIndex.get(reaction.reactant),
     products: reaction.products.map((product) => ({ index: speciesIndex.get(product.speciesId), stoichiometry: product.stoichiometry })),
-    rate: parameters.get(reaction.rateConstantId)
+    rateConstantId: reaction.rateConstantId
   }))
   return {
     initial: species.map((item) => item.initial),
+    speciesIndex,
+    parameters,
     derivative(state) {
       const slope = state.map(() => 0)
       for (const reaction of reactions) {
-        const flux = reaction.rate * state[reaction.reactant]
+        const flux = parameters.get(reaction.rateConstantId) * state[reaction.reactant]
         slope[reaction.reactant] -= flux
         for (const product of reaction.products) slope[product.index] += product.stoichiometry * flux
       }
@@ -61,9 +63,10 @@ function schedule(duration, interval) {
 
 export function runOde(model, experiment) {
   const controls = experiment.controls
-  const { initial, derivative } = system(model)
+  const dynamics = system(model)
+  const { initial, derivative } = dynamics
   const times = schedule(controls.duration, controls.outputInterval)
-  const values = model.definition.species.map((item) => [item.initial])
+  const values = model.definition.species.map(() => [])
   let state = [...initial]
   let time = 0
   let step = Math.min(controls.fixedStep, controls.outputInterval)
@@ -71,13 +74,27 @@ export function runOde(model, experiment) {
   let rejectedSteps = 0
   let minimumStep = Number.POSITIVE_INFINITY
   let maximumStep = 0
+  let interventionIndex = 0
+
+  const applyInterventions = () => {
+    while (interventionIndex < experiment.interventions.length && Math.abs(experiment.interventions[interventionIndex].time - time) <= 1e-12) {
+      const intervention = experiment.interventions[interventionIndex]
+      const stateIndex = dynamics.speciesIndex.get(intervention.targetId)
+      if (stateIndex === undefined) dynamics.parameters.set(intervention.targetId, intervention.value)
+      else state[stateIndex] = intervention.value
+      interventionIndex += 1
+    }
+  }
+  applyInterventions()
+  state.forEach((value, index) => values[index].push(round(value)))
 
   for (const target of times.slice(1)) {
     while (time < target - 1e-14) {
       if (iterations + rejectedSteps >= controls.maxInternalSteps) {
         return { outcome: 'non-converged', data: null, iterations, residuals: { rejectedSteps }, warnings: [], failure: { code: 'step_limit', message: 'ODE integration exceeded maxInternalSteps.' } }
       }
-      const candidateStep = Math.min(step, target - time)
+      const nextIntervention = experiment.interventions[interventionIndex]?.time ?? Number.POSITIVE_INFINITY
+      const candidateStep = Math.min(step, target - time, nextIntervention - time)
       if (controls.method === 'rk4') {
         state = rk4Step(derivative, state, candidateStep)
         assertState(state)
@@ -104,6 +121,7 @@ export function runOde(model, experiment) {
           return { outcome: 'non-converged', data: null, iterations, residuals: { rejectedSteps }, warnings: [], failure: { code: 'step_underflow', message: 'Adaptive ODE step size underflowed before reaching the requested output time.' } }
         }
       }
+      applyInterventions()
     }
     state.forEach((value, index) => values[index].push(round(value)))
   }
@@ -120,7 +138,10 @@ export function runOde(model, experiment) {
     },
     iterations,
     residuals: { rejectedSteps, minimumStep: round(minimumStep), maximumStep: round(maximumStep), conservedPool: round(Math.abs(finalTotal - initialTotal)) },
-    warnings: controls.method === 'rk4' ? ['Fixed-step RK4 has no local error estimator; convergence must be checked by step refinement.'] : [],
+    warnings: [
+      ...controls.method === 'rk4' ? ['Fixed-step RK4 has no local error estimator; convergence must be checked by step refinement.'] : [],
+      ...experiment.interventions.length > 0 ? ['Scheduled assignments are applied exactly at declared times; they are discontinuities, not inferred biological mechanisms.'] : []
+    ],
     failure: null
   }
 }

@@ -82,7 +82,8 @@ class Simplex {
 }
 
 export function runFba(model, experiment) {
-  const reactions = model.definition.reactions
+  const interventions = new Map(experiment.interventions.map((item) => [item.targetId, item.value]))
+  const reactions = model.definition.reactions.map((reaction) => interventions.has(reaction.id) ? { ...reaction, upperBound: interventions.get(reaction.id) } : reaction)
   const metabolites = model.definition.metabolites
   if (reactions.some((reaction) => !Number.isFinite(reaction.lowerBound))) throw new Error('FBA profile requires finite lower bounds')
   const shiftedObjective = reactions.map((reaction) => reaction.id === model.definition.objective.reactionId ? 1 : 0)
@@ -127,7 +128,10 @@ export function runFba(model, experiment) {
     },
     iterations: solved.iterations ?? 0,
     residuals: { steadyState: steadyStateResidual, boundViolation, objectiveAgreement: Math.abs(objective - fluxes[reactions.findIndex((reaction) => reaction.id === model.definition.objective.reactionId)]) },
-    warnings: ['FBA optimality applies only to the declared linear objective and constraints.'],
+    warnings: [
+      'FBA optimality applies only to the declared linear objective and constraints.',
+      ...experiment.interventions.length > 0 ? ['Time-zero FBA interventions replace declared reaction upper bounds; they do not represent dynamic continuation.'] : []
+    ],
     failure: null
   }
 }

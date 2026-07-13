@@ -58,6 +58,18 @@ import {
 } from '../shared/derived-contracts.js'
 import { createDerivedClient, DerivedCompatibilityError } from './derived/client.js'
 import { createDerivedRunService, DerivedRequestError } from './derived/service.js'
+import {
+  BundleImportRequestSchema,
+  ComparisonRequestSchema,
+  ExperimentCreateRequestSchema,
+  HistoryFilterSchema,
+  ReportRequestSchema,
+  ResourceProfileSchema,
+  RestartRequestSchema,
+  RevisionCreateRequestSchema,
+  RunCreateRequestSchema
+} from '../shared/workspace-contracts.js'
+import { createWorkspaceService, WorkspaceRequestError } from './workspace/service.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -111,6 +123,16 @@ const DerivedListQuerySchema = z.object({
   classification: DerivedClassificationSchema.optional(),
   review_status: ReviewStatusSchema.optional()
 }).strict()
+const WorkspaceExperimentParamSchema = z.object({ experimentId: z.string().uuid() }).strict()
+const WorkspaceRevisionParamSchema = z.object({ experimentId: z.string().uuid() }).strict()
+const WorkspaceAttemptParamSchema = z.object({ attemptId: Sha256Schema }).strict()
+const WorkspaceRunParamSchema = z.object({ runId: Sha256Schema }).strict()
+const WorkspaceCheckpointParamSchema = z.object({ checkpointId: Sha256Schema }).strict()
+const WorkspaceArtifactParamSchema = z.object({ artifactId: Sha256Schema }).strict()
+const WorkspaceComparisonParamSchema = z.object({ comparisonId: Sha256Schema }).strict()
+const WorkspaceReportParamSchema = z.object({ reportId: Sha256Schema }).strict()
+const WorkspaceReportFileParamSchema = z.object({ reportId: Sha256Schema, format: z.enum(['html', 'json', 'csv', 'svg']) }).strict()
+const WorkspaceCloneRequestSchema = z.object({ name: z.string().trim().min(1).max(160).optional() }).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function invalidAtlasQuery(reply, parsed) {
@@ -136,6 +158,11 @@ export async function buildApp(options = {}) {
   const studies = options.studyService ?? createStudyService(parameters)
   const apapRuns = options.apapRunService ?? createApapRunService(apap)
   const derivedRuns = options.derivedRunService ?? createDerivedRunService(derived, apapRuns)
+  const workspace = options.workspaceService ?? await createWorkspaceService({
+    env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env,
+    knowledgeClient: knowledge
+  })
+  app.addHook('onClose', async () => workspace.close?.())
   const configuredPublicOrigin = env.BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN?.replace(/\/$/, '')
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
@@ -162,6 +189,9 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof DerivedCompatibilityError || error instanceof DerivedRequestError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof WorkspaceRequestError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -562,6 +592,144 @@ export async function buildApp(options = {}) {
     const parsed = MeasurementComparisonRequestSchema.safeParse(request.body)
     if (!parsed.success) return invalidDerived(reply, parsed)
     return derived.compare(parsed.data)
+  })
+  const invalidWorkspace = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_WORKSPACE_REQUEST', error: 'Unprocessable Entity', message: 'Workspace request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  app.get('/api/v7/workspace', async () => ({
+    contractVersion: '1.0.0',
+    checkpointMode: 'from-specification',
+    statefulContinuation: false,
+    objectAddressing: 'sha256',
+    routes: {
+      experiments: '/api/v7/workspace/experiments',
+      runs: '/api/v7/workspace/runs',
+      resourceProfiles: '/api/v7/workspace/resource-profiles',
+      comparisons: '/api/v7/workspace/comparisons',
+      reports: '/api/v7/workspace/reports'
+    }
+  }))
+  app.get('/api/v7/workspace/resource-profiles', async () => workspace.listResourceProfiles())
+  app.post('/api/v7/workspace/resource-profiles', async (request, reply) => {
+    const parsed = ResourceProfileSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(201).send(workspace.createResourceProfile(parsed.data))
+  })
+  app.get('/api/v7/workspace/experiments', async () => workspace.listExperiments())
+  app.post('/api/v7/workspace/experiments', async (request, reply) => {
+    const parsed = ExperimentCreateRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(201).send(await workspace.createExperiment(parsed.data))
+  })
+  app.post('/api/v7/workspace/experiments/import', async (request, reply) => {
+    const parsed = BundleImportRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(201).send(await workspace.importExperiment(Buffer.from(parsed.data.bundleBase64, 'base64')))
+  })
+  app.get('/api/v7/workspace/experiments/:experimentId', async (request, reply) => {
+    const parsed = WorkspaceExperimentParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.getExperiment(parsed.data.experimentId)
+  })
+  app.post('/api/v7/workspace/experiments/:experimentId/revisions', async (request, reply) => {
+    const params = WorkspaceRevisionParamSchema.safeParse(request.params)
+    const body = RevisionCreateRequestSchema.safeParse(request.body)
+    if (!params.success) return invalidWorkspace(reply, params)
+    if (!body.success) return invalidWorkspace(reply, body)
+    return reply.status(201).send(await workspace.createRevision(params.data.experimentId, body.data))
+  })
+  app.post('/api/v7/workspace/experiments/:experimentId/clone', async (request, reply) => {
+    const params = WorkspaceExperimentParamSchema.safeParse(request.params)
+    const body = WorkspaceCloneRequestSchema.safeParse(request.body ?? {})
+    if (!params.success) return invalidWorkspace(reply, params)
+    if (!body.success) return invalidWorkspace(reply, body)
+    return reply.status(201).send(await workspace.cloneExperiment(params.data.experimentId, body.data.name))
+  })
+  app.get('/api/v7/workspace/experiments/:experimentId/export', async (request, reply) => {
+    const parsed = WorkspaceExperimentParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.exportExperiment(parsed.data.experimentId)
+  })
+  app.get('/api/v7/workspace/runs', async (request, reply) => {
+    const parsed = HistoryFilterSchema.safeParse(request.query)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.listHistory(parsed.data)
+  })
+  app.post('/api/v7/workspace/runs', async (request, reply) => {
+    const parsed = RunCreateRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(202).send(workspace.queueRun(parsed.data))
+  })
+  app.get('/api/v7/workspace/runs/scientific/:runId', async (request, reply) => {
+    const parsed = WorkspaceRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.getRun(parsed.data.runId)
+  })
+  app.get('/api/v7/workspace/runs/:attemptId', async (request, reply) => {
+    const parsed = WorkspaceAttemptParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.getAttempt(parsed.data.attemptId)
+  })
+  app.get('/api/v7/workspace/runs/:attemptId/events', async (request, reply) => {
+    const parsed = WorkspaceAttemptParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.events(parsed.data.attemptId)
+  })
+  app.post('/api/v7/workspace/runs/:attemptId/cancel', async (request, reply) => {
+    const parsed = WorkspaceAttemptParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    const attempt = workspace.cancel(parsed.data.attemptId)
+    return attempt ?? reply.status(409).send({ statusCode: 409, code: 'ATTEMPT_NOT_CANCELLABLE', error: 'Conflict', message: 'Run attempt is already terminal.' })
+  })
+  app.get('/api/v7/workspace/runs/:attemptId/checkpoints', async (request, reply) => {
+    const parsed = WorkspaceAttemptParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.checkpoints(parsed.data.attemptId)
+  })
+  app.post('/api/v7/workspace/checkpoints/:checkpointId/restart', async (request, reply) => {
+    const params = WorkspaceCheckpointParamSchema.safeParse(request.params)
+    const body = RestartRequestSchema.safeParse(request.body ?? {})
+    if (!params.success) return invalidWorkspace(reply, params)
+    if (!body.success) return invalidWorkspace(reply, body)
+    return reply.status(202).send(await workspace.restart(params.data.checkpointId, body.data.resourceProfileId))
+  })
+  app.get('/api/v7/workspace/runs/:attemptId/artifacts', async (request, reply) => {
+    const parsed = WorkspaceAttemptParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.artifacts(parsed.data.attemptId)
+  })
+  app.get('/api/v7/workspace/artifacts/:artifactId', async (request, reply) => {
+    const parsed = WorkspaceArtifactParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    const { artifact, content } = await workspace.artifactContent(parsed.data.artifactId)
+    return reply.headers({ 'content-type': artifact.mediaType, 'content-length': artifact.bytes, 'x-content-sha256': artifact.digest, 'content-disposition': `attachment; filename="${artifact.name}"` }).send(content)
+  })
+  app.post('/api/v7/workspace/comparisons', async (request, reply) => {
+    const parsed = ComparisonRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(201).send(await workspace.compare(parsed.data))
+  })
+  app.get('/api/v7/workspace/comparisons/:comparisonId', async (request, reply) => {
+    const parsed = WorkspaceComparisonParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.getComparison(parsed.data.comparisonId)
+  })
+  app.post('/api/v7/workspace/reports', async (request, reply) => {
+    const parsed = ReportRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return reply.status(201).send(await workspace.createReport(parsed.data.attemptId))
+  })
+  app.get('/api/v7/workspace/reports/:reportId', async (request, reply) => {
+    const parsed = WorkspaceReportParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    return workspace.getReport(parsed.data.reportId)
+  })
+  app.get('/api/v7/workspace/reports/:reportId/files/:format', async (request, reply) => {
+    const parsed = WorkspaceReportFileParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidWorkspace(reply, parsed)
+    const report = workspace.getReport(parsed.data.reportId)
+    const artifact = report.artifacts.find((item) => item.kind === `report-${parsed.data.format}`)
+    const content = await workspace.artifactContent(artifact.artifactId)
+    const headers = parsed.data.format === 'html' ? { 'content-security-policy': report.csp } : {}
+    return reply.headers({ ...headers, 'content-type': content.artifact.mediaType, 'x-content-sha256': content.artifact.digest }).send(content.content)
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

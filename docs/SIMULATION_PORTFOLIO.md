@@ -18,7 +18,7 @@ Units carry a symbol, SI scale, and all seven SI base-dimension exponents. The c
 - SSA state: integer `molecule` counts; first-order rates: `s^-1`; time: `s`.
 - FBA flux: `mmol gDW^-1 h^-1`.
 
-All dynamic state dimensions must agree, first-order constants must have inverse-time dimensions, FBA flux dimensions must agree, and observables/interventions must match their targets. Goal 4 contracts validate intervention units but the benchmark executor rejects non-empty intervention schedules. Intervention execution and parameter sweeps belong to Goal 9.
+All dynamic state dimensions must agree, first-order constants must have inverse-time dimensions, FBA flux dimensions must agree, and observables/interventions must match their targets. Goal 9 executes ordered, unit-compatible intervention assignments: ODE and SSA state/rate assignments occur at exact declared times, while FBA time-zero assignments replace reaction upper bounds. See `EXPERIMENT_WORKSPACE.md` for portfolio and discontinuity semantics.
 
 ## Standards Profile
 
@@ -49,7 +49,7 @@ Archives contain exactly `manifest.xml`, `model.xml`, and `experiment.sedml`. Im
 
 ## Execution Boundary
 
-Each run executes in a child Node.js process with validated JSON-text IPC, a 1 MB input limit, 2 MB default output limit, 96 MB V8 heap, and 10 second wall-time limit. The worker imports only contracts and numerical engines and has no network client. Parent-enforced termination produces `resource-exhausted`; cancellation produces `cancelled`. The protocol and API are cancellation-ready, but durable queues, checkpoints, resume, and artifact retention remain explicitly deferred to Goal 9.
+Each run executes in a child Node.js process with validated JSON-text IPC, a 1 MB input limit, 2 MB default output limit, 96 MB V8 heap, and 10 second wall-time limit. The worker imports only contracts and numerical engines and has no network client. Parent-enforced termination produces `resource-exhausted`; cancellation produces `cancelled`. Goal 9 adds a durable queue, content-addressed artifacts, and exact specification checkpoints around these same workers. It explicitly does not claim mid-state resume.
 
 The Fastify surface is additive:
 
@@ -61,4 +61,4 @@ The Fastify surface is additive:
 - `GET /api/v2/runs/:runId`
 - `DELETE /api/v2/runs/:runId`
 
-Run storage is process-local and synchronous terminal completion is intentional for Goal 4.
+The v2 compatibility API remains process-local and synchronous. Durable background execution is the separate v7 workspace surface.

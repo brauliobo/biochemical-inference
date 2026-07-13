@@ -58,6 +58,19 @@ describe('Goal 4 numerical conformance', () => {
     expect(runFba(unboundedModel, experiment).outcome).toBe('unbounded')
   })
 
+  it('applies declared ODE, SSA, and FBA intervention assignments deterministically', () => {
+    const odeExperiment = benchmarkExperiment(ODE_MODEL)
+    odeExperiment.interventions = [{ targetId: 'A', time: 5, value: 10, unit: ODE_MODEL.definition.species[0].unit }]
+    const ssaExperiment = benchmarkExperiment(SSA_MODEL, { controls: { replicates: 16 } })
+    ssaExperiment.interventions = [{ targetId: 'A', time: 0, value: 0, unit: SSA_MODEL.definition.species[0].unit }]
+    const fbaExperiment = benchmarkExperiment(FBA_MODEL)
+    fbaExperiment.interventions = [{ targetId: 'uptake', time: 0, value: 4, unit: FBA_MODEL.definition.reactions[0].unit }]
+
+    expect(runOde(ODE_MODEL, odeExperiment).data.trajectories[0].values.at(-1)).toBeCloseTo(10 * Math.exp(-0.3 * 5), 7)
+    expect(runSsa(SSA_MODEL, ssaExperiment).data.summaries.find((item) => item.id === 'A').mean).toBe(0)
+    expect(runFba(FBA_MODEL, fbaExperiment)).toMatchObject({ outcome: 'successful', data: { objective: 4 } })
+  })
+
   it('rejects incompatible state and observable dimensions in strict model contracts', () => {
     expect(PortfolioModelSchema.safeParse(incompatibleUnitModel())).toMatchObject({ success: false })
   })
