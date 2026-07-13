@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism simulation, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism simulation, a standards-based ODE/SSA/FBA portfolio, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -117,6 +117,13 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v2/releases/:releaseId/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_depth=4&max_nodes=50`
 - `GET /api/v2/releases/:releaseId/coverage?taxon_id=9606`
 - `GET /api/v2/releases/:releaseId/network?taxon_id=9606`
+- `GET /api/v2/models`
+- `GET /api/v2/models/:modelId`
+- `POST /api/v2/model-archives/export`
+- `POST /api/v2/model-archives/validate`
+- `POST /api/v2/runs`
+- `GET /api/v2/runs/:runId`
+- `DELETE /api/v2/runs/:runId`
 - `GET /api/v3/evidence/health`
 - `POST /api/v3/evidence/search`
 - `GET /api/v3/evidence/documents/:identifier`
@@ -129,3 +136,5 @@ Every successful run includes the exact release digest, model and engine version
 See `docs/ATLAS_EXPLORER.md` for atlas contract, interpretation, and failure boundaries.
 
 See `docs/EVIDENCE_PANEL.md` for the evidence contract, ranking interpretation, license behavior, and candidate trust boundary.
+
+See `docs/SIMULATION_PORTFOLIO.md` for algorithms, strict v2 contracts, units, worker limits, and the exact SBML L3/SED-ML/COMBINE supported profile.

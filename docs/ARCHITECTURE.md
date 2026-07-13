@@ -36,6 +36,18 @@ same-origin Fastify /api/v3/evidence proxy
         |
         v
 EvidencePanel (exact/BM25/vector/RRF, licensed spans, review-only candidates)
+
+declarative Goal 4 registry
+        |
+        v
+validated JSON IPC -> bounded child process
+        |
+        +-- RK4 / Dormand-Prince 5(4)
+        +-- seeded Gillespie direct SSA
+        +-- two-phase simplex FBA
+        |
+        v
+strict terminal result + PortfolioWorkbench
 ```
 
 ## Active Application
@@ -51,6 +63,8 @@ specs/e2e/            Product-level acceptance scenarios
 The legacy Jekyll, Slim, Riot, and generated `docs/` application remains outside the active build until unrelated local modifications are resolved. The new build writes only to `dist/` and `server-dist/`.
 
 The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the browser application, while the server build reproducibly copies the ES modules in `server/` and `shared/` without a compilation step.
+
+Goal 4 adds `shared/portfolio-contracts.js`, `server/portfolio/`, and `src/components/PortfolioWorkbench.vue`. Registry models are immutable declarative data. Numerical execution occurs only in bounded child processes; the parent validates input and output contracts and owns timeout, output-limit, cancellation, and lifecycle transitions. The archive boundary validates XML and ZIP safety before a model can reach execution.
 
 ## Service Contract
 

@@ -10,6 +10,10 @@ import { createEvidenceClient, EvidenceCompatibilityError } from './evidence/cli
 import { createKnowledgeClient, KnowledgeCompatibilityError } from './knowledge/client.js'
 import { MODEL } from './model.js'
 import { simulate, SimulationNumericalError } from './simulation.js'
+import { ArchiveValidationRequestSchema, ExperimentSchema, Sha256Schema } from '../shared/portfolio-contracts.js'
+import { exportCombineArchive, validateCombineArchive } from './portfolio/archive.js'
+import { createRunService, PortfolioRequestError, validateExperimentForModel } from './portfolio/execution.js'
+import { getModel, listModels } from './portfolio/registry.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -41,6 +45,8 @@ const AtlasNetworkQuerySchema = z.object({
 }).strict()
 const EvidenceDocumentParamSchema = z.object({ identifier: z.string().min(1).max(200) }).strict()
 const EvidenceCandidateParamSchema = z.object({ candidateId: z.string().regex(/^CANDIDATE:[a-f0-9]{32}$/) }).strict()
+const PortfolioRunRequestSchema = z.object({ experiment: ExperimentSchema }).strict()
+const PortfolioRunParamSchema = z.object({ runId: Sha256Schema }).strict()
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -57,6 +63,7 @@ export async function buildApp(options = {}) {
   const app = Fastify({ logger: env.NODE_ENV !== 'test' })
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
+  const portfolioRuns = options.portfolioRunService ?? createRunService()
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
@@ -71,6 +78,9 @@ export async function buildApp(options = {}) {
     }
     if (error instanceof SimulationNumericalError) {
       return reply.status(422).send({ statusCode: 422, code: 'INVALID_NUMERICAL_STATE', error: 'Unprocessable Entity', message: error.message })
+    }
+    if (error instanceof PortfolioRequestError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message, findings: error.findings })
     }
     if (error instanceof Error && 'validation' in error && error.validation) {
       return reply.status(400).send({ statusCode: 400, code: 'INVALID_REQUEST', error: 'Bad Request', message: error.message })
@@ -146,6 +156,43 @@ export async function buildApp(options = {}) {
     const parsed = AtlasNetworkQuerySchema.safeParse(request.query)
     if (!parsed.success) return invalidAtlasQuery(reply, parsed)
     return knowledge.atlasNetwork(request.params.releaseId, parsed.data.taxon_id, parsed.data.tissue_id)
+  })
+  app.get('/api/v2/models', async () => listModels())
+  app.get('/api/v2/models/:modelId', async (request, reply) => {
+    const model = getModel(request.params.modelId)
+    return model ?? reply.status(404).send({ statusCode: 404, code: 'MODEL_NOT_FOUND', error: 'Not Found', message: 'Portfolio model is not registered.' })
+  })
+  app.post('/api/v2/model-archives/validate', async (request, reply) => {
+    const parsed = ArchiveValidationRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_ARCHIVE_REQUEST', error: 'Unprocessable Entity', message: 'Archive request must contain bounded base64 content.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return validateCombineArchive(Buffer.from(parsed.data.archiveBase64, 'base64'))
+  })
+  app.post('/api/v2/model-archives/export', async (request, reply) => {
+    const parsed = PortfolioRunRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_EXPERIMENT', error: 'Unprocessable Entity', message: 'Experiment contract is invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+    const model = getModel(parsed.data.experiment.modelId)
+    if (!model) return reply.status(404).send({ statusCode: 404, code: 'MODEL_NOT_FOUND', error: 'Not Found', message: 'Portfolio model is not registered.' })
+    const archive = await exportCombineArchive(model, validateExperimentForModel(model, parsed.data.experiment))
+    return { profile: 'portfolio-combine-1.0', archiveBase64: archive.toString('base64') }
+  })
+  app.post('/api/v2/runs', async (request, reply) => {
+    const parsed = PortfolioRunRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_EXPERIMENT', error: 'Unprocessable Entity', message: 'Experiment contract is invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+    const model = getModel(parsed.data.experiment.modelId)
+    if (!model) return reply.status(404).send({ statusCode: 404, code: 'MODEL_NOT_FOUND', error: 'Not Found', message: 'Portfolio model is not registered.' })
+    return reply.status(201).send(await portfolioRuns.create(model, parsed.data.experiment))
+  })
+  app.get('/api/v2/runs/:runId', async (request, reply) => {
+    const parsed = PortfolioRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_RUN_ID', error: 'Bad Request', message: 'Run identifier is invalid.' })
+    const record = portfolioRuns.get(parsed.data.runId)
+    return record ?? reply.status(404).send({ statusCode: 404, code: 'RUN_NOT_FOUND', error: 'Not Found', message: 'Portfolio run is not available.' })
+  })
+  app.delete('/api/v2/runs/:runId', async (request, reply) => {
+    const parsed = PortfolioRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_RUN_ID', error: 'Bad Request', message: 'Run identifier is invalid.' })
+    if (!portfolioRuns.cancel(parsed.data.runId)) return reply.status(409).send({ statusCode: 409, code: 'RUN_NOT_CANCELLABLE', error: 'Conflict', message: 'Run is not active or is already terminal.' })
+    return reply.status(202).send({ runId: parsed.data.runId, lifecycle: 'running', cancellationRequested: true })
   })
   app.get('/api/v3/evidence/health', async () => evidence.health())
   app.post('/api/v3/evidence/search', async (request, reply) => {

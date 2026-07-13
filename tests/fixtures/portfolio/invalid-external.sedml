@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="remote" language="urn:sedml:language:sbml" source="https://example.invalid/model.xml"/>
+  </listOfModels>
+</sedML>

@@ -8,7 +8,9 @@ const api = vi.hoisted(() => ({
   loadWorkspace: vi.fn(),
   loadNetwork: vi.fn(),
   loadProvenance: vi.fn(),
-  runSimulation: vi.fn()
+  runSimulation: vi.fn(),
+  loadPortfolioModels: vi.fn(),
+  runPortfolioExperiment: vi.fn()
 }))
 
 vi.mock('../../src/api.js', () => api)
@@ -26,6 +28,7 @@ beforeEach(() => {
   api.loadWorkspace.mockResolvedValue({ release: BUNDLED_RELEASE, model: MODEL, network: bundledNetwork(9606) })
   api.loadProvenance.mockResolvedValue(BUNDLED_PROVENANCE)
   api.runSimulation.mockImplementation(async (request) => simulate(request, BUNDLED_RELEASE, bundledNetwork(request.taxonId)))
+  api.loadPortfolioModels.mockResolvedValue([])
 })
 
 describe('workbench request hardening', () => {

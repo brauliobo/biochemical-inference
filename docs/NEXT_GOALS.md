@@ -78,6 +78,8 @@ Convert the existing literature cache into a structured, searchable evidence sys
 
 ## Goal 4: Standards-Based Simulation Portfolio
 
+Status: delivered in the active inference application. See `docs/SIMULATION_PORTFOLIO.md` for the exact supported standards profile and explicit Goal 9 deferrals.
+
 Replace the single demonstration engine with composable scientific model types.
 
 ### Scope

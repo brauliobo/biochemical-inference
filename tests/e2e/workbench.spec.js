@@ -98,7 +98,7 @@ test('validates controls before sending a simulation request', async ({ page }) 
     if (request.method() === 'POST' && request.url().includes('/simulations')) simulationRequests += 1
   })
   await page.goto('/')
-  await page.getByLabel('Duration').fill('100')
+  await page.getByLabel('Duration', { exact: true }).fill('100')
   await page.getByRole('button', { name: 'Run deterministic model' }).click()
 
   await expect(page.getByText('Enter a duration from 1 to 72 hours.')).toBeVisible()
