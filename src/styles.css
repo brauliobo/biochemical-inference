@@ -71,7 +71,7 @@ dd { margin: .35rem 0 0; font-weight: 600; }
 .controls-panel { grid-column: 1; }
 .network-panel { grid-column: 2; }
 .details-panel { grid-column: 3; }
-.atlas-panel, .evidence-panel, .portfolio-panel, .parameter-study-panel, .apap-panel, .results-panel, .limitations { grid-column: 1 / -1; }
+.atlas-panel, .evidence-panel, .portfolio-panel, .parameter-study-panel, .apap-panel, .review-panel, .results-panel, .limitations { grid-column: 1 / -1; }
 .controls-panel form { display: grid; }
 label { margin: 1.05rem 0 .45rem; font-weight: 600; font-size: .86rem; }
 select, input, textarea { width: 100%; min-height: 46px; border: 1px solid #3b5752; border-radius: 2px; background: #0d1816; color: var(--ink); padding: .72rem; }
@@ -327,6 +327,38 @@ small { margin-top: .3rem; color: var(--muted); }
 .apap-audit { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); overflow-x: auto; }
 .apap-audit summary { cursor: pointer; color: var(--mint); font-weight: 700; }
 
+.review-intro { max-width: 920px; color: var(--muted); line-height: 1.55; }
+.review-linkage { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
+.review-linkage article { min-width: 0; display: grid; gap: .5rem; padding: 1rem; background: #0d1816; }
+.review-linkage p { margin: 0; color: var(--muted); line-height: 1.5; }
+.review-linkage .run-button { width: 100%; }
+.review-layout { display: grid; grid-template-columns: minmax(230px, .48fr) minmax(0, 1.52fr); gap: 1px; margin-top: 1px; background: var(--line); }
+.review-queue, .review-detail { min-width: 0; padding: 1rem; border: 0; background: #0d1816; }
+.review-queue h3 { margin-top: 0; }
+.review-queue .candidate-row.selected { border-color: var(--lime); background: #1b2b27; }
+.review-claim { padding: 1rem; border-left: 3px solid var(--amber); background: #211b14; }
+.review-claim h3 { margin: .7rem 0; }
+.review-claim p { line-height: 1.55; }
+.review-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 1px; background: var(--line); }
+.review-columns section { min-width: 0; padding: 1rem; border: 0; background: #101b19; }
+.review-columns h3 { margin-top: 0; }
+.review-columns p, .review-columns li { color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.lineage-list { display: grid; gap: .55rem; padding: 0; list-style: none; }
+.lineage-list strong, .lineage-list code, .review-columns li strong, .review-columns li span { display: block; }
+.review-form { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); }
+.review-form h3 { margin-top: 0; }
+.reviewer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.reviewer-grid label { margin: 0; }
+.reviewer-grid input { margin-top: .4rem; }
+.review-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .8rem; align-items: center; }
+.review-actions .run-button { margin: 0; }
+.review-actions select { width: auto; min-width: 240px; flex: 1; }
+.event-history { display: grid; gap: .6rem; padding-left: 1.4rem; }
+.event-history li { padding: .8rem; border: 1px solid var(--line); background: #101b19; }
+.event-history strong, .event-history span, .event-history code { display: block; overflow-wrap: anywhere; }
+.event-history span { margin: .35rem 0; color: var(--muted); font-size: .76rem; }
+.event-history summary { cursor: pointer; color: var(--mint); }
+
 .detail-grid { grid-template-columns: repeat(2, 1fr); }
 .connected-list, .protein-list, .evidence-list { padding-left: 1.1rem; color: #bbccc7; font-size: .82rem; line-height: 1.55; }
 .protein-list span, .evidence-list span { display: block; color: var(--muted); font-size: .72rem; }
@@ -392,7 +424,7 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .provenance-grid, .summary-grid, .detail-grid, .diagnostics, .spatial-provenance, .spatial-layout { grid-template-columns: 1fr; }
   .provenance-digests, .provenance-closure, .source-objects { grid-template-columns: 1fr; }
   .entity-list { grid-template-columns: repeat(2, 1fr); }
-  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid { grid-template-columns: 1fr; }
+  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid, .review-linkage, .review-layout, .review-columns, .reviewer-grid { grid-template-columns: 1fr; }
   .atlas-controls .run-button { grid-column: auto; }
   .atlas-summary { display: grid; }
   .mapping-heading { display: grid; }

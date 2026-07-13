@@ -168,6 +168,8 @@ Advance visualization from a pathway scene to linked scientific spaces.
 
 ## Goal 8: Reviewed Derived Knowledge Loop
 
+Status: delivered for completed synthetic APAP runs in the active inference application. See `docs/DERIVED_KNOWLEDGE.md` for content identity, bundle lineage, review transitions, reproduction gates, security, and limitations. Persistent inference-side run recovery, measured comparisons, automatic source-update discovery, and multi-reviewer authorization remain future work.
+
 Allow simulations and analyses to grow the database without corrupting source truth.
 
 ### Scope

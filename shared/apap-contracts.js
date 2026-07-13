@@ -305,6 +305,7 @@ export const ApapRunRecordSchema = z.object({
   runId: CanonicalDigestSchema,
   lifecycle: z.literal('terminal'),
   outcome: z.literal('successful'),
+  specification: ApapRunRequestSchema,
   result: ApapRunResultSchema
 }).strict()
 

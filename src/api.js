@@ -50,6 +50,25 @@ import {
   SpatialAssetIdSchema
 } from '../shared/spatial-contracts.js'
 import { selectLod } from './spatial.js'
+import {
+  AssertionDetailSchema,
+  AssertionEventsSchema,
+  AssertionListSchema,
+  BundleDetailSchema,
+  BundleSubmitResponseSchema,
+  DERIVED_CSRF_HEADER,
+  DERIVED_CSRF_VALUE,
+  DerivedHealthSchema,
+  EventAppendResponseSchema,
+  ImpactRequestSchema,
+  ImpactResponseSchema,
+  LayeredQueryResponseSchema,
+  LayeredQuerySchema,
+  MeasurementComparisonRequestSchema,
+  MeasurementComparisonResponseSchema,
+  ReproduceRequestSchema,
+  ReviewEventRequestSchema
+} from '../shared/derived-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -62,6 +81,7 @@ async function requestJson(path, init) {
 }
 
 const withSignal = (signal) => signal ? { signal } : {}
+const derivedMutationHeaders = { 'content-type': 'application/json', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
 
 function queryString(values) {
   const query = new URLSearchParams()
@@ -168,6 +188,91 @@ export async function loadApapWorkspace(signal) {
 export async function runApapBenchmark(input, signal) {
   const request = ApapRunRequestSchema.parse(input)
   return ApapRunRecordSchema.parse(await requestJson('/api/v4/apap/runs', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadDerivedHealth(signal) {
+  return DerivedHealthSchema.parse(await requestJson('/api/v6/derived/health', withSignal(signal)))
+}
+
+export async function loadDerivedAssertions(filters = {}, signal) {
+  const query = queryString(filters)
+  return AssertionListSchema.parse(await requestJson(`/api/v6/derived/assertions${query ? `?${query}` : ''}`, withSignal(signal)))
+}
+
+export async function loadReviewedDerivedAssertions(filters = {}, signal) {
+  const query = queryString(filters)
+  return AssertionListSchema.parse(await requestJson(`/api/v6/derived/reviewed-assertions${query ? `?${query}` : ''}`, withSignal(signal)))
+}
+
+export async function loadDerivedAssertion(assertionDigest, signal) {
+  return AssertionDetailSchema.parse(await requestJson(`/api/v6/derived/assertions/${encodeURIComponent(assertionDigest)}`, withSignal(signal)))
+}
+
+export async function loadDerivedEvents(assertionDigest, signal) {
+  return AssertionEventsSchema.parse(await requestJson(`/api/v6/derived/assertions/${encodeURIComponent(assertionDigest)}/events`, withSignal(signal)))
+}
+
+export async function loadDerivedBundle(bundleDigest, signal) {
+  return BundleDetailSchema.parse(await requestJson(`/api/v6/derived/bundles/${encodeURIComponent(bundleDigest)}`, withSignal(signal)))
+}
+
+export async function submitApapDerivedBundle(runId, signal) {
+  return BundleSubmitResponseSchema.parse(await requestJson(`/api/v6/derived/apap-runs/${encodeURIComponent(runId)}/bundles`, {
+    method: 'POST',
+    headers: derivedMutationHeaders,
+    body: '{}',
+    ...withSignal(signal)
+  }))
+}
+
+export async function appendDerivedReviewEvent(assertionDigest, input, signal) {
+  const request = ReviewEventRequestSchema.parse(input)
+  return EventAppendResponseSchema.parse(await requestJson(`/api/v6/derived/assertions/${encodeURIComponent(assertionDigest)}/events`, {
+    method: 'POST',
+    headers: derivedMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function reproduceDerivedAssertion(assertionDigest, input, signal) {
+  const request = ReproduceRequestSchema.parse(input)
+  return EventAppendResponseSchema.parse(await requestJson(`/api/v6/derived/assertions/${encodeURIComponent(assertionDigest)}/reproduce`, {
+    method: 'POST',
+    headers: derivedMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function queryDerivedLayers(input, signal) {
+  const request = LayeredQuerySchema.parse(input)
+  return LayeredQueryResponseSchema.parse(await requestJson('/api/v6/derived/query', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function queryDerivedImpact(input, signal) {
+  const request = ImpactRequestSchema.parse(input)
+  return ImpactResponseSchema.parse(await requestJson('/api/v6/derived/impact', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function compareDerivedMeasurement(input, signal) {
+  const request = MeasurementComparisonRequestSchema.parse(input)
+  return MeasurementComparisonResponseSchema.parse(await requestJson('/api/v6/derived/measurements/compare', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(request),

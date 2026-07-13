@@ -10,6 +10,7 @@ import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import PortfolioWorkbench from './components/PortfolioWorkbench.vue'
 import ParameterStudyWorkbench from './components/ParameterStudyWorkbench.vue'
 import APAPBenchmarkWorkbench from './components/APAPBenchmarkWorkbench.vue'
+import ReviewWorkbench from './components/ReviewWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -30,6 +31,7 @@ const selectedId = ref(METABOLITE_IDS.homocysteine)
 const state = ref('loading')
 const message = ref('')
 const resultIsPrevious = ref(false)
+const apapRun = ref()
 const errors = ref({})
 let knowledgeGeneration = 0
 let knowledgeController
@@ -327,7 +329,9 @@ main#main
 
     ParameterStudyWorkbench
 
-    APAPBenchmarkWorkbench
+    APAPBenchmarkWorkbench(@completed="apapRun = $event")
+
+    ReviewWorkbench(:apap-run="apapRun")
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading

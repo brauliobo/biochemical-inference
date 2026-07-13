@@ -9,6 +9,7 @@ This software is an educational systems model. Its initial conditions and kineti
 - Node.js 22
 - npm 10 or newer
 - Python 3.12 and `uv` for the sibling `../biochemical-db` service
+- OpenSSL for runtime-only reviewed-derived Ed25519 keys
 
 ## Start
 
@@ -110,11 +111,27 @@ Goal 7 independently pins `apap-liver-spatial-benchmark-v1.0.0` with digest `fd8
 
 The same-origin `/api/v5/spatial` proxy validates strict metadata closures, content ownership, byte caps, immutable single ranges, release headers, and full-content SHA-256 digests. The APAP workbench links time, field, and portal-to-central bin across the complete numeric table, semantic inspector, and lazy Three.js instanced-cell view. Synthetic geometry and unavailable HRA status remain persistent; no mouse or pointer operation creates HRA placement. See `docs/SPATIAL_WORKBENCH.md`.
 
+### Reviewed derived knowledge
+
+Goal 8 uses the independent reviewed-derived service on `http://127.0.0.1:8002`. Configure `BIOCHEMICAL_DERIVED_URL`, `BIOCHEMICAL_DERIVED_WRITE_TOKEN`, and optional `BIOCHEMICAL_DERIVED_TIMEOUT_MS`. Generate the service key and token only at runtime; do not place either in this repository:
+
+```sh
+DERIVED_RUNTIME="$(mktemp -d)"
+openssl genpkey -algorithm Ed25519 -out "$DERIVED_RUNTIME/events.pem"
+export BIOCHEMICAL_DERIVED_DATABASE="$DERIVED_RUNTIME/derived.sqlite3"
+export BIOCHEMICAL_DERIVED_OBJECT_ROOT="$DERIVED_RUNTIME/objects"
+export BIOCHEMICAL_DERIVED_SIGNING_KEY="$DERIVED_RUNTIME/events.pem"
+export BIOCHEMICAL_DERIVED_WRITE_TOKEN="$(openssl rand -hex 32)"
+uv run biochemical-db-derived
+```
+
+Pass the same runtime `BIOCHEMICAL_DERIVED_WRITE_TOKEN` only to the inference server. The browser uses same-origin `/api/v6/derived` routes and never receives the bearer token, signing key material, or upstream service address. Completed APAP runs become three-object RFC 8785 content-addressed bundles with one explicitly synthetic prediction, complete lineage/context/applicability/qualitative uncertainty/limitations, and signed append-only review. Exact reproduction must match the complete canonical result artifact before verification can be appended. `BIOCHEMICAL_DERIVED_USE_FIXTURE=true` enables the explicit in-memory test/demo ledger. See `docs/DERIVED_KNOWLEDGE.md`.
+
 ### Identifier integrity
 
 The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
 
-Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), and explicit comma-separated `CORS_ORIGINS`.
+Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), explicit comma-separated `CORS_ORIGINS`, and `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` when a trusted development reverse proxy gives the browser a different origin. The development script pins that value to `http://127.0.0.1:5173`; production same-origin serving needs no override.
 
 ## Verification
 
@@ -169,6 +186,19 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v5/spatial/releases/:releaseId`
 - `GET /api/v5/spatial/releases/:releaseId/{structures|spaces|transforms|assets|descriptors|mappings|inventory}`
 - `GET /api/v5/spatial/releases/:releaseId/assets/:assetId/content/:contentId`
+- `GET /api/v6/derived/health`
+- `POST /api/v6/derived/apap-runs/:runId/bundles`
+- `GET /api/v6/derived/bundles/:bundleDigest`
+- `GET /api/v6/derived/assertions`
+- `GET /api/v6/derived/assertions/:assertionDigest`
+- `GET /api/v6/derived/assertions/:assertionDigest/events`
+- `POST /api/v6/derived/assertions/:assertionDigest/events`
+- `POST /api/v6/derived/assertions/:assertionDigest/reproduce`
+- `GET /api/v6/derived/reviewed-assertions`
+- `GET /api/v6/derived/source-records`
+- `POST /api/v6/derived/query`
+- `POST /api/v6/derived/impact`
+- `POST /api/v6/derived/measurements/compare`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -183,3 +213,5 @@ See `docs/PARAMETER_STUDIES.md` for parameter selection, study algorithms, conve
 See `docs/APAP_BENCHMARK.md` for APAP equations, context parameter bindings, deterministic results, diagnostics, and unsupported scientific boundaries.
 
 See `docs/SPATIAL_WORKBENCH.md` for spatial release integrity, range proxy behavior, linked selections, visual encoding, fallback behavior, and HRA limitations.
+
+See `docs/DERIVED_KNOWLEDGE.md` for canonical bundle identity, APAP assertion lineage, review transitions, reproduction, layer separation, security, and limitations.

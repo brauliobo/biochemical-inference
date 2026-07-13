@@ -42,6 +42,22 @@ import {
 } from '../shared/spatial-contracts.js'
 import { createSpatialClient, SpatialCompatibilityError } from './spatial/client.js'
 import { parseSpatialRange, SpatialRangeError } from './spatial/range.js'
+import {
+  DERIVED_CSRF_HEADER,
+  DERIVED_CSRF_VALUE,
+  DerivedClassificationSchema,
+  DerivedDigestSchema,
+  ImpactRequestSchema,
+  LayeredQuerySchema,
+  MeasurementComparisonRequestSchema,
+  QualifiedIdSchema,
+  ReproduceRequestSchema,
+  ReviewEventRequestSchema,
+  ReviewStatusSchema,
+  SourceSelectorSchema
+} from '../shared/derived-contracts.js'
+import { createDerivedClient, DerivedCompatibilityError } from './derived/client.js'
+import { createDerivedRunService, DerivedRequestError } from './derived/service.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -87,6 +103,14 @@ const SpatialAssetQuerySchema = z.object({
   asset_type: z.enum(['geometry', 'instances', 'scalar-field']).optional()
 }).strict()
 const SpatialDescriptorQuerySchema = z.object({ asset_id: SpatialAssetIdSchema.optional() }).strict()
+const DerivedRunParamSchema = z.object({ runId: Sha256Schema }).strict()
+const DerivedAssertionParamSchema = z.object({ assertionDigest: DerivedDigestSchema }).strict()
+const DerivedBundleParamSchema = z.object({ bundleDigest: DerivedDigestSchema }).strict()
+const DerivedListQuerySchema = z.object({
+  subject_id: QualifiedIdSchema.optional(),
+  classification: DerivedClassificationSchema.optional(),
+  review_status: ReviewStatusSchema.optional()
+}).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function invalidAtlasQuery(reply, parsed) {
@@ -107,9 +131,12 @@ export async function buildApp(options = {}) {
   const parameters = options.parameterClient ?? createParameterClient(env)
   const apap = options.apapClient ?? createApapClient(env)
   const spatial = options.spatialClient ?? createSpatialClient(env)
+  const derived = options.derivedClient ?? createDerivedClient(env)
   const portfolioRuns = options.portfolioRunService ?? createRunService()
   const studies = options.studyService ?? createStudyService(parameters)
   const apapRuns = options.apapRunService ?? createApapRunService(apap)
+  const derivedRuns = options.derivedRunService ?? createDerivedRunService(derived, apapRuns)
+  const configuredPublicOrigin = env.BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN?.replace(/\/$/, '')
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
@@ -132,6 +159,9 @@ export async function buildApp(options = {}) {
       return reply.header('content-range', `bytes */${error.size}`).status(416).send({ statusCode: 416, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SpatialCompatibilityError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof DerivedCompatibilityError || error instanceof DerivedRequestError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -451,6 +481,87 @@ export async function buildApp(options = {}) {
     if (!content) return reply.status(404).send({ statusCode: 404, code: 'SPATIAL_CONTENT_NOT_FOUND', error: 'Not Found', message: 'Spatial content does not belong to this asset.' })
     if (range) headers['content-range'] = `bytes ${range.start}-${range.end}/${item.bytes}`
     return reply.headers(headers).type(item.media_type).status(content.statusCode).send(content.body)
+  })
+  const invalidDerived = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_DERIVED_REQUEST', error: 'Unprocessable Entity', message: 'Derived knowledge request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireDerivedMutation = async (request) => {
+    const origin = request.headers.origin
+    let sameOrigin = false
+    try {
+      const parsed = new URL(origin)
+      const requestOrigin = `${request.protocol}://${request.headers.host}`
+      sameOrigin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.origin === origin && (origin === requestOrigin || origin === configuredPublicOrigin)
+    } catch {
+      sameOrigin = false
+    }
+    if (!sameOrigin || request.headers[DERIVED_CSRF_HEADER] !== DERIVED_CSRF_VALUE) {
+      throw new DerivedRequestError('Derived mutation requires an exact same-origin request and CSRF header.', { statusCode: 403, code: 'DERIVED_CSRF_REJECTED' })
+    }
+  }
+
+  app.get('/api/v6/derived/health', async () => derived.health())
+  app.post('/api/v6/derived/apap-runs/:runId/bundles', { preHandler: requireDerivedMutation }, async (request, reply) => {
+    const parsed = DerivedRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return reply.status(201).send(await derivedRuns.submitApapRun(parsed.data.runId))
+  })
+  app.get('/api/v6/derived/bundles/:bundleDigest', async (request, reply) => {
+    const parsed = DerivedBundleParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.bundle(parsed.data.bundleDigest)
+  })
+  app.get('/api/v6/derived/assertions', async (request, reply) => {
+    const parsed = DerivedListQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.assertions(parsed.data)
+  })
+  app.get('/api/v6/derived/reviewed-assertions', async (request, reply) => {
+    const parsed = DerivedListQuerySchema.omit({ review_status: true }).safeParse(request.query)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.reviewedAssertions(parsed.data)
+  })
+  app.get('/api/v6/derived/assertions/:assertionDigest', async (request, reply) => {
+    const parsed = DerivedAssertionParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.assertion(parsed.data.assertionDigest)
+  })
+  app.get('/api/v6/derived/assertions/:assertionDigest/events', async (request, reply) => {
+    const parsed = DerivedAssertionParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.events(parsed.data.assertionDigest)
+  })
+  app.post('/api/v6/derived/assertions/:assertionDigest/events', { preHandler: requireDerivedMutation }, async (request, reply) => {
+    const params = DerivedAssertionParamSchema.safeParse(request.params)
+    const body = ReviewEventRequestSchema.safeParse(request.body)
+    if (!params.success) return invalidDerived(reply, params)
+    if (!body.success) return invalidDerived(reply, body)
+    return reply.status(201).send(await derived.appendEvent(params.data.assertionDigest, body.data))
+  })
+  app.post('/api/v6/derived/assertions/:assertionDigest/reproduce', { preHandler: requireDerivedMutation }, async (request, reply) => {
+    const params = DerivedAssertionParamSchema.safeParse(request.params)
+    const body = ReproduceRequestSchema.safeParse(request.body)
+    if (!params.success) return invalidDerived(reply, params)
+    if (!body.success) return invalidDerived(reply, body)
+    return reply.status(201).send(await derivedRuns.reproduce(params.data.assertionDigest, body.data))
+  })
+  app.get('/api/v6/derived/source-records', async (request, reply) => {
+    const parsed = SourceSelectorSchema.safeParse({ ...request.query, record_id: request.query.record_id ?? null })
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.sourceRecords(parsed.data)
+  })
+  app.post('/api/v6/derived/query', async (request, reply) => {
+    const parsed = LayeredQuerySchema.safeParse(request.body)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.query(parsed.data)
+  })
+  app.post('/api/v6/derived/impact', async (request, reply) => {
+    const parsed = ImpactRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.impact(parsed.data)
+  })
+  app.post('/api/v6/derived/measurements/compare', async (request, reply) => {
+    const parsed = MeasurementComparisonRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidDerived(reply, parsed)
+    return derived.compare(parsed.data)
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

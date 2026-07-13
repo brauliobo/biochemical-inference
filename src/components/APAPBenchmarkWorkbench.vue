@@ -4,6 +4,8 @@ import { APAP_RELEASE_ID, APAP_WARNING } from '../../shared/apap-contracts.js'
 import { loadApapWorkspace, runApapBenchmark } from '../api.js'
 import SpatialTissueWorkbench from './SpatialTissueWorkbench.vue'
 
+const emit = defineEmits(['completed'])
+
 const workspace = ref()
 const records = ref({})
 const result = ref()
@@ -75,6 +77,7 @@ async function run() {
     }, controller.signal)
     result.value = record.result
     records.value = { ...records.value, [record.result.context.id]: record }
+    emit('completed', record)
     timeIndex.value = record.result.timeHours.length - 1
     state.value = 'ready'
   } catch (error) {

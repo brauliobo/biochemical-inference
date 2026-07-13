@@ -6,6 +6,7 @@ import {
   APAP_MODEL_VERSION,
   APAP_RELEASE_ID,
   APAP_WARNING,
+  ApapRunRequestSchema,
   ApapRunRecordSchema
 } from '../../shared/apap-contracts.js'
 import {
@@ -89,16 +90,17 @@ export function createApapRunService(client) {
 
   return {
     async create(request) {
+      const specification = ApapRunRequestSchema.parse(request)
       const closure = await loadApapClosure(client)
-      const context = requireUnique(closure.contexts, request.contextId, 'context')
-      const protocol = requireUnique(closure.protocols, request.protocolId, 'protocol')
+      const context = requireUnique(closure.contexts, specification.contextId, 'context')
+      const protocol = requireUnique(closure.protocols, specification.protocolId, 'protocol')
       if (protocol.context_id !== context.id) throw new ApapRequestError(`${protocol.id} is bound to ${protocol.context_id}, not ${context.id}`)
-      const binding = resolveContextBinding(context.id, request.mechanismScales)
+      const binding = resolveContextBinding(context.id, specification.mechanismScales)
       for (const parameter of binding.effectiveParameters.filter((item) => item.origin === 'upstream-illustrative-assumption')) requireUnique(closure.parameters, parameter.id, 'upstream parameter')
 
       const durationHours = protocol.observation_window.upper
       const antidote = protocol.interventions.find((item) => item.role === 'antidote')
-      const controls = { durationHours, stepHours: request.stepHours, outputEveryHours: request.outputEveryHours, nacStartHours: antidote?.start_time.lower ?? null }
+      const controls = { durationHours, stepHours: specification.stepHours, outputEveryHours: specification.outputEveryHours, nacStartHours: antidote?.start_time.lower ?? null }
       const integrated = integrateApap(binding.values, controls)
       const limitingCases = runLimitingCaseDiagnostics(binding.values, controls)
       if (!limitingCases.every((item) => item.passed)) throw new ApapRequestError('APAP equation set failed a required limiting-case diagnostic', { statusCode: 500, code: 'APAP_LIMITING_CASE_FAILED' })
@@ -128,7 +130,7 @@ export function createApapRunService(client) {
         context,
         protocol,
         equationSet: { id: APAP_EQUATION_SET_ID, version: APAP_MODEL_VERSION, digest: APAP_EQUATION_SET_DIGEST, taxonBranches: false, lobuleBins: 12 },
-        engine: { version: APAP_ENGINE_VERSION, method: 'fixed-step RK4', stepHours: request.stepHours, outputEveryHours: request.outputEveryHours, deterministic: true },
+        engine: { version: APAP_ENGINE_VERSION, method: 'fixed-step RK4', stepHours: specification.stepHours, outputEveryHours: specification.outputEveryHours, deterministic: true },
         effectiveParameters: binding.effectiveParameters,
         assumptions: resultAssumptions(binding.effectiveParameters, closure.detail.benchmark.assumptions.filter((item) => item.context_id === context.id)),
         timeHours: integrated.times,
@@ -154,7 +156,7 @@ export function createApapRunService(client) {
         },
         limitations: internalLimitations(closure.detail.benchmark.limitations)
       }
-      const record = ApapRunRecordSchema.parse({ runId, lifecycle: 'terminal', outcome: 'successful', result })
+      const record = ApapRunRecordSchema.parse({ runId, lifecycle: 'terminal', outcome: 'successful', specification, result })
       records.set(runId, record)
       return record
     },

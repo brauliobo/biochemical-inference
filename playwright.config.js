@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
+import { randomBytes } from 'node:crypto'
 
 const useFixture = process.env.E2E_USE_FIXTURE === 'true'
 const evidenceRuntime = `/tmp/biochemical-inference-evidence-e2e-${process.pid}`
+const derivedRuntime = `/tmp/biochemical-inference-derived-e2e-${process.pid}`
+const derivedToken = randomBytes(32).toString('hex')
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -26,9 +29,17 @@ export default defineConfig({
       url: 'http://127.0.0.1:8001/healthz',
       reuseExistingServer: false,
       timeout: 120_000
+    }, {
+      command: `sh -c 'umask 077 && mkdir -p "${derivedRuntime}" && openssl genpkey -algorithm Ed25519 -out "${derivedRuntime}/events.pem" && BIOCHEMICAL_DERIVED_DATABASE="${derivedRuntime}/derived.sqlite3" BIOCHEMICAL_DERIVED_OBJECT_ROOT="${derivedRuntime}/objects" BIOCHEMICAL_DERIVED_SIGNING_KEY="${derivedRuntime}/events.pem" BIOCHEMICAL_DERIVED_WRITE_TOKEN="${derivedToken}" uv run biochemical-db-derived'`,
+      cwd: '../biochemical-db/service',
+      url: 'http://127.0.0.1:8002/healthz',
+      reuseExistingServer: false,
+      timeout: 120_000
     }],
     {
-      command: useFixture ? 'BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true npm run dev' : 'npm run dev',
+      command: useFixture
+        ? 'BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm run dev'
+        : `BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm run dev`,
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: false,
       timeout: 120_000
