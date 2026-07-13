@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { APAP_RELEASE_ID, APAP_WARNING } from '../../shared/apap-contracts.js'
 import { loadApapWorkspace, runApapBenchmark } from '../api.js'
+import SpatialTissueWorkbench from './SpatialTissueWorkbench.vue'
 
 const workspace = ref()
 const records = ref({})
@@ -11,6 +12,7 @@ const message = ref('')
 const selectedProtocolId = ref('PROTOCOL:APAP-HUMAN-PK')
 const heatmapVariable = ref('adduct')
 const timeIndex = ref(0)
+const selectedBin = ref(0)
 const cypActivity = ref(1)
 const adductBinding = ref(1)
 const zonation = ref(1)
@@ -218,8 +220,9 @@ section.apap-panel(aria-labelledby="apap-title")
         option(value="injured") Injured fraction
 
     template(v-if="snapshot")
+      SpatialTissueWorkbench(:taxon-id="selectedContext.taxon_id" :snapshot="snapshot" :time-index="timeIndex" :field="heatmapVariable" :selected-bin="selectedBin" @select-bin="selectedBin = $event")
       .lobule-heatmap(role="img" :aria-label="`${heatmapVariable} across 12 portal-to-central lobule bins at ${snapshot.timeHours} hours`")
-        div(v-for="(value, index) in snapshot[heatmapVariable]" :key="index" :style="heatStyle(value, snapshot[heatmapVariable])" :aria-label="`Bin ${index + 1}: ${value}`")
+        button(v-for="(value, index) in snapshot[heatmapVariable]" :key="index" type="button" :class="{ selected: selectedBin === index }" :style="heatStyle(value, snapshot[heatmapVariable])" :aria-label="`Bin ${index + 1}: ${value}`" :aria-pressed="selectedBin === index" @click="selectedBin = index")
           span {{ index + 1 }}
           strong {{ value.toFixed(4) }}
       .lobule-axis(aria-hidden="true")
@@ -241,7 +244,7 @@ section.apap-panel(aria-labelledby="apap-title")
               th(scope="col") Injured
               th(scope="col") Recovering
           tbody
-            tr(v-for="(_, index) in snapshot.apap" :key="index")
+            tr(v-for="(_, index) in snapshot.apap" :key="index" :class="{ emphasized: selectedBin === index }")
               th(scope="row") {{ index + 1 }}
               td {{ snapshot.apap[index].toFixed(4) }}
               td {{ snapshot.napqi[index].toFixed(4) }}

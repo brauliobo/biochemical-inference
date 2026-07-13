@@ -145,6 +145,8 @@ Build the first defensible multiscale vertical simulation around acetaminophen l
 
 ## Goal 7: Spatial Tissue And Anatomical 3D Workbench
 
+Status: delivered for the pinned synthetic APAP spatial algorithm benchmark in the active inference application. See `docs/SPATIAL_WORKBENCH.md` for integrity controls, linked semantics, rendering behavior, and the explicit unavailable HRA boundary. Measured imaging, realistic tissue geometry, HRA reference-organ assets, and OME-Zarr remain future release work.
+
 Advance visualization from a pathway scene to linked scientific spaces.
 
 ### Scope

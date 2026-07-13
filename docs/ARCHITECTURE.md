@@ -80,6 +80,22 @@ explicit human/mouse context bindings -> one taxon-agnostic equation set
         |
         v
 canonical terminal run + APAPBenchmarkWorkbench
+
+Spatial benchmark API :8000
+        | apap-liver-spatial-benchmark-v1.0.0 + independent digest pin
+        v
+strict spatial contracts + bounded same-origin /api/v5/spatial proxy
+        |
+        +-- asset/content ID ownership + immutable single ranges
+        +-- full-content SHA-256 + byte-cap verification
+        +-- same-taxon transforms + explicit unavailable HRA mapping
+        v
+shared APAP time / field / lobule bin
+        |
+        +-- complete semantic and numeric workflow
+        +-- lazy Three.js instancing with context-loss fallback
+        v
+SpatialTissueWorkbench
 ```
 
 ## Active Application
@@ -101,6 +117,8 @@ Goal 4 adds `shared/portfolio-contracts.js`, `server/portfolio/`, and `src/compo
 Goal 5 adds `shared/parameter-contracts.js`, `server/parameters/`, `server/studies/`, and `src/components/ParameterStudyWorkbench.vue`. Parameter evidence is independently pinned and fail-closed. Studies are bounded synchronous benchmark analyses rather than Goal 9 background jobs; their immediate terminal records still distinguish successful and non-converged outcomes.
 
 Goal 6 adds `shared/apap-contracts.js`, `server/apap/`, and `src/components/APAPBenchmarkWorkbench.vue`. APAP producer payloads and internal runs have separate strict contracts. Context binding occurs before a single equation evaluator with no taxon branches. Fixed-step RK4 fails on invalid intermediate state, and every terminal result includes mass, cell-state, and limiting-case diagnostics.
+
+Goal 7 adds `shared/spatial-contracts.js`, `server/spatial/`, `src/spatial.js`, `SpatialTissueWorkbench`, and the lazy `TissueScene`. Spatial trust is independent of the APAP simulation release. Metadata and content are fail-closed at the server boundary; the browser receives only same-origin content IDs. The scene has no placement operation, and the explicit unavailable human HRA mapping cannot become a mouse target. WebGL is an optional projection over the same time, field, bin, values, provenance, and encoding policy exposed semantically.
 
 ## Service Contract
 

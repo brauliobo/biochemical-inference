@@ -1,0 +1,51 @@
+import { expect, test } from '@playwright/test'
+
+test('links spatial bin, time, field, values, and provenance on desktop and mobile', async ({ page }) => {
+  await page.goto('/')
+  const apap = page.locator('.apap-panel')
+  await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
+  const spatial = apap.locator('.spatial-workbench')
+  await expect(spatial.getByRole('heading', { name: 'Synthetic lobule spatial view' })).toBeVisible()
+  await expect(spatial.getByText('Synthetic geometry · HRA unavailable')).toBeVisible()
+  await expect(spatial.getByText('apap-liver-spatial-benchmark-v1.0.0')).toBeVisible()
+  await expect(spatial.getByText('fd838be6771c61b79eb97561320ffee8096f538e31ec769480c0a4979101290b')).toBeVisible()
+
+  await spatial.locator('.spatial-bin-controls').getByRole('button', { name: 'Bin 6' }).click()
+  await expect(spatial.getByRole('heading', { name: /Bin 6/ })).toBeVisible()
+  await expect(apap.locator('.lobule-heatmap').getByRole('button', { name: /^Bin 6:/ })).toHaveAttribute('aria-pressed', 'true')
+  await apap.locator('#apap-time').fill('2')
+  await expect(spatial.getByRole('heading', { name: /Bin 6 · 1 h/ })).toBeVisible()
+  await apap.locator('#apap-field').selectOption('gsh')
+  await expect(spatial.getByText(/Color: gsh scaled linearly/)).toBeVisible()
+  await expect(apap.getByText(/Accessible lobule state at 1 h/)).toBeVisible()
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  expect(overflow).toBeLessThanOrEqual(1)
+})
+
+test('retains the complete numeric workflow when WebGL is unavailable', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(window, 'WebGLRenderingContext', { configurable: true, value: undefined }))
+  await page.goto('/')
+  const apap = page.locator('.apap-panel')
+  await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
+  const spatial = apap.locator('.spatial-workbench')
+  await expect(spatial.getByText('3D tissue view unavailable')).toBeVisible()
+  await expect(spatial.getByText(/complete numeric table and controls remain active/i)).toBeVisible()
+  await expect(apap.getByText(/Accessible lobule state/)).toBeVisible()
+  await spatial.locator('.spatial-bin-controls').getByRole('button', { name: 'Bin 12' }).click()
+  await expect(spatial.getByRole('heading', { name: /Bin 12/ })).toBeVisible()
+})
+
+test('handles WebGL context loss without losing semantic results', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Context-loss behavior is viewport-independent')
+  await page.goto('/')
+  const apap = page.locator('.apap-panel')
+  await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
+  const spatial = apap.locator('.spatial-workbench')
+  const canvas = spatial.locator('canvas')
+  test.skip(await canvas.count() === 0, 'Browser WebGL is unavailable and covered by fallback E2E')
+  await canvas.dispatchEvent('webglcontextlost')
+  await expect(spatial.getByText('3D tissue view unavailable')).toBeVisible()
+  await expect(spatial.getByText(/WebGL context was lost/)).toBeVisible()
+  await expect(apap.getByText(/Accessible lobule state/)).toBeVisible()
+})

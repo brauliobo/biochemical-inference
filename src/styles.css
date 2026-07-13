@@ -290,10 +290,35 @@ small { margin-top: .3rem; color: var(--muted); }
 .apap-time-control { display: grid; grid-template-columns: auto minmax(180px, 1fr) auto minmax(150px, .4fr); gap: .7rem; align-items: center; margin-top: 1rem; padding: .8rem; border: 1px solid var(--line); }
 .apap-time-control label { margin: 0; }
 .lobule-heatmap { display: grid; grid-template-columns: repeat(12, minmax(42px, 1fr)); gap: 2px; margin-top: .7rem; overflow-x: auto; }
-.lobule-heatmap > div { min-height: 68px; display: grid; place-items: center; align-content: center; gap: .25rem; border: 1px solid #564834; color: #fff; }
+.lobule-heatmap > button { min-height: 68px; display: grid; place-items: center; align-content: center; gap: .25rem; padding: .3rem; border: 1px solid #564834; border-radius: 0; color: #fff; }
+.lobule-heatmap > button.selected { outline: 2px solid var(--lime); outline-offset: -3px; }
 .lobule-heatmap span { color: #e6d7c3; font-size: .62rem; }
 .lobule-heatmap strong { font: .68rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
 .lobule-axis { display: flex; justify-content: space-between; padding: .35rem 0; color: var(--muted); font: .68rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.spatial-workbench { margin-top: 1rem; padding: 1rem; border: 1px solid #31534c; background: #091513; }
+.spatial-workbench .section-heading { margin-bottom: .8rem; }
+.spatial-boundary { padding: .8rem 1rem; border-left: 3px solid var(--amber); background: #271e14; }
+.spatial-boundary strong { color: #f5c58c; font: .7rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.spatial-boundary p { margin: .35rem 0 0; color: #cfbda6; font-size: .75rem; line-height: 1.45; }
+.spatial-provenance { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 1px 0 0; background: var(--line); }
+.spatial-provenance > div { min-width: 0; padding: .75rem; background: #0d1c19; }
+.spatial-provenance dt { color: var(--muted); font-size: .67rem; }
+.spatial-provenance dd { margin: .3rem 0 0; overflow-wrap: anywhere; font-size: .75rem; }
+.spatial-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(230px, .7fr); gap: 1px; margin-top: 1px; background: var(--line); }
+.scene-column { min-width: 0; position: relative; background: #081311; }
+.tissue-scene { min-height: 340px; position: relative; overflow: hidden; outline: none; }
+.tissue-scene:focus-visible { box-shadow: inset 0 0 0 3px var(--lime); }
+.tissue-scene canvas { width: 100%; height: 100%; display: block; }
+.scene-orientation { position: absolute; z-index: 2; inset: .65rem .75rem auto; display: flex; justify-content: space-between; pointer-events: none; color: #a9c9c0; font: .66rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.tissue-scene > .fallback { min-height: 340px; display: grid; place-content: center; padding: 2rem; text-align: center; }
+.spatial-inspector { min-width: 0; padding: 1rem; background: #0d1a18; }
+.spatial-inspector h4 { margin: .5rem 0; font-size: 1.15rem; }
+.spatial-inspector > p { color: var(--muted); font-size: .76rem; line-height: 1.5; }
+.encoding-legend { display: grid; gap: .32rem; padding: .85rem; border: 1px solid var(--line); color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.encoding-legend strong { color: var(--ink); }
+.spatial-bin-controls { display: grid; grid-template-columns: repeat(12, minmax(45px, 1fr)); gap: 2px; margin-top: .7rem; overflow-x: auto; }
+.spatial-bin-controls button { padding: .45rem .25rem; border-radius: 0; border-color: #36534d; background: #10221e; color: #bbd0ca; font-size: .68rem; }
+.spatial-bin-controls button.selected { border-color: var(--lime); background: #294038; color: #fff; }
 .limiting-cases { padding-left: 1rem; }
 .limiting-cases li { margin-top: .5rem; }
 .limiting-cases strong, .limiting-cases span, .study-limitations strong, .study-limitations span { display: block; }
@@ -364,7 +389,7 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .scope-badge { margin-top: 2rem; transform: none; }
   .workspace { display: block; }
   .workspace > * { margin-top: -1px; }
-  .provenance-grid, .summary-grid, .detail-grid, .diagnostics { grid-template-columns: 1fr; }
+  .provenance-grid, .summary-grid, .detail-grid, .diagnostics, .spatial-provenance, .spatial-layout { grid-template-columns: 1fr; }
   .provenance-digests, .provenance-closure, .source-objects { grid-template-columns: 1fr; }
   .entity-list { grid-template-columns: repeat(2, 1fr); }
   .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid { grid-template-columns: 1fr; }

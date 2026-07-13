@@ -3,14 +3,16 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApapFixtureClient } from '../../server/apap/fixture.js'
 import { createApapRunService, loadApapClosure } from '../../server/apap/service.js'
 import { APAP_RELEASE_ID } from '../../shared/apap-contracts.js'
+import { spatialWorkspace } from '../fixtures/spatial.js'
 
-const api = vi.hoisted(() => ({ loadApapWorkspace: vi.fn(), runApapBenchmark: vi.fn() }))
+const api = vi.hoisted(() => ({ loadApapWorkspace: vi.fn(), runApapBenchmark: vi.fn(), loadSpatialWorkspace: vi.fn() }))
 vi.mock('../../src/api.js', () => api)
 
 import APAPBenchmarkWorkbench from '../../src/components/APAPBenchmarkWorkbench.vue'
 
 let workspace
 let record
+let spatial
 
 beforeAll(async () => {
   const client = createApapFixtureClient()
@@ -22,12 +24,14 @@ beforeAll(async () => {
     limitations: closure.detail.benchmark.limitations
   }
   record = await createApapRunService(client).create({ releaseId: APAP_RELEASE_ID, contextId: 'CONTEXT:APAP-HUMAN-LIVER', protocolId: 'PROTOCOL:APAP-HUMAN-PK', stepHours: 0.01, outputEveryHours: 0.5, mechanismScales: { cypActivity: 1, adductBinding: 1, zonation: 1, nacGsh: 1 } })
+  spatial = await spatialWorkspace()
 }, 30_000)
 
 beforeEach(() => {
   vi.clearAllMocks()
   api.loadApapWorkspace.mockResolvedValue(workspace)
   api.runApapBenchmark.mockResolvedValue(record)
+  api.loadSpatialWorkspace.mockResolvedValue(spatial)
 })
 
 describe('APAPBenchmarkWorkbench', () => {
@@ -52,6 +56,8 @@ describe('APAPBenchmarkWorkbench', () => {
     expect(await screen.findByText('Canonical APAP run identity')).toBeTruthy()
     expect(screen.getByRole('img', { name: /adduct across 12 portal-to-central lobule bins/ })).toBeTruthy()
     expect(screen.getByText(/Accessible lobule state/)).toBeTruthy()
+    expect(await screen.findByText('Synthetic lobule spatial view')).toBeTruthy()
+    expect(screen.getByText('Synthetic geometry · HRA unavailable')).toBeTruthy()
     expect(screen.getByText('Conservation diagnostics')).toBeTruthy()
     expect(screen.getByText('Pass · zero-cyp')).toBeTruthy()
     expect(screen.getByText('Pass · zero-binding')).toBeTruthy()

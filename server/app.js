@@ -32,6 +32,16 @@ import {
 import { createApapClient, ApapCompatibilityError } from './apap/client.js'
 import { createApapRunService, ApapRequestError } from './apap/service.js'
 import { ApapNumericalError } from './apap/model.js'
+import {
+  SPATIAL_CONTRACT_VERSION,
+  SPATIAL_MAX_CONTENT_BYTES,
+  SPATIAL_RELEASE_DIGEST,
+  SPATIAL_RELEASE_ID,
+  SpatialAssetIdSchema,
+  SpatialContentIdSchema
+} from '../shared/spatial-contracts.js'
+import { createSpatialClient, SpatialCompatibilityError } from './spatial/client.js'
+import { parseSpatialRange, SpatialRangeError } from './spatial/range.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -68,6 +78,16 @@ const PortfolioRunParamSchema = z.object({ runId: Sha256Schema }).strict()
 const StudyParamSchema = z.object({ studyId: Sha256Schema }).strict()
 const ApapReleaseParamSchema = z.object({ releaseId: z.literal(APAP_RELEASE_ID) }).strict()
 const ApapRunParamSchema = z.object({ runId: Sha256Schema }).strict()
+const SpatialReleaseParamSchema = z.object({ releaseId: z.literal(SPATIAL_RELEASE_ID) }).strict()
+const SpatialContentParamSchema = z.object({ releaseId: z.literal(SPATIAL_RELEASE_ID), assetId: SpatialAssetIdSchema, contentId: SpatialContentIdSchema }).strict()
+const SpatialTaxonQuerySchema = z.object({ taxon_id: z.enum(['NCBITaxon:9606', 'NCBITaxon:10090']).optional() }).strict()
+const SpatialAssetQuerySchema = z.object({
+  taxon_id: z.enum(['NCBITaxon:9606', 'NCBITaxon:10090']).optional(),
+  structure_id: z.string().regex(/^STRUCTURE:(?:HUMAN|MOUSE)-(?:LIVER|HEPATOCYTE)$/).optional(),
+  asset_type: z.enum(['geometry', 'instances', 'scalar-field']).optional()
+}).strict()
+const SpatialDescriptorQuerySchema = z.object({ asset_id: SpatialAssetIdSchema.optional() }).strict()
+const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -86,6 +106,7 @@ export async function buildApp(options = {}) {
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
   const parameters = options.parameterClient ?? createParameterClient(env)
   const apap = options.apapClient ?? createApapClient(env)
+  const spatial = options.spatialClient ?? createSpatialClient(env)
   const portfolioRuns = options.portfolioRunService ?? createRunService()
   const studies = options.studyService ?? createStudyService(parameters)
   const apapRuns = options.apapRunService ?? createApapRunService(apap)
@@ -105,6 +126,12 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof ApapCompatibilityError || error instanceof ApapRequestError || error instanceof ApapNumericalError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof SpatialRangeError) {
+      return reply.header('content-range', `bytes */${error.size}`).status(416).send({ statusCode: 416, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof SpatialCompatibilityError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -327,6 +354,103 @@ export async function buildApp(options = {}) {
     const parsed = ApapRunParamSchema.safeParse(request.params)
     if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_APAP_RUN_ID', error: 'Bad Request', message: 'APAP run identifier is invalid.' })
     return apapRuns.get(parsed.data.runId) ?? reply.status(404).send({ statusCode: 404, code: 'APAP_RUN_NOT_FOUND', error: 'Not Found', message: 'APAP run is not available.' })
+  })
+  const spatialMetadata = (reply) => reply.headers({ 'cache-control': SPATIAL_IMMUTABLE_CACHE, etag: `"sha256:${SPATIAL_RELEASE_DIGEST}"`, 'x-release-digest': SPATIAL_RELEASE_DIGEST })
+  const spatialRelease = (request, reply) => {
+    const parsed = SpatialReleaseParamSchema.safeParse(request.params)
+    if (!parsed.success) {
+      reply.status(404).send({ statusCode: 404, code: 'SPATIAL_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned spatial benchmark release is supported.' })
+      return false
+    }
+    return true
+  }
+  const invalidSpatialQuery = (reply, parsed) => reply.status(400).send({ statusCode: 400, code: 'INVALID_SPATIAL_QUERY', error: 'Bad Request', message: 'Spatial query parameters are invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+
+  app.get('/api/v5/spatial', async () => ({
+    contractVersion: SPATIAL_CONTRACT_VERSION,
+    releaseId: SPATIAL_RELEASE_ID,
+    releaseDigest: SPATIAL_RELEASE_DIGEST,
+    maxContentBytes: SPATIAL_MAX_CONTENT_BYTES,
+    syntheticGeometry: true,
+    hraAvailable: false,
+    routes: {
+      catalog: '/api/v5/spatial/releases',
+      release: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}`,
+      structures: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/structures`,
+      spaces: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/spaces`,
+      transforms: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/transforms`,
+      assets: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/assets`,
+      descriptors: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/descriptors`,
+      mappings: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/mappings`,
+      inventory: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/inventory`,
+      content: `/api/v5/spatial/releases/${SPATIAL_RELEASE_ID}/assets/{assetId}/content/{contentId}`
+    }
+  }))
+  app.get('/api/v5/spatial/releases', async () => spatial.catalog())
+  app.get('/api/v5/spatial/releases/:releaseId', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    spatialMetadata(reply)
+    return spatial.detail()
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/structures', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    const parsed = SpatialTaxonQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialQuery(reply, parsed)
+    spatialMetadata(reply)
+    return spatial.structures(parsed.data.taxon_id)
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/spaces', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    const parsed = SpatialTaxonQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialQuery(reply, parsed)
+    spatialMetadata(reply)
+    return spatial.spaces(parsed.data.taxon_id)
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/transforms', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    const parsed = SpatialTaxonQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialQuery(reply, parsed)
+    spatialMetadata(reply)
+    return spatial.transforms(parsed.data.taxon_id)
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/assets', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    const parsed = SpatialAssetQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialQuery(reply, parsed)
+    spatialMetadata(reply)
+    return spatial.assets({ taxonId: parsed.data.taxon_id, structureId: parsed.data.structure_id, assetType: parsed.data.asset_type })
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/descriptors', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    const parsed = SpatialDescriptorQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialQuery(reply, parsed)
+    spatialMetadata(reply)
+    return spatial.descriptors(parsed.data.asset_id)
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/mappings', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    spatialMetadata(reply)
+    return spatial.mappings()
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/inventory', async (request, reply) => {
+    if (!spatialRelease(request, reply)) return reply
+    spatialMetadata(reply)
+    return spatial.inventory()
+  })
+  app.get('/api/v5/spatial/releases/:releaseId/assets/:assetId/content/:contentId', async (request, reply) => {
+    const parsed = SpatialContentParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(404).send({ statusCode: 404, code: 'SPATIAL_CONTENT_NOT_FOUND', error: 'Not Found', message: 'Spatial content identifier is unknown.' })
+    const inventory = await spatial.inventory()
+    const item = inventory.items.find((candidate) => candidate.asset_id === parsed.data.assetId && candidate.id === parsed.data.contentId)
+    if (!item) return reply.status(404).send({ statusCode: 404, code: 'SPATIAL_CONTENT_NOT_FOUND', error: 'Not Found', message: 'Spatial content does not belong to this asset.' })
+    const range = parseSpatialRange(request.headers.range, item.bytes)
+    const etag = `"sha256:${item.sha256}"`
+    const headers = { 'accept-ranges': 'bytes', 'cache-control': SPATIAL_IMMUTABLE_CACHE, etag, 'x-content-sha256': item.sha256, 'x-release-digest': SPATIAL_RELEASE_DIGEST }
+    if (!range && request.headers['if-none-match'] === etag) return reply.headers(headers).status(304).send()
+    const content = await spatial.content(parsed.data.assetId, parsed.data.contentId, range)
+    if (!content) return reply.status(404).send({ statusCode: 404, code: 'SPATIAL_CONTENT_NOT_FOUND', error: 'Not Found', message: 'Spatial content does not belong to this asset.' })
+    if (range) headers['content-range'] = `bytes ${range.start}-${range.end}/${item.bytes}`
+    return reply.headers(headers).type(item.media_type).status(content.statusCode).send(content.body)
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

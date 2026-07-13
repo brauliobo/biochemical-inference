@@ -104,6 +104,12 @@ Goal 6 independently pins `apap-liver-benchmark-v1.0.0` with digest `6de9844b2e8
 
 Strict producer and internal Zod contracts cover discovery, detail, contexts, parameters, protocols, observations, assumptions, limitations, validation matrix, requests, and terminal results. One taxon-agnostic fixed-step equation set receives explicit human or mouse parameter bindings and produces systemic time series, 12-bin lobule matrices, exact assumptions, unsupported synthetic comparisons, and mass/cell-state/limiting-case diagnostics. NAC affects only its state and the explicit GSH term. See `docs/APAP_BENCHMARK.md` for equations, baseline software results, and limitations.
 
+### Spatial tissue benchmark
+
+Goal 7 independently pins `apap-liver-spatial-benchmark-v1.0.0` with digest `fd838be6771c61b79eb97561320ffee8096f538e31ec769480c0a4979101290b`. Optional settings are `BIOCHEMICAL_SPATIAL_URL`, `BIOCHEMICAL_SPATIAL_RELEASE_ID`, `BIOCHEMICAL_SPATIAL_EXPECTED_DIGEST`, and `BIOCHEMICAL_SPATIAL_TIMEOUT_MS`. Production has no fallback; `BIOCHEMICAL_SPATIAL_USE_FIXTURE=true` is explicit test/demo behavior.
+
+The same-origin `/api/v5/spatial` proxy validates strict metadata closures, content ownership, byte caps, immutable single ranges, release headers, and full-content SHA-256 digests. The APAP workbench links time, field, and portal-to-central bin across the complete numeric table, semantic inspector, and lazy Three.js instanced-cell view. Synthetic geometry and unavailable HRA status remain persistent; no mouse or pointer operation creates HRA placement. See `docs/SPATIAL_WORKBENCH.md`.
+
 ### Identifier integrity
 
 The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
@@ -158,6 +164,11 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v4/apap/releases/:releaseId/{contexts|parameters|protocols|observations|assumptions|limitations|validation-matrix}`
 - `POST /api/v4/apap/runs`
 - `GET /api/v4/apap/runs/:runId`
+- `GET /api/v5/spatial`
+- `GET /api/v5/spatial/releases`
+- `GET /api/v5/spatial/releases/:releaseId`
+- `GET /api/v5/spatial/releases/:releaseId/{structures|spaces|transforms|assets|descriptors|mappings|inventory}`
+- `GET /api/v5/spatial/releases/:releaseId/assets/:assetId/content/:contentId`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -170,3 +181,5 @@ See `docs/SIMULATION_PORTFOLIO.md` for algorithms, strict v2 contracts, units, w
 See `docs/PARAMETER_STUDIES.md` for parameter selection, study algorithms, convergence diagnostics, held-out validation, and uncertainty boundaries.
 
 See `docs/APAP_BENCHMARK.md` for APAP equations, context parameter bindings, deterministic results, diagnostics, and unsupported scientific boundaries.
+
+See `docs/SPATIAL_WORKBENCH.md` for spatial release integrity, range proxy behavior, linked selections, visual encoding, fallback behavior, and HRA limitations.
