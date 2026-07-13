@@ -8,6 +8,15 @@ import {
   AtlasReleaseSchema,
   AtlasSubgraphSchema
 } from '../shared/atlas-contracts.js'
+import {
+  EvidenceCandidateExtractionRequestSchema,
+  EvidenceCandidateListResponseSchema,
+  EvidenceCandidateResponseSchema,
+  EvidenceDocumentResponseSchema,
+  EvidenceHealthSchema,
+  EvidenceSearchRequestSchema,
+  EvidenceSearchResponseSchema
+} from '../shared/evidence-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -32,6 +41,13 @@ function queryString(values) {
 function verifyAtlasEnvelope(payload, release) {
   if (payload.releaseId !== release.id || payload.releaseDigest !== release.digest) {
     throw new Error('Atlas response does not match the independently verified release and digest.')
+  }
+  return payload
+}
+
+function verifyEvidenceEnvelope(payload, release) {
+  if (payload.release.id !== release.id || payload.release.digest !== release.digest) {
+    throw new Error('Evidence response does not match the independently verified release and digest.')
   }
   return payload
 }
@@ -117,4 +133,45 @@ export async function loadAtlasSubgraph(release, rootId, taxonId, maxDepth, maxN
     withSignal(signal)
   ))
   return verifyAtlasEnvelope(payload, release)
+}
+
+export async function loadEvidenceHealth(signal) {
+  return EvidenceHealthSchema.parse(await requestJson('/api/v3/evidence/health', withSignal(signal)))
+}
+
+export async function searchEvidence(release, input, signal) {
+  const request = EvidenceSearchRequestSchema.parse(input)
+  const payload = EvidenceSearchResponseSchema.parse(await requestJson('/api/v3/evidence/search', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+  return verifyEvidenceEnvelope(payload, release)
+}
+
+export async function loadEvidenceDocument(release, identifier, signal) {
+  const payload = EvidenceDocumentResponseSchema.parse(await requestJson(`/api/v3/evidence/documents/${encodeURIComponent(identifier)}`, withSignal(signal)))
+  return verifyEvidenceEnvelope(payload, release)
+}
+
+export async function extractEvidenceCandidate(release, input, signal) {
+  const request = EvidenceCandidateExtractionRequestSchema.parse(input)
+  const payload = EvidenceCandidateResponseSchema.parse(await requestJson('/api/v3/evidence/candidates/extract', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+  return verifyEvidenceEnvelope(payload, release)
+}
+
+export async function loadEvidenceCandidates(release, signal) {
+  const payload = EvidenceCandidateListResponseSchema.parse(await requestJson('/api/v3/evidence/candidates', withSignal(signal)))
+  return verifyEvidenceEnvelope(payload, release)
+}
+
+export async function loadEvidenceCandidate(release, candidateId, signal) {
+  const payload = EvidenceCandidateResponseSchema.parse(await requestJson(`/api/v3/evidence/candidates/${encodeURIComponent(candidateId)}`, withSignal(signal)))
+  return verifyEvidenceEnvelope(payload, release)
 }

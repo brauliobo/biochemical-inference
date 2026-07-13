@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism simulation and a bounded contextual MTHFR evidence explorer. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism simulation, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -16,6 +16,9 @@ This software is an educational systems model. Its initial conditions and kineti
 cd ../biochemical-db/service
 uv sync --frozen
 uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000
+BIOCHEMICAL_EVIDENCE_INDEX=/tmp/biochemical-evidence-index.sqlite3 \
+BIOCHEMICAL_EVIDENCE_WORKSPACE=/tmp/biochemical-evidence-candidates.sqlite3 \
+uv run uvicorn biochemical_db_api.evidence_app:app --host 127.0.0.1 --port 8001
 ```
 
 In another shell, from this repository:
@@ -63,11 +66,30 @@ Build provenance is loaded through the inference service's same-origin proxy and
 
 The bundled v1 and atlas v2 fixtures are available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`. The atlas fixture follows the real v2 response contracts and release identifiers while its source is visibly marked `bundled-demonstration`.
 
+### Literature evidence
+
+The independent Goal 3 evidence service is consumed server-to-server and pinned separately:
+
+```sh
+BIOCHEMICAL_EVIDENCE_URL=http://127.0.0.1:8001
+BIOCHEMICAL_EVIDENCE_RELEASE_ID=mthfr-evidence-v1.0.0
+BIOCHEMICAL_EVIDENCE_EXPECTED_DIGEST=93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701
+BIOCHEMICAL_EVIDENCE_TIMEOUT_MS=10000
+```
+
+The browser never contacts port 8001. Fastify verifies `/healthz` before each evidence operation, validates strict search/document/candidate payloads, checks every available release reference, and exposes same-origin `/api/v3/evidence` routes. Cross-origin API access is denied unless `CORS_ORIGINS` explicitly allowlists an origin; no Ollama address, model service, or secret is sent to the browser.
+
+Exact identifier and annotation matches, SQLite BM25, optional vector cosine ranking, and reciprocal-rank-fusion contributions remain separately visible. Vector retrieval is opt-in. If Ollama embedding fails, that vector request fails visibly and can be retried; the UI does not silently substitute lexical results. Exact/BM25 search does not depend on Ollama.
+
+Document reads preserve content scope, license identifiers, source locators, local/source offsets, PubTator annotations and relations, and publication lifecycle. The inference proxy attaches the two license records fixed by the pinned release because the evidence document endpoint currently returns their IDs but not the license objects.
+
+Candidate extraction sends only user-selected exact spans and an instruction. Every candidate remains visibly `unreviewed, not trusted knowledge`, records model and digest provenance, and stays in the evidence service's separate workspace. This application has no candidate promotion route. Use `BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true` only for explicit tests; it enables deterministic candidate E2E without Ollama and is independent of `BIOCHEMICAL_INFERENCE_USE_FIXTURE`.
+
 ### Identifier integrity
 
 The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
 
-Optional server settings are `PORT` (default `3000`) and `HOST` (default `127.0.0.1`).
+Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), and explicit comma-separated `CORS_ORIGINS`.
 
 ## Verification
 
@@ -78,7 +100,7 @@ E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
-Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. The Playwright configuration starts the real sibling biochemical-db API on port 8000 and the inference development servers; it does not enable the fixture.
+Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and the inference development servers. Evidence uses run-isolated index and candidate workspace paths below `/tmp`; real E2E exercises non-vector search and document retrieval and has no generation dependency. Fixture mode enables both explicit inference and evidence fixtures and exercises deterministic candidate extraction.
 
 ## API
 
@@ -95,7 +117,15 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v2/releases/:releaseId/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_depth=4&max_nodes=50`
 - `GET /api/v2/releases/:releaseId/coverage?taxon_id=9606`
 - `GET /api/v2/releases/:releaseId/network?taxon_id=9606`
+- `GET /api/v3/evidence/health`
+- `POST /api/v3/evidence/search`
+- `GET /api/v3/evidence/documents/:identifier`
+- `POST /api/v3/evidence/candidates/extract`
+- `GET /api/v3/evidence/candidates`
+- `GET /api/v3/evidence/candidates/:candidateId`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
 See `docs/ATLAS_EXPLORER.md` for atlas contract, interpretation, and failure boundaries.
+
+See `docs/EVIDENCE_PANEL.md` for the evidence contract, ranking interpretation, license behavior, and candidate trust boundary.

@@ -1,16 +1,54 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../../server/app.js'
 import { createKnowledgeClient } from '../../server/knowledge/client.js'
 import { BUNDLED_RELEASE } from '../../server/knowledge/fixture.js'
 import { ModelSchema, NetworkSchema, ProvenanceSchema, ReleaseSchema } from '../../shared/contracts.js'
 import { AtlasCoverageResponseSchema, AtlasEntityResponseSchema, AtlasNetworkSchema, AtlasSubgraphSchema } from '../../shared/atlas-contracts.js'
 import { BUNDLED_ATLAS_RELEASE } from '../../server/knowledge/atlas-fixture.js'
+import { createEvidenceFixtureClient, FIXTURE_EVIDENCE_RELEASE } from '../../server/evidence/fixture.js'
+import { EvidenceCandidateListResponseSchema, EvidenceCandidateResponseSchema, EvidenceDocumentResponseSchema, EvidenceHealthSchema, EvidenceSearchResponseSchema } from '../../shared/evidence-contracts.js'
 
 let app
 afterEach(async () => app?.close())
 const fixtureKnowledge = () => createKnowledgeClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' })
 
 describe('simulation API', () => {
+  it('proxies pinned search, document, and isolated unreviewed candidate contracts', async () => {
+    app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge(), evidenceClient: createEvidenceFixtureClient(), env: { NODE_ENV: 'test' } })
+    const health = await app.inject({ method: 'GET', url: '/api/v3/evidence/health' })
+    const search = await app.inject({ method: 'POST', url: '/api/v3/evidence/search', payload: { query: 'PMID:29891918', limit: 10, use_vector: false } })
+    const document = await app.inject({ method: 'GET', url: '/api/v3/evidence/documents/PMCID%3APMC5995969' })
+    const extracted = await app.inject({ method: 'POST', url: '/api/v3/evidence/candidates/extract', payload: { document_id: 'EVIDENCE-DOC:29891918', span_ids: ['SPAN:PMID-29891918-RESULTS-SUPPORT'], instruction: 'Extract one regulation assertion.' } })
+    const candidateId = extracted.json().candidate.id
+    const detail = await app.inject({ method: 'GET', url: `/api/v3/evidence/candidates/${encodeURIComponent(candidateId)}` })
+    const listing = await app.inject({ method: 'GET', url: '/api/v3/evidence/candidates' })
+
+    expect(health.statusCode).toBe(200)
+    expect(() => EvidenceHealthSchema.parse(health.json())).not.toThrow()
+    expect(health.json().release).toEqual(FIXTURE_EVIDENCE_RELEASE)
+    expect(() => EvidenceSearchResponseSchema.parse(search.json())).not.toThrow()
+    expect(search.json().items[0].score_components).toMatchObject({ exact: { rank: 1 } })
+    expect(() => EvidenceDocumentResponseSchema.parse(document.json())).not.toThrow()
+    expect(document.json().licenses[0].redistribution).toBe('full-text-permitted')
+    expect(extracted.statusCode).toBe(201)
+    expect(() => EvidenceCandidateResponseSchema.parse(extracted.json())).not.toThrow()
+    expect(extracted.json().candidate.status).toBe('unreviewed')
+    expect(detail.json().candidate).toEqual(extracted.json().candidate)
+    expect(() => EvidenceCandidateListResponseSchema.parse(listing.json())).not.toThrow()
+  })
+
+  it('rejects invalid evidence requests before contacting the client', async () => {
+    const evidenceClient = { search: vi.fn(), extract: vi.fn(), health: vi.fn(), candidates: vi.fn(), candidate: vi.fn(), document: vi.fn() }
+    app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge(), evidenceClient, env: { NODE_ENV: 'test' } })
+    const search = await app.inject({ method: 'POST', url: '/api/v3/evidence/search', payload: { query: '', unknown: true } })
+    const candidate = await app.inject({ method: 'POST', url: '/api/v3/evidence/candidates/extract', payload: { document_id: 'bad', span_ids: [], instruction: '' } })
+
+    expect(search.statusCode).toBe(422)
+    expect(candidate.statusCode).toBe(422)
+    expect(evidenceClient.search).not.toHaveBeenCalled()
+    expect(evidenceClient.extract).not.toHaveBeenCalled()
+  })
+
   it('proxies independently pinned atlas release, entity, traversal, claims, coverage, and network contracts', async () => {
     app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
     const base = `/api/v2/releases/${BUNDLED_ATLAS_RELEASE.id}`

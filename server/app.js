@@ -5,6 +5,8 @@ import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { z } from 'zod'
 import { ApiErrorSchema, SimulationRequestSchema, TaxonIdSchema } from '../shared/contracts.js'
+import { EvidenceCandidateExtractionRequestSchema, EvidenceSearchRequestSchema } from '../shared/evidence-contracts.js'
+import { createEvidenceClient, EvidenceCompatibilityError } from './evidence/client.js'
 import { createKnowledgeClient, KnowledgeCompatibilityError } from './knowledge/client.js'
 import { MODEL } from './model.js'
 import { simulate, SimulationNumericalError } from './simulation.js'
@@ -37,6 +39,8 @@ const AtlasNetworkQuerySchema = z.object({
   taxon_id: z.coerce.number().pipe(TaxonIdSchema),
   tissue_id: AtlasCurieSchema.optional()
 }).strict()
+const EvidenceDocumentParamSchema = z.object({ identifier: z.string().min(1).max(200) }).strict()
+const EvidenceCandidateParamSchema = z.object({ candidateId: z.string().regex(/^CANDIDATE:[a-f0-9]{32}$/) }).strict()
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -52,16 +56,18 @@ export async function buildApp(options = {}) {
   const env = options.env ?? process.env
   const app = Fastify({ logger: env.NODE_ENV !== 'test' })
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
+  const evidence = options.evidenceClient ?? createEvidenceClient(env)
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
-    origin: env.NODE_ENV === 'production'
-      ? (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
-      : true
+    origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
   })
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof KnowledgeCompatibilityError) {
       return reply.status(409).send({ statusCode: 409, code: 'KNOWLEDGE_INCOMPATIBLE', error: 'Conflict', message: error.message })
+    }
+    if (error instanceof EvidenceCompatibilityError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
       return reply.status(422).send({ statusCode: 422, code: 'INVALID_NUMERICAL_STATE', error: 'Unprocessable Entity', message: error.message })
@@ -140,6 +146,28 @@ export async function buildApp(options = {}) {
     const parsed = AtlasNetworkQuerySchema.safeParse(request.query)
     if (!parsed.success) return invalidAtlasQuery(reply, parsed)
     return knowledge.atlasNetwork(request.params.releaseId, parsed.data.taxon_id, parsed.data.tissue_id)
+  })
+  app.get('/api/v3/evidence/health', async () => evidence.health())
+  app.post('/api/v3/evidence/search', async (request, reply) => {
+    const parsed = EvidenceSearchRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_EVIDENCE_SEARCH', error: 'Unprocessable Entity', message: 'Evidence search parameters are invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return evidence.search(parsed.data)
+  })
+  app.get('/api/v3/evidence/documents/:identifier', async (request, reply) => {
+    const parsed = EvidenceDocumentParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_EVIDENCE_DOCUMENT', error: 'Bad Request', message: 'Evidence document identifier is invalid.' })
+    return evidence.document(parsed.data.identifier)
+  })
+  app.post('/api/v3/evidence/candidates/extract', async (request, reply) => {
+    const parsed = EvidenceCandidateExtractionRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_EVIDENCE_CANDIDATE', error: 'Unprocessable Entity', message: 'Candidate extraction requires unique exact spans from one document.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return reply.status(201).send(await evidence.extract(parsed.data))
+  })
+  app.get('/api/v3/evidence/candidates', async () => evidence.candidates())
+  app.get('/api/v3/evidence/candidates/:candidateId', async (request, reply) => {
+    const parsed = EvidenceCandidateParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_EVIDENCE_CANDIDATE_ID', error: 'Bad Request', message: 'Candidate identifier is invalid.' })
+    return evidence.candidate(parsed.data.candidateId)
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

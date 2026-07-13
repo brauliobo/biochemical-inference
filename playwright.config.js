@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const useFixture = process.env.E2E_USE_FIXTURE === 'true'
+const evidenceRuntime = `/tmp/biochemical-inference-evidence-e2e-${process.pid}`
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -19,9 +20,15 @@ export default defineConfig({
       url: 'http://127.0.0.1:8000/healthz',
       reuseExistingServer: false,
       timeout: 120_000
+    }, {
+      command: `BIOCHEMICAL_EVIDENCE_INDEX=${evidenceRuntime}/index.sqlite3 BIOCHEMICAL_EVIDENCE_WORKSPACE=${evidenceRuntime}/workspace.sqlite3 uv run uvicorn biochemical_db_api.evidence_app:app --host 127.0.0.1 --port 8001`,
+      cwd: '../biochemical-db/service',
+      url: 'http://127.0.0.1:8001/healthz',
+      reuseExistingServer: false,
+      timeout: 120_000
     }],
     {
-      command: useFixture ? 'BIOCHEMICAL_INFERENCE_USE_FIXTURE=true npm run dev' : 'npm run dev',
+      command: useFixture ? 'BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true npm run dev' : 'npm run dev',
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: false,
       timeout: 120_000

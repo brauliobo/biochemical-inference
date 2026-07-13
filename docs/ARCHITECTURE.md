@@ -25,6 +25,17 @@ run result + diagnostics
 Vue/Pug workbench
   |       |       |
  chart   table   Three.js
+
+evidence API :8001
+        | evidence v3 release + mutable candidate workspace
+        v
+strict evidence adapter + independent release/digest pin
+        |
+        v
+same-origin Fastify /api/v3/evidence proxy
+        |
+        v
+EvidencePanel (exact/BM25/vector/RRF, licensed spans, review-only candidates)
 ```
 
 ## Active Application
@@ -52,6 +63,10 @@ The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the 
 The inference service proxies knowledge requests so the browser has one origin and every simulation can verify the same release used by the workbench. Atlas v2 has a separate catalog, release ID, digest, strict schemas, adapters, and endpoint envelope checks; it never inherits verification from the v1 release.
 
 Atlas v2 adds read-only same-origin release detail, entity, claims, bounded subgraph, coverage, and taxon network routes. The network projection supplies mappings and limitations that are not present in the producer's subgraph response. Traversal bounds are validated at the Fastify boundary before upstream access.
+
+Evidence is a third independent compatibility boundary. The server verifies `mthfr-evidence-v1.0.0` and digest `93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701` through evidence health before search, document, or candidate operations. Strict schemas cover release references, ranking components, documents, licenses, lifecycle, licensed sections, exact spans, PubTator annotations/relations, and unreviewed candidates. Browser code receives only same-origin proxy responses and never receives an Ollama endpoint or direct evidence-service access.
+
+The evidence index is disposable derived state. Candidate storage is a separate mutable workspace. Neither is part of an immutable release, and the inference service has no route that promotes a candidate into atlas or trusted knowledge.
 
 ## Model Contract
 
@@ -91,3 +106,5 @@ Display formatting, object key order, UI state, and locale must not change run i
 The interface distinguishes loading, invalid, incompatible, running, successful, failed, and cancelled states. A failed request cannot reuse stale data. Changing a completed run configuration marks existing results as belonging to the previous specification until a new run succeeds.
 
 The atlas independently distinguishes release loading, traversal loading, unavailable data, unknown or ambiguous seeds, bounded/truncated results, denominator gaps, and successful results. Unknown roots are never replaced with a default. Atlas compatibility failure does not disable a separately verified v1 simulation, and v1 readiness does not establish atlas compatibility.
+
+Evidence independently distinguishes release verification, lexical search, requested vector search, document retrieval, and generation. A vector failure displays no substituted lexical result. A generation failure creates no candidate. Publication corrections, retractions, and deletions are warnings at the document boundary. Candidate output remains labeled `unreviewed, not trusted knowledge` in extraction results, detail, and the persistent workspace list.

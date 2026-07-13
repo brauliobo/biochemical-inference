@@ -5,6 +5,7 @@ import { loadNetwork, loadProvenance, loadWorkspace, runSimulation } from './api
 import { compatibleRuns } from './comparison.js'
 import BuildProvenance from './components/BuildProvenance.vue'
 import AtlasExplorer from './components/AtlasExplorer.vue'
+import EvidencePanel from './components/EvidencePanel.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
@@ -49,6 +50,7 @@ const selectedEvidence = computed(() => {
 })
 const comparison = computed(() => result.value?.preset === 'reduced-mthfr' && baseline.value && compatibleRuns(result.value, baseline.value) ? baseline.value : undefined)
 const requestLocked = computed(() => state.value === 'running' || state.value === 'loading' || !network.value)
+const evidenceQuery = computed(() => selectedCompound.value ? `${selectedCompound.value.name} ${selectedCompound.value.id}` : selectedModelReaction.value?.name ?? 'MTHFR')
 
 function isAbort(error) {
   return error instanceof DOMException && error.name === 'AbortError'
@@ -316,10 +318,12 @@ main#main
 
     AtlasExplorer(:taxon-id="taxonId")
 
+    EvidencePanel(:suggested-query="evidenceQuery")
+
     section.results-panel(aria-labelledby="results-title")
       .section-heading
         div
-          p.kicker 05 · Results
+          p.kicker 07 · Results
           h2#results-title Controlled run
         span.status-chip.previous(v-if="resultIsPrevious") Previous specification
       .alert.error(v-if="state === 'failed'" role="alert")

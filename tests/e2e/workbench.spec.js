@@ -5,7 +5,7 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
 
   await expect(page.getByRole('heading', { name: 'Verified knowledge workspace' })).toBeVisible()
   await expect(page.locator('.provenance-grid dd').filter({ hasText: /^one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)$/ })).toBeVisible()
-  await expect(page.locator('.provenance-grid .digest')).toHaveText(/^sha256:[a-f0-9]{64}$/)
+  await expect(page.locator('.status-panel .provenance-grid .digest')).toHaveText(/^sha256:[a-f0-9]{64}$/)
   await page.getByText('Build provenance', { exact: true }).click()
   await expect(page.getByText('Recipe', { exact: true })).toBeVisible()
   await expect(page.getByText('Source lock', { exact: true })).toBeVisible()
