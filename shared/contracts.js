@@ -7,14 +7,46 @@ export const TAXA = [
 
 export const TaxonIdSchema = z.union([z.literal(9606), z.literal(10090)])
 
+const Sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
+
 export const ReleaseSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
-  digest: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  digest: Sha256Schema,
   schemaVersion: z.literal('1.0.0'),
   supportedTaxa: z.array(TaxonIdSchema),
   verified: z.literal(true),
   source: z.enum(['biochemical-db', 'bundled-demonstration'])
+}).strict()
+
+const ProvenanceArtifactSchema = z.object({
+  path: z.string().regex(/^(recipes|sources\/locks)\/[a-z0-9.-]+\.json$/),
+  digest: Sha256Schema
+}).strict()
+
+const ProvenanceImplementationSchema = z.object({
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  version: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
+  digest: Sha256Schema
+}).strict()
+
+const ProvenanceSourceObjectSchema = z.object({
+  name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  recordType: z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']),
+  digest: Sha256Schema,
+  bytes: z.number().int().positive(),
+  sourceIds: z.array(z.string().regex(/^[A-Z][A-Z0-9_]*$/)).min(1),
+  licenseId: z.string().min(1)
+}).strict()
+
+export const ProvenanceSchema = z.object({
+  releaseId: z.string().min(1),
+  releaseDigest: Sha256Schema,
+  recipe: ProvenanceArtifactSchema,
+  sourceLock: ProvenanceArtifactSchema,
+  sourceObjects: z.array(ProvenanceSourceObjectSchema).min(1),
+  transformer: ProvenanceImplementationSchema,
+  validation: ProvenanceImplementationSchema
 }).strict()
 
 export const EvidenceClassSchema = z.enum(['direct', 'inferred'])

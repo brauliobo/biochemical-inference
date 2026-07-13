@@ -53,6 +53,7 @@ export async function buildApp(options = {}) {
     }
   })
   app.get('/api/v1/releases', async () => knowledge.releases())
+  app.get('/api/v1/releases/:releaseId/provenance', async (request) => knowledge.provenance(request.params.releaseId))
   app.get('/api/v1/releases/:releaseId/network', async (request, reply) => {
     const params = request.params
     const query = request.query

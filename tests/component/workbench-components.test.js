@@ -1,11 +1,13 @@
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
+import { BUNDLED_PROVENANCE } from '../../server/knowledge/fixture.js'
 import { simulate } from '../../server/simulation.js'
 import NetworkView from '../../src/components/NetworkView.vue'
 import TimeSeriesChart from '../../src/components/TimeSeriesChart.vue'
 import { METABOLITE_IDS } from '../../shared/identifiers.js'
 import { MODEL } from '../../server/model.js'
+import BuildProvenance from '../../src/components/BuildProvenance.vue'
 
 const result = simulate({
   releaseId: BUNDLED_RELEASE.id,
@@ -30,5 +32,26 @@ describe('scientific workbench components', () => {
     expect(charts[0].getAttribute('aria-label')).toContain('Final value')
     expect(charts[1].getAttribute('aria-label')).toContain('MTHFR flux over time')
     expect(screen.getByText(/illustrative µM at 4 h/)).toBeTruthy()
+  })
+
+  it('expands the complete build provenance closure', async () => {
+    render(BuildProvenance, { props: { provenance: BUNDLED_PROVENANCE, status: 'available' } })
+
+    await screen.getByText('Build provenance').click()
+    expect(screen.getByText('Recipe')).toBeTruthy()
+    expect(screen.getByText(BUNDLED_PROVENANCE.recipe.digest)).toBeTruthy()
+    expect(screen.getByText('normalized-json 1.0.0')).toBeTruthy()
+    expect(screen.getByText('mvp-scientific 1.0.0')).toBeTruthy()
+    expect(screen.getByText(/catalysis, compounds, limitations/)).toBeTruthy()
+    expect(screen.getByText(/CHEBI.*NCBI_TAXONOMY.*PUBMED.*RHEA.*UNIPROTKB/)).toBeTruthy()
+    expect(screen.getByText(/CC-BY-4.0.*MIT.*NLM-TERMS/)).toBeTruthy()
+    expect(screen.getByText('demo-compounds')).toBeTruthy()
+  })
+
+  it('states that reproducibility is not established when provenance is unavailable', () => {
+    render(BuildProvenance, { props: { status: 'unavailable', error: 'upstream provenance failed' } })
+
+    expect(screen.getByText('upstream provenance failed')).toBeTruthy()
+    expect(screen.getByText(/Reproducibility is not established/)).toBeTruthy()
   })
 })

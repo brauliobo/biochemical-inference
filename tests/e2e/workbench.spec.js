@@ -4,8 +4,16 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
   await page.goto('/')
 
   await expect(page.getByRole('heading', { name: 'Verified knowledge workspace' })).toBeVisible()
-  await expect(page.getByText(/one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)/)).toBeVisible()
-  await expect(page.getByText(/^sha256:[a-f0-9]{64}$/)).toBeVisible()
+  await expect(page.locator('.provenance-grid dd').filter({ hasText: /^one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)$/ })).toBeVisible()
+  await expect(page.locator('.provenance-grid .digest')).toHaveText(/^sha256:[a-f0-9]{64}$/)
+  await page.getByText('Build provenance', { exact: true }).click()
+  await expect(page.getByText('Recipe', { exact: true })).toBeVisible()
+  await expect(page.getByText('Source lock', { exact: true })).toBeVisible()
+  await expect(page.getByText('normalized-json 1.0.0')).toBeVisible()
+  await expect(page.getByText('mvp-scientific 1.0.0')).toBeVisible()
+  await expect(page.getByText('Source namespaces')).toBeVisible()
+  await expect(page.getByText('License IDs')).toBeVisible()
+  await expect(page.locator('.source-objects article')).toHaveCount(7)
   await expect(page.getByLabel('Taxon and protein evidence')).toContainText('Human')
   await expect(page.getByLabel('Taxon and protein evidence')).toContainText('Mouse')
 
@@ -24,6 +32,20 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
   await page.getByRole('button', { name: /CHEBI:58199/ }).click()
   await expect(page.getByText('Final model value')).toBeVisible()
   await expect(page.getByRole('img', { name: /Homocysteine concentration over time/ })).toBeVisible()
+})
+
+test('rejects mismatched browser provenance without overstating reproducibility', async ({ page }) => {
+  await page.route('**/api/v1/releases/*/provenance', async (route) => {
+    const response = await route.fetch()
+    const payload = await response.json()
+    await route.fulfill({ response, json: { ...payload, releaseDigest: `sha256:${'0'.repeat(64)}` } })
+  })
+  await page.goto('/')
+
+  await expect(page.getByText('Build provenance unavailable')).toBeVisible()
+  await expect(page.getByText('Build provenance does not match the verified release and digest.')).toBeVisible()
+  await expect(page.getByText('Reproducibility is not established from the information currently available.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Run deterministic model' })).toBeEnabled()
 })
 
 test('validates controls before sending a simulation request', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { ModelSchema, NetworkSchema, ReleaseSchema, SimulationResultSchema } from '../shared/contracts.js'
+import { ModelSchema, NetworkSchema, ProvenanceSchema, ReleaseSchema, SimulationResultSchema } from '../shared/contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -26,6 +26,14 @@ export async function loadWorkspace(taxonId, signal) {
 
 export async function loadNetwork(releaseId, taxonId, signal) {
   return NetworkSchema.parse(await requestJson(`/api/v1/releases/${encodeURIComponent(releaseId)}/network?taxon_id=${taxonId}`, withSignal(signal)))
+}
+
+export async function loadProvenance(release, signal) {
+  const provenance = ProvenanceSchema.parse(await requestJson(`/api/v1/releases/${encodeURIComponent(release.id)}/provenance`, withSignal(signal)))
+  if (provenance.releaseId !== release.id || provenance.releaseDigest !== release.digest) {
+    throw new Error('Build provenance does not match the verified release and digest.')
+  }
+  return provenance
 }
 
 export async function runSimulation(input) {

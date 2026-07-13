@@ -1,12 +1,13 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
+import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
 import { MODEL } from '../../server/model.js'
 import { simulate } from '../../server/simulation.js'
 
 const api = vi.hoisted(() => ({
   loadWorkspace: vi.fn(),
   loadNetwork: vi.fn(),
+  loadProvenance: vi.fn(),
   runSimulation: vi.fn()
 }))
 
@@ -23,6 +24,7 @@ function deferred() {
 beforeEach(() => {
   vi.clearAllMocks()
   api.loadWorkspace.mockResolvedValue({ release: BUNDLED_RELEASE, model: MODEL, network: bundledNetwork(9606) })
+  api.loadProvenance.mockResolvedValue(BUNDLED_PROVENANCE)
   api.runSimulation.mockImplementation(async (request) => simulate(request, BUNDLED_RELEASE, bundledNetwork(request.taxonId)))
 })
 
@@ -88,5 +90,14 @@ describe('workbench request hardening', () => {
 
     mouse.resolve(bundledNetwork(10090))
     await waitFor(() => expect(runButton.disabled).toBe(false))
+  })
+
+  it('identifies a provenance request failure without claiming reproducibility or disabling a verified release', async () => {
+    api.loadProvenance.mockRejectedValue(new Error('provenance digest mismatch'))
+    render(App)
+
+    expect(await screen.findByText('provenance digest mismatch')).toBeTruthy()
+    expect(screen.getByText('Reproducibility is not established from the information currently available.')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Run deterministic model' }).disabled).toBe(false)
   })
 })

@@ -1,8 +1,9 @@
 <script setup>
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { TAXA, SimulationRequestSchema } from '../shared/contracts.js'
-import { loadNetwork, loadWorkspace, runSimulation } from './api.js'
+import { loadNetwork, loadProvenance, loadWorkspace, runSimulation } from './api.js'
 import { compatibleRuns } from './comparison.js'
+import BuildProvenance from './components/BuildProvenance.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
@@ -15,6 +16,9 @@ const duration = ref(24)
 const release = ref()
 const model = ref()
 const network = ref()
+const provenance = ref()
+const provenanceState = ref('loading')
+const provenanceError = ref('')
 const result = ref()
 const baseline = ref()
 const selectedId = ref(METABOLITE_IDS.homocysteine)
@@ -24,6 +28,8 @@ const resultIsPrevious = ref(false)
 const errors = ref({})
 let knowledgeGeneration = 0
 let knowledgeController
+let provenanceGeneration = 0
+let provenanceController
 
 const selectedCompound = computed(() => network.value?.compounds.find((item) => item.id === selectedId.value))
 const selectedModelReaction = computed(() => model.value?.topology.reactions.find((item) => item.id === selectedId.value))
@@ -85,6 +91,10 @@ async function initialize() {
   knowledgeController = new AbortController()
   const requestedTaxon = taxonId.value
   network.value = undefined
+  provenance.value = undefined
+  provenanceState.value = 'loading'
+  provenanceError.value = ''
+  provenanceController?.abort()
   state.value = 'loading'
   try {
     const workspace = await loadWorkspace(requestedTaxon, knowledgeController.signal)
@@ -93,10 +103,31 @@ async function initialize() {
     model.value = workspace.model
     network.value = workspace.network
     state.value = 'ready'
+    requestProvenance(workspace.release)
   } catch (error) {
     if (generation !== knowledgeGeneration || isAbort(error)) return
     state.value = 'incompatible'
     message.value = error instanceof Error ? error.message : 'The knowledge release is incompatible.'
+  }
+}
+
+async function requestProvenance(verifiedRelease = release.value) {
+  if (!verifiedRelease) return
+  const generation = ++provenanceGeneration
+  provenanceController?.abort()
+  provenanceController = new AbortController()
+  provenance.value = undefined
+  provenanceState.value = 'loading'
+  provenanceError.value = ''
+  try {
+    const loaded = await loadProvenance(verifiedRelease, provenanceController.signal)
+    if (generation !== provenanceGeneration || verifiedRelease.id !== release.value?.id) return
+    provenance.value = loaded
+    provenanceState.value = 'available'
+  } catch (error) {
+    if (generation !== provenanceGeneration || isAbort(error)) return
+    provenanceState.value = 'unavailable'
+    provenanceError.value = error instanceof Error ? error.message : 'The build provenance request failed.'
   }
 }
 
@@ -145,7 +176,10 @@ function select(id) {
 }
 
 onMounted(initialize)
-onBeforeUnmount(() => knowledgeController?.abort())
+onBeforeUnmount(() => {
+  knowledgeController?.abort()
+  provenanceController?.abort()
+})
 </script>
 
 <template lang="pug">
@@ -185,6 +219,7 @@ main#main
           dt Model / engine
           dd {{ model.version }} / {{ model.engineVersion }}
       p.source-note Curated network evidence is kept separate from model-only concentrations and kinetics.
+      BuildProvenance(:provenance="provenance" :status="provenanceState" :error="provenanceError" @retry="requestProvenance()")
 
   .workspace(v-if="release && model")
     aside.controls-panel(aria-labelledby="experiment-title")
@@ -370,5 +405,6 @@ main#main
         li(v-for="limitation in network.limitations" :key="limitation.id") {{ limitation.statement }}
 
 footer
-  p Reproducible biochemical systems demonstration. No output is medical advice.
+  p(v-if="provenanceState === 'available'") Verified release metadata and build provenance are shown above. No output is medical advice.
+  p(v-else) Build provenance is unavailable; reproducibility is not established. No output is medical advice.
 </template>

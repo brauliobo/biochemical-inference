@@ -46,7 +46,9 @@ BIOCHEMICAL_DB_RELEASE_ID=one-carbon-human-mouse-v1.0.0
 BIOCHEMICAL_DB_EXPECTED_DIGEST=b72d00c072551a6babd348cf88302788e9a7b547cca17f9fb834e7e0cddbeef1
 ```
 
-The upstream must expose the biochemical-db 1.0 catalog and network contracts. The client validates those responses with strict upstream Zod schemas, verifies the release and digest, sends URL-encoded canonical taxon identifiers such as `NCBITaxon%3A9606`, and then adapts the response into the workbench contract. Any unsupported schema, release mismatch, digest mismatch, or unavailable service disables simulation; there is no production fixture fallback.
+The upstream must expose the biochemical-db 1.0 catalog, network, and provenance contracts. The client validates those responses with strict upstream Zod schemas, verifies the pinned release and digest across the catalog, endpoint envelope, and provenance closure, sends URL-encoded canonical taxon identifiers such as `NCBITaxon%3A9606`, and then adapts the responses into workbench contracts. An unsupported catalog or network schema, release mismatch, digest mismatch, or unavailable knowledge service disables simulation; there is no production fixture fallback.
+
+Build provenance is loaded through the inference service's same-origin proxy and shown in an expandable section. It includes recipe, source-lock, transformer, validator, and source-object digests, plus record types, source namespaces, and license identifiers. A provenance-only request failure is displayed explicitly and the UI states that reproducibility is not established; simulation remains available only when the release and network verification have succeeded.
 
 The bundled fixture is available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`.
 
@@ -60,6 +62,8 @@ Optional server settings are `PORT` (default `3000`) and `HOST` (default `127.0.
 
 ```sh
 npm run check
+npm audit
+E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
@@ -69,6 +73,7 @@ Playwright browsers must be installed once with `npx playwright install chromium
 
 - `GET /api/v1/health`
 - `GET /api/v1/releases`
+- `GET /api/v1/releases/:releaseId/provenance`
 - `GET /api/v1/releases/:releaseId/network?taxon_id=9606`
 - `GET /api/v1/models/one-carbon`
 - `POST /api/v1/models/one-carbon/simulations`

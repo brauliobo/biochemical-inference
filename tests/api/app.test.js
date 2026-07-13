@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { buildApp } from '../../server/app.js'
 import { createKnowledgeClient } from '../../server/knowledge/client.js'
 import { BUNDLED_RELEASE } from '../../server/knowledge/fixture.js'
-import { ModelSchema, NetworkSchema, ReleaseSchema } from '../../shared/contracts.js'
+import { ModelSchema, NetworkSchema, ProvenanceSchema, ReleaseSchema } from '../../shared/contracts.js'
 
 let app
 afterEach(async () => app?.close())
@@ -12,12 +12,16 @@ describe('simulation API', () => {
   it('serves model, release, and taxon-filtered network contracts', async () => {
     app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
     const releases = await app.inject({ method: 'GET', url: '/api/v1/releases' })
+    const provenance = await app.inject({ method: 'GET', url: `/api/v1/releases/${BUNDLED_RELEASE.id}/provenance` })
     const network = await app.inject({ method: 'GET', url: `/api/v1/releases/${BUNDLED_RELEASE.id}/network?taxon_id=10090` })
     const model = await app.inject({ method: 'GET', url: '/api/v1/models/one-carbon' })
 
     expect(releases.statusCode).toBe(200)
     expect(() => ReleaseSchema.array().parse(releases.json())).not.toThrow()
     expect(releases.json()[0]).toMatchObject({ id: BUNDLED_RELEASE.id, verified: true })
+    expect(provenance.statusCode).toBe(200)
+    expect(() => ProvenanceSchema.parse(provenance.json())).not.toThrow()
+    expect(provenance.json()).toMatchObject({ releaseId: BUNDLED_RELEASE.id, releaseDigest: BUNDLED_RELEASE.digest })
     expect(network.statusCode).toBe(200)
     expect(() => NetworkSchema.parse(network.json())).not.toThrow()
     expect(network.json().proteins.every((protein) => protein.taxonId === 10090)).toBe(true)

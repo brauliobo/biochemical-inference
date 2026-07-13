@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import {
   NetworkSchema,
+  ProvenanceSchema,
   ReleaseSchema,
   TaxonIdSchema
 } from '../../shared/contracts.js'
@@ -11,6 +12,7 @@ const ReactionIdSchema = z.string().regex(/^RHEA:[1-9][0-9]*$/)
 const ProteinIdSchema = z.string().regex(/^UniProtKB:[A-Z0-9]+$/)
 const ReferenceIdSchema = z.string().regex(/^(PubMed:[1-9][0-9]*|UniProtKB:[A-Z0-9]+)$/)
 const DigestSchema = z.string().regex(/^[a-f0-9]{64}$/)
+const SourceIdSchema = z.string().regex(/^[A-Z][A-Z0-9_]*$/)
 
 const CatalogEntrySchema = z.object({
   release_id: z.string().min(1),
@@ -30,6 +32,41 @@ const ReleaseRefSchema = z.object({
   id: z.string().min(1),
   schema_version: z.literal('1.0.0'),
   digest: DigestSchema
+}).strict()
+
+const ProvenanceArtifactSchema = z.object({
+  path: z.string().regex(/^(recipes|sources\/locks)\/[a-z0-9.-]+\.json$/),
+  sha256: DigestSchema
+}).strict()
+
+const ProvenanceImplementationSchema = z.object({
+  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  version: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
+  sha256: DigestSchema
+}).strict()
+
+const ProvenanceSourceObjectSchema = z.object({
+  name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  record_type: z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']),
+  sha256: DigestSchema,
+  bytes: z.number().int().positive(),
+  source_ids: z.array(SourceIdSchema).min(1),
+  license_id: z.string().min(1)
+}).strict()
+
+const ReleaseProvenanceSchema = z.object({
+  release_id: z.string().min(1),
+  release_digest: DigestSchema,
+  recipe: ProvenanceArtifactSchema,
+  source_lock: ProvenanceArtifactSchema,
+  source_objects: z.array(ProvenanceSourceObjectSchema).min(1),
+  transformer: ProvenanceImplementationSchema,
+  validation: ProvenanceImplementationSchema
+}).strict()
+
+export const BiochemicalDbProvenanceSchema = z.object({
+  release: ReleaseRefSchema,
+  provenance: ReleaseProvenanceSchema
 }).strict()
 
 const TaxonSchema = z.object({
@@ -128,6 +165,27 @@ export function adaptCatalogEntry(entry) {
     supportedTaxa: entry.supported_taxa.map(internalTaxonId),
     verified: true,
     source: 'biochemical-db'
+  })
+}
+
+export function adaptProvenance(payload) {
+  const provenance = payload.provenance
+  const implementation = (value) => ({ id: value.id, version: value.version, digest: `sha256:${value.sha256}` })
+  return ProvenanceSchema.parse({
+    releaseId: provenance.release_id,
+    releaseDigest: `sha256:${provenance.release_digest}`,
+    recipe: { path: provenance.recipe.path, digest: `sha256:${provenance.recipe.sha256}` },
+    sourceLock: { path: provenance.source_lock.path, digest: `sha256:${provenance.source_lock.sha256}` },
+    sourceObjects: provenance.source_objects.map((sourceObject) => ({
+      name: sourceObject.name,
+      recordType: sourceObject.record_type,
+      digest: `sha256:${sourceObject.sha256}`,
+      bytes: sourceObject.bytes,
+      sourceIds: sourceObject.source_ids,
+      licenseId: sourceObject.license_id
+    })),
+    transformer: implementation(provenance.transformer),
+    validation: implementation(provenance.validation)
   })
 }
 

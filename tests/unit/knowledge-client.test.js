@@ -17,6 +17,26 @@ const catalog = {
   }]
 }
 
+const provenance = {
+  release: { id: DEFAULT_RELEASE_ID, schema_version: '1.0.0', digest: DEFAULT_RELEASE_DIGEST },
+  provenance: {
+    release_id: DEFAULT_RELEASE_ID,
+    release_digest: DEFAULT_RELEASE_DIGEST,
+    recipe: { path: `recipes/${DEFAULT_RELEASE_ID}.json`, sha256: 'a'.repeat(64) },
+    source_lock: { path: `sources/locks/${DEFAULT_RELEASE_ID}.json`, sha256: 'b'.repeat(64) },
+    source_objects: [{
+      name: 'one-carbon-compounds',
+      record_type: 'compounds',
+      sha256: 'c'.repeat(64),
+      bytes: 2182,
+      source_ids: ['CHEBI'],
+      license_id: 'CC-BY-4.0'
+    }],
+    transformer: { id: 'normalized-json', version: '1.0.0', sha256: 'd'.repeat(64) },
+    validation: { id: 'mvp-scientific', version: '1.0.0', sha256: 'e'.repeat(64) }
+  }
+}
+
 function network(taxonId) {
   return {
     contract_version: '1.0.0',
@@ -101,6 +121,44 @@ describe('biochemical-db client', () => {
     const client = createKnowledgeClient({ BIOCHEMICAL_DB_EXPECTED_DIGEST: '0'.repeat(64) })
 
     await expect(client.releases()).rejects.toThrow(`Digest mismatch for ${DEFAULT_RELEASE_ID}`)
+  })
+
+  it('loads strict build provenance only when its release and digest match the verified catalog', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(catalog), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(provenance), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(createKnowledgeClient().provenance(DEFAULT_RELEASE_ID)).resolves.toMatchObject({
+      releaseId: DEFAULT_RELEASE_ID,
+      releaseDigest: `sha256:${DEFAULT_RELEASE_DIGEST}`,
+      recipe: { digest: `sha256:${'a'.repeat(64)}` },
+      sourceObjects: [{ recordType: 'compounds', sourceIds: ['CHEBI'], licenseId: 'CC-BY-4.0' }],
+      transformer: { id: 'normalized-json' },
+      validation: { id: 'mvp-scientific' }
+    })
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      `http://127.0.0.1:8000/api/v1/releases/${DEFAULT_RELEASE_ID}/provenance`,
+      expect.any(Object)
+    )
+  })
+
+  it('rejects provenance whose envelope digest differs from the pinned release', async () => {
+    const mismatched = { ...provenance, release: { ...provenance.release, digest: '0'.repeat(64) } }
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(catalog), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(mismatched), { status: 200 })))
+
+    await expect(createKnowledgeClient().provenance(DEFAULT_RELEASE_ID)).rejects.toThrow('provenance does not match the pinned release and digest')
+  })
+
+  it('rejects undocumented provenance fields instead of accepting schema drift', async () => {
+    const undocumented = { ...provenance, provenance: { ...provenance.provenance, undocumented: true } }
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(catalog), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(undocumented), { status: 200 })))
+
+    await expect(createKnowledgeClient().provenance(DEFAULT_RELEASE_ID)).rejects.toThrow('provenance schema is incompatible')
   })
 
   it('rejects undocumented upstream fields instead of silently accepting schema drift', async () => {

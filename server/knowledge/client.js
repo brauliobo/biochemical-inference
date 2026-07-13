@@ -1,11 +1,13 @@
 import {
   adaptCatalogEntry,
   adaptNetwork,
+  adaptProvenance,
   BiochemicalDbCatalogSchema,
   BiochemicalDbNetworkSchema,
+  BiochemicalDbProvenanceSchema,
   canonicalTaxonId
 } from './biochemical-db.js'
-import { BUNDLED_RELEASE, bundledNetwork } from './fixture.js'
+import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from './fixture.js'
 
 export const DEFAULT_BIOCHEMICAL_DB_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_RELEASE_ID = 'one-carbon-human-mouse-v1.0.0'
@@ -25,6 +27,10 @@ export function createKnowledgeClient(env = process.env) {
       async network(releaseId, taxonId) {
         if (releaseId !== BUNDLED_RELEASE.id) throw new KnowledgeCompatibilityError(`Unknown release ${releaseId}`)
         return bundledNetwork(taxonId)
+      },
+      async provenance(releaseId) {
+        if (releaseId !== BUNDLED_RELEASE.id) throw new KnowledgeCompatibilityError(`Unknown release ${releaseId}`)
+        return BUNDLED_PROVENANCE
       }
     }
   }
@@ -62,6 +68,23 @@ export function createKnowledgeClient(env = process.env) {
 
   return {
     async releases() { return [await verifiedRelease()] },
+    async provenance(requestedReleaseId) {
+      if (requestedReleaseId !== releaseId) throw new KnowledgeCompatibilityError(`Only pinned release ${releaseId} is available`)
+      await verifiedRelease()
+      const payload = await fetchJson(`/api/v1/releases/${encodeURIComponent(requestedReleaseId)}/provenance`)
+      const parsed = BiochemicalDbProvenanceSchema.safeParse(payload)
+      if (!parsed.success) throw new KnowledgeCompatibilityError('biochemical-db provenance schema is incompatible with 1.0.0')
+      const { release, provenance } = parsed.data
+      if (
+        release.id !== requestedReleaseId ||
+        provenance.release_id !== requestedReleaseId ||
+        release.digest !== expectedDigest ||
+        provenance.release_digest !== expectedDigest
+      ) {
+        throw new KnowledgeCompatibilityError('biochemical-db provenance does not match the pinned release and digest')
+      }
+      return adaptProvenance(parsed.data)
+    },
     async network(requestedReleaseId, taxonId) {
       if (requestedReleaseId !== releaseId) throw new KnowledgeCompatibilityError(`Only pinned release ${releaseId} is available`)
       await verifiedRelease()
