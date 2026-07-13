@@ -42,8 +42,8 @@ export default defineConfig({
     }],
     {
       command: useFixture
-        ? `BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm run dev`
-        : `BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm run dev`,
+        ? `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm start`
+        : `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm start`,
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: false,
       timeout: 120_000

@@ -110,6 +110,24 @@ Goal 9 workspace root outside source
         +-- static HTML/JSON/CSV/SVG reports with no network
         v
 ExperimentWorkspace + /api/v7/workspace
+
+physiology evidence API :8000
+        | physiology-plugin-evidence-v1.0.0 + independent digest pin
+        v
+strict evidence closure + same-origin /api/v8/physiology proxy
+        |
+        +-- Ed25519 trust store + strict canonical .bpp ZIP validation
+        +-- immutable SHA-256 package objects + SQLite metadata
+        +-- exact semantic/unit/shape/taxon port matching
+        v
+deterministic multirate coupler
+        |
+        +-- integrated source loss / target gain + residual
+        +-- explicit cadence / zero-order hold interpolation
+        +-- 1x / 2x / 4x timestep refinement
+        +-- Bubblewrap-gated process protocol (default refused)
+        v
+PhysiologyPluginWorkbench + persistent synthetic/non-clinical boundary
 ```
 
 ## Active Application
@@ -135,6 +153,8 @@ Goal 6 adds `shared/apap-contracts.js`, `server/apap/`, and `src/components/APAP
 Goal 7 adds `shared/spatial-contracts.js`, `server/spatial/`, `src/spatial.js`, `SpatialTissueWorkbench`, and the lazy `TissueScene`. Spatial trust is independent of the APAP simulation release. Metadata and content are fail-closed at the server boundary; the browser receives only same-origin content IDs. The scene has no placement operation, and the explicit unavailable human HRA mapping cannot become a mouse target. WebGL is an optional projection over the same time, field, bin, values, provenance, and encoding policy exposed semantically.
 
 Goal 9 adds `shared/workspace-contracts.js`, `shared/snapshot-contracts.js`, `server/workspace/`, and `src/components/ExperimentWorkspace.vue`. Metadata is SQLite WAL with foreign keys; specifications, snapshots, results, bundles, and reports are content-addressed objects under `BIOCHEMICAL_WORKSPACE_ROOT`. Scientific run identity is independent of attempt identity. Restart recovery creates a new attempt from a digest-verified specification checkpoint because current engines expose no serializable mid-state. Portable imports validate every ZIP name, size, ratio, and digest before publication and can rerun from the embedded verified snapshot without an upstream service.
+
+Goal 10 adds `shared/physiology-contracts.js`, `server/physiology/`, and `src/components/PhysiologyPluginWorkbench.vue`. The upstream release remains evidence-only. Inference-owned `.bpp` bytes are signed, strictly validated, content-addressed, and immutable; local trust revocation dynamically invalidates certification and execution without deleting audit bytes. Package evidence digests and package-content digests remain separate. Couplings require exact ports, semantics, dimensions, units, scalar shapes, taxon applicability, and complete circulation/liver/kidney closure. Protocol conformance, mass conservation, and timestep convergence are reported separately from scientific validation, which remains unsupported.
 
 ## Service Contract
 

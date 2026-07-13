@@ -71,7 +71,7 @@ dd { margin: .35rem 0 0; font-weight: 600; }
 .controls-panel { grid-column: 1; }
 .network-panel { grid-column: 2; }
 .details-panel { grid-column: 3; }
-.atlas-panel, .evidence-panel, .portfolio-panel, .experiment-workspace, .parameter-study-panel, .apap-panel, .review-panel, .results-panel, .limitations { grid-column: 1 / -1; }
+.atlas-panel, .evidence-panel, .portfolio-panel, .experiment-workspace, .parameter-study-panel, .apap-panel, .review-panel, .physiology-panel, .results-panel, .limitations { grid-column: 1 / -1; }
 .controls-panel form { display: grid; }
 label { margin: 1.05rem 0 .45rem; font-weight: 600; font-size: .86rem; }
 select, input, textarea { width: 100%; min-height: 46px; border: 1px solid #3b5752; border-radius: 2px; background: #0d1816; color: var(--ink); padding: .72rem; }
@@ -395,6 +395,64 @@ small { margin-top: .3rem; color: var(--muted); }
 .event-history span { margin: .35rem 0; color: var(--muted); font-size: .76rem; }
 .event-history summary { cursor: pointer; color: var(--mint); }
 
+.physiology-panel { position: relative; background: linear-gradient(135deg, rgba(14, 29, 31, .98), rgba(24, 27, 24, .98)); }
+.physiology-warning { position: sticky; top: 0; z-index: 8; display: flex; justify-content: space-between; gap: 1rem; margin: calc(clamp(1.15rem, 2vw, 2rem) * -1) calc(clamp(1.15rem, 2vw, 2rem) * -1) 1.5rem; padding: .8rem clamp(1.15rem, 2vw, 2rem); border-bottom: 1px solid var(--amber); background: #302316; color: #f5c58c; }
+.physiology-warning strong { flex: none; font: .7rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.physiology-warning span { font-size: .78rem; text-align: right; }
+.physiology-loading { padding: 1.2rem; border: 1px dashed #3b5752; color: var(--muted); }
+.physiology-provenance { display: grid; grid-template-columns: 1.4fr 2fr 1fr 1fr; gap: 1px; margin: 0; background: var(--line); }
+.physiology-provenance > div { min-width: 0; padding: .9rem; background: #0c1918; }
+.physiology-provenance dd { overflow-wrap: anywhere; font-size: .78rem; }
+.science-separation { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 1px; background: var(--line); }
+.science-separation article { min-width: 0; padding: 1rem; border: 0; background: #11201e; }
+.science-separation article.unsupported-science { background: #231c14; }
+.science-separation strong, .science-separation span { display: block; }
+.science-separation strong { margin-top: .55rem; }
+.science-separation p { margin-bottom: 0; color: var(--muted); font-size: .76rem; line-height: 1.5; }
+.certification-label, .plugin-domain { color: var(--mint); font: .65rem ui-monospace, "SFMono-Regular", Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.plugin-catalog { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; }
+.plugin-card { min-width: 0; padding: 1rem; border: 1px solid var(--line); background: #091615; }
+.plugin-card-heading { display: flex; align-items: start; justify-content: space-between; gap: .7rem; }
+.plugin-card h4 { margin: .35rem 0 .8rem; font-size: .9rem; overflow-wrap: anywhere; }
+.plugin-card h5 { margin: 1rem 0 .4rem; }
+.plugin-card .compact-list div { display: grid; grid-template-columns: minmax(6rem, .38fr) minmax(0, 1fr); }
+.plugin-card .compact-list dd { text-align: right; overflow-wrap: anywhere; }
+.port-list { display: grid; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.port-list li { min-width: 0; padding: .5rem; border-left: 2px solid #3b5752; background: #0e1c1a; }
+.port-list strong, .port-list span { display: block; overflow-wrap: anywhere; }
+.port-list strong { color: var(--mint); font: .66rem/1.45 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.port-list span, .plugin-context { color: var(--muted); font-size: .7rem; line-height: 1.45; }
+.unsupported-text { color: var(--amber); text-transform: uppercase; }
+.conformance-result { padding: .55rem; border-left: 2px solid var(--mint); color: var(--muted); font-size: .7rem; }
+.coupling-editor { display: grid; grid-template-columns: minmax(260px, .52fr) minmax(0, 1.48fr); gap: 1px; margin-top: 1.4rem; background: var(--line); }
+.coupling-controls, .coupling-contract { min-width: 0; padding: 1rem; background: #0c1817; }
+.coupling-controls h3, .coupling-contract h3 { margin-top: 0; }
+.coupling-controls > p, .coupling-contract > p { color: var(--muted); font-size: .76rem; line-height: 1.5; }
+.coupling-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-top: 1rem; }
+.coupling-actions .run-button { margin: 0; }
+.exchange-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: 1rem; }
+.exchange-list article { min-width: 0; display: grid; gap: .35rem; padding: .8rem; border: 1px solid #31534c; background: #091513; }
+.exchange-list strong, .exchange-list code, .exchange-list span { overflow-wrap: anywhere; }
+.exchange-list strong { color: var(--mint); font-size: .76rem; }
+.exchange-list span { color: var(--muted); font-size: .68rem; }
+.physiology-result { margin-top: 1rem; padding: 1rem; border: 1px solid #31534c; background: #081412; }
+.physiology-run-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem; align-items: start; margin-bottom: 1rem; }
+.physiology-run-header code, .physiology-run-header .run-label { display: block; }
+.physiology-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+.physiology-metrics article { min-width: 0; display: grid; gap: .45rem; padding: 1rem; border: 0; background: #11201e; }
+.physiology-metrics span { color: var(--muted); font-size: .7rem; }
+.physiology-metrics strong { overflow-wrap: anywhere; }
+.run-tables { display: grid; grid-template-columns: 1.2fr .8fr; gap: 1rem; margin-top: 1rem; }
+.exchange-audit { margin-top: 1rem; overflow-x: auto; }
+.exchange-audit summary { cursor: pointer; color: var(--mint); font-weight: 700; }
+.coverage-panel { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.coverage-panel > p { color: var(--muted); font-size: .76rem; }
+.coverage-grid { display: grid; grid-template-columns: repeat(8, minmax(95px, 1fr)); gap: 2px; overflow-x: auto; }
+.coverage-grid article { min-width: 95px; display: grid; gap: .3rem; padding: .7rem; border: 1px solid #644e36; background: #1f1913; }
+.coverage-grid article.contract-covered { border-color: #315f54; background: #10231f; }
+.coverage-grid span, .coverage-grid small { color: var(--muted); font-size: .64rem; }
+.coverage-grid strong { text-transform: capitalize; }
+
 .detail-grid { grid-template-columns: repeat(2, 1fr); }
 .connected-list, .protein-list, .evidence-list { padding-left: 1.1rem; color: #bbccc7; font-size: .82rem; line-height: 1.55; }
 .protein-list span, .evidence-list span { display: block; color: var(--muted); font-size: .72rem; }
@@ -460,21 +518,25 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .provenance-grid, .summary-grid, .detail-grid, .diagnostics, .spatial-provenance, .spatial-layout { grid-template-columns: 1fr; }
   .provenance-digests, .provenance-closure, .source-objects { grid-template-columns: 1fr; }
   .entity-list { grid-template-columns: repeat(2, 1fr); }
-  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .experiment-grid, .attempt-columns, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid, .review-linkage, .review-layout, .review-columns, .reviewer-grid { grid-template-columns: 1fr; }
+  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .experiment-grid, .attempt-columns, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid, .review-linkage, .review-layout, .review-columns, .reviewer-grid, .physiology-provenance, .science-separation, .plugin-catalog, .coupling-editor, .exchange-list, .physiology-metrics, .run-tables { grid-template-columns: 1fr; }
   .atlas-controls .run-button { grid-column: auto; }
   .atlas-summary { display: grid; }
   .mapping-heading { display: grid; }
   .evidence-search, .evidence-results, .annotation-grid { grid-template-columns: 1fr; }
   .evidence-result-heading, .document-heading { display: grid; }
   .run-header { grid-template-columns: 1fr; }
+  .physiology-run-header { grid-template-columns: 1fr; }
   .study-metrics, .uncertainty-grid { grid-template-columns: 1fr; }
   .apap-warning { display: grid; }
   .apap-warning span { text-align: left; }
+  .physiology-warning { display: grid; }
+  .physiology-warning span { text-align: left; }
   .apap-time-control { grid-template-columns: 1fr; }
   .chart-card figcaption { display: grid; }
   .limitations ul { columns: 1; }
   .experiment-inline, .history-filters { grid-template-columns: 1fr; }
   .history-heading { display: grid; }
+  .coupling-actions { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

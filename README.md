@@ -139,6 +139,12 @@ Goal 9 stores metadata in SQLite WAL and artifacts in a staged, atomically publi
 
 The v7 workspace distinguishes immutable revisions, scientific run identity, and attempt identity. Process recovery never claims engine continuation: interrupted work is terminalized and a new attempt is explicitly labeled `restart` and `from-specification` after all specification, model, engine, and snapshot digests are checked. Portable ZIP bundles include a manifest, content-addressed objects, and the verified knowledge snapshot; imports reject traversal, duplicates, digest mismatch, and expansion bombs. Imported runs execute offline and must meet their exported exact or tolerance contract. See `docs/EXPERIMENT_WORKSPACE.md`.
 
+### Extensible physiology plugins
+
+Goal 10 independently pins `physiology-plugin-evidence-v1.0.0` with digest `8f7a14db2cebe4603772146b3d1f9f2a8ccafbf2452ef5c9ff856326584fadb8`. Optional settings are `BIOCHEMICAL_PHYSIOLOGY_URL`, `BIOCHEMICAL_PHYSIOLOGY_RELEASE_ID`, `BIOCHEMICAL_PHYSIOLOGY_EXPECTED_DIGEST`, and `BIOCHEMICAL_PHYSIOLOGY_TIMEOUT_MS`. Production has no fixture fallback; the general fixture flag enables the exact synthetic producer contract for tests.
+
+The v8 service adds strict signed `.bpp` packages, an Ed25519 local trust store, immutable package objects, SQLite package/coupling/run metadata, exact semantic port matching, human applicability intersection, integrated exchange accounting, conservation residuals, explicit multirate cadence and interpolation, and 1×/2×/4× timestep convergence. The three shipped circulation/liver/kidney packages are deterministic declarative fixtures whose evidence bindings match the producer exactly. Certification is software conformance only and remains scientifically unsupported. Process packages are refused unless an explicitly configured Bubblewrap binary passes namespace capability checks. See `docs/PHYSIOLOGY_PLUGINS.md`.
+
 Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), explicit comma-separated `CORS_ORIGINS`, and `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` when a trusted development reverse proxy gives the browser a different origin. The development script pins that value to `http://127.0.0.1:5173`; production same-origin serving needs no override.
 
 ## Verification
@@ -150,7 +156,7 @@ E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
-Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and the inference development servers. Evidence and Goal 9 use run-isolated sibling runtime paths outside the source tree; real E2E exercises the canonical network snapshot, non-vector search, and document retrieval and has no generation dependency. Fixture mode enables explicit inference, evidence, and deterministic workspace fixtures.
+Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and a production-built inference server on port 5173. Evidence and Goal 9 use run-isolated sibling runtime paths outside the source tree; real E2E exercises the canonical network snapshot, non-vector search, document retrieval, and pinned physiology release without a generation dependency. Fixture mode enables explicit inference, evidence, physiology, and deterministic workspace fixtures.
 
 ## API
 
@@ -222,6 +228,18 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v7/workspace/artifacts/:artifactId`
 - `GET/POST /api/v7/workspace/comparisons`
 - `GET/POST /api/v7/workspace/reports`
+- `GET /api/v8/physiology`
+- `GET /api/v8/physiology/evidence`
+- `GET /api/v8/physiology/packages`
+- `POST /api/v8/physiology/packages/{validate|install}`
+- `GET /api/v8/physiology/packages/:packageDigest`
+- `POST /api/v8/physiology/packages/:packageDigest/conformance`
+- `GET /api/v8/physiology/trust`
+- `POST /api/v8/physiology/trust`
+- `POST /api/v8/physiology/trust/:keyId/revoke`
+- `GET/POST /api/v8/physiology/couplings`
+- `GET/POST /api/v8/physiology/runs`
+- `GET /api/v8/physiology/coverage`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -240,3 +258,5 @@ See `docs/SPATIAL_WORKBENCH.md` for spatial release integrity, range proxy behav
 See `docs/DERIVED_KNOWLEDGE.md` for canonical bundle identity, APAP assertion lineage, review transitions, reproduction, layer separation, security, and limitations.
 
 See `docs/EXPERIMENT_WORKSPACE.md` for durable identity, queue recovery, resource profiles, specification checkpoints, portable bundle safety, offline rerun verification, report CSP, and limitations.
+
+See `docs/PHYSIOLOGY_PLUGINS.md` for the `.bpp` profile, publisher trust, process sandbox gate, persistence, exact coupling identity, conservation/convergence diagnostics, certification boundary, and unsupported scientific scope.

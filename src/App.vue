@@ -12,6 +12,7 @@ import ExperimentWorkspace from './components/ExperimentWorkspace.vue'
 import ParameterStudyWorkbench from './components/ParameterStudyWorkbench.vue'
 import APAPBenchmarkWorkbench from './components/APAPBenchmarkWorkbench.vue'
 import ReviewWorkbench from './components/ReviewWorkbench.vue'
+import PhysiologyPluginWorkbench from './components/PhysiologyPluginWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -335,6 +336,8 @@ main#main
     APAPBenchmarkWorkbench(@completed="apapRun = $event")
 
     ReviewWorkbench(:apap-run="apapRun")
+
+    PhysiologyPluginWorkbench
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading

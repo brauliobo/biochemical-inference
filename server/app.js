@@ -70,6 +70,21 @@ import {
   RunCreateRequestSchema
 } from '../shared/workspace-contracts.js'
 import { createWorkspaceService, WorkspaceRequestError } from './workspace/service.js'
+import {
+  CouplingCreateRequestSchema,
+  PackageValidationRequestSchema,
+  PHYSIOLOGY_CONTRACT_VERSION,
+  PHYSIOLOGY_CSRF_HEADER,
+  PHYSIOLOGY_CSRF_VALUE,
+  PHYSIOLOGY_RELEASE_DIGEST,
+  PHYSIOLOGY_RELEASE_ID,
+  PHYSIOLOGY_WARNING,
+  PhysiologyDigestSchema,
+  PhysiologyRunRequestSchema,
+  TrustKeyAddRequestSchema
+} from '../shared/physiology-contracts.js'
+import { createPhysiologyClient, PhysiologyCompatibilityError } from './physiology/client.js'
+import { createPhysiologyService, PhysiologyRequestError } from './physiology/service.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -133,6 +148,10 @@ const WorkspaceComparisonParamSchema = z.object({ comparisonId: Sha256Schema }).
 const WorkspaceReportParamSchema = z.object({ reportId: Sha256Schema }).strict()
 const WorkspaceReportFileParamSchema = z.object({ reportId: Sha256Schema, format: z.enum(['html', 'json', 'csv', 'svg']) }).strict()
 const WorkspaceCloneRequestSchema = z.object({ name: z.string().trim().min(1).max(160).optional() }).strict()
+const PhysiologyDigestParamSchema = z.object({ packageDigest: PhysiologyDigestSchema }).strict()
+const PhysiologyCouplingParamSchema = z.object({ couplingDigest: PhysiologyDigestSchema }).strict()
+const PhysiologyRunParamSchema = z.object({ runDigest: PhysiologyDigestSchema }).strict()
+const PhysiologyTrustParamSchema = z.object({ keyId: z.string().regex(/^ed25519:[a-f0-9]{16}$/) }).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function invalidAtlasQuery(reply, parsed) {
@@ -154,6 +173,7 @@ export async function buildApp(options = {}) {
   const apap = options.apapClient ?? createApapClient(env)
   const spatial = options.spatialClient ?? createSpatialClient(env)
   const derived = options.derivedClient ?? createDerivedClient(env)
+  const physiologyEvidence = options.physiologyClient ?? createPhysiologyClient(process.env.VITEST ? { ...env, BIOCHEMICAL_PHYSIOLOGY_USE_FIXTURE: 'true' } : env)
   const portfolioRuns = options.portfolioRunService ?? createRunService()
   const studies = options.studyService ?? createStudyService(parameters)
   const apapRuns = options.apapRunService ?? createApapRunService(apap)
@@ -162,7 +182,13 @@ export async function buildApp(options = {}) {
     env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env,
     knowledgeClient: knowledge
   })
-  app.addHook('onClose', async () => workspace.close?.())
+  const physiology = options.physiologyService ?? await createPhysiologyService({
+    env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env,
+    evidenceClient: physiologyEvidence
+  })
+  app.addHook('onClose', async () => {
+    await Promise.allSettled([workspace.close?.(), physiology.close?.()])
+  })
   const configuredPublicOrigin = env.BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN?.replace(/\/$/, '')
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
@@ -192,6 +218,9 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof WorkspaceRequestError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof PhysiologyCompatibilityError || error instanceof PhysiologyRequestError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -731,6 +760,86 @@ export async function buildApp(options = {}) {
     const headers = parsed.data.format === 'html' ? { 'content-security-policy': report.csp } : {}
     return reply.headers({ ...headers, 'content-type': content.artifact.mediaType, 'x-content-sha256': content.artifact.digest }).send(content.content)
   })
+  const invalidPhysiology = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_PHYSIOLOGY_REQUEST', error: 'Unprocessable Entity', message: 'Physiology request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requirePhysiologyMutation = async (request) => {
+    const origin = request.headers.origin
+    let sameOrigin = false
+    try {
+      const parsed = new URL(origin)
+      const requestOrigin = `${request.protocol}://${request.headers.host}`
+      sameOrigin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.origin === origin && (origin === requestOrigin || origin === configuredPublicOrigin)
+    } catch {
+      sameOrigin = false
+    }
+    if (!sameOrigin || request.headers[PHYSIOLOGY_CSRF_HEADER] !== PHYSIOLOGY_CSRF_VALUE) throw new PhysiologyRequestError('physiology_csrf_rejected', 'Physiology mutation requires an exact same-origin request and CSRF header.', 403)
+  }
+
+  app.get('/api/v8/physiology', async () => ({
+    contractVersion: PHYSIOLOGY_CONTRACT_VERSION,
+    releaseId: PHYSIOLOGY_RELEASE_ID,
+    releaseDigest: PHYSIOLOGY_RELEASE_DIGEST,
+    packageProfile: 'biochemical-physiology-package-v1',
+    processPlugins: physiology.sandbox.available ? 'sandbox-gated' : 'disabled',
+    scientificValidation: 'unsupported',
+    warning: PHYSIOLOGY_WARNING,
+    routes: { evidence: '/api/v8/physiology/evidence', validatePackage: '/api/v8/physiology/packages/validate', installPackage: '/api/v8/physiology/packages/install', catalog: '/api/v8/physiology/packages', couplings: '/api/v8/physiology/couplings', runs: '/api/v8/physiology/runs', coverage: '/api/v8/physiology/coverage', trust: '/api/v8/physiology/trust' }
+  }))
+  app.get('/api/v8/physiology/evidence', async () => physiology.evidence())
+  app.post('/api/v8/physiology/packages/validate', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = PackageValidationRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.validatePackage(Buffer.from(parsed.data.packageBase64, 'base64'))
+  })
+  app.post('/api/v8/physiology/packages/install', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = PackageValidationRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return reply.status(201).send(await physiology.installPackage(Buffer.from(parsed.data.packageBase64, 'base64')))
+  })
+  app.get('/api/v8/physiology/packages', async () => physiology.listPackages())
+  app.get('/api/v8/physiology/packages/:packageDigest', async (request, reply) => {
+    const parsed = PhysiologyDigestParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.getPackage(parsed.data.packageDigest)
+  })
+  app.post('/api/v8/physiology/packages/:packageDigest/conformance', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = PhysiologyDigestParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.conformance(parsed.data.packageDigest)
+  })
+  app.get('/api/v8/physiology/trust', async () => physiology.listTrust())
+  app.post('/api/v8/physiology/trust', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = TrustKeyAddRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return reply.status(201).send(physiology.addTrustKey(parsed.data))
+  })
+  app.post('/api/v8/physiology/trust/:keyId/revoke', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = PhysiologyTrustParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.revokeTrustKey(parsed.data.keyId)
+  })
+  app.get('/api/v8/physiology/couplings', async () => physiology.listCouplings())
+  app.post('/api/v8/physiology/couplings', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = CouplingCreateRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return reply.status(201).send(physiology.createCoupling(parsed.data))
+  })
+  app.get('/api/v8/physiology/couplings/:couplingDigest', async (request, reply) => {
+    const parsed = PhysiologyCouplingParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.getCoupling(parsed.data.couplingDigest)
+  })
+  app.get('/api/v8/physiology/runs', async () => physiology.listRuns())
+  app.post('/api/v8/physiology/runs', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+    const parsed = PhysiologyRunRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return reply.status(201).send(await physiology.run(parsed.data))
+  })
+  app.get('/api/v8/physiology/runs/:runDigest', async (request, reply) => {
+    const parsed = PhysiologyRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidPhysiology(reply, parsed)
+    return physiology.getRun(parsed.data.runDigest)
+  })
+  app.get('/api/v8/physiology/coverage', async () => physiology.coverage())
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {
     const parsed = SimulationRequestSchema.safeParse(request.body)

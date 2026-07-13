@@ -87,6 +87,22 @@ import {
   SpecificationCheckpointSchema,
   WorkspaceEventSchema
 } from '../shared/workspace-contracts.js'
+import {
+  ConformanceResultSchema,
+  CouplingCreateRequestSchema,
+  PHYSIOLOGY_CSRF_HEADER,
+  PHYSIOLOGY_CSRF_VALUE,
+  PackageValidationRequestSchema,
+  PackageValidationResponseSchema,
+  PhysiologyCouplingSchema,
+  PhysiologyCoverageMatrixSchema,
+  PhysiologyDiscoverySchema,
+  PhysiologyEvidenceSchema,
+  PhysiologyPackageSchema,
+  PhysiologyRunRequestSchema,
+  PhysiologyRunSchema,
+  TrustKeySchema
+} from '../shared/physiology-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -100,6 +116,7 @@ async function requestJson(path, init) {
 
 const withSignal = (signal) => signal ? { signal } : {}
 const derivedMutationHeaders = { 'content-type': 'application/json', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
+const physiologyMutationHeaders = { 'content-type': 'application/json', [PHYSIOLOGY_CSRF_HEADER]: PHYSIOLOGY_CSRF_VALUE }
 
 function queryString(values) {
   const query = new URLSearchParams()
@@ -548,6 +565,69 @@ export async function importWorkspaceExperiment(bundleBase64, signal) {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ bundleBase64 }),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadPhysiologyWorkbench(signal) {
+  const [discovery, evidence, packages, trust, coverage, couplings, runs] = await Promise.all([
+    requestJson('/api/v8/physiology', withSignal(signal)).then((payload) => PhysiologyDiscoverySchema.parse(payload)),
+    requestJson('/api/v8/physiology/evidence', withSignal(signal)).then((payload) => PhysiologyEvidenceSchema.parse(payload)),
+    requestJson('/api/v8/physiology/packages', withSignal(signal)).then((payload) => PhysiologyPackageSchema.array().parse(payload)),
+    requestJson('/api/v8/physiology/trust', withSignal(signal)).then((payload) => TrustKeySchema.array().parse(payload)),
+    requestJson('/api/v8/physiology/coverage', withSignal(signal)).then((payload) => PhysiologyCoverageMatrixSchema.parse(payload)),
+    requestJson('/api/v8/physiology/couplings', withSignal(signal)).then((payload) => PhysiologyCouplingSchema.array().parse(payload)),
+    requestJson('/api/v8/physiology/runs', withSignal(signal)).then((payload) => PhysiologyRunSchema.array().parse(payload))
+  ])
+  if (discovery.releaseId !== evidence.release.id || discovery.releaseDigest !== evidence.release.digest || coverage.release.digest !== evidence.release.digest) throw new Error('Physiology responses do not match the independently pinned evidence release and digest.')
+  return { discovery, evidence, packages, trust, coverage, couplings, runs }
+}
+
+export async function validatePhysiologyPackage(packageBase64, signal) {
+  const request = PackageValidationRequestSchema.parse({ packageBase64 })
+  return PackageValidationResponseSchema.parse(await requestJson('/api/v8/physiology/packages/validate', {
+    method: 'POST',
+    headers: physiologyMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function installPhysiologyPackage(packageBase64, signal) {
+  const request = PackageValidationRequestSchema.parse({ packageBase64 })
+  return PhysiologyPackageSchema.parse(await requestJson('/api/v8/physiology/packages/install', {
+    method: 'POST',
+    headers: physiologyMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function runPhysiologyConformance(packageDigest, signal) {
+  return ConformanceResultSchema.parse(await requestJson(`/api/v8/physiology/packages/${encodeURIComponent(packageDigest)}/conformance`, {
+    method: 'POST',
+    headers: physiologyMutationHeaders,
+    body: '{}',
+    ...withSignal(signal)
+  }))
+}
+
+export async function createPhysiologyCoupling(input, signal) {
+  const request = CouplingCreateRequestSchema.parse(input)
+  return PhysiologyCouplingSchema.parse(await requestJson('/api/v8/physiology/couplings', {
+    method: 'POST',
+    headers: physiologyMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function runPhysiologyCoupling(couplingDigest, signal) {
+  const request = PhysiologyRunRequestSchema.parse({ couplingDigest })
+  return PhysiologyRunSchema.parse(await requestJson('/api/v8/physiology/runs', {
+    method: 'POST',
+    headers: physiologyMutationHeaders,
+    body: JSON.stringify(request),
     ...withSignal(signal)
   }))
 }
