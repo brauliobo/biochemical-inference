@@ -18,6 +18,7 @@ import {
   EvidenceSearchResponseSchema
 } from '../shared/evidence-contracts.js'
 import { ExperimentSchema, PortfolioModelSchema, RunRecordSchema } from '../shared/portfolio-contracts.js'
+import { ParameterOptionsResponseSchema, StudyRecordSchema, StudyRequestSchema } from '../shared/parameter-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -95,6 +96,20 @@ export async function runPortfolioExperiment(input, signal) {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ experiment }),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadParameterOptions(signal) {
+  return ParameterOptionsResponseSchema.parse(await requestJson('/api/v2/parameter-options', withSignal(signal)))
+}
+
+export async function runParameterStudy(input, signal) {
+  const request = StudyRequestSchema.parse(input)
+  return StudyRecordSchema.parse(await requestJson('/api/v2/studies', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
     ...withSignal(signal)
   }))
 }

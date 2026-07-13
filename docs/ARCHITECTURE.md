@@ -48,6 +48,22 @@ validated JSON IPC -> bounded child process
         |
         v
 strict terminal result + PortfolioWorkbench
+
+parameter API :8000
+        | parameter-evidence-benchmark-v1.0.0 + digest pin
+        v
+strict parameter adapter + context/unit/taxon selection
+        |
+        v
+immediate-terminal /api/v2/studies
+        |
+        +-- centered finite-difference + seeded Morris
+        +-- bounded Nelder-Mead + Fisher identifiability
+        +-- multi-chain random-walk Metropolis + held-out prediction
+        +-- numerical/model-form robustness matrix
+        |
+        v
+ParameterStudyWorkbench
 ```
 
 ## Active Application
@@ -66,6 +82,8 @@ The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the 
 
 Goal 4 adds `shared/portfolio-contracts.js`, `server/portfolio/`, and `src/components/PortfolioWorkbench.vue`. Registry models are immutable declarative data. Numerical execution occurs only in bounded child processes; the parent validates input and output contracts and owns timeout, output-limit, cancellation, and lifecycle transitions. The archive boundary validates XML and ZIP safety before a model can reach execution.
 
+Goal 5 adds `shared/parameter-contracts.js`, `server/parameters/`, `server/studies/`, and `src/components/ParameterStudyWorkbench.vue`. Parameter evidence is independently pinned and fail-closed. Studies are bounded synchronous benchmark analyses rather than Goal 9 background jobs; their immediate terminal records still distinguish successful and non-converged outcomes.
+
 ## Service Contract
 
 - `GET /api/v1/health`
@@ -79,6 +97,8 @@ The inference service proxies knowledge requests so the browser has one origin a
 Atlas v2 adds read-only same-origin release detail, entity, claims, bounded subgraph, coverage, and taxon network routes. The network projection supplies mappings and limitations that are not present in the producer's subgraph response. Traversal bounds are validated at the Fastify boundary before upstream access.
 
 Evidence is a third independent compatibility boundary. The server verifies `mthfr-evidence-v1.0.0` and digest `93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701` through evidence health before search, document, or candidate operations. Strict schemas cover release references, ranking components, documents, licenses, lifecycle, licensed sections, exact spans, PubTator annotations/relations, and unreviewed candidates. Browser code receives only same-origin proxy responses and never receives an Ollama endpoint or direct evidence-service access.
+
+Parameter evidence is a fourth independent compatibility boundary. It verifies `parameter-evidence-benchmark-v1.0.0` and digest `6e72e6bebf3b18aa2edd95dae7e719799cb6916a3e58bb68e697347eebce7fa9` before every operation. Candidate and dataset response closures retain contexts, evidence, correlations, uncertainties, observations, and fixed partitions. Calibration and posterior likelihood receive only calibration IDs; held-out IDs enter only posterior predictive validation.
 
 The evidence index is disposable derived state. Candidate storage is a separate mutable workspace. Neither is part of an immutable release, and the inference service has no route that promotes a candidate into atlas or trusted knowledge.
 

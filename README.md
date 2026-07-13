@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism simulation, a standards-based ODE/SSA/FBA portfolio, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism simulation, a standards-based ODE/SSA/FBA portfolio, parameter calibration and uncertainty, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -66,6 +66,19 @@ Build provenance is loaded through the inference service's same-origin proxy and
 
 The bundled v1 and atlas v2 fixtures are available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`. The atlas fixture follows the real v2 response contracts and release identifiers while its source is visibly marked `bundled-demonstration`.
 
+### Parameter evidence
+
+The Goal 5 parameter client independently pins:
+
+```sh
+BIOCHEMICAL_PARAMETERS_URL=http://127.0.0.1:8000
+BIOCHEMICAL_PARAMETERS_RELEASE_ID=parameter-evidence-benchmark-v1.0.0
+BIOCHEMICAL_PARAMETERS_EXPECTED_DIGEST=6e72e6bebf3b18aa2edd95dae7e719799cb6916a3e58bb68e697347eebce7fa9
+BIOCHEMICAL_PARAMETERS_TIMEOUT_MS=5000
+```
+
+Strict upstream and internal Zod schemas cover release references, contexts, point/interval/distribution candidates, evidence, correlations, uncertainty categories, datasets, observations, and fixed partitions. Candidate selection prefers exact context and canonical units, performs only dimension-compatible conversions, exposes all exclusions, and rejects taxon transfer without an explicit transform. The bundled parameter fixture is enabled by `BIOCHEMICAL_PARAMETERS_USE_FIXTURE=true` or the general inference fixture flag. See `docs/PARAMETER_STUDIES.md` for algorithms and scientific boundaries.
+
 ### Literature evidence
 
 The independent Goal 3 evidence service is consumed server-to-server and pinned separately:
@@ -124,6 +137,9 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `POST /api/v2/runs`
 - `GET /api/v2/runs/:runId`
 - `DELETE /api/v2/runs/:runId`
+- `GET /api/v2/parameter-options?parameter_id=PARAMETER%3ADECAY-K&target_context_id=CONTEXT%3ASYNTHETIC-DECAY`
+- `POST /api/v2/studies`
+- `GET /api/v2/studies/:studyId`
 - `GET /api/v3/evidence/health`
 - `POST /api/v3/evidence/search`
 - `GET /api/v3/evidence/documents/:identifier`
@@ -138,3 +154,5 @@ See `docs/ATLAS_EXPLORER.md` for atlas contract, interpretation, and failure bou
 See `docs/EVIDENCE_PANEL.md` for the evidence contract, ranking interpretation, license behavior, and candidate trust boundary.
 
 See `docs/SIMULATION_PORTFOLIO.md` for algorithms, strict v2 contracts, units, worker limits, and the exact SBML L3/SED-ML/COMBINE supported profile.
+
+See `docs/PARAMETER_STUDIES.md` for parameter selection, study algorithms, convergence diagnostics, held-out validation, and uncertainty boundaries.

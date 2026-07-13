@@ -14,6 +14,10 @@ import { ArchiveValidationRequestSchema, ExperimentSchema, Sha256Schema } from '
 import { exportCombineArchive, validateCombineArchive } from './portfolio/archive.js'
 import { createRunService, PortfolioRequestError, validateExperimentForModel } from './portfolio/execution.js'
 import { getModel, listModels } from './portfolio/registry.js'
+import { ParameterOptionsQuerySchema, StudyRequestSchema } from '../shared/parameter-contracts.js'
+import { createParameterClient, ParameterCompatibilityError } from './parameters/client.js'
+import { loadParameterOptions, ParameterSelectionError } from './parameters/selection.js'
+import { createStudyService } from './studies/service.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -47,6 +51,7 @@ const EvidenceDocumentParamSchema = z.object({ identifier: z.string().min(1).max
 const EvidenceCandidateParamSchema = z.object({ candidateId: z.string().regex(/^CANDIDATE:[a-f0-9]{32}$/) }).strict()
 const PortfolioRunRequestSchema = z.object({ experiment: ExperimentSchema }).strict()
 const PortfolioRunParamSchema = z.object({ runId: Sha256Schema }).strict()
+const StudyParamSchema = z.object({ studyId: Sha256Schema }).strict()
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -63,7 +68,9 @@ export async function buildApp(options = {}) {
   const app = Fastify({ logger: env.NODE_ENV !== 'test' })
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
+  const parameters = options.parameterClient ?? createParameterClient(env)
   const portfolioRuns = options.portfolioRunService ?? createRunService()
+  const studies = options.studyService ?? createStudyService(parameters)
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
@@ -74,6 +81,9 @@ export async function buildApp(options = {}) {
       return reply.status(409).send({ statusCode: 409, code: 'KNOWLEDGE_INCOMPATIBLE', error: 'Conflict', message: error.message })
     }
     if (error instanceof EvidenceCompatibilityError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof ParameterCompatibilityError || error instanceof ParameterSelectionError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -193,6 +203,22 @@ export async function buildApp(options = {}) {
     if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_RUN_ID', error: 'Bad Request', message: 'Run identifier is invalid.' })
     if (!portfolioRuns.cancel(parsed.data.runId)) return reply.status(409).send({ statusCode: 409, code: 'RUN_NOT_CANCELLABLE', error: 'Conflict', message: 'Run is not active or is already terminal.' })
     return reply.status(202).send({ runId: parsed.data.runId, lifecycle: 'running', cancellationRequested: true })
+  })
+  app.get('/api/v2/parameter-options', async (request, reply) => {
+    const parsed = ParameterOptionsQuerySchema.safeParse(request.query)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_PARAMETER_OPTIONS', error: 'Bad Request', message: 'Parameter option filters are invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return loadParameterOptions(parameters, { parameterId: parsed.data.parameter_id, targetContextId: parsed.data.target_context_id })
+  })
+  app.post('/api/v2/studies', async (request, reply) => {
+    const parsed = StudyRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_STUDY', error: 'Unprocessable Entity', message: 'Study controls are invalid.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return reply.status(201).send(await studies.create(parsed.data))
+  })
+  app.get('/api/v2/studies/:studyId', async (request, reply) => {
+    const parsed = StudyParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_STUDY_ID', error: 'Bad Request', message: 'Study identifier is invalid.' })
+    const record = studies.get(parsed.data.studyId)
+    return record ?? reply.status(404).send({ statusCode: 404, code: 'STUDY_NOT_FOUND', error: 'Not Found', message: 'Parameter study is not available.' })
   })
   app.get('/api/v3/evidence/health', async () => evidence.health())
   app.post('/api/v3/evidence/search', async (request, reply) => {

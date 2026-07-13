@@ -101,6 +101,8 @@ Replace the single demonstration engine with composable scientific model types.
 
 ## Goal 5: Parameter Evidence, Calibration, And Uncertainty
 
+Status: delivered for the pinned synthetic algorithm benchmark in the active inference application. See `docs/PARAMETER_STUDIES.md` for algorithms, convergence gates, uncertainty labels, and limitations. External measured BRENDA, SABIO-RK, BioModels, and literature parameter releases remain future data work.
+
 Make simulation conclusions evidence-aware rather than single-valued demonstrations.
 
 ### Scope

@@ -8,6 +8,7 @@ import AtlasExplorer from './components/AtlasExplorer.vue'
 import EvidencePanel from './components/EvidencePanel.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import PortfolioWorkbench from './components/PortfolioWorkbench.vue'
+import ParameterStudyWorkbench from './components/ParameterStudyWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -322,6 +323,8 @@ main#main
     EvidencePanel(:suggested-query="evidenceQuery")
 
     PortfolioWorkbench
+
+    ParameterStudyWorkbench
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading
