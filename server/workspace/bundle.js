@@ -3,12 +3,11 @@ import yauzl from 'yauzl'
 import yazl from 'yazl'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import { KnowledgeSnapshotSchema } from '../../shared/snapshot-contracts.js'
-import { PORTABLE_BUNDLE_PROFILE, PortableBundleManifestSchema, WorkspaceRunResultSchema, WorkspaceSpecificationSchema } from '../../shared/workspace-contracts.js'
+import { PORTABLE_BUNDLE_PROFILE, PortableBundleManifestSchema, WORKSPACE_MAX_BUNDLE_BYTES, WorkspaceRunResultSchema, WorkspaceSpecificationSchema } from '../../shared/workspace-contracts.js'
 import { verifyKnowledgeSnapshot } from '../knowledge/snapshot.js'
 import { modelDigest } from '../portfolio/identity.js'
 import { engineIdentity, specificationIdentity } from './identity.js'
 
-const MAX_ARCHIVE_BYTES = 25_000_000
 const MAX_ENTRY_BYTES = 25_000_000
 const MAX_TOTAL_BYTES = 50_000_000
 const MAX_ENTRIES = 260
@@ -59,7 +58,7 @@ export async function exportPortableBundle({ experiment, revision, specification
 }
 
 function readZip(buffer) {
-  if (!Buffer.isBuffer(buffer) || buffer.length === 0 || buffer.length > MAX_ARCHIVE_BYTES) return Promise.reject(new Error(`bundle: compressed bundle must be 1..${MAX_ARCHIVE_BYTES} bytes`))
+  if (!Buffer.isBuffer(buffer) || buffer.length === 0 || buffer.length > WORKSPACE_MAX_BUNDLE_BYTES) return Promise.reject(new Error(`bundle: compressed bundle must be 1..${WORKSPACE_MAX_BUNDLE_BYTES} bytes`))
   return new Promise((resolve, reject) => {
     yauzl.fromBuffer(buffer, { lazyEntries: true, decodeStrings: true, validateEntrySizes: true, strictFileNames: true }, (openError, zip) => {
       if (openError) return reject(openError)

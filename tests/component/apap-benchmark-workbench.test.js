@@ -14,6 +14,12 @@ let workspace
 let record
 let spatial
 
+function deferred() {
+  let resolve
+  const promise = new Promise((complete) => { resolve = complete })
+  return { promise, resolve }
+}
+
 beforeAll(async () => {
   const client = createApapFixtureClient()
   const closure = await loadApapClosure(client)
@@ -54,7 +60,7 @@ describe('APAPBenchmarkWorkbench', () => {
     await waitFor(() => expect(api.runApapBenchmark).toHaveBeenCalledOnce())
 
     expect(await screen.findByText('Canonical APAP run identity')).toBeTruthy()
-    expect(screen.getByRole('img', { name: /adduct across 12 portal-to-central lobule bins/ })).toBeTruthy()
+    expect(screen.getByRole('group', { name: /adduct across 12 portal-to-central lobule bins/ })).toBeTruthy()
     expect(screen.getByText(/Accessible lobule state/)).toBeTruthy()
     expect(await screen.findByText('Synthetic lobule spatial view')).toBeTruthy()
     expect(screen.getByText('Synthetic geometry · HRA unavailable')).toBeTruthy()
@@ -63,5 +69,20 @@ describe('APAPBenchmarkWorkbench', () => {
     expect(screen.getByText('Pass · zero-cyp')).toBeTruthy()
     expect(screen.getByText('Pass · zero-binding')).toBeTruthy()
     expect(screen.getByText('Pass · uniform-zonation')).toBeTruthy()
+  })
+
+  it('locks all request-defining controls and ignores a response after its generation ends', async () => {
+    const pending = deferred()
+    api.runApapBenchmark.mockReturnValue(pending.promise)
+    const view = render(APAPBenchmarkWorkbench)
+    await fireEvent.click(await screen.findByRole('button', { name: 'Run APAP benchmark' }))
+
+    for (const control of screen.getAllByRole('button').filter((button) => button.classList.contains('apap-context') || button.classList.contains('protocol-card'))) expect(control.disabled).toBe(true)
+    for (const name of ['CYP activity', 'NAPQI adduct binding', 'Zonation amplitude', 'NAC-to-GSH term']) expect(screen.getByLabelText(name).disabled).toBe(true)
+
+    view.unmount()
+    pending.resolve(record)
+    await Promise.resolve()
+    expect(view.emitted().completed).toBeUndefined()
   })
 })

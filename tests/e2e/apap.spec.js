@@ -15,7 +15,7 @@ test('runs APAP with inspectable outputs, unsupported validation, and limiting d
   const response = await responsePromise
   expect(response.ok(), await response.text()).toBe(true)
   await expect(workbench.getByText('Canonical APAP run identity')).toBeVisible()
-  await expect(workbench.getByRole('img', { name: /adduct across 12 portal-to-central lobule bins/ })).toBeVisible()
+  await expect(workbench.getByRole('group', { name: /adduct across 12 portal-to-central lobule bins/ })).toBeVisible()
   await expect(workbench.getByText('Pass · zero-cyp')).toBeVisible()
   await expect(workbench.getByText('Pass · zero-binding')).toBeVisible()
   await expect(workbench.getByText('Pass · uniform-zonation')).toBeVisible()

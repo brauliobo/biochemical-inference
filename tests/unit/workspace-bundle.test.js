@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createKnowledgeClient } from '../../server/knowledge/client.js'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import { importPortableBundle } from '../../server/workspace/bundle.js'
+import { modelDigest } from '../../server/portfolio/identity.js'
+import { ODE_MODEL } from '../../server/portfolio/registry.js'
 import { createWorkspaceService } from '../../server/workspace/service.js'
 import { workspaceSpecification } from '../fixtures/workspace.js'
 import { isolatedTestRoot } from '../fixtures/test-root.js'
@@ -119,5 +121,25 @@ describe('portable workspace bundles', () => {
 
     const bomb = await zip([['objects/sha256/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', Buffer.alloc(1_000_000)]])
     await expect(importPortableBundle(bomb)).rejects.toThrow(/compression ratio/)
+  })
+
+  it('retains an imported non-registry model by exact ID and digest', async () => {
+    const changed = { ...ODE_MODEL, name: 'Externally supplied exact ODE', assumptions: [...ODE_MODEL.assumptions, 'External immutable model variant.'] }
+    const externalModel = { ...changed, digest: modelDigest(changed) }
+    const source = await workspace()
+    const created = await source.createExperiment({ name: 'External model', description: '', specification: workspaceSpecification({ model: externalModel }), resourceProfileId: 'local-default' })
+    const exported = await source.exportExperiment(created.experiment.experimentId)
+    const offline = await workspace({ async snapshot() { throw new Error('import must use the embedded snapshot') } })
+
+    const imported = await offline.importExperiment(Buffer.from(exported.bundleBase64, 'base64'))
+    const embedded = imported.revisions[0].specification.entries[0].model
+    const reexported = await offline.exportExperiment(imported.experiment.experimentId)
+    const parsed = await importPortableBundle(Buffer.from(reexported.bundleBase64, 'base64'))
+
+    expect(embedded).toEqual(externalModel)
+    expect(embedded.id).toBe(ODE_MODEL.id)
+    expect(embedded.digest).not.toBe(ODE_MODEL.digest)
+    expect(parsed.specification.entries[0].model).toEqual(externalModel)
+    expect(() => offline.queueRun({ revisionId: imported.revisions[0].revisionId })).toThrow(/inspectable and exportable only/)
   })
 })

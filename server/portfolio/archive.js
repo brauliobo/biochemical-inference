@@ -2,11 +2,10 @@ import { XMLParser } from 'fast-xml-parser'
 import yauzl from 'yauzl'
 import yazl from 'yazl'
 import { canonicalJson } from '../../shared/canonical-json.js'
-import { ExperimentSchema, PortfolioModelSchema } from '../../shared/portfolio-contracts.js'
+import { ExperimentSchema, PORTFOLIO_MAX_ARCHIVE_BYTES, PortfolioModelSchema } from '../../shared/portfolio-contracts.js'
 import { modelDigest } from './identity.js'
 
 export const COMBINE_PROFILE = 'portfolio-combine-1.0'
-const MAX_ARCHIVE_BYTES = 2_000_000
 const MAX_ENTRY_BYTES = 2_000_000
 const MAX_TOTAL_BYTES = 5_000_000
 const MAX_ENTRIES = 32
@@ -311,7 +310,7 @@ export function importSedml(xml, path = 'experiment.sedml') {
 }
 
 function readArchive(buffer) {
-  if (!Buffer.isBuffer(buffer) || buffer.length === 0 || buffer.length > MAX_ARCHIVE_BYTES) return Promise.reject(new Error(`archive: compressed archive must be 1..${MAX_ARCHIVE_BYTES} bytes`))
+  if (!Buffer.isBuffer(buffer) || buffer.length === 0 || buffer.length > PORTFOLIO_MAX_ARCHIVE_BYTES) return Promise.reject(new Error(`archive: compressed archive must be 1..${PORTFOLIO_MAX_ARCHIVE_BYTES} bytes`))
   return new Promise((resolve, reject) => {
     yauzl.fromBuffer(buffer, { lazyEntries: true, decodeStrings: true, validateEntrySizes: true }, (openError, zip) => {
       if (openError) return reject(openError)

@@ -10,12 +10,34 @@ const durationMinutes = ref(4)
 const coupling = ref()
 const run = ref()
 const conformance = ref({})
+const selectedPackageDigests = ref({})
 let controller
 
+const requiredPluginIds = ['PLUGIN:CIRCULATION-REFERENCE', 'PLUGIN:LIVER-REFERENCE', 'PLUGIN:KIDNEY-REFERENCE']
 const packages = computed(() => workspace.value?.packages ?? [])
+const selectedPackages = computed(() => requiredPluginIds.map((pluginId) => packages.value.find((item) => item.manifest.pluginId === pluginId && item.packageDigest === selectedPackageDigests.value[pluginId] && item.trust.status === 'trusted')).filter(Boolean))
 const evidenceByPlugin = computed(() => new Map((workspace.value?.evidence.modelEvidence ?? []).map((item) => [item.plugin_id, item])))
 const contextById = computed(() => new Map((workspace.value?.evidence.contexts ?? []).map((item) => [item.id, item])))
 const isBusy = computed(() => ['coupling', 'running'].includes(state.value))
+
+function samePackageClosure(left, right) {
+  return [...left].sort().join(',') === [...right].sort().join(',')
+}
+
+function clearSelectionResult() {
+  coupling.value = undefined
+  run.value = undefined
+}
+
+function choosePackage(item) {
+  if (isBusy.value || item.trust.status !== 'trusted') return
+  selectedPackageDigests.value = { ...selectedPackageDigests.value, [item.manifest.pluginId]: item.packageDigest }
+  clearSelectionResult()
+}
+
+function changeCouplingControls() {
+  clearSelectionResult()
+}
 
 async function initialize() {
   controller?.abort()
@@ -23,9 +45,16 @@ async function initialize() {
   state.value = 'loading'
   message.value = ''
   try {
-    workspace.value = await loadPhysiologyWorkbench(controller.signal)
-    coupling.value = workspace.value.couplings.at(-1)
-    run.value = workspace.value.runs.at(-1)
+    const loaded = await loadPhysiologyWorkbench(controller.signal)
+    workspace.value = loaded
+    selectedPackageDigests.value = Object.fromEntries(requiredPluginIds.map((pluginId) => {
+      const trusted = loaded.packages.filter((item) => item.manifest.pluginId === pluginId && item.trust.status === 'trusted')
+      const selected = trusted.find((item) => item.builtIn) ?? trusted.at(-1)
+      return [pluginId, selected?.packageDigest ?? '']
+    }))
+    const selectedDigests = selectedPackages.value.map((item) => item.packageDigest)
+    coupling.value = [...loaded.couplings].reverse().find((item) => item.taxonId === taxonId.value && item.durationMinutes === Number(durationMinutes.value) && samePackageClosure(item.packageDigests, selectedDigests))
+    run.value = coupling.value ? [...loaded.runs].reverse().find((item) => item.couplingDigest === coupling.value.couplingDigest) : undefined
     state.value = 'ready'
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') return
@@ -49,12 +78,13 @@ async function checkConformance(item) {
 }
 
 async function buildCoupling() {
+  if (selectedPackages.value.length !== requiredPluginIds.length) return
   state.value = 'coupling'
   message.value = ''
-  run.value = undefined
+  clearSelectionResult()
   try {
     coupling.value = await createPhysiologyCoupling({
-      packageDigests: packages.value.map((item) => item.packageDigest),
+      packageDigests: selectedPackages.value.map((item) => item.packageDigest),
       taxonId: taxonId.value,
       durationMinutes: Number(durationMinutes.value),
       couplingCadenceMinutes: 1,
@@ -71,10 +101,13 @@ async function buildCoupling() {
 
 async function execute() {
   if (!coupling.value) return
+  const couplingDigest = coupling.value.couplingDigest
   state.value = 'running'
   message.value = ''
   try {
-    run.value = await runPhysiologyCoupling(coupling.value.couplingDigest, controller?.signal)
+    const completed = await runPhysiologyCoupling(couplingDigest, controller?.signal)
+    if (coupling.value?.couplingDigest !== couplingDigest || completed.couplingDigest !== couplingDigest) throw new Error('Physiology run does not match the displayed coupling digest.')
+    run.value = completed
     state.value = 'ready'
   } catch (error) {
     state.value = 'failed'
@@ -168,6 +201,9 @@ section.physiology-panel(aria-labelledby="physiology-title")
             strong {{ port.direction }} · {{ port.id }}
             span {{ port.semantic }} · {{ port.dimension }} · {{ port.unit }}
         p.plugin-context {{ contextById.get(item.manifest.applicability.contextIds[0])?.name }} · {{ item.manifest.applicability.taxonIds[0] }}
+        label
+          input(type="radio" :name="`physiology-package-${item.manifest.pluginId}`" :checked="selectedPackageDigests[item.manifest.pluginId] === item.packageDigest" :disabled="isBusy || item.trust.status !== 'trusted'" @change="choosePackage(item)")
+          span Use this exact package for {{ item.manifest.pluginId }}
         button.secondary(type="button" :disabled="isBusy || item.trust.status !== 'trusted'" @click="checkConformance(item)") Run and persist conformance
         p.conformance-result(v-if="conformance[item.packageDigest]") Protocol {{ conformance[item.packageDigest].benchmark.passed ? 'passed' : 'failed' }} · scientific validation {{ conformance[item.packageDigest].scientificValidation }}
 
@@ -176,11 +212,11 @@ section.physiology-panel(aria-labelledby="physiology-title")
         h3 Coupling editor
         p Four extensive `mg/min` exchanges use exact interval integration. Cadence and interpolation are explicit; incompatible units, shapes, ports, taxa, and extrapolations are blocked.
         label(for="physiology-taxon") Applicability taxon
-        select#physiology-taxon(v-model="taxonId" :disabled="isBusy")
+        select#physiology-taxon(v-model="taxonId" :disabled="isBusy" @change="changeCouplingControls")
           option(value="NCBITaxon:9606") Homo sapiens · supported synthetic contract
           option(value="NCBITaxon:10090") Mus musculus · unsupported, must block
         label(for="physiology-duration") Bounded duration
-        select#physiology-duration(v-model.number="durationMinutes" :disabled="isBusy")
+        select#physiology-duration(v-model.number="durationMinutes" :disabled="isBusy" @change="changeCouplingControls")
           option(v-for="minute in [1, 2, 3, 4]" :key="minute" :value="minute") {{ minute }} min
         dl.compact-list
           div
@@ -196,7 +232,7 @@ section.physiology-panel(aria-labelledby="physiology-title")
             dt Refinement
             dd 1× / 2× / 4×
         .coupling-actions
-          button.run-button(type="button" :disabled="isBusy || packages.length !== 3" @click="buildCoupling") {{ state === 'coupling' ? 'Validating…' : 'Create exact coupling' }}
+          button.run-button(type="button" :disabled="isBusy || selectedPackages.length !== 3" @click="buildCoupling") {{ state === 'coupling' ? 'Validating…' : 'Create exact coupling' }}
           button.secondary(type="button" :disabled="isBusy || !coupling" @click="execute") {{ state === 'running' ? 'Running…' : 'Run coupled fixture' }}
       .coupling-contract(v-if="coupling")
         h3 Immutable coupling contract

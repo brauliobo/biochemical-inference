@@ -88,10 +88,37 @@ function selectFromKeyboard(event) {
   emit('selectBin', Math.max(0, Math.min(11, keys[event.key])))
 }
 
-function markUnavailable(message) {
-  fallback.value = message
+function teardown(forceContextLoss = true) {
   cancelAnimationFrame(frame)
+  frame = 0
+  resizeObserver?.disconnect()
+  resizeObserver = undefined
+  const currentRenderer = renderer
+  currentRenderer?.domElement.removeEventListener('pointerdown', selectFromPointer)
+  currentRenderer?.domElement.removeEventListener('webglcontextlost', contextLost)
+  scene?.traverse((object) => {
+    if ('geometry' in object) object.geometry?.dispose()
+    if ('material' in object) (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material?.dispose())
+  })
+  currentRenderer?.dispose()
+  if (forceContextLoss) currentRenderer?.forceContextLoss()
+  currentRenderer?.domElement.remove()
+  renderer = undefined
+  scene = undefined
+  camera = undefined
+  cellsMesh = undefined
+  lobule = undefined
+}
+
+function markUnavailable(message, forceContextLoss = true) {
+  fallback.value = message
+  teardown(forceContextLoss)
   emit('unavailable', message)
+}
+
+function contextLost(event) {
+  event.preventDefault()
+  markUnavailable('The WebGL context was lost.', false)
 }
 
 onMounted(() => {
@@ -107,11 +134,7 @@ onMounted(() => {
     renderer.domElement.setAttribute('aria-hidden', 'true')
     renderer.domElement.tabIndex = -1
     renderer.domElement.addEventListener('pointerdown', selectFromPointer)
-    renderer.domElement.addEventListener('webglcontextlost', (event) => {
-      event.preventDefault()
-      renderer.domElement.hidden = true
-      markUnavailable('The WebGL context was lost.')
-    }, { once: true })
+    renderer.domElement.addEventListener('webglcontextlost', contextLost, { once: true })
     host.value.append(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0x8ed0bd, 1.5))
@@ -138,6 +161,7 @@ onMounted(() => {
     updateEncoding()
 
     const resize = () => {
+      if (!renderer || !camera || !host.value) return
       const width = host.value.clientWidth
       const height = Math.max(320, host.value.clientHeight)
       renderer.setSize(width, height, false)
@@ -162,18 +186,7 @@ onMounted(() => {
 
 watch([() => props.snapshot, () => props.field, () => props.selectedBin], updateEncoding)
 
-onBeforeUnmount(() => {
-  cancelAnimationFrame(frame)
-  resizeObserver?.disconnect()
-  renderer?.domElement.removeEventListener('pointerdown', selectFromPointer)
-  scene?.traverse((object) => {
-    if ('geometry' in object) object.geometry?.dispose()
-    if ('material' in object) (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material?.dispose())
-  })
-  renderer?.dispose()
-  if (!fallback.value) renderer?.forceContextLoss()
-  renderer?.domElement.remove()
-})
+onBeforeUnmount(teardown)
 </script>
 
 <template lang="pug">

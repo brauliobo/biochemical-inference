@@ -20,6 +20,7 @@ const adductBinding = ref(1)
 const zonation = ref(1)
 const nacGsh = ref(1)
 let controller
+let generation = 0
 
 const selectedProtocol = computed(() => workspace.value?.protocols.find((item) => item.id === selectedProtocolId.value))
 const selectedContext = computed(() => workspace.value?.contexts.find((item) => item.id === selectedProtocol.value?.context_id))
@@ -34,6 +35,7 @@ const modelParameterDiff = computed(() => {
 })
 
 function chooseProtocol(protocol) {
+  if (state.value === 'running') return
   selectedProtocolId.value = protocol.id
   result.value = records.value[protocol.context_id]?.result.protocol.id === protocol.id ? records.value[protocol.context_id].result : undefined
   timeIndex.value = 0
@@ -41,20 +43,24 @@ function chooseProtocol(protocol) {
 }
 
 function chooseContext(contextId) {
+  if (state.value === 'running') return
   const protocol = workspace.value?.protocols.find((item) => item.context_id === contextId && item.protocol_class !== 'delayed-nac')
   if (protocol) chooseProtocol(protocol)
 }
 
 async function initialize() {
+  const requestGeneration = ++generation
   controller?.abort()
   controller = new AbortController()
   state.value = 'loading'
   message.value = ''
   try {
-    workspace.value = await loadApapWorkspace(controller.signal)
+    const loaded = await loadApapWorkspace(controller.signal)
+    if (requestGeneration !== generation) return
+    workspace.value = loaded
     state.value = 'ready'
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
+    if (requestGeneration !== generation || error instanceof DOMException && error.name === 'AbortError') return
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'The pinned APAP benchmark could not be verified.'
   }
@@ -62,6 +68,9 @@ async function initialize() {
 
 async function run() {
   if (!selectedProtocol.value || state.value === 'running') return
+  const requestGeneration = ++generation
+  const protocolId = selectedProtocol.value.id
+  const contextId = selectedProtocol.value.context_id
   controller?.abort()
   controller = new AbortController()
   state.value = 'running'
@@ -69,19 +78,20 @@ async function run() {
   try {
     const record = await runApapBenchmark({
       releaseId: APAP_RELEASE_ID,
-      contextId: selectedProtocol.value.context_id,
-      protocolId: selectedProtocol.value.id,
+      contextId,
+      protocolId,
       stepHours: 0.01,
       outputEveryHours: 0.5,
       mechanismScales: { cypActivity: cypActivity.value, adductBinding: adductBinding.value, zonation: zonation.value, nacGsh: nacGsh.value }
     }, controller.signal)
+    if (requestGeneration !== generation || selectedProtocolId.value !== protocolId || record.result.context.id !== contextId || record.result.protocol.id !== protocolId) return
     result.value = record.result
     records.value = { ...records.value, [record.result.context.id]: record }
     emit('completed', record)
     timeIndex.value = record.result.timeHours.length - 1
     state.value = 'ready'
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
+    if (requestGeneration !== generation || error instanceof DOMException && error.name === 'AbortError') return
     result.value = undefined
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'The APAP benchmark run failed.'
@@ -95,7 +105,10 @@ function heatStyle(value, values) {
 }
 
 onMounted(initialize)
-onBeforeUnmount(() => controller?.abort())
+onBeforeUnmount(() => {
+  generation += 1
+  controller?.abort()
+})
 </script>
 
 <template lang="pug">
@@ -129,14 +142,14 @@ section.apap-panel(aria-labelledby="apap-title")
 
     h3 Human and mouse contexts
     .apap-contexts
-      button.apap-context(v-for="context in workspace.contexts" :key="context.id" type="button" :class="{ selected: selectedContext?.id === context.id }" :aria-pressed="selectedContext?.id === context.id" @click="chooseContext(context.id)")
+      button.apap-context(v-for="context in workspace.contexts" :key="context.id" type="button" :class="{ selected: selectedContext?.id === context.id }" :aria-pressed="selectedContext?.id === context.id" :disabled="state === 'running'" @click="chooseContext(context.id)")
         span {{ context.taxon_label }}
         strong {{ context.id }}
         small {{ context.challenge_route }} · {{ context.strain ?? 'no cohort/strain asserted' }} · {{ context.sex }} · {{ context.fasting_status }}
 
     h3 Bounded synthetic protocols
     .protocol-cards
-      button.protocol-card(v-for="protocol in workspace.protocols" :key="protocol.id" type="button" :class="{ selected: selectedProtocolId === protocol.id }" :aria-pressed="selectedProtocolId === protocol.id" @click="chooseProtocol(protocol)")
+      button.protocol-card(v-for="protocol in workspace.protocols" :key="protocol.id" type="button" :class="{ selected: selectedProtocolId === protocol.id }" :aria-pressed="selectedProtocolId === protocol.id" :disabled="state === 'running'" @click="chooseProtocol(protocol)")
         span.assumption-label {{ protocol.protocol_class }} · unsupported
         strong {{ protocol.name }}
         small {{ protocol.observation_window.lower }}–{{ protocol.observation_window.upper }} h · {{ protocol.interventions.map(item => `${item.role} ${item.dose.lower} ${item.dose.unit} at ${item.start_time.lower} h`).join(' · ') }}
@@ -224,7 +237,7 @@ section.apap-panel(aria-labelledby="apap-title")
 
     template(v-if="snapshot")
       SpatialTissueWorkbench(:taxon-id="selectedContext.taxon_id" :snapshot="snapshot" :time-index="timeIndex" :field="heatmapVariable" :selected-bin="selectedBin" @select-bin="selectedBin = $event")
-      .lobule-heatmap(role="img" :aria-label="`${heatmapVariable} across 12 portal-to-central lobule bins at ${snapshot.timeHours} hours`")
+      .lobule-heatmap(role="group" :aria-label="`${heatmapVariable} across 12 portal-to-central lobule bins at ${snapshot.timeHours} hours`")
         button(v-for="(value, index) in snapshot[heatmapVariable]" :key="index" type="button" :class="{ selected: selectedBin === index }" :style="heatStyle(value, snapshot[heatmapVariable])" :aria-label="`Bin ${index + 1}: ${value}`" :aria-pressed="selectedBin === index" @click="selectedBin = index")
           span {{ index + 1 }}
           strong {{ value.toFixed(4) }}

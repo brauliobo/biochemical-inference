@@ -104,12 +104,29 @@ import {
   TrustKeySchema
 } from '../shared/physiology-contracts.js'
 
-async function requestJson(path, init) {
-  const response = await fetch(path, init)
+export class ApiError extends Error {
+  constructor(message, { status, code, payload } = {}) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.code = code
+    this.payload = payload
+  }
+}
+
+export async function requestJson(path, init) {
+  let response
+  try {
+    response = await fetch(path, init)
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    throw new ApiError(error instanceof Error ? error.message : 'Network request failed.', { status: 0, code: 'NETWORK_ERROR', payload: null })
+  }
   const payload = await response.json().catch(() => null)
   if (!response.ok) {
     const message = payload && typeof payload === 'object' && 'message' in payload ? String(payload.message) : `Request failed with status ${response.status}`
-    throw new Error(message)
+    const code = payload && typeof payload === 'object' && 'code' in payload && typeof payload.code === 'string' ? payload.code : 'HTTP_ERROR'
+    throw new ApiError(message, { status: response.status, code, payload })
   }
   return payload
 }

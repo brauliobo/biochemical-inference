@@ -53,4 +53,14 @@ describe('experiment workspace API v7', () => {
     expect(exported.json()).toMatchObject({ profile: 'biochemical-workspace-portable-1.0' })
     expect(ExperimentDetailSchema.parse(imported.json()).revisions[0].source).toBe('import')
   })
+
+  it('passes a valid >1 MiB portable-bundle encoding to bundle validation', async () => {
+    app = await buildApp({ serveClient: false, knowledgeClient: createKnowledgeClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' }), env: { NODE_ENV: 'test' } })
+    const bundleBase64 = Buffer.alloc(825_000).toString('base64')
+    const response = await app.inject({ method: 'POST', url: '/api/v7/workspace/experiments/import', payload: { bundleBase64 } })
+
+    expect(Buffer.byteLength(JSON.stringify({ bundleBase64 }))).toBeGreaterThan(1_048_576)
+    expect(response.statusCode).toBe(422)
+    expect(response.json().code).toBe('invalid_portable_bundle')
+  })
 })

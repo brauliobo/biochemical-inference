@@ -28,45 +28,62 @@ const role = ref('scientific-reviewer')
 const reason = ref('Reviewed against the visible synthetic scope, lineage, context, uncertainty, and limitations.')
 const supersedingDigest = ref('')
 let controller
+let selectionController
+let layersController
+let refreshGeneration = 0
+let selectionGeneration = 0
+let layersGeneration = 0
 
 const reviewer = computed(() => ({ id: reviewerId.value, name: reviewerName.value, organization: organization.value, role: role.value }))
 const reviewStatus = computed(() => detail.value?.state.review_status)
-const acceptedTargets = computed(() => assertions.value.filter((item) => item.digest !== selectedDigest.value && item.state.review_status === 'accepted'))
+const displayedDigest = computed(() => detail.value?.digest ?? '')
+const canMutateDisplayed = computed(() => Boolean(displayedDigest.value) && displayedDigest.value === selectedDigest.value && state.value !== 'submitting')
+const acceptedTargets = computed(() => assertions.value.filter((item) => item.digest !== displayedDigest.value && item.state.review_status === 'accepted'))
 
 function isAbort(error) {
   return error instanceof DOMException && error.name === 'AbortError'
 }
 
-async function loadLayers(signal) {
+async function fetchLayers(signal) {
   const source = props.apapRun ? {
     family: 'apap',
     release_id: props.apapRun.result.release.id,
     collection: 'protocols',
     record_id: props.apapRun.result.protocol.id
   } : null
-  layers.value = await queryDerivedLayers({
+  return queryDerivedLayers({
     layers: source ? ['source', 'reviewed-derived'] : ['reviewed-derived'],
     source,
     reviewed_derived: { subject_id: 'OBSERVABLE:APAP-PEAK-INJURED-FRACTION', classification: 'predicted' }
   }, signal)
 }
 
-async function loadSelected(signal) {
-  if (!selectedDigest.value) {
-    detail.value = undefined
-    events.value = []
-    return
-  }
+async function fetchSelected(digest, signal) {
+  if (!digest) return { selected: undefined, history: [] }
   const [selected, history] = await Promise.all([
-    loadDerivedAssertion(selectedDigest.value, signal),
-    loadDerivedEvents(selectedDigest.value, signal)
+    loadDerivedAssertion(digest, signal),
+    loadDerivedEvents(digest, signal)
   ])
-  detail.value = selected
-  events.value = history.items
+  return { selected, history: history.items }
+}
+
+async function refreshLayers() {
+  const generation = ++layersGeneration
+  layersController?.abort()
+  layersController = new AbortController()
+  try {
+    const loaded = await fetchLayers(layersController.signal)
+    if (generation === layersGeneration) layers.value = loaded
+  } catch (error) {
+    if (!isAbort(error) && generation === layersGeneration) layers.value = undefined
+  }
 }
 
 async function refresh(preferredDigest = selectedDigest.value) {
+  const generation = ++refreshGeneration
+  selectionGeneration += 1
   controller?.abort()
+  selectionController?.abort()
   controller = new AbortController()
   state.value = 'loading'
   try {
@@ -74,26 +91,43 @@ async function refresh(preferredDigest = selectedDigest.value) {
       loadDerivedHealth(controller.signal),
       loadDerivedAssertions({}, controller.signal)
     ])
+    if (generation !== refreshGeneration) return
     health.value = loadedHealth
     assertions.value = queue.items
-    selectedDigest.value = queue.items.some((item) => item.digest === preferredDigest) ? preferredDigest : queue.items[0]?.digest ?? ''
-    await Promise.all([loadSelected(controller.signal), loadLayers(controller.signal)])
+    const digest = queue.items.some((item) => item.digest === preferredDigest) ? preferredDigest : queue.items[0]?.digest ?? ''
+    selectedDigest.value = digest
+    const [selection, loadedLayers] = await Promise.all([fetchSelected(digest, controller.signal), fetchLayers(controller.signal)])
+    if (generation !== refreshGeneration || selectedDigest.value !== digest) return
+    detail.value = selection.selected
+    events.value = selection.history
+    layers.value = loadedLayers
     state.value = 'ready'
   } catch (error) {
-    if (isAbort(error)) return
+    if (generation !== refreshGeneration || isAbort(error)) return
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'The reviewed-derived workspace is unavailable.'
   }
 }
 
 async function selectAssertion(digest) {
+  refreshGeneration += 1
+  controller?.abort()
+  const generation = ++selectionGeneration
+  selectionController?.abort()
+  selectionController = new AbortController()
   selectedDigest.value = digest
+  detail.value = undefined
+  events.value = []
   state.value = 'loading'
   message.value = ''
   try {
-    await loadSelected()
+    const selection = await fetchSelected(digest, selectionController.signal)
+    if (generation !== selectionGeneration || selectedDigest.value !== digest) return
+    detail.value = selection.selected
+    events.value = selection.history
     state.value = 'ready'
   } catch (error) {
+    if (generation !== selectionGeneration || isAbort(error)) return
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'Assertion detail could not be loaded.'
   }
@@ -114,11 +148,12 @@ async function submit() {
 }
 
 async function review(action) {
-  if (!selectedDigest.value) return
+  const assertionDigest = displayedDigest.value
+  if (!assertionDigest || assertionDigest !== selectedDigest.value) return
   state.value = 'submitting'
   message.value = ''
   try {
-    await appendDerivedReviewEvent(selectedDigest.value, {
+    await appendDerivedReviewEvent(assertionDigest, {
       action,
       reviewer: reviewer.value,
       reason: reason.value,
@@ -126,7 +161,7 @@ async function review(action) {
       reproduction_artifact_digest: null
     })
     message.value = `Signed ${action} review event appended.`
-    await refresh(selectedDigest.value)
+    await refresh(assertionDigest)
   } catch (error) {
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'The review event was rejected.'
@@ -134,13 +169,14 @@ async function review(action) {
 }
 
 async function reproduce() {
-  if (!props.apapRun || !selectedDigest.value) return
+  const assertionDigest = displayedDigest.value
+  if (!props.apapRun || !assertionDigest || assertionDigest !== selectedDigest.value) return
   state.value = 'submitting'
   message.value = ''
   try {
-    await reproduceDerivedAssertion(selectedDigest.value, { run_id: props.apapRun.runId, reviewer: reviewer.value, reason: reason.value })
+    await reproduceDerivedAssertion(assertionDigest, { run_id: props.apapRun.runId, reviewer: reviewer.value, reason: reason.value })
     message.value = 'Exact APAP specification reproduced the canonical result; signed verification appended.'
-    await refresh(selectedDigest.value)
+    await refresh(assertionDigest)
   } catch (error) {
     state.value = 'failed'
     message.value = error instanceof Error ? error.message : 'Reproduction did not verify.'
@@ -149,10 +185,17 @@ async function reproduce() {
 
 watch(() => props.apapRun?.runId, () => {
   message.value = props.apapRun ? 'Completed APAP run is ready for content-addressed submission.' : ''
-  loadLayers().catch(() => {})
+  refreshLayers()
 })
 onMounted(refresh)
-onBeforeUnmount(() => controller?.abort())
+onBeforeUnmount(() => {
+  refreshGeneration += 1
+  selectionGeneration += 1
+  layersGeneration += 1
+  controller?.abort()
+  selectionController?.abort()
+  layersController?.abort()
+})
 </script>
 
 <template lang="pug">
@@ -186,7 +229,7 @@ section.review-panel(aria-labelledby="review-title")
     aside.review-queue(aria-label="Derived review queue")
       h3 Review queue
       p(v-if="!assertions.length") No derived assertions have been submitted.
-      button.candidate-row(v-for="item in assertions" :key="item.digest" type="button" :class="{ selected: item.digest === selectedDigest }" :aria-pressed="item.digest === selectedDigest" @click="selectAssertion(item.digest)")
+      button.candidate-row(v-for="item in assertions" :key="item.digest" type="button" :class="{ selected: item.digest === selectedDigest }" :aria-pressed="item.digest === selectedDigest" :disabled="state === 'submitting'" @click="selectAssertion(item.digest)")
         strong {{ item.state.review_status }} · {{ item.assertion.classification }}
         span {{ item.assertion.property }}
         code {{ item.digest }}
@@ -265,16 +308,16 @@ section.review-panel(aria-labelledby="review-title")
         label(for="review-reason") Review reason
         textarea#review-reason(v-model="reason" rows="3" required)
         .review-actions(v-if="reviewStatus === 'pending'")
-          button.run-button(type="button" @click="review('accepted')") Accept
-          button.secondary(type="button" @click="review('rejected')") Reject
+          button.run-button(type="button" :disabled="!canMutateDisplayed" @click="review('accepted')") Accept
+          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('rejected')") Reject
         .review-actions(v-else-if="reviewStatus === 'accepted'")
-          button.run-button(v-if="!detail.state.reproduction_verified" type="button" :disabled="!apapRun" @click="reproduce") Reproduce exact APAP run
-          button.secondary(type="button" @click="review('recalculation-requested')") Request recalculation
-          button.secondary(type="button" @click="review('invalidated')") Invalidate
+          button.run-button(v-if="!detail.state.reproduction_verified" type="button" :disabled="!apapRun || !canMutateDisplayed" @click="reproduce") Reproduce exact APAP run
+          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('recalculation-requested')") Request recalculation
+          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('invalidated')") Invalidate
           select(v-model="supersedingDigest" aria-label="Accepted superseding assertion")
             option(value="") Select accepted replacement
             option(v-for="target in acceptedTargets" :key="target.digest" :value="target.digest") {{ target.digest }}
-          button.secondary(type="button" :disabled="!supersedingDigest" @click="review('superseded')") Supersede
+          button.secondary(type="button" :disabled="!supersedingDigest || !canMutateDisplayed" @click="review('superseded')") Supersede
         p(v-else) This terminal review state remains auditable and allows no further events.
 
       h3 Signed event history

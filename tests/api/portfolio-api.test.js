@@ -49,4 +49,17 @@ describe('portfolio API v2', () => {
     expect(digestMismatch.json()).toMatchObject({ code: 'model_mismatch' })
     expect(algorithmMismatch.json()).toMatchObject({ code: 'algorithm_mismatch' })
   })
+
+  it('allows a valid >1 MiB archive encoding to reach validation while ordinary routes stay small', async () => {
+    app = await buildApp({ serveClient: false, knowledgeClient: createKnowledgeClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' }), env: { NODE_ENV: 'test' } })
+    const archiveBase64 = Buffer.alloc(825_000).toString('base64')
+    const archive = await app.inject({ method: 'POST', url: '/api/v2/model-archives/validate', payload: { archiveBase64 } })
+    const ordinary = await app.inject({ method: 'POST', url: '/api/v1/models/one-carbon/simulations', payload: { padding: 'x'.repeat(1_050_000) } })
+
+    expect(Buffer.byteLength(JSON.stringify({ archiveBase64 }))).toBeGreaterThan(1_048_576)
+    expect(archive.statusCode).toBe(200)
+    expect(archive.json()).toMatchObject({ valid: false, findings: [{ code: 'archive_validation' }] })
+    expect(ordinary.statusCode).toBe(413)
+    expect(ordinary.json().code).toBe('FST_ERR_CTP_BODY_TOO_LARGE')
+  })
 })

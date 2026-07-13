@@ -3,6 +3,9 @@ import { ExperimentSchema, PortfolioModelSchema, PortfolioResultSchema, RunOutco
 
 export const WORKSPACE_CONTRACT_VERSION = '1.0.0'
 export const PORTABLE_BUNDLE_PROFILE = 'biochemical-workspace-portable-1.0'
+export const WORKSPACE_MAX_BUNDLE_BYTES = 25_000_000
+export const WORKSPACE_BUNDLE_BASE64_MAX_LENGTH = Math.ceil(WORKSPACE_MAX_BUNDLE_BYTES / 3) * 4
+export const WORKSPACE_BUNDLE_REQUEST_BODY_LIMIT = WORKSPACE_BUNDLE_BASE64_MAX_LENGTH + 64
 
 const IdentifierSchema = z.string().regex(/^[A-Za-z][A-Za-z0-9_.-]{0,63}$/)
 const TimestampSchema = z.string().datetime({ offset: true })
@@ -244,5 +247,5 @@ export const PortableBundleManifestSchema = z.object({
   rerun: z.object({ contract: NumericalContractSchema, expectedResultDigest: Sha256Schema.nullable() }).strict()
 }).strict()
 
-export const BundleImportRequestSchema = z.object({ bundleBase64: z.string().min(1).max(70_000_000).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
+export const BundleImportRequestSchema = z.object({ bundleBase64: z.string().min(1).max(WORKSPACE_BUNDLE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
 export const BundleExportResponseSchema = z.object({ profile: z.literal(PORTABLE_BUNDLE_PROFILE), fileName: z.string().regex(/^[A-Za-z0-9_.-]+\.zip$/), bundleBase64: z.string().min(1) }).strict()

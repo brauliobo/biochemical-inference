@@ -8,6 +8,8 @@ export const PHYSIOLOGY_CSRF_HEADER = 'x-physiology-csrf'
 export const PHYSIOLOGY_CSRF_VALUE = 'physiology-v1'
 export const BPP_PROFILE = 'biochemical-physiology-package-v1'
 export const BPP_MAX_ARCHIVE_BYTES = 1_000_000
+export const BPP_BASE64_MAX_LENGTH = Math.ceil(BPP_MAX_ARCHIVE_BYTES / 3) * 4
+export const BPP_REQUEST_BODY_LIMIT = BPP_BASE64_MAX_LENGTH + 64
 export const BPP_MAX_ENTRY_BYTES = 256_000
 export const BPP_MAX_TOTAL_BYTES = 750_000
 export const BPP_MAX_ENTRIES = 8
@@ -321,7 +323,7 @@ export const BppSignatureSchema = z.object({
   signature: z.string().regex(/^[A-Za-z0-9+/]{86}==$/)
 }).strict()
 
-export const PackageValidationRequestSchema = z.object({ packageBase64: z.string().min(4).max(Math.ceil(BPP_MAX_ARCHIVE_BYTES * 4 / 3) + 8).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/) }).strict()
+export const PackageValidationRequestSchema = z.object({ packageBase64: z.string().min(4).max(BPP_BASE64_MAX_LENGTH).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/) }).strict()
 export const PackageFindingSchema = z.object({ code: z.string().regex(/^[a-z0-9_]+$/), path: z.string().min(1), message: z.string().min(1) }).strict()
 
 export const CertificationSchema = z.object({

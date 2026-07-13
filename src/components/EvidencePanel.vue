@@ -32,6 +32,9 @@ let controller
 let searchController
 let documentController
 let candidateController
+let searchGeneration = 0
+let documentGeneration = 0
+let candidateGeneration = 0
 
 const release = computed(() => health.value?.release)
 const spanById = computed(() => new Map((documentResponse.value?.spans ?? []).map((span) => [span.id, span])))
@@ -65,21 +68,32 @@ function useSelection() {
 
 async function search() {
   if (!release.value || !query.value.trim()) return
+  const generation = ++searchGeneration
+  documentGeneration += 1
+  candidateGeneration += 1
   searchController?.abort()
+  documentController?.abort()
+  candidateController?.abort()
   searchController = new AbortController()
   results.value = []
   searchResponse.value = undefined
   documentResponse.value = undefined
+  selectedCandidate.value = undefined
   selectedSpanIds.value = []
   searchState.value = 'searching'
+  documentState.value = 'idle'
+  candidateState.value = 'idle'
   message.value = ''
+  documentMessage.value = ''
+  candidateMessage.value = ''
   try {
     const response = await searchEvidence(release.value, { query: query.value, limit: 10, use_vector: useVector.value }, searchController.signal)
+    if (generation !== searchGeneration) return
     searchResponse.value = response
     results.value = response.items
     searchState.value = 'ready'
   } catch (error) {
-    if (isAbort(error)) return
+    if (generation !== searchGeneration || isAbort(error)) return
     searchState.value = useVector.value ? 'vector-failed' : 'failed'
     message.value = errorMessage(error, 'Evidence search failed.')
   }
@@ -87,32 +101,42 @@ async function search() {
 
 async function openDocument(identifier) {
   if (!release.value) return
+  const generation = ++documentGeneration
+  const owner = searchGeneration
+  candidateGeneration += 1
   documentController?.abort()
+  candidateController?.abort()
   documentController = new AbortController()
   documentResponse.value = undefined
+  selectedCandidate.value = undefined
   selectedSpanIds.value = []
   documentState.value = 'loading'
   documentMessage.value = ''
   candidateState.value = 'idle'
   candidateMessage.value = ''
   try {
-    documentResponse.value = await loadEvidenceDocument(release.value, identifier, documentController.signal)
+    const response = await loadEvidenceDocument(release.value, identifier, documentController.signal)
+    if (generation !== documentGeneration || owner !== searchGeneration) return
+    documentResponse.value = response
     documentState.value = 'ready'
   } catch (error) {
-    if (isAbort(error)) return
+    if (generation !== documentGeneration || owner !== searchGeneration || isAbort(error)) return
     documentState.value = 'failed'
     documentMessage.value = errorMessage(error, 'The evidence document could not be loaded.')
   }
 }
 
-async function refreshCandidates() {
+async function refreshCandidates(signal = controller?.signal, current = () => true) {
   if (!release.value) return
-  const response = await loadEvidenceCandidates(release.value, controller?.signal)
-  candidates.value = response.items
+  const response = await loadEvidenceCandidates(release.value, signal)
+  if (current()) candidates.value = response.items
 }
 
 async function extractCandidate() {
   if (!release.value || !documentResponse.value || !canExtract.value) return
+  const generation = ++candidateGeneration
+  const owner = searchGeneration
+  const documentId = documentResponse.value.document.id
   candidateController?.abort()
   candidateController = new AbortController()
   candidateState.value = 'extracting'
@@ -120,31 +144,36 @@ async function extractCandidate() {
   selectedCandidate.value = undefined
   try {
     const response = await extractEvidenceCandidate(release.value, {
-      document_id: documentResponse.value.document.id,
-      span_ids: selectedSpanIds.value,
+      document_id: documentId,
+      span_ids: [...selectedSpanIds.value],
       instruction: instruction.value
     }, candidateController.signal)
+    if (generation !== candidateGeneration || owner !== searchGeneration || documentId !== documentResponse.value?.document.id) return
     selectedCandidate.value = response.candidate
     candidateState.value = 'ready'
-    await refreshCandidates()
+    await refreshCandidates(candidateController.signal, () => generation === candidateGeneration && owner === searchGeneration)
   } catch (error) {
-    if (isAbort(error)) return
-    candidateState.value = 'generation-failed'
-    candidateMessage.value = errorMessage(error, 'Ollama generation is unavailable.')
+    if (generation !== candidateGeneration || owner !== searchGeneration || isAbort(error)) return
+    candidateState.value = error && typeof error === 'object' && error.code === 'EVIDENCE_MODEL_UNAVAILABLE' ? 'generation-unavailable' : 'failed'
+    candidateMessage.value = errorMessage(error, 'Candidate extraction failed.')
   }
 }
 
 async function openCandidate(identifier) {
   if (!release.value) return
+  const generation = ++candidateGeneration
+  const owner = searchGeneration
   candidateController?.abort()
   candidateController = new AbortController()
   candidateState.value = 'loading'
   candidateMessage.value = ''
   try {
-    selectedCandidate.value = (await loadEvidenceCandidate(release.value, identifier, candidateController.signal)).candidate
+    const response = await loadEvidenceCandidate(release.value, identifier, candidateController.signal)
+    if (generation !== candidateGeneration || owner !== searchGeneration) return
+    selectedCandidate.value = response.candidate
     candidateState.value = 'ready'
   } catch (error) {
-    if (isAbort(error)) return
+    if (generation !== candidateGeneration || owner !== searchGeneration || isAbort(error)) return
     candidateState.value = 'failed'
     candidateMessage.value = errorMessage(error, 'The unreviewed candidate could not be loaded.')
   }
@@ -317,7 +346,7 @@ section.evidence-panel(aria-labelledby="literature-title")
         textarea#candidate-instruction(v-model="instruction" maxlength="2000" rows="3")
         p {{ selectedSpanIds.length }} exact span{{ selectedSpanIds.length === 1 ? '' : 's' }} selected.
         button.run-button(type="submit" :disabled="!canExtract") {{ candidateState === 'extracting' ? 'Generating candidate…' : 'Extract unreviewed candidate' }}
-      .alert.error(v-if="candidateState === 'generation-failed'" role="alert")
+      .alert.error(v-if="candidateState === 'generation-unavailable'" role="alert")
         strong Ollama generation unavailable; no candidate was created
         p {{ candidateMessage }}
         button.secondary(type="button" @click="extractCandidate") Retry candidate generation

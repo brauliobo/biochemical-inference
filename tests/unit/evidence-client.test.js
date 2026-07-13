@@ -55,4 +55,24 @@ describe('evidence service boundary', () => {
     expect(response.explanations.annotation).toContain('PubTator')
     expect(lexical.vector_metadata).toBeNull()
   })
+
+  it('classifies only explicit Ollama availability failures as model unavailable', async () => {
+    const health = {
+      status: 'ok',
+      release: { id: DEFAULT_EVIDENCE_RELEASE_ID, schema_version: '3.0.0', digest: DEFAULT_EVIDENCE_RELEASE_DIGEST },
+      documents: 3
+    }
+    let detail = 'Ollama generation response is invalid: malformed JSON'
+    vi.stubGlobal('fetch', vi.fn(async (url) => new Response(JSON.stringify(String(url).endsWith('/healthz') ? health : { detail }), {
+      status: String(url).endsWith('/healthz') ? 200 : 503,
+      headers: { 'content-type': 'application/json' }
+    })))
+    const client = createEvidenceClient()
+    const request = { document_id: 'EVIDENCE-DOC:1', span_ids: ['SPAN:TEST'], instruction: 'Extract.' }
+
+    await expect(client.extract(request)).rejects.toMatchObject({ code: 'EVIDENCE_UPSTREAM_ERROR' })
+
+    detail = 'Ollama model is not installed: qwen3:4b'
+    await expect(client.extract(request)).rejects.toMatchObject({ code: 'EVIDENCE_MODEL_UNAVAILABLE' })
+  })
 })

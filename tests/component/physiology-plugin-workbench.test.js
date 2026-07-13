@@ -86,4 +86,32 @@ describe('PhysiologyPluginWorkbench', () => {
     expect(await screen.findByText(/mouse extrapolation is blocked/i)).toBeTruthy()
     await waitFor(() => expect(screen.getByText('PLUGIN:CIRCULATION-REFERENCE')).toBeTruthy())
   })
+
+  it('restores a run only from the selected coupling digest and clears it when controls change', async () => {
+    const unrelatedRun = { ...run, runDigest: `sha256:${'f'.repeat(64)}`, couplingDigest: `sha256:${'e'.repeat(64)}` }
+    api.loadPhysiologyWorkbench.mockResolvedValue({ ...workspace, couplings: [coupling], runs: [run, unrelatedRun] })
+    render(PhysiologyPluginWorkbench)
+
+    expect(await screen.findByText(run.runDigest)).toBeTruthy()
+    expect(screen.queryByText(unrelatedRun.runDigest)).toBeNull()
+    await fireEvent.update(screen.getByLabelText('Bounded duration'), '3')
+    expect(screen.queryByRole('heading', { name: 'Immutable coupling contract' })).toBeNull()
+    expect(screen.queryByText(run.runDigest)).toBeNull()
+  })
+
+  it('selects exactly one trusted package per required plugin when duplicate catalog entries exist', async () => {
+    const original = workspace.packages[0]
+    const replacement = { ...original, packageDigest: `sha256:${'d'.repeat(64)}`, builtIn: false }
+    api.loadPhysiologyWorkbench.mockResolvedValue({ ...workspace, packages: [...workspace.packages, replacement], couplings: [coupling], runs: [run] })
+    render(PhysiologyPluginWorkbench)
+    const choices = await screen.findAllByLabelText(`Use this exact package for ${original.manifest.pluginId}`)
+    await fireEvent.click(choices[1])
+
+    expect(screen.queryByRole('heading', { name: 'Immutable coupling contract' })).toBeNull()
+    await fireEvent.click(screen.getByRole('button', { name: 'Create exact coupling' }))
+    const request = api.createPhysiologyCoupling.mock.calls[0][0]
+    expect(request.packageDigests).toHaveLength(3)
+    expect(request.packageDigests).toContain(replacement.packageDigest)
+    expect(request.packageDigests).not.toContain(original.packageDigest)
+  })
 })

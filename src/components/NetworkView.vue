@@ -62,9 +62,50 @@ function updateResultEncoding() {
   updateSelection()
 }
 
+function selectFromPointer(event) {
+  if (!renderer || !camera) return
+  const rect = renderer.domElement.getBoundingClientRect()
+  const pointer = new THREE.Vector2(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1)
+  const raycaster = new THREE.Raycaster()
+  raycaster.setFromCamera(pointer, camera)
+  const hit = raycaster.intersectObjects([...objects.values()])[0]
+  if (hit?.object.userData.id) emit('select', String(hit.object.userData.id))
+}
+
+function teardown(forceContextLoss = true) {
+  cancelAnimationFrame(frame)
+  frame = 0
+  resizeObserver?.disconnect()
+  resizeObserver = undefined
+  const currentRenderer = renderer
+  currentRenderer?.domElement.removeEventListener('pointerdown', selectFromPointer)
+  currentRenderer?.domElement.removeEventListener('webglcontextlost', contextLost)
+  scene?.traverse((object) => {
+    if ('geometry' in object) object.geometry?.dispose()
+    if ('material' in object) (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material?.dispose())
+  })
+  currentRenderer?.dispose()
+  if (forceContextLoss) currentRenderer?.forceContextLoss()
+  currentRenderer?.domElement.remove()
+  objects.clear()
+  renderer = undefined
+  scene = undefined
+  camera = undefined
+}
+
+function markUnavailable(message, forceContextLoss = true) {
+  fallback.value = message
+  teardown(forceContextLoss)
+}
+
+function contextLost(event) {
+  event.preventDefault()
+  markUnavailable('The WebGL context was lost. Use the semantic network list below.', false)
+}
+
 onMounted(() => {
   if (!host.value || typeof WebGLRenderingContext === 'undefined') {
-    fallback.value = '3D network unavailable because WebGL is not supported. Use the semantic network list below.'
+    markUnavailable('3D network unavailable because WebGL is not supported. Use the semantic network list below.')
     return
   }
   try {
@@ -76,6 +117,8 @@ onMounted(() => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.domElement.setAttribute('aria-hidden', 'true')
     renderer.domElement.tabIndex = -1
+    renderer.domElement.addEventListener('pointerdown', selectFromPointer)
+    renderer.domElement.addEventListener('webglcontextlost', contextLost, { once: true })
     host.value.append(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xa8d8cb, 1.8))
@@ -121,6 +164,7 @@ onMounted(() => {
     })
 
     const resize = () => {
+      if (!renderer || !camera || !host.value) return
       const width = host.value.clientWidth
       const height = Math.max(290, host.value.clientHeight)
       renderer.setSize(width, height, false)
@@ -141,38 +185,15 @@ onMounted(() => {
       }
       animate()
     }
-
-    renderer.domElement.addEventListener('pointerdown', (event) => {
-      const rect = renderer.domElement.getBoundingClientRect()
-      const pointer = new THREE.Vector2(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1)
-      const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObjects([...objects.values()])[0]
-      if (hit?.object.userData.id) emit('select', String(hit.object.userData.id))
-    })
   } catch {
-    fallback.value = '3D network could not initialize. The semantic network list and all simulation results remain available.'
+    markUnavailable('3D network could not initialize. The semantic network list and all simulation results remain available.')
   }
 })
 
 watch(() => props.selectedId, updateSelection)
 watch(() => props.result, updateResultEncoding)
 
-onBeforeUnmount(() => {
-  cancelAnimationFrame(frame)
-  resizeObserver?.disconnect()
-  scene?.traverse((object) => {
-    if (!('geometry' in object) || !('material' in object)) return
-    const disposable = object
-    disposable.geometry.dispose()
-    const materials = Array.isArray(disposable.material) ? disposable.material : [disposable.material]
-    materials.forEach((material) => material.dispose())
-  })
-  renderer?.dispose()
-  renderer?.forceContextLoss()
-  renderer?.domElement.remove()
-  objects.clear()
-})
+onBeforeUnmount(teardown)
 </script>
 
 <template lang="pug">

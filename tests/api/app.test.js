@@ -49,6 +49,17 @@ describe('simulation API', () => {
     expect(evidenceClient.extract).not.toHaveBeenCalled()
   })
 
+  it('allows route parameters up to the declared 200-character schema bound', async () => {
+    const identifier = 'a'.repeat(200)
+    const evidenceClient = { ...createEvidenceFixtureClient(), document: vi.fn(async (value) => ({ identifier: value })) }
+    app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge(), evidenceClient, env: { NODE_ENV: 'test' } })
+    const response = await app.inject({ method: 'GET', url: `/api/v3/evidence/documents/${identifier}` })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toEqual({ identifier })
+    expect(evidenceClient.document).toHaveBeenCalledWith(identifier)
+  })
+
   it('proxies independently pinned atlas release, entity, traversal, claims, coverage, and network contracts', async () => {
     app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
     const base = `/api/v2/releases/${BUNDLED_ATLAS_RELEASE.id}`

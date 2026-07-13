@@ -10,7 +10,7 @@ import { createEvidenceClient, EvidenceCompatibilityError } from './evidence/cli
 import { createKnowledgeClient, KnowledgeCompatibilityError } from './knowledge/client.js'
 import { MODEL } from './model.js'
 import { simulate, SimulationNumericalError } from './simulation.js'
-import { ArchiveValidationRequestSchema, ExperimentSchema, Sha256Schema } from '../shared/portfolio-contracts.js'
+import { ArchiveValidationRequestSchema, ExperimentSchema, PORTFOLIO_ARCHIVE_REQUEST_BODY_LIMIT, Sha256Schema } from '../shared/portfolio-contracts.js'
 import { exportCombineArchive, validateCombineArchive } from './portfolio/archive.js'
 import { createRunService, PortfolioRequestError, validateExperimentForModel } from './portfolio/execution.js'
 import { getModel, listModels } from './portfolio/registry.js'
@@ -67,10 +67,12 @@ import {
   ResourceProfileSchema,
   RestartRequestSchema,
   RevisionCreateRequestSchema,
+  WORKSPACE_BUNDLE_REQUEST_BODY_LIMIT,
   RunCreateRequestSchema
 } from '../shared/workspace-contracts.js'
 import { createWorkspaceService, WorkspaceRequestError } from './workspace/service.js'
 import {
+  BPP_REQUEST_BODY_LIMIT,
   CouplingCreateRequestSchema,
   PackageValidationRequestSchema,
   PHYSIOLOGY_CONTRACT_VERSION,
@@ -166,7 +168,7 @@ function invalidAtlasQuery(reply, parsed) {
 
 export async function buildApp(options = {}) {
   const env = options.env ?? process.env
-  const app = Fastify({ logger: env.NODE_ENV !== 'test' })
+  const app = Fastify({ bodyLimit: 1_048_576, logger: env.NODE_ENV !== 'test', routerOptions: { maxParamLength: 200 } })
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
   const parameters = options.parameterClient ?? createParameterClient(env)
@@ -309,7 +311,7 @@ export async function buildApp(options = {}) {
     const model = getModel(request.params.modelId)
     return model ?? reply.status(404).send({ statusCode: 404, code: 'MODEL_NOT_FOUND', error: 'Not Found', message: 'Portfolio model is not registered.' })
   })
-  app.post('/api/v2/model-archives/validate', async (request, reply) => {
+  app.post('/api/v2/model-archives/validate', { bodyLimit: PORTFOLIO_ARCHIVE_REQUEST_BODY_LIMIT }, async (request, reply) => {
     const parsed = ArchiveValidationRequestSchema.safeParse(request.body)
     if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_ARCHIVE_REQUEST', error: 'Unprocessable Entity', message: 'Archive request must contain bounded base64 content.', fieldErrors: parsed.error.flatten().fieldErrors })
     return validateCombineArchive(Buffer.from(parsed.data.archiveBase64, 'base64'))
@@ -648,7 +650,7 @@ export async function buildApp(options = {}) {
     if (!parsed.success) return invalidWorkspace(reply, parsed)
     return reply.status(201).send(await workspace.createExperiment(parsed.data))
   })
-  app.post('/api/v7/workspace/experiments/import', async (request, reply) => {
+  app.post('/api/v7/workspace/experiments/import', { bodyLimit: WORKSPACE_BUNDLE_REQUEST_BODY_LIMIT }, async (request, reply) => {
     const parsed = BundleImportRequestSchema.safeParse(request.body)
     if (!parsed.success) return invalidWorkspace(reply, parsed)
     return reply.status(201).send(await workspace.importExperiment(Buffer.from(parsed.data.bundleBase64, 'base64')))
@@ -785,12 +787,12 @@ export async function buildApp(options = {}) {
     routes: { evidence: '/api/v8/physiology/evidence', validatePackage: '/api/v8/physiology/packages/validate', installPackage: '/api/v8/physiology/packages/install', catalog: '/api/v8/physiology/packages', couplings: '/api/v8/physiology/couplings', runs: '/api/v8/physiology/runs', coverage: '/api/v8/physiology/coverage', trust: '/api/v8/physiology/trust' }
   }))
   app.get('/api/v8/physiology/evidence', async () => physiology.evidence())
-  app.post('/api/v8/physiology/packages/validate', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+  app.post('/api/v8/physiology/packages/validate', { bodyLimit: BPP_REQUEST_BODY_LIMIT, preHandler: requirePhysiologyMutation }, async (request, reply) => {
     const parsed = PackageValidationRequestSchema.safeParse(request.body)
     if (!parsed.success) return invalidPhysiology(reply, parsed)
     return physiology.validatePackage(Buffer.from(parsed.data.packageBase64, 'base64'))
   })
-  app.post('/api/v8/physiology/packages/install', { preHandler: requirePhysiologyMutation }, async (request, reply) => {
+  app.post('/api/v8/physiology/packages/install', { bodyLimit: BPP_REQUEST_BODY_LIMIT, preHandler: requirePhysiologyMutation }, async (request, reply) => {
     const parsed = PackageValidationRequestSchema.safeParse(request.body)
     if (!parsed.success) return invalidPhysiology(reply, parsed)
     return reply.status(201).send(await physiology.installPackage(Buffer.from(parsed.data.packageBase64, 'base64')))

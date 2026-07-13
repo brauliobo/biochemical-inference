@@ -75,7 +75,10 @@ watch(preset, (value) => {
 })
 
 watch(taxonId, async (value) => {
-  markChanged()
+  result.value = undefined
+  baseline.value = undefined
+  resultIsPrevious.value = false
+  message.value = ''
   if (!release.value) return
   const generation = ++knowledgeGeneration
   knowledgeController?.abort()

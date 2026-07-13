@@ -103,4 +103,16 @@ describe('workbench request hardening', () => {
     expect(screen.getByText('Reproducibility is not established from the information currently available.')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Run deterministic model' }).disabled).toBe(false)
   })
+
+  it('clears old-taxonomy simulation output before loading a new network', async () => {
+    api.loadNetwork.mockResolvedValue(bundledNetwork(10090))
+    render(App)
+    await fireEvent.click(await screen.findByRole('button', { name: 'Run deterministic model' }))
+    expect(await screen.findByText('Stable run identity')).toBeTruthy()
+
+    await fireEvent.update(screen.getByLabelText('Taxon and protein evidence'), '10090')
+
+    await waitFor(() => expect(screen.queryByText('Stable run identity')).toBeNull())
+    expect(screen.getByText('No simulation has been run')).toBeTruthy()
+  })
 })

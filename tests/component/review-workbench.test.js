@@ -14,6 +14,16 @@ import ReviewWorkbench from '../../src/components/ReviewWorkbench.vue'
 let record
 let item
 
+function deferred() {
+  let resolve
+  const promise = new Promise((complete) => { resolve = complete })
+  return { promise, resolve }
+}
+
+function queueButton(digest) {
+  return screen.getAllByText(digest).map((element) => element.closest('button')).find(Boolean)
+}
+
 beforeAll(async () => {
   record = await createApapRunService(createApapFixtureClient()).create({})
   const wrapped = buildApapDerivedBundle(record).bundle.assertions[0]
@@ -55,5 +65,37 @@ describe('ReviewWorkbench', () => {
     await waitFor(() => expect(api.submitApapDerivedBundle).toHaveBeenCalledWith(record.runId))
     await fireEvent.click(screen.getByRole('button', { name: 'Accept' }))
     await waitFor(() => expect(api.appendDerivedReviewEvent).toHaveBeenCalledWith(item.digest, expect.objectContaining({ action: 'accepted', reproduction_artifact_digest: null })))
+  })
+
+  it('aborts and ignores stale rapid-selection detail responses', async () => {
+    const second = { ...item, digest: `sha256:${'c'.repeat(64)}`, assertion: { ...item.assertion, statement: 'Second rapidly selected claim.' } }
+    const delayed = deferred()
+    api.loadDerivedAssertions.mockResolvedValue({ layer: 'derived-review-workspace', items: [item, second] })
+    render(ReviewWorkbench, { props: { apapRun: record } })
+    await screen.findByText('Claim')
+    api.loadDerivedAssertion.mockImplementation((digest) => digest === second.digest ? delayed.promise : Promise.resolve(item))
+
+    await fireEvent.click(queueButton(second.digest))
+    const staleSignal = api.loadDerivedAssertion.mock.calls.at(-1)[1]
+    await fireEvent.click(queueButton(item.digest))
+    await screen.findByText(item.assertion.statement)
+    delayed.resolve(second)
+
+    await waitFor(() => expect(staleSignal.aborted).toBe(true))
+    expect(screen.getByText(item.assertion.statement)).toBeTruthy()
+    expect(screen.queryByText(second.assertion.statement)).toBeNull()
+  })
+
+  it('binds a review mutation to the digest rendered in the detail panel', async () => {
+    const second = { ...item, digest: `sha256:${'d'.repeat(64)}`, assertion: { ...item.assertion, statement: 'Displayed second claim.' } }
+    api.loadDerivedAssertions.mockResolvedValue({ layer: 'derived-review-workspace', items: [item, second] })
+    api.loadDerivedAssertion.mockImplementation((digest) => Promise.resolve(digest === second.digest ? second : item))
+    render(ReviewWorkbench, { props: { apapRun: record } })
+    await screen.findByText('Claim')
+    await fireEvent.click(queueButton(second.digest))
+    await screen.findByText(second.assertion.statement)
+    await fireEvent.click(screen.getByRole('button', { name: 'Accept' }))
+
+    await waitFor(() => expect(api.appendDerivedReviewEvent).toHaveBeenCalledWith(second.digest, expect.objectContaining({ action: 'accepted' })))
   })
 })

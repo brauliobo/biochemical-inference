@@ -11,8 +11,8 @@ const derivedToken = randomBytes(32).toString('hex')
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  fullyParallel: true,
-  workers: Number(process.env.E2E_WORKERS ?? 4),
+  fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: { baseURL: 'http://127.0.0.1:5173', trace: 'on-first-retry' },

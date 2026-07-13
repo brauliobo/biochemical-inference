@@ -30,6 +30,7 @@ import { PortfolioResultSchema } from '../../shared/portfolio-contracts.js'
 import { verifyKnowledgeSnapshot } from '../knowledge/snapshot.js'
 import { executeInWorker, validateExperimentForModel } from '../portfolio/execution.js'
 import { modelDigest } from '../portfolio/identity.js'
+import { getModel } from '../portfolio/registry.js'
 import { exportPortableBundle, importPortableBundle } from './bundle.js'
 import { openWorkspaceDatabase } from './database.js'
 import {
@@ -248,6 +249,10 @@ export async function createWorkspaceService(options = {}) {
     const row = database.prepare('SELECT * FROM revisions WHERE revision_id = ?').get(id)
     if (!row) throw new WorkspaceRequestError('revision_not_found', 'Experiment revision does not exist.', 404)
     return row
+  }
+  const assertRevisionWritable = (revision) => {
+    const unsupported = revision.specification.entries.find((entry) => getModel(entry.model.id)?.digest !== entry.model.digest)
+    if (unsupported) throw new WorkspaceRequestError('unsupported_embedded_model', `Embedded model ${unsupported.model.id} at ${unsupported.model.digest} is not in the exact executable registry; this revision is inspectable and exportable only.`, 409)
   }
   const attemptRow = (id) => {
     const row = database.prepare('SELECT * FROM attempts WHERE attempt_id = ?').get(id)
@@ -561,6 +566,7 @@ export async function createWorkspaceService(options = {}) {
 
   async function restart(checkpointId, resourceProfileId) {
     const { checkpoint, revision } = await validateCheckpoint(checkpointId)
+    assertRevisionWritable(revision)
     const attempt = createAttempt(revision.revisionId, resourceProfileId ?? revision.resourceProfileId, 'restart', checkpoint.checkpointId)
     schedule()
     return attempt
@@ -616,16 +622,21 @@ export async function createWorkspaceService(options = {}) {
     },
     async createRevision(experimentId, input) {
       const request = RevisionCreateRequestSchema.parse(input)
+      const current = database.prepare('SELECT latest_revision_id FROM experiments WHERE experiment_id = ?').get(experimentId)
+      if (!current) throw new WorkspaceRequestError('experiment_not_found', 'Experiment does not exist.', 404)
+      if (current.latest_revision_id) assertRevisionWritable(revisionRecord(revisionRow(current.latest_revision_id)))
       return insertRevision(experimentId, request.specification, request.resourceProfileId, 'local')
     },
     async cloneExperiment(experimentId, name) {
       const detail = await this.getExperiment(experimentId)
       const revision = detail.revisions.at(-1)
+      assertRevisionWritable(revision)
       const snapshot = JSON.parse((await objects.get(revision.snapshotObjectDigest)).toString('utf8'))
       return createExperiment({ name: name ?? `${detail.experiment.name} clone`, description: detail.experiment.description, specification: revision.specification, resourceProfileId: revision.resourceProfileId }, { source: 'clone', snapshot })
     },
     queueRun(input) {
       const revision = revisionRecord(revisionRow(input.revisionId))
+      assertRevisionWritable(revision)
       const attempt = createAttempt(revision.revisionId, input.resourceProfileId ?? revision.resourceProfileId)
       schedule()
       return attempt

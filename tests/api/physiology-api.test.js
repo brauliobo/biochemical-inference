@@ -98,4 +98,14 @@ describe('physiology API v8', () => {
     expect(historical.statusCode).toBe(200)
     expect(historical.json()).toEqual(run)
   })
+
+  it('passes a valid >1 MiB package encoding to package validation', async () => {
+    app = await createApp()
+    const packageBase64 = Buffer.alloc(825_000).toString('base64')
+    const response = await app.inject({ method: 'POST', url: '/api/v8/physiology/packages/validate', headers: mutationHeaders, payload: { packageBase64 } })
+
+    expect(Buffer.byteLength(JSON.stringify({ packageBase64 }))).toBeGreaterThan(1_048_576)
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toMatchObject({ valid: false, installable: false })
+  })
 })

@@ -31,6 +31,15 @@ function detailMessage(payload, fallback) {
   return payload && typeof payload === 'object' && 'detail' in payload && typeof payload.detail === 'string' ? payload.detail : fallback
 }
 
+function upstreamErrorCode(payload, status) {
+  const explicit = payload && typeof payload === 'object' && 'code' in payload && typeof payload.code === 'string' ? payload.code : ''
+  if (explicit === 'EVIDENCE_MODEL_UNAVAILABLE' || explicit === 'MODEL_UNAVAILABLE') return 'EVIDENCE_MODEL_UNAVAILABLE'
+  const detail = detailMessage(payload, '')
+  if (status === 503 && /^Ollama (?:model is not installed|request failed:)/.test(detail)) return 'EVIDENCE_MODEL_UNAVAILABLE'
+  if (status === 404) return 'EVIDENCE_NOT_FOUND'
+  return 'EVIDENCE_UPSTREAM_ERROR'
+}
+
 export function createEvidenceClient(env = process.env) {
   if (env.BIOCHEMICAL_EVIDENCE_USE_FIXTURE === 'true') return createEvidenceFixtureClient()
 
@@ -51,7 +60,7 @@ export function createEvidenceClient(env = process.env) {
       const payload = await response.json().catch(() => null)
       if (!response.ok) {
         const statusCode = response.status >= 400 && response.status < 500 ? response.status : 503
-        const code = response.status === 503 ? 'EVIDENCE_MODEL_UNAVAILABLE' : response.status === 404 ? 'EVIDENCE_NOT_FOUND' : 'EVIDENCE_UPSTREAM_ERROR'
+        const code = upstreamErrorCode(payload, response.status)
         throw new EvidenceCompatibilityError(detailMessage(payload, `Evidence service returned ${response.status} for ${path}`), { statusCode, code })
       }
       return payload

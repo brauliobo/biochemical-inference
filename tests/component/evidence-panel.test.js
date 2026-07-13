@@ -17,6 +17,12 @@ import EvidencePanel from '../../src/components/EvidencePanel.vue'
 
 let fixture
 
+function deferred() {
+  let resolve
+  const promise = new Promise((complete) => { resolve = complete })
+  return { promise, resolve }
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   fixture = createEvidenceFixtureClient()
@@ -78,7 +84,7 @@ describe('EvidencePanel', () => {
   })
 
   it('reports generation unavailability and creates no candidate', async () => {
-    api.extractEvidenceCandidate.mockRejectedValue(new Error('generation model qwen3:4b is not installed'))
+    api.extractEvidenceCandidate.mockRejectedValue(Object.assign(new Error('generation model qwen3:4b is not installed'), { name: 'ApiError', status: 503, code: 'EVIDENCE_MODEL_UNAVAILABLE' }))
     await openLicensedDocument()
     await fireEvent.click(screen.getByLabelText(/Phosphorylation has been identified/))
     await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
@@ -87,5 +93,53 @@ describe('EvidencePanel', () => {
     expect(within(alert).getByText('Ollama generation unavailable; no candidate was created')).toBeTruthy()
     expect(within(alert).getByText(/qwen3:4b is not installed/)).toBeTruthy()
     await waitFor(() => expect(screen.getByText('No unreviewed candidates have been persisted in this workspace.')).toBeTruthy())
+  })
+
+  it('aborts and ignores document work when a new search begins', async () => {
+    const pending = deferred()
+    let staleSignal
+    api.loadEvidenceDocument.mockImplementation((_release, _identifier, signal) => {
+      staleSignal = signal
+      return pending.promise
+    })
+    render(EvidencePanel)
+    await fireEvent.click(await screen.findByRole('button', { name: /Structural basis/ }))
+    await waitFor(() => expect(staleSignal).toBeInstanceOf(AbortSignal))
+    await fireEvent.update(screen.getByLabelText('PMID, PMCID, DOI, ontology ID, or text'), 'MTHFR')
+    await fireEvent.click(screen.getByRole('button', { name: 'Search evidence' }))
+    pending.resolve(await fixture.document('PMCID:PMC5995969'))
+
+    await waitFor(() => expect(staleSignal.aborted).toBe(true))
+    expect(screen.queryByText('Selected document')).toBeNull()
+  })
+
+  it('aborts and ignores candidate generation when a new search begins', async () => {
+    const pending = deferred()
+    let staleSignal
+    let candidateInput
+    await openLicensedDocument()
+    api.extractEvidenceCandidate.mockImplementation((_release, input, signal) => {
+      candidateInput = input
+      staleSignal = signal
+      return pending.promise
+    })
+    await fireEvent.click(screen.getByLabelText(/Phosphorylation has been identified/))
+    await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
+    await waitFor(() => expect(staleSignal).toBeInstanceOf(AbortSignal))
+    await fireEvent.click(screen.getByRole('button', { name: 'Search evidence' }))
+    pending.resolve(await fixture.extract(candidateInput))
+
+    await waitFor(() => expect(staleSignal.aborted).toBe(true))
+    expect(screen.queryByText(/MTHFR phosphorylation · increases sensitivity to · SAM inhibition/)).toBeNull()
+  })
+
+  it('does not label a generic extraction error as Ollama unavailable', async () => {
+    api.extractEvidenceCandidate.mockRejectedValue(new Error('Candidate response failed schema validation.'))
+    await openLicensedDocument()
+    await fireEvent.click(screen.getByLabelText(/Phosphorylation has been identified/))
+    await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
+
+    expect(await screen.findByText('Candidate response failed schema validation.')).toBeTruthy()
+    expect(screen.queryByText('Ollama generation unavailable; no candidate was created')).toBeNull()
   })
 })

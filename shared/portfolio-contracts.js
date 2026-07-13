@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
 export const PORTFOLIO_CONTRACT_VERSION = '2.0.0'
+export const PORTFOLIO_MAX_ARCHIVE_BYTES = 2_000_000
+export const PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH = Math.ceil(PORTFOLIO_MAX_ARCHIVE_BYTES / 3) * 4
+export const PORTFOLIO_ARCHIVE_REQUEST_BODY_LIMIT = PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH + 64
 export const Sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
 
 const IdentifierSchema = z.string().regex(/^[A-Za-z][A-Za-z0-9_.-]{0,63}$/)
@@ -291,7 +294,7 @@ export const RunRecordSchema = z.object({
   result: PortfolioResultSchema.nullable()
 }).strict()
 
-export const ArchiveValidationRequestSchema = z.object({ archiveBase64: z.string().min(1).max(8_000_000).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
+export const ArchiveValidationRequestSchema = z.object({ archiveBase64: z.string().min(1).max(PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
 export const ArchiveValidationResponseSchema = z.object({
   valid: z.boolean(),
   profile: z.literal('portfolio-combine-1.0'),
