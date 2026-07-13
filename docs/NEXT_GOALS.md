@@ -122,6 +122,8 @@ Make simulation conclusions evidence-aware rather than single-valued demonstrati
 
 ## Goal 6: Human And Mouse Liver Toxicity Benchmark
 
+Status: delivered for the pinned synthetic APAP algorithm benchmark in the active inference application. See `docs/APAP_BENCHMARK.md` for equations, context bindings, diagnostics, results, and unsupported biological validation. Measured independent PK, biomarker, histology, injury, and NAC-response validation remain future evidence work.
+
 Build the first defensible multiscale vertical simulation around acetaminophen liver injury.
 
 ### Scope

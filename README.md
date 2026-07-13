@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism simulation, a standards-based ODE/SSA/FBA portfolio, parameter calibration and uncertainty, a bounded contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -98,6 +98,12 @@ Document reads preserve content scope, license identifiers, source locators, loc
 
 Candidate extraction sends only user-selected exact spans and an instruction. Every candidate remains visibly `unreviewed, not trusted knowledge`, records model and digest provenance, and stays in the evidence service's separate workspace. This application has no candidate promotion route. Use `BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true` only for explicit tests; it enables deterministic candidate E2E without Ollama and is independent of `BIOCHEMICAL_INFERENCE_USE_FIXTURE`.
 
+### APAP benchmark
+
+Goal 6 independently pins `apap-liver-benchmark-v1.0.0` with digest `6de9844b2e8e4f3a15a0aba5455c69dc4116dc3287b7adb05e68ea337707f23b`. Optional settings are `BIOCHEMICAL_APAP_URL`, `BIOCHEMICAL_APAP_RELEASE_ID`, `BIOCHEMICAL_APAP_EXPECTED_DIGEST`, and `BIOCHEMICAL_APAP_TIMEOUT_MS`. Production has no fallback; `BIOCHEMICAL_APAP_USE_FIXTURE=true` is explicit test/demo behavior.
+
+Strict producer and internal Zod contracts cover discovery, detail, contexts, parameters, protocols, observations, assumptions, limitations, validation matrix, requests, and terminal results. One taxon-agnostic fixed-step equation set receives explicit human or mouse parameter bindings and produces systemic time series, 12-bin lobule matrices, exact assumptions, unsupported synthetic comparisons, and mass/cell-state/limiting-case diagnostics. NAC affects only its state and the explicit GSH term. See `docs/APAP_BENCHMARK.md` for equations, baseline software results, and limitations.
+
 ### Identifier integrity
 
 The pinned release follows the authoritative EMBL-EBI ChEBI identities: `CHEBI:57844` is L-methionine zwitterion and `CHEBI:58199` is L-homocysteine zwitterion. The inference adapter preserves these identifiers without rewriting upstream records.
@@ -146,6 +152,12 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `POST /api/v3/evidence/candidates/extract`
 - `GET /api/v3/evidence/candidates`
 - `GET /api/v3/evidence/candidates/:candidateId`
+- `GET /api/v4/apap`
+- `GET /api/v4/apap/releases`
+- `GET /api/v4/apap/releases/:releaseId`
+- `GET /api/v4/apap/releases/:releaseId/{contexts|parameters|protocols|observations|assumptions|limitations|validation-matrix}`
+- `POST /api/v4/apap/runs`
+- `GET /api/v4/apap/runs/:runId`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -156,3 +168,5 @@ See `docs/EVIDENCE_PANEL.md` for the evidence contract, ranking interpretation, 
 See `docs/SIMULATION_PORTFOLIO.md` for algorithms, strict v2 contracts, units, worker limits, and the exact SBML L3/SED-ML/COMBINE supported profile.
 
 See `docs/PARAMETER_STUDIES.md` for parameter selection, study algorithms, convergence diagnostics, held-out validation, and uncertainty boundaries.
+
+See `docs/APAP_BENCHMARK.md` for APAP equations, context parameter bindings, deterministic results, diagnostics, and unsupported scientific boundaries.

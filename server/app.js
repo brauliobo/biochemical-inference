@@ -18,6 +18,20 @@ import { ParameterOptionsQuerySchema, StudyRequestSchema } from '../shared/param
 import { createParameterClient, ParameterCompatibilityError } from './parameters/client.js'
 import { loadParameterOptions, ParameterSelectionError } from './parameters/selection.js'
 import { createStudyService } from './studies/service.js'
+import {
+  APAP_CONTRACT_VERSION,
+  APAP_ENGINE_VERSION,
+  APAP_EQUATION_SET_ID,
+  APAP_MODEL_ID,
+  APAP_MODEL_VERSION,
+  APAP_RELEASE_DIGEST,
+  APAP_RELEASE_ID,
+  APAP_WARNING,
+  ApapRunRequestSchema
+} from '../shared/apap-contracts.js'
+import { createApapClient, ApapCompatibilityError } from './apap/client.js'
+import { createApapRunService, ApapRequestError } from './apap/service.js'
+import { ApapNumericalError } from './apap/model.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -52,6 +66,8 @@ const EvidenceCandidateParamSchema = z.object({ candidateId: z.string().regex(/^
 const PortfolioRunRequestSchema = z.object({ experiment: ExperimentSchema }).strict()
 const PortfolioRunParamSchema = z.object({ runId: Sha256Schema }).strict()
 const StudyParamSchema = z.object({ studyId: Sha256Schema }).strict()
+const ApapReleaseParamSchema = z.object({ releaseId: z.literal(APAP_RELEASE_ID) }).strict()
+const ApapRunParamSchema = z.object({ runId: Sha256Schema }).strict()
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -69,8 +85,10 @@ export async function buildApp(options = {}) {
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
   const parameters = options.parameterClient ?? createParameterClient(env)
+  const apap = options.apapClient ?? createApapClient(env)
   const portfolioRuns = options.portfolioRunService ?? createRunService()
   const studies = options.studyService ?? createStudyService(parameters)
+  const apapRuns = options.apapRunService ?? createApapRunService(apap)
   const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
@@ -84,6 +102,9 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof ParameterCompatibilityError || error instanceof ParameterSelectionError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof ApapCompatibilityError || error instanceof ApapRequestError || error instanceof ApapNumericalError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
@@ -241,6 +262,71 @@ export async function buildApp(options = {}) {
     const parsed = EvidenceCandidateParamSchema.safeParse(request.params)
     if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_EVIDENCE_CANDIDATE_ID', error: 'Bad Request', message: 'Candidate identifier is invalid.' })
     return evidence.candidate(parsed.data.candidateId)
+  })
+  app.get('/api/v4/apap', async () => ({
+    contractVersion: APAP_CONTRACT_VERSION,
+    releaseId: APAP_RELEASE_ID,
+    releaseDigest: APAP_RELEASE_DIGEST,
+    modelId: APAP_MODEL_ID,
+    modelVersion: APAP_MODEL_VERSION,
+    equationSetId: APAP_EQUATION_SET_ID,
+    engineVersion: APAP_ENGINE_VERSION,
+    routes: {
+      release: `/api/v4/apap/releases/${APAP_RELEASE_ID}`,
+      contexts: `/api/v4/apap/releases/${APAP_RELEASE_ID}/contexts`,
+      parameters: `/api/v4/apap/releases/${APAP_RELEASE_ID}/parameters`,
+      protocols: `/api/v4/apap/releases/${APAP_RELEASE_ID}/protocols`,
+      observations: `/api/v4/apap/releases/${APAP_RELEASE_ID}/observations`,
+      assumptions: `/api/v4/apap/releases/${APAP_RELEASE_ID}/assumptions`,
+      limitations: `/api/v4/apap/releases/${APAP_RELEASE_ID}/limitations`,
+      validationMatrix: `/api/v4/apap/releases/${APAP_RELEASE_ID}/validation-matrix`,
+      runs: '/api/v4/apap/runs'
+    },
+    warning: APAP_WARNING
+  }))
+  app.get('/api/v4/apap/releases', async () => apap.catalog())
+  app.get('/api/v4/apap/releases/:releaseId', async (request, reply) => {
+    const parsed = ApapReleaseParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.detail()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/contexts', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.contexts()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/parameters', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.parameters()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/protocols', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.protocols()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/observations', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.observations()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/assumptions', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.assumptions()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/limitations', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.limitations()
+  })
+  app.get('/api/v4/apap/releases/:releaseId/validation-matrix', async (request, reply) => {
+    if (!ApapReleaseParamSchema.safeParse(request.params).success) return reply.status(404).send({ statusCode: 404, code: 'APAP_RELEASE_NOT_FOUND', error: 'Not Found', message: 'Only the pinned APAP benchmark release is supported.' })
+    return apap.validationMatrix()
+  })
+  app.post('/api/v4/apap/runs', async (request, reply) => {
+    const parsed = ApapRunRequestSchema.safeParse(request.body)
+    if (!parsed.success) return reply.status(422).send({ statusCode: 422, code: 'INVALID_APAP_RUN', error: 'Unprocessable Entity', message: 'APAP run controls are invalid or outside the pinned benchmark.', fieldErrors: parsed.error.flatten().fieldErrors })
+    return reply.status(201).send(await apapRuns.create(parsed.data))
+  })
+  app.get('/api/v4/apap/runs/:runId', async (request, reply) => {
+    const parsed = ApapRunParamSchema.safeParse(request.params)
+    if (!parsed.success) return reply.status(400).send({ statusCode: 400, code: 'INVALID_APAP_RUN_ID', error: 'Bad Request', message: 'APAP run identifier is invalid.' })
+    return apapRuns.get(parsed.data.runId) ?? reply.status(404).send({ statusCode: 404, code: 'APAP_RUN_NOT_FOUND', error: 'Not Found', message: 'APAP run is not available.' })
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

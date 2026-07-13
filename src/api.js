@@ -19,6 +19,20 @@ import {
 } from '../shared/evidence-contracts.js'
 import { ExperimentSchema, PortfolioModelSchema, RunRecordSchema } from '../shared/portfolio-contracts.js'
 import { ParameterOptionsResponseSchema, StudyRecordSchema, StudyRequestSchema } from '../shared/parameter-contracts.js'
+import {
+  APAP_RELEASE_ID,
+  ApapDiscoverySchema,
+  ApapRunRecordSchema,
+  ApapRunRequestSchema,
+  UpstreamApapAssumptionsSchema,
+  UpstreamApapContextsSchema,
+  UpstreamApapDetailSchema,
+  UpstreamApapLimitationsSchema,
+  UpstreamApapObservationsSchema,
+  UpstreamApapParametersSchema,
+  UpstreamApapProtocolsSchema,
+  UpstreamApapValidationSchema
+} from '../shared/apap-contracts.js'
 
 async function requestJson(path, init) {
   const response = await fetch(path, init)
@@ -107,6 +121,36 @@ export async function loadParameterOptions(signal) {
 export async function runParameterStudy(input, signal) {
   const request = StudyRequestSchema.parse(input)
   return StudyRecordSchema.parse(await requestJson('/api/v2/studies', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadApapWorkspace(signal) {
+  const base = `/api/v4/apap/releases/${encodeURIComponent(APAP_RELEASE_ID)}`
+  const [discovery, detail, contexts, parameters, protocols, observations, assumptions, limitations, validationMatrix] = await Promise.all([
+    requestJson('/api/v4/apap', withSignal(signal)).then((payload) => ApapDiscoverySchema.parse(payload)),
+    requestJson(base, withSignal(signal)).then((payload) => UpstreamApapDetailSchema.parse(payload)),
+    requestJson(`${base}/contexts`, withSignal(signal)).then((payload) => UpstreamApapContextsSchema.parse(payload)),
+    requestJson(`${base}/parameters`, withSignal(signal)).then((payload) => UpstreamApapParametersSchema.parse(payload)),
+    requestJson(`${base}/protocols`, withSignal(signal)).then((payload) => UpstreamApapProtocolsSchema.parse(payload)),
+    requestJson(`${base}/observations`, withSignal(signal)).then((payload) => UpstreamApapObservationsSchema.parse(payload)),
+    requestJson(`${base}/assumptions`, withSignal(signal)).then((payload) => UpstreamApapAssumptionsSchema.parse(payload)),
+    requestJson(`${base}/limitations`, withSignal(signal)).then((payload) => UpstreamApapLimitationsSchema.parse(payload)),
+    requestJson(`${base}/validation-matrix`, withSignal(signal)).then((payload) => UpstreamApapValidationSchema.parse(payload))
+  ])
+  const envelopes = [detail, contexts, parameters, protocols, observations, assumptions, limitations, validationMatrix]
+  if (discovery.releaseId !== detail.release.id || discovery.releaseDigest !== detail.release.digest || envelopes.some((item) => item.release.id !== detail.release.id || item.release.digest !== detail.release.digest)) {
+    throw new Error('APAP responses do not match the independently pinned release and digest.')
+  }
+  return { discovery, detail, contexts: contexts.items, parameters: parameters.items, protocols: protocols.items, observations: observations.items, assumptions: assumptions.items, limitations: limitations.items, validationMatrix: validationMatrix.items }
+}
+
+export async function runApapBenchmark(input, signal) {
+  const request = ApapRunRequestSchema.parse(input)
+  return ApapRunRecordSchema.parse(await requestJson('/api/v4/apap/runs', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(request),

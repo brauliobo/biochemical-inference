@@ -71,7 +71,7 @@ dd { margin: .35rem 0 0; font-weight: 600; }
 .controls-panel { grid-column: 1; }
 .network-panel { grid-column: 2; }
 .details-panel { grid-column: 3; }
-.atlas-panel, .evidence-panel, .portfolio-panel, .parameter-study-panel, .results-panel, .limitations { grid-column: 1 / -1; }
+.atlas-panel, .evidence-panel, .portfolio-panel, .parameter-study-panel, .apap-panel, .results-panel, .limitations { grid-column: 1 / -1; }
 .controls-panel form { display: grid; }
 label { margin: 1.05rem 0 .45rem; font-weight: 600; font-size: .86rem; }
 select, input, textarea { width: 100%; min-height: 46px; border: 1px solid #3b5752; border-radius: 2px; background: #0d1816; color: var(--ink); padding: .72rem; }
@@ -263,6 +263,45 @@ small { margin-top: .3rem; color: var(--muted); }
 .robustness-conclusion { padding: .8rem; border-left: 3px solid var(--mint); background: var(--panel-bright); }
 .status-chip.non-converged, .status-chip.downgraded { border-color: var(--amber); color: var(--amber); }
 
+.apap-panel { position: relative; }
+.apap-warning { position: sticky; top: 0; z-index: 8; display: flex; justify-content: space-between; gap: 1rem; margin: calc(clamp(1.15rem, 2vw, 2rem) * -1) calc(clamp(1.15rem, 2vw, 2rem) * -1) 1.5rem; padding: .8rem clamp(1.15rem, 2vw, 2rem); border-bottom: 1px solid var(--amber); background: #302316; color: #f5c58c; }
+.apap-warning strong { flex: none; font: .7rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.apap-warning span { font-size: .78rem; text-align: right; }
+.apap-provenance { margin-bottom: 1rem; }
+.apap-contexts, .protocol-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.protocol-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.apap-context, .protocol-card { min-width: 0; display: grid; gap: .35rem; padding: 1rem; border: 1px solid var(--line); border-radius: 2px; background: #0d1816; color: var(--ink); text-align: left; }
+.apap-context.selected, .protocol-card.selected { border-color: var(--lime); background: #1b2b27; }
+.apap-context > span { color: var(--mint); }
+.apap-context small, .protocol-card small, .protocol-card p { color: var(--muted); line-height: 1.45; }
+.protocol-card p { margin: .4rem 0 0; font-size: .75rem; }
+.apap-run-layout { display: grid; grid-template-columns: minmax(250px, .55fr) minmax(0, 1.45fr); gap: 1px; margin-top: 1rem; background: var(--line); }
+.apap-controls, .parameter-diff { min-width: 0; padding: 1rem; background: #0d1816; }
+.apap-controls { display: grid; align-content: start; }
+.parameter-diff { overflow-x: auto; }
+.parameter-diff p { color: var(--muted); font-size: .8rem; }
+.parameter-diff code, .parameter-diff td span { display: block; }
+.validation-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.validation-grid article { min-width: 0; padding: .8rem; border: 1px solid #745b3f; background: #211b14; }
+.validation-grid strong { display: block; margin-top: .6rem; }
+.validation-grid p { color: var(--muted); font-size: .75rem; line-height: 1.45; }
+.unsupported-badge { display: inline-block; padding: .2rem .4rem; border: 1px solid var(--amber); color: var(--amber); font: .64rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.apap-result { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); background: #0f1918; }
+.apap-time-control { display: grid; grid-template-columns: auto minmax(180px, 1fr) auto minmax(150px, .4fr); gap: .7rem; align-items: center; margin-top: 1rem; padding: .8rem; border: 1px solid var(--line); }
+.apap-time-control label { margin: 0; }
+.lobule-heatmap { display: grid; grid-template-columns: repeat(12, minmax(42px, 1fr)); gap: 2px; margin-top: .7rem; overflow-x: auto; }
+.lobule-heatmap > div { min-height: 68px; display: grid; place-items: center; align-content: center; gap: .25rem; border: 1px solid #564834; color: #fff; }
+.lobule-heatmap span { color: #e6d7c3; font-size: .62rem; }
+.lobule-heatmap strong { font: .68rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.lobule-axis { display: flex; justify-content: space-between; padding: .35rem 0; color: var(--muted); font: .68rem ui-monospace, "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.limiting-cases { padding-left: 1rem; }
+.limiting-cases li { margin-top: .5rem; }
+.limiting-cases strong, .limiting-cases span, .study-limitations strong, .study-limitations span { display: block; }
+.limiting-cases strong { color: var(--mint); }
+.limiting-cases span { color: var(--muted); font-size: .76rem; line-height: 1.45; }
+.apap-audit { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); overflow-x: auto; }
+.apap-audit summary { cursor: pointer; color: var(--mint); font-weight: 700; }
+
 .detail-grid { grid-template-columns: repeat(2, 1fr); }
 .connected-list, .protein-list, .evidence-list { padding-left: 1.1rem; color: #bbccc7; font-size: .82rem; line-height: 1.55; }
 .protein-list span, .evidence-list span { display: block; color: var(--muted); font-size: .72rem; }
@@ -328,7 +367,7 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .provenance-grid, .summary-grid, .detail-grid, .diagnostics { grid-template-columns: 1fr; }
   .provenance-digests, .provenance-closure, .source-objects { grid-template-columns: 1fr; }
   .entity-list { grid-template-columns: repeat(2, 1fr); }
-  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .study-layout, .partition-columns, .study-grid { grid-template-columns: 1fr; }
+  .atlas-controls, .atlas-columns, .atlas-columns.atlas-lower, .portfolio-layout, .study-layout, .partition-columns, .study-grid, .apap-run-layout, .apap-contexts, .protocol-cards, .validation-grid { grid-template-columns: 1fr; }
   .atlas-controls .run-button { grid-column: auto; }
   .atlas-summary { display: grid; }
   .mapping-heading { display: grid; }
@@ -336,6 +375,9 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .evidence-result-heading, .document-heading { display: grid; }
   .run-header { grid-template-columns: 1fr; }
   .study-metrics, .uncertainty-grid { grid-template-columns: 1fr; }
+  .apap-warning { display: grid; }
+  .apap-warning span { text-align: left; }
+  .apap-time-control { grid-template-columns: 1fr; }
   .chart-card figcaption { display: grid; }
   .limitations ul { columns: 1; }
 }

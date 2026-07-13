@@ -9,6 +9,7 @@ import EvidencePanel from './components/EvidencePanel.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import PortfolioWorkbench from './components/PortfolioWorkbench.vue'
 import ParameterStudyWorkbench from './components/ParameterStudyWorkbench.vue'
+import APAPBenchmarkWorkbench from './components/APAPBenchmarkWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -325,6 +326,8 @@ main#main
     PortfolioWorkbench
 
     ParameterStudyWorkbench
+
+    APAPBenchmarkWorkbench
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading

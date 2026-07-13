@@ -64,6 +64,22 @@ immediate-terminal /api/v2/studies
         |
         v
 ParameterStudyWorkbench
+
+APAP benchmark API :8000
+        | apap-liver-benchmark-v1.0.0 + independent digest pin
+        v
+strict APAP producer contracts + same-origin /api/v4/apap proxy
+        |
+        v
+explicit human/mouse context bindings -> one taxon-agnostic equation set
+        |
+        +-- gut / central / 12-bin portal-to-central APAP exposure
+        +-- NAPQI / GSH / adduct / repair / oxygen / neighbor exchange
+        +-- conservative healthy / stressed / injured / recovering states
+        +-- NAC state coupled only to explicit GSH synthesis
+        |
+        v
+canonical terminal run + APAPBenchmarkWorkbench
 ```
 
 ## Active Application
@@ -83,6 +99,8 @@ The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the 
 Goal 4 adds `shared/portfolio-contracts.js`, `server/portfolio/`, and `src/components/PortfolioWorkbench.vue`. Registry models are immutable declarative data. Numerical execution occurs only in bounded child processes; the parent validates input and output contracts and owns timeout, output-limit, cancellation, and lifecycle transitions. The archive boundary validates XML and ZIP safety before a model can reach execution.
 
 Goal 5 adds `shared/parameter-contracts.js`, `server/parameters/`, `server/studies/`, and `src/components/ParameterStudyWorkbench.vue`. Parameter evidence is independently pinned and fail-closed. Studies are bounded synchronous benchmark analyses rather than Goal 9 background jobs; their immediate terminal records still distinguish successful and non-converged outcomes.
+
+Goal 6 adds `shared/apap-contracts.js`, `server/apap/`, and `src/components/APAPBenchmarkWorkbench.vue`. APAP producer payloads and internal runs have separate strict contracts. Context binding occurs before a single equation evaluator with no taxon branches. Fixed-step RK4 fails on invalid intermediate state, and every terminal result includes mass, cell-state, and limiting-case diagnostics.
 
 ## Service Contract
 
