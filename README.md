@@ -145,7 +145,22 @@ Goal 10 independently pins `physiology-plugin-evidence-v1.0.0` with digest `8f7a
 
 The v8 service adds strict signed `.bpp` packages, an Ed25519 local trust store, immutable package objects, SQLite package/coupling/run metadata, exact semantic port matching, human applicability intersection, simultaneous integrated exchange accounting, conservation residuals, event-driven multirate cadence with zero-order hold, and 1×/2×/4× timestep convergence without changing plugin invocation cadence. The three shipped circulation/liver/kidney packages are deterministic declarative fixtures whose evidence bindings match the producer exactly. Packages begin not-certified; only a successful persisted conformance run can certify software protocol conformance, which remains scientifically unsupported. Every run POST rechecks publisher trust before cached reuse, while historical GET records remain readable. Process packages are refused unless an explicitly configured Bubblewrap binary passes namespace capability checks. See `docs/PHYSIOLOGY_PLUGINS.md`.
 
-Optional server settings are `PORT` (default `3000`), `HOST` (default `127.0.0.1`), explicit comma-separated `CORS_ORIGINS`, and `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` when a trusted development reverse proxy gives the browser a different origin. The development script pins that value to `http://127.0.0.1:5173`; production same-origin serving needs no override.
+### Authoritative local data plane
+
+Goal 11 independently pins baseline `one-carbon-authority-human-mouse-v2.0.0` / `310bd8a04320c9b1bd9d4e18795bd998627265ac11b1c0e2b07a0473ba48f8e0` and active candidate `one-carbon-authority-human-mouse-v2.0.1` / `9dad9f1ac92ff2c53810867414c7729a1ee97425213b9749482ebe2fd37874b5`. The signed catalog is `a1569da9b2193d4bbfc09349fa24acbf72d03fde04af06e1b0a95eb55fdc25dc`, trust is `d9ada7b62b31e6ff07d3363c5b756bbc979b5600aa44add50c9ffa089ee862f7`, historical signer `goal11-release-2026` is retained as retired, and candidate signer `goal11-release-2026-rotation-1` is active. Their separately persisted semantic diff is `080b92aa65472f1df25d6b2b573ea6b332786b22c3601ddbd081bf1e76d4b3a5`.
+
+Configure the loopback producer, persistent root outside the source tree, and deployment-held local cursor secret:
+
+```sh
+BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8000
+BIOCHEMICAL_DATA_PLANE_ROOT=$HOME/.local/share/biochemical-inference/data-plane-v2
+BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:3000
+```
+
+Only explicit `POST /api/v9/data-plane/sync` contacts the factory. Sync verifies canonical signed metadata, both exact release closures, every partition, producer cursor equality and binding, source/adapter/license/accession closure, biochemical links, and the attributed cross-release diff before publishing both generations and one separate diff row atomically. Reads, local HMAC pagination, integrity, diff, and persisted authority-closure audits never contact or fall back to the producer. See `docs/DATA_PLANE.md`.
+
+Optional server settings are `PORT` (default `3000`) and `HOST` (default `127.0.0.1`). `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` and comma-separated `CORS_ORIGINS` are validated once at startup into one exact allowed-origin set. Every derived, physiology, and data-plane mutation requires an `Origin` in that set plus its family CSRF header; `Host` is never an authority source. Configure at least one allowed browser origin wherever mutations are enabled. The development and Playwright commands pin their public origin explicitly.
 
 ## Verification
 
@@ -156,7 +171,7 @@ E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
-Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and a production-built inference server on port 5173. Evidence and Goal 9 use run-isolated sibling runtime paths outside the source tree; real E2E exercises the canonical network snapshot, non-vector search, document retrieval, and pinned physiology release without a generation dependency. Fixture mode enables explicit inference, evidence, physiology, and deterministic workspace fixtures.
+Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and a production-built inference server on port 5173. It configures separate random producer and local cursor secrets plus run-isolated data-plane and workspace roots outside the source tree. Real E2E exercises the signed factory sync, local pages, canonical network snapshot, non-vector search, document retrieval, and pinned physiology release. Fixture mode starts an exact public factory artifact server and enables explicit inference, evidence, physiology, and deterministic workspace fixtures.
 
 ## API
 
@@ -240,6 +255,17 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET/POST /api/v8/physiology/couplings`
 - `GET/POST /api/v8/physiology/runs`
 - `GET /api/v8/physiology/coverage`
+- `GET /api/v9/data-plane`
+- `GET /api/v9/data-plane/status`
+- `POST /api/v9/data-plane/sync`
+- `GET /api/v9/data-plane/releases`
+- `GET /api/v9/data-plane/releases/:releaseId`
+- `GET /api/v9/data-plane/releases/:releaseId/records/:recordType/:recordId`
+- `GET /api/v9/data-plane/releases/:releaseId/pages/:recordType`
+- `GET /api/v9/data-plane/diff`
+- `GET /api/v9/data-plane/integrity`
+- `GET/POST /api/v9/data-plane/audits`
+- `GET /api/v9/data-plane/audits/:reportDigest`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -260,3 +286,5 @@ See `docs/DERIVED_KNOWLEDGE.md` for canonical bundle identity, APAP assertion li
 See `docs/EXPERIMENT_WORKSPACE.md` for durable identity, queue recovery, resource profiles, specification checkpoints, portable bundle safety, offline rerun verification, report CSP, and limitations.
 
 See `docs/PHYSIOLOGY_PLUGINS.md` for the `.bpp` profile, publisher trust, process sandbox gate, persistence, exact coupling identity, conservation/convergence diagnostics, certification boundary, and unsupported scientific scope.
+
+See `docs/DATA_PLANE.md` for factory trust verification, exact artifact and scientific closure, persistent publication, offline reads, cursor binding, API security, test evidence, and limitations.

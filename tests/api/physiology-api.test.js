@@ -7,7 +7,7 @@ import { PhysiologyCouplingSchema, PhysiologyEvidenceSchema, PhysiologyRunSchema
 let app
 afterEach(async () => app?.close())
 
-const mutationHeaders = { origin: 'http://localhost', host: 'localhost', 'x-physiology-csrf': 'physiology-v1' }
+const mutationHeaders = { origin: 'http://localhost', host: 'untrusted-host.example', 'x-physiology-csrf': 'physiology-v1' }
 
 async function createApp() {
   return buildApp({ serveClient: false, env: { NODE_ENV: 'test', BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true', BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN: 'http://localhost' } })
@@ -51,6 +51,7 @@ describe('physiology API v8', () => {
     const mouse = await app.inject({ method: 'POST', url: '/api/v8/physiology/couplings', headers: mutationHeaders, payload: { ...payload, taxonId: 'NCBITaxon:10090' } })
     const malformed = await app.inject({ method: 'POST', url: '/api/v8/physiology/runs', headers: mutationHeaders, payload: { couplingDigest: coupling.couplingDigest, unexpected: true } })
     const csrf = await app.inject({ method: 'POST', url: '/api/v8/physiology/runs', payload: { couplingDigest: coupling.couplingDigest } })
+    const rebound = await app.inject({ method: 'POST', url: '/api/v8/physiology/runs', headers: { ...mutationHeaders, host: 'attacker.test', origin: 'http://attacker.test' }, payload: { couplingDigest: coupling.couplingDigest } })
 
     expect(couplingResponse.statusCode).toBe(201)
     expect(runResponse.statusCode).toBe(201)
@@ -61,6 +62,7 @@ describe('physiology API v8', () => {
     expect(mouse.json().code).toBe('unsupported_extrapolation')
     expect(malformed.statusCode).toBe(422)
     expect(csrf.statusCode).toBe(403)
+    expect(rebound.statusCode).toBe(403)
   })
 
   it('validates deterministic package bytes and applies trust revocation immediately', async () => {

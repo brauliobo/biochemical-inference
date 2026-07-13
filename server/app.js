@@ -87,6 +87,20 @@ import {
 } from '../shared/physiology-contracts.js'
 import { createPhysiologyClient, PhysiologyCompatibilityError } from './physiology/client.js'
 import { createPhysiologyService, PhysiologyRequestError } from './physiology/service.js'
+import {
+  DATA_PLANE_CSRF_HEADER,
+  DATA_PLANE_CSRF_VALUE,
+  DATA_PLANE_PINS,
+  AuthorityClosureAuditRequestSchema,
+  DataPlanePageQuerySchema,
+  DataPlaneRecordTypeSchema,
+  DataPlaneSyncRequestSchema,
+  ReleaseIdSchema,
+  Sha256Schema as DataPlaneSha256Schema
+} from '../shared/data-plane-contracts.js'
+import { DataPlaneUpstreamError } from './data-plane/client.js'
+import { createDataPlaneService, DataPlaneRequestError } from './data-plane/service.js'
+import { DataPlaneVerificationError } from './data-plane/verification.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -154,7 +168,27 @@ const PhysiologyDigestParamSchema = z.object({ packageDigest: PhysiologyDigestSc
 const PhysiologyCouplingParamSchema = z.object({ couplingDigest: PhysiologyDigestSchema }).strict()
 const PhysiologyRunParamSchema = z.object({ runDigest: PhysiologyDigestSchema }).strict()
 const PhysiologyTrustParamSchema = z.object({ keyId: z.string().regex(/^ed25519:[a-f0-9]{16}$/) }).strict()
+const DataPlaneReleaseParamSchema = z.object({ releaseId: ReleaseIdSchema }).strict()
+const DataPlaneRecordParamSchema = z.object({ releaseId: ReleaseIdSchema, recordType: DataPlaneRecordTypeSchema, recordId: z.string().min(1).max(200) }).strict()
+const DataPlanePageParamSchema = z.object({ releaseId: ReleaseIdSchema, recordType: DataPlaneRecordTypeSchema }).strict()
+const DataPlaneDiffQuerySchema = z.object({ base_release_id: ReleaseIdSchema, candidate_release_id: ReleaseIdSchema }).strict()
+const DataPlaneAuditParamSchema = z.object({ reportDigest: DataPlaneSha256Schema }).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
+
+function fixedAllowedOrigins(env) {
+  const values = [env.BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN, ...(env.CORS_ORIGINS ?? '').split(',')].filter((value) => value !== undefined && value !== '')
+  return new Set(values.map((raw) => {
+    const value = raw.trim()
+    let parsed
+    try {
+      parsed = new URL(value)
+    } catch {
+      throw new Error(`Invalid configured browser origin: ${raw}.`)
+    }
+    if (value !== raw || !['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.origin !== value) throw new Error(`Configured browser origin must be an exact HTTP(S) origin: ${raw}.`)
+    return value
+  }))
+}
 
 function invalidAtlasQuery(reply, parsed) {
   return reply.status(400).send({
@@ -168,6 +202,7 @@ function invalidAtlasQuery(reply, parsed) {
 
 export async function buildApp(options = {}) {
   const env = options.env ?? process.env
+  const allowedOrigins = fixedAllowedOrigins(env)
   const app = Fastify({ bodyLimit: 1_048_576, logger: env.NODE_ENV !== 'test', routerOptions: { maxParamLength: 200 } })
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
@@ -188,14 +223,17 @@ export async function buildApp(options = {}) {
     env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env,
     evidenceClient: physiologyEvidence
   })
-  app.addHook('onClose', async () => {
-    await Promise.allSettled([workspace.close?.(), physiology.close?.()])
+  const dataPlane = options.dataPlaneService ?? await createDataPlaneService({
+    env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env
   })
-  const configuredPublicOrigin = env.BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN?.replace(/\/$/, '')
-  const allowedOrigins = new Set((env.CORS_ORIGINS ?? '').split(',').map((origin) => origin.trim()).filter(Boolean))
+  app.addHook('onClose', async () => {
+    await Promise.allSettled([workspace.close?.(), physiology.close?.(), dataPlane.close?.()])
+  })
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
   })
+
+  const requireFixedOrigin = (request, csrfHeader, csrfValue) => allowedOrigins.has(request.headers.origin) && request.headers[csrfHeader] === csrfValue
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof KnowledgeCompatibilityError) {
@@ -224,6 +262,12 @@ export async function buildApp(options = {}) {
     }
     if (error instanceof PhysiologyCompatibilityError || error instanceof PhysiologyRequestError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof DataPlaneRequestError || error instanceof DataPlaneUpstreamError || error instanceof DataPlaneVerificationError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return reply.status(409).send({ statusCode: 409, code: 'DATA_PLANE_SYNC_SUPERSEDED', error: 'Conflict', message: error.message })
     }
     if (error instanceof SimulationNumericalError) {
       return reply.status(422).send({ statusCode: 422, code: 'INVALID_NUMERICAL_STATE', error: 'Unprocessable Entity', message: error.message })
@@ -545,18 +589,7 @@ export async function buildApp(options = {}) {
   })
   const invalidDerived = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_DERIVED_REQUEST', error: 'Unprocessable Entity', message: 'Derived knowledge request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
   const requireDerivedMutation = async (request) => {
-    const origin = request.headers.origin
-    let sameOrigin = false
-    try {
-      const parsed = new URL(origin)
-      const requestOrigin = `${request.protocol}://${request.headers.host}`
-      sameOrigin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.origin === origin && (origin === requestOrigin || origin === configuredPublicOrigin)
-    } catch {
-      sameOrigin = false
-    }
-    if (!sameOrigin || request.headers[DERIVED_CSRF_HEADER] !== DERIVED_CSRF_VALUE) {
-      throw new DerivedRequestError('Derived mutation requires an exact same-origin request and CSRF header.', { statusCode: 403, code: 'DERIVED_CSRF_REJECTED' })
-    }
+    if (!requireFixedOrigin(request, DERIVED_CSRF_HEADER, DERIVED_CSRF_VALUE)) throw new DerivedRequestError('Derived mutation requires a startup-allowlisted Origin and CSRF header.', { statusCode: 403, code: 'DERIVED_CSRF_REJECTED' })
   }
 
   app.get('/api/v6/derived/health', async () => derived.health())
@@ -764,16 +797,7 @@ export async function buildApp(options = {}) {
   })
   const invalidPhysiology = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_PHYSIOLOGY_REQUEST', error: 'Unprocessable Entity', message: 'Physiology request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
   const requirePhysiologyMutation = async (request) => {
-    const origin = request.headers.origin
-    let sameOrigin = false
-    try {
-      const parsed = new URL(origin)
-      const requestOrigin = `${request.protocol}://${request.headers.host}`
-      sameOrigin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') && parsed.origin === origin && (origin === requestOrigin || origin === configuredPublicOrigin)
-    } catch {
-      sameOrigin = false
-    }
-    if (!sameOrigin || request.headers[PHYSIOLOGY_CSRF_HEADER] !== PHYSIOLOGY_CSRF_VALUE) throw new PhysiologyRequestError('physiology_csrf_rejected', 'Physiology mutation requires an exact same-origin request and CSRF header.', 403)
+    if (!requireFixedOrigin(request, PHYSIOLOGY_CSRF_HEADER, PHYSIOLOGY_CSRF_VALUE)) throw new PhysiologyRequestError('physiology_csrf_rejected', 'Physiology mutation requires a startup-allowlisted Origin and CSRF header.', 403)
   }
 
   app.get('/api/v8/physiology', async () => ({
@@ -842,6 +866,72 @@ export async function buildApp(options = {}) {
     return physiology.getRun(parsed.data.runDigest)
   })
   app.get('/api/v8/physiology/coverage', async () => physiology.coverage())
+  const invalidDataPlane = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_DATA_PLANE_REQUEST', error: 'Unprocessable Entity', message: 'Data-plane request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireDataPlaneMutation = async (request) => {
+    if (!requireFixedOrigin(request, DATA_PLANE_CSRF_HEADER, DATA_PLANE_CSRF_VALUE)) throw new DataPlaneRequestError('data_plane_csrf_rejected', 'Data-plane mutation requires a startup-allowlisted Origin and CSRF header.', 403)
+  }
+
+  app.get('/api/v9/data-plane', async () => ({
+    contractVersion: '1.0.0',
+    mode: 'local-verified-mirror',
+    explicitSync: true,
+    readNetworkAccess: false,
+    pins: DATA_PLANE_PINS,
+    status: dataPlane.status(),
+    routes: {
+      status: '/api/v9/data-plane/status',
+      sync: '/api/v9/data-plane/sync',
+      releases: '/api/v9/data-plane/releases',
+      release: '/api/v9/data-plane/releases/{releaseId}',
+      record: '/api/v9/data-plane/releases/{releaseId}/records/{recordType}/{recordId}',
+      pages: '/api/v9/data-plane/releases/{releaseId}/pages/{recordType}',
+      diff: '/api/v9/data-plane/diff',
+      integrity: '/api/v9/data-plane/integrity',
+      audits: '/api/v9/data-plane/audits',
+      audit: '/api/v9/data-plane/audits/{reportDigest}'
+    }
+  }))
+  app.get('/api/v9/data-plane/status', async () => dataPlane.status())
+  app.post('/api/v9/data-plane/sync', { preHandler: requireDataPlaneMutation }, async (request, reply) => {
+    const parsed = DataPlaneSyncRequestSchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return reply.status(200).send(await dataPlane.sync())
+  })
+  app.get('/api/v9/data-plane/releases', async () => dataPlane.listReleases())
+  app.get('/api/v9/data-plane/releases/:releaseId', async (request, reply) => {
+    const parsed = DataPlaneReleaseParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return dataPlane.releaseDetail(parsed.data.releaseId)
+  })
+  app.get('/api/v9/data-plane/releases/:releaseId/records/:recordType/:recordId', async (request, reply) => {
+    const parsed = DataPlaneRecordParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return dataPlane.record(parsed.data.releaseId, parsed.data.recordType, parsed.data.recordId)
+  })
+  app.get('/api/v9/data-plane/releases/:releaseId/pages/:recordType', async (request, reply) => {
+    const params = DataPlanePageParamSchema.safeParse(request.params)
+    const query = DataPlanePageQuerySchema.safeParse(request.query)
+    if (!params.success) return invalidDataPlane(reply, params)
+    if (!query.success) return invalidDataPlane(reply, query)
+    return dataPlane.page(params.data.releaseId, params.data.recordType, query.data)
+  })
+  app.get('/api/v9/data-plane/diff', async (request, reply) => {
+    const parsed = DataPlaneDiffQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return dataPlane.diff(parsed.data.base_release_id, parsed.data.candidate_release_id)
+  })
+  app.get('/api/v9/data-plane/integrity', async () => dataPlane.integrity())
+  app.post('/api/v9/data-plane/audits', { preHandler: requireDataPlaneMutation }, async (request, reply) => {
+    const parsed = AuthorityClosureAuditRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return reply.status(201).send(await dataPlane.audit(parsed.data.candidateReleaseId, parsed.data.baselineReleaseId))
+  })
+  app.get('/api/v9/data-plane/audits', async () => dataPlane.listAudits())
+  app.get('/api/v9/data-plane/audits/:reportDigest', async (request, reply) => {
+    const parsed = DataPlaneAuditParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidDataPlane(reply, parsed)
+    return dataPlane.auditDetail(parsed.data.reportDigest)
+  })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {
     const parsed = SimulationRequestSchema.safeParse(request.body)

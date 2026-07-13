@@ -103,6 +103,21 @@ import {
   PhysiologyRunSchema,
   TrustKeySchema
 } from '../shared/physiology-contracts.js'
+import {
+  DATA_PLANE_CSRF_HEADER,
+  DATA_PLANE_CSRF_VALUE,
+  AuthorityClosureAuditListSchema,
+  AuthorityClosureAuditReportSchema,
+  AuthorityClosureAuditRequestSchema,
+  DataPlaneDiscoverySchema,
+  DataPlaneIntegritySchema,
+  DataPlaneLocalPageSchema,
+  DataPlaneLocalRecordSchema,
+  DataPlaneReleaseDetailSchema,
+  DataPlaneReleaseListSchema,
+  DataPlaneStatusSchema,
+  FactorySemanticDiffSchema
+} from '../shared/data-plane-contracts.js'
 
 export class ApiError extends Error {
   constructor(message, { status, code, payload } = {}) {
@@ -134,6 +149,7 @@ export async function requestJson(path, init) {
 const withSignal = (signal) => signal ? { signal } : {}
 const derivedMutationHeaders = { 'content-type': 'application/json', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
 const physiologyMutationHeaders = { 'content-type': 'application/json', [PHYSIOLOGY_CSRF_HEADER]: PHYSIOLOGY_CSRF_VALUE }
+const dataPlaneMutationHeaders = { 'content-type': 'application/json', [DATA_PLANE_CSRF_HEADER]: DATA_PLANE_CSRF_VALUE }
 
 function queryString(values) {
   const query = new URLSearchParams()
@@ -647,4 +663,65 @@ export async function runPhysiologyCoupling(couplingDigest, signal) {
     body: JSON.stringify(request),
     ...withSignal(signal)
   }))
+}
+
+export async function loadDataPlaneDiscovery(signal) {
+  return DataPlaneDiscoverySchema.parse(await requestJson('/api/v9/data-plane', withSignal(signal)))
+}
+
+export async function loadDataPlaneStatus(signal) {
+  return DataPlaneStatusSchema.parse(await requestJson('/api/v9/data-plane/status', withSignal(signal)))
+}
+
+export async function syncDataPlane(signal) {
+  return DataPlaneStatusSchema.parse(await requestJson('/api/v9/data-plane/sync', {
+    method: 'POST',
+    headers: dataPlaneMutationHeaders,
+    body: '{}',
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadDataPlaneReleases(signal) {
+  return DataPlaneReleaseListSchema.parse(await requestJson('/api/v9/data-plane/releases', withSignal(signal)))
+}
+
+export async function loadDataPlaneRelease(releaseId, signal) {
+  return DataPlaneReleaseDetailSchema.parse(await requestJson(`/api/v9/data-plane/releases/${encodeURIComponent(releaseId)}`, withSignal(signal)))
+}
+
+export async function loadDataPlanePage(releaseId, recordType, query = {}, signal) {
+  const encoded = queryString(query)
+  return DataPlaneLocalPageSchema.parse(await requestJson(`/api/v9/data-plane/releases/${encodeURIComponent(releaseId)}/pages/${encodeURIComponent(recordType)}${encoded ? `?${encoded}` : ''}`, withSignal(signal)))
+}
+
+export async function loadDataPlaneRecord(releaseId, recordType, recordId, signal) {
+  return DataPlaneLocalRecordSchema.parse(await requestJson(`/api/v9/data-plane/releases/${encodeURIComponent(releaseId)}/records/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`, withSignal(signal)))
+}
+
+export async function loadDataPlaneDiff(baseReleaseId, candidateReleaseId, signal) {
+  const query = queryString({ base_release_id: baseReleaseId, candidate_release_id: candidateReleaseId })
+  return FactorySemanticDiffSchema.parse(await requestJson(`/api/v9/data-plane/diff?${query}`, withSignal(signal)))
+}
+
+export async function loadDataPlaneIntegrity(signal) {
+  return DataPlaneIntegritySchema.parse(await requestJson('/api/v9/data-plane/integrity', withSignal(signal)))
+}
+
+export async function runAuthorityClosureAudit(input, signal) {
+  const request = AuthorityClosureAuditRequestSchema.parse(input)
+  return AuthorityClosureAuditReportSchema.parse(await requestJson('/api/v9/data-plane/audits', {
+    method: 'POST',
+    headers: dataPlaneMutationHeaders,
+    body: JSON.stringify(request),
+    ...withSignal(signal)
+  }))
+}
+
+export async function loadAuthorityClosureAudits(signal) {
+  return AuthorityClosureAuditListSchema.parse(await requestJson('/api/v9/data-plane/audits', withSignal(signal)))
+}
+
+export async function loadAuthorityClosureAudit(reportDigest, signal) {
+  return AuthorityClosureAuditReportSchema.parse(await requestJson(`/api/v9/data-plane/audits/${encodeURIComponent(reportDigest)}`, withSignal(signal)))
 }

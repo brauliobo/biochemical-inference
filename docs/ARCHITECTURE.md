@@ -128,6 +128,24 @@ deterministic multirate coupler
         +-- Bubblewrap-gated process protocol (default refused)
         v
 PhysiologyPluginWorkbench + persistent synthetic/non-clinical boundary
+
+factory API :8000 (loopback only during explicit sync)
+        | signed catalog/trust/envelope + exact manifest/partitions/pages/diff
+        v
+strict Goal 11 contracts + RFC 8785 + Ed25519 trust policy + independent pins
+        |
+        +-- exact producer cursor traversal equals partition records
+        +-- source/license/adapter/accession closure
+        +-- reaction/taxon/protein/reference/catalysis scientific closure
+        v
+staged SHA-256 objects -> one SQLite WAL publication transaction
+        |
+        +-- immutable generation/partition/record triggers
+        +-- restart integrity scan
+        +-- deployment-HMAC local cursors
+        +-- no upstream code path for reads
+        v
+DataPlaneWorkbench + /api/v9/data-plane
 ```
 
 ## Active Application
@@ -155,6 +173,8 @@ Goal 7 adds `shared/spatial-contracts.js`, `server/spatial/`, `src/spatial.js`, 
 Goal 9 adds `shared/workspace-contracts.js`, `shared/snapshot-contracts.js`, `server/workspace/`, and `src/components/ExperimentWorkspace.vue`. Metadata is SQLite WAL with foreign keys; specifications, snapshots, results, bundles, and reports are content-addressed objects under `BIOCHEMICAL_WORKSPACE_ROOT`. Scientific run identity is independent of attempt identity. Restart recovery creates a new attempt from a digest-verified specification checkpoint because current engines expose no serializable mid-state. Portable imports validate every ZIP name, size, ratio, and digest before publication and can rerun from the embedded verified snapshot without an upstream service.
 
 Goal 10 adds `shared/physiology-contracts.js`, `server/physiology/`, and `src/components/PhysiologyPluginWorkbench.vue`. The upstream release remains evidence-only. Inference-owned `.bpp` bytes are signed, strictly validated, content-addressed, and immutable; local trust revocation dynamically invalidates certification and execution without deleting audit bytes. Package evidence digests and package-content digests remain separate. Couplings require exact ports, semantics, dimensions, units, scalar shapes, taxon applicability, and complete circulation/liver/kidney closure. Protocol conformance, mass conservation, and timestep convergence are reported separately from scientific validation, which remains unsupported.
+
+Goal 11 adds `shared/data-plane-contracts.js`, `server/data-plane/`, and `src/components/DataPlaneWorkbench.vue`. The explicit sync path is the only loopback producer client. It independently verifies the rotated trust store, signed two-release catalog, exact partitions, producer cursor pages, scientific links, and attributed baseline-to-candidate difference before one transaction publishes both generations, one active candidate pointer, and one separate diff pair. The private CAS and SQLite paths reject symlink ancestors and use no-follow descriptors where Node exposes them. Startup checks SQLite and foreign-key integrity, exact row/file closure, canonical record bytes, denormalized columns, signatures, and the cross-release diff. Immutable authority-closure audit reports are generated from verified local records only. Local HMAC cursors bind every query dimension, and v9 reads have no upstream fallback. See `docs/DATA_PLANE.md`.
 
 ## Service Contract
 

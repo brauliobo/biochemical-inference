@@ -10,7 +10,7 @@ import { APAP_RELEASE_ID } from '../../shared/apap-contracts.js'
 import { DERIVED_CSRF_HEADER, DERIVED_CSRF_VALUE } from '../../shared/derived-contracts.js'
 
 const specification = { releaseId: APAP_RELEASE_ID, contextId: 'CONTEXT:APAP-HUMAN-LIVER', protocolId: 'PROTOCOL:APAP-HUMAN-PK', stepHours: 0.01, outputEveryHours: 0.5, mechanismScales: { cypActivity: 1, adductBinding: 1, zonation: 1, nacGsh: 1 } }
-const mutationHeaders = { host: 'localhost', origin: 'http://localhost', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
+const mutationHeaders = { host: 'untrusted-host.example', origin: 'http://localhost', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
 const reviewer = { id: 'local:derived-api-reviewer', name: 'API Reviewer', organization: 'Test Review Board', role: 'scientific-reviewer' }
 let baseRecord
 let app
@@ -27,7 +27,7 @@ async function fixtureApp() {
   await apapRuns.create(specification)
   return buildApp({
     serveClient: false,
-    env: { NODE_ENV: 'test', BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' },
+    env: { NODE_ENV: 'test', BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true', BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN: 'http://localhost' },
     knowledgeClient: createKnowledgeClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' }),
     apapClient,
     apapRunService: apapRuns,
@@ -40,7 +40,7 @@ describe('reviewed-derived API v6', () => {
     app = await fixtureApp()
     const url = `/api/v6/derived/apap-runs/${encodeURIComponent(baseRecord.runId)}/bundles`
     const missing = await app.inject({ method: 'POST', url })
-    const crossOrigin = await app.inject({ method: 'POST', url, headers: { ...mutationHeaders, origin: 'https://attacker.example' } })
+    const crossOrigin = await app.inject({ method: 'POST', url, headers: { ...mutationHeaders, host: 'attacker.example', origin: 'https://attacker.example' } })
     const accepted = await app.inject({ method: 'POST', url, headers: mutationHeaders })
     const health = await app.inject({ method: 'GET', url: '/api/v6/derived/health' })
     const serialized = JSON.stringify({ accepted: accepted.json(), health: health.json() })

@@ -124,6 +124,35 @@ Feature: Controlled multiscale biochemical platform
     Then execution is blocked
     And the coverage matrix reports unsupported applicability instead of substituting parameters
 
+  Scenario: Publish a verified local factory release pair
+    Given an empty inference data plane and the independently pinned factory trust root
+    When the user explicitly synchronizes the signed baseline and candidate releases
+    Then trust, key rotation, signatures, canonical metadata, exact partitions, producer pages, scientific links, and the cross-release difference verify before publication
+    And both generations and their separate difference publish atomically with the candidate active
+    And a failure leaves no partial generation or unindexed object readable
+
+  Scenario: Traverse a fixed local snapshot offline
+    Given a published immutable data-plane generation
+    When the producer becomes unavailable and the user traverses every small local page
+    Then every eligible record appears exactly once in ID order
+    And a cursor cannot cross release, schema, type, filters, sort, or limit
+    And no read path contacts or falls back to the producer
+
+  Scenario: Inspect authority, curation, rights, and semantic classes
+    Given the pinned human and mouse authority release is local
+    When the data-plane workbench opens on desktop or mobile
+    Then release, catalog, trust, signer, manifest, source object, adapter, license, and NLM courtesy pins are visible
+    And authority responses remain distinct from repository curation
+    And taxon, reaction, protein, reference, and catalysis links remain inspectable
+    And scientific, provenance, rights, and packaging differences remain separate
+
+  Scenario: Persist an offline authority closure audit
+    Given both signed releases and their verified difference are local
+    When the user runs the authority closure audit after the producer is stopped
+    Then the immutable report pins release, schema, signer, signed time, catalog, trust, envelope, manifest, partitions, sources, adapters, licenses, and difference classes
+    And repeated execution returns one deterministic report identity
+    And reaction balance, taxon catalysis, and reference closure pass without claiming scientific validation
+
   Scenario: Complete every workflow without 3D
     Given WebGL is unavailable on a narrow viewport
     When the user searches evidence, runs models, inspects spatial results, reviews derivations, and compares experiments

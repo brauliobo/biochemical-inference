@@ -1,0 +1,2 @@
+{"evidence_class":"direct","evidence_code":"ECO:0000269","id":"CATALYSIS:P34896-15483","protein_id":"UniProtKB:P34896","reaction_id":"RHEA:15483","reference_ids":["PubMed:24698160"],"taxon_id":"NCBITaxon:9606"}
+{"evidence_class":"inferred","evidence_code":"ECO:0000250","id":"CATALYSIS:P50431-15483","protein_id":"UniProtKB:P50431","reaction_id":"RHEA:15483","reference_ids":["PubMed:24698160"],"taxon_id":"NCBITaxon:10090"}

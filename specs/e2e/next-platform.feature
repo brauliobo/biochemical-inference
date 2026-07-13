@@ -1,7 +1,7 @@
 Feature: Verified measured platform expansion
   Goals 11-15 extend the completed bounded fixtures without changing their scientific labels.
 
-  @goal11 @active
+  @goal11 @delivered
   Scenario: Rebuild and consume an authoritative release offline
     Given clean checkouts and the complete pinned local source-object closure
     And external network access is unavailable
@@ -10,7 +10,7 @@ Feature: Verified measured platform expansion
     And signed metadata verifies under the configured trust policy
     And a pinned inference workflow completes after the producer is stopped
 
-  @goal11 @active
+  @goal11 @delivered
   Scenario: Traverse a release through snapshot-pinned pagination
     Given a verified release is mirrored in the empty local data plane
     When the inference application follows every page cursor for a fixed query
@@ -18,7 +18,7 @@ Feature: Verified measured platform expansion
     And every page remains pinned to one release and query contract
     And a cursor from another release or query is rejected
 
-  @goal11 @active
+  @goal11 @delivered
   Scenario: Explain a semantic release change
     Given a pinned baseline release and a reproducible candidate release
     When the inference application requests their semantic difference

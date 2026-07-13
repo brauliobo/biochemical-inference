@@ -7,7 +7,10 @@ const runtimeRoot = process.env.E2E_RUNTIME_ROOT ?? resolve(process.cwd(), '..',
 const evidenceRuntime = `${runtimeRoot}/evidence`
 const derivedRuntime = `${runtimeRoot}/derived`
 const workspaceRuntime = `${runtimeRoot}/workspace`
+const dataPlaneRuntime = `${runtimeRoot}/data-plane`
 const derivedToken = randomBytes(32).toString('hex')
+const factoryCursorSecret = randomBytes(32).toString('base64url')
+const dataPlaneCursorSecret = randomBytes(32).toString('base64url')
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -21,8 +24,13 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Galaxy S9+'], viewport: { width: 360, height: 740 } } }
   ],
   webServer: [
-    ...useFixture ? [] : [{
-      command: 'uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000',
+    ...(useFixture ? [{
+      command: `BIOCHEMICAL_FACTORY_CURSOR_SECRET=${factoryCursorSecret} PORT=8010 node tests/fixtures/data-plane-server.js`,
+      url: 'http://127.0.0.1:8010/api/factory/v1',
+      reuseExistingServer: false,
+      timeout: 120_000
+    }] : [{
+      command: `BIOCHEMICAL_FACTORY_CURSOR_SECRET=${factoryCursorSecret} uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000`,
       cwd: '../biochemical-db/service',
       url: 'http://127.0.0.1:8000/healthz',
       reuseExistingServer: false,
@@ -39,11 +47,11 @@ export default defineConfig({
       url: 'http://127.0.0.1:8002/healthz',
       reuseExistingServer: false,
       timeout: 120_000
-    }],
+    }]),
     {
       command: useFixture
-        ? `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm start`
-        : `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm start`,
+        ? `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8010 BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm start`
+        : `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8000 BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm start`,
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: false,
       timeout: 120_000

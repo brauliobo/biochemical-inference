@@ -1,0 +1,2 @@
+{"id":"LIMITATION:MOUSE-INFERENCE","statement":"The mouse catalysis assertion is curator-authored and explicitly inferred from the reviewed UniProtKB cross-species annotation, not direct mouse experimental evidence."}
+{"id":"LIMITATION:NO-KINETICS","statement":"Concentrations, fluxes, compartments, kinetic parameters, clinical claims, and measured physiological values are outside this release."}

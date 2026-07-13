@@ -1,0 +1,2 @@
+{"id":"LIMITATION:AUTHORITY-SNAPSHOT","statement":"Authority responses are immutable retrieval snapshots; publisher signatures authenticate this release envelope, not upstream authorship or scientific completeness."}
+{"id":"LIMITATION:BOUNDED-SLICE","statement":"This authority-backed release contains one serine hydroxymethyltransferase reaction and two reviewed proteins; omission does not establish biological absence."}
