@@ -61,9 +61,12 @@ describe('PhysiologyPluginWorkbench', () => {
     expect(screen.getByText('Synthetic / non-clinical')).toBeTruthy()
     expect(await screen.findByText('Certification is not scientific validation')).toBeTruthy()
     expect(screen.getByText('8f7a14db2cebe4603772146b3d1f9f2a8ccafbf2452ef5c9ff856326584fadb8')).toBeTruthy()
-    expect(screen.getAllByText('certified-conformant')).toHaveLength(3)
+    expect(screen.getAllByText('not-certified')).toHaveLength(3)
     expect(screen.getByText(/PORT:CIRCULATION-LIVER-OUT/)).toBeTruthy()
     expect(screen.getAllByText(/signed package installed/)).toHaveLength(3)
+
+    await fireEvent.click(screen.getAllByRole('button', { name: 'Run and persist conformance' })[0])
+    expect(await screen.findByText('certified-conformant')).toBeTruthy()
 
     await fireEvent.click(screen.getByRole('button', { name: 'Create exact coupling' }))
     expect(await screen.findByText(coupling.couplingDigest)).toBeTruthy()

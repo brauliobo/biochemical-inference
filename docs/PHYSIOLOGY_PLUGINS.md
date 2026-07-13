@@ -67,8 +67,9 @@ undeclared permissions, and output schedule gaps.
 
 The local trust store begins with the built-in public key. Revocation is durable
 and immediately downgrades every affected package to `not-certified`; new
-validation, conformance, coupling, and execution fail closed. Immutable package
-bytes are retained for audit.
+validation, conformance, coupling, and execution fail closed. Every execution
+POST checks current trust before returning a cached run, while historical run
+GETs remain readable. Immutable package bytes are retained for audit.
 
 Declarative packages execute in-process through the bounded descriptor runtime.
 Process packages are format-recognized but default to refused installation and
@@ -101,8 +102,14 @@ negative value.
 
 The explicit coupling cadence is one minute with zero-order-hold interpolation.
 Plugin cadences are one minute for circulation and two minutes for liver and
-kidney. Protocol events distinguish initialization, input reads, due advances,
-and output publication. Coupling applicability is the taxon/use-scope
+kidney. Descriptor schedule changes, coupling ticks, plugin cadences, and all
+refinement grids must align. Each plugin advances and publishes only when its
+own cadence is due; the published rate is held explicitly between events.
+Process entrypoints are therefore invoked only on due events, independent of
+the 1x, 2x, or 4x numerical refinement. Each interval computes all exchange
+deltas from the same pre-exchange state, checks aggregate source availability,
+and then applies the deltas simultaneously. Protocol events record only actual
+initialization, input-read, advance, and publication operations. Coupling applicability is the taxon/use-scope
 intersection plus all three context bindings and exclusions. Mouse and duration
 beyond the four-minute evidence domain are blocked as unsupported extrapolation.
 
@@ -122,7 +129,11 @@ maximum endpoint difference, and the declared convergence tolerance.
 
 ## Certification
 
-`certified-conformant` requires all seven checks: publisher signature, strict
+Every validated or newly installed package starts `not-certified`, with
+`conformanceBenchmark: false` and `protocolConformance: not-run`. Package ZIP
+bytes and their content digest never change when conformance is run. Catalog and
+detail responses derive `certified-conformant` only from a successfully persisted
+conformance result containing all seven checks: publisher signature, strict
 schema, exact ports, applicability, redistributable license, bounded resources,
 and conformance benchmark. Protocol certification always carries
 `scientificValidation: unsupported` and the statement that certification does

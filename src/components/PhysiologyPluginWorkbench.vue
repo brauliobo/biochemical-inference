@@ -38,7 +38,9 @@ async function checkConformance(item) {
   state.value = 'coupling'
   message.value = ''
   try {
-    conformance.value = { ...conformance.value, [item.packageDigest]: await runPhysiologyConformance(item.packageDigest, controller?.signal) }
+    const result = await runPhysiologyConformance(item.packageDigest, controller?.signal)
+    conformance.value = { ...conformance.value, [item.packageDigest]: result }
+    item.certification = result.certification
     state.value = 'ready'
   } catch (error) {
     state.value = 'failed'
@@ -120,8 +122,8 @@ section.physiology-panel(aria-labelledby="physiology-title")
     .science-separation
       article
         span.certification-label Protocol certification
-        strong Signature + schema + ports + applicability + license + resources + synthetic benchmark
-        p A passing package is certified only for the declared software exchange protocol.
+        strong Verification first, persisted conformance run second
+        p Packages start not-certified. Only a successful persisted benchmark run certifies the declared software exchange protocol.
       article.unsupported-science
         span.unsupported-badge Scientifically unsupported
         strong Certification is not scientific validation
@@ -166,7 +168,7 @@ section.physiology-panel(aria-labelledby="physiology-title")
             strong {{ port.direction }} · {{ port.id }}
             span {{ port.semantic }} · {{ port.dimension }} · {{ port.unit }}
         p.plugin-context {{ contextById.get(item.manifest.applicability.contextIds[0])?.name }} · {{ item.manifest.applicability.taxonIds[0] }}
-        button.secondary(type="button" :disabled="isBusy || item.trust.status !== 'trusted'" @click="checkConformance(item)") Run conformance
+        button.secondary(type="button" :disabled="isBusy || item.trust.status !== 'trusted'" @click="checkConformance(item)") Run and persist conformance
         p.conformance-result(v-if="conformance[item.packageDigest]") Protocol {{ conformance[item.packageDigest].benchmark.passed ? 'passed' : 'failed' }} · scientific validation {{ conformance[item.packageDigest].scientificValidation }}
 
     .coupling-editor

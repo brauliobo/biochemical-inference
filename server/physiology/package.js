@@ -125,17 +125,18 @@ function verifyDescriptorClosure(manifest, model, coupling, evidence) {
     let cursor = 0
     for (const interval of schedule.intervals) {
       if (interval.startMinute !== cursor) invalid('schedule_gap', 'model.json', `Output schedule ${schedule.portId} is not contiguous from minute zero.`)
+      if (Math.abs(interval.startMinute / model.cadenceMinutes - Math.round(interval.startMinute / model.cadenceMinutes)) > 1e-12 || Math.abs(interval.endMinute / model.cadenceMinutes - Math.round(interval.endMinute / model.cadenceMinutes)) > 1e-12) invalid('cadence_mismatch', 'model.json', `Output schedule ${schedule.portId} changes between declared cadence events.`)
       cursor = interval.endMinute
     }
     if (cursor !== 4) invalid('schedule_scope', 'model.json', `Output schedule ${schedule.portId} must cover exactly the bounded four-minute benchmark.`)
   }
 }
 
-function certification(checks, passed) {
+function initialCertification(checks) {
   return CertificationSchema.parse({
-    status: passed && Object.values(checks).every(Boolean) ? 'certified-conformant' : 'not-certified',
+    status: 'not-certified',
     checks,
-    protocolConformance: passed ? 'passed' : 'failed',
+    protocolConformance: 'not-run',
     scientificValidation: 'unsupported',
     statement: 'Certification is software protocol conformance only and does not establish scientific validity.'
   })
@@ -176,7 +177,7 @@ export async function inspectBppPackage(buffer, options) {
   verifyDescriptorClosure(manifest, model, coupling, options.evidence)
   const trustKey = options.trustKey(signature.keyId)
   verifyPublisher(manifest, signature, trustKey)
-  const checks = { signature: true, schema: true, ports: true, applicability: true, license: true, resources: true, conformanceBenchmark: manifest.pluginKind === 'declarative' }
+  const checks = { signature: true, schema: true, ports: true, applicability: true, license: true, resources: true, conformanceBenchmark: false }
   const processAllowed = manifest.pluginKind === 'declarative' || options.processSandboxAvailable === true
   const record = PhysiologyPackageSchema.parse({
     packageDigest: digestBuffer(buffer),
@@ -188,7 +189,7 @@ export async function inspectBppPackage(buffer, options) {
     manifest,
     signature,
     trust: { keyId: trustKey.keyId, status: trustKey.status, publisher: trustKey.publisher },
-    certification: certification(checks, manifest.pluginKind === 'declarative')
+    certification: initialCertification(checks)
   })
   return { record, manifest, signature, model, coupling, files, installable: processAllowed }
 }

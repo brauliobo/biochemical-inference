@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { canonicalDigest } from '../../shared/canonical-json.js'
 import { BppManifestSchema, BppSignatureSchema } from '../../shared/physiology-contracts.js'
 import { createPhysiologyClient } from '../../server/physiology/client.js'
-import { createBppArchive, digestBuffer, validateBppPackage } from '../../server/physiology/package.js'
+import { createBppArchive, digestBuffer, validateBppPackage, verifyDescriptorClosure } from '../../server/physiology/package.js'
 import { createReferencePackages, REFERENCE_KEY_ID, REFERENCE_PUBLIC_KEY_SPKI_BASE64, REFERENCE_PUBLISHER, unsignedReferenceDefinitions } from '../../server/physiology/reference.js'
 
 const referenceTrust = (status = 'trusted') => ({ keyId: REFERENCE_KEY_ID, status, publisher: REFERENCE_PUBLISHER, publicKeySpkiBase64: REFERENCE_PUBLIC_KEY_SPKI_BASE64 })
@@ -33,9 +33,21 @@ describe('safe signed .bpp packages', () => {
     const first = await validateBppPackage(reference.bytes, { evidence, trustKey: () => referenceTrust(), processSandboxAvailable: false, builtIn: true })
     const rebuilt = await createBppArchive(reference)
 
-    expect(first.response).toMatchObject({ valid: true, installable: true, findings: [], package: { trust: { status: 'trusted' }, certification: { status: 'certified-conformant', scientificValidation: 'unsupported' } } })
+    expect(first.response).toMatchObject({ valid: true, installable: true, findings: [], package: { trust: { status: 'trusted' }, certification: { status: 'not-certified', checks: { conformanceBenchmark: false }, protocolConformance: 'not-run', scientificValidation: 'unsupported' } } })
     expect(first.response.package.packageDigest).toBe(digestBuffer(reference.bytes))
     expect(rebuilt).toEqual(reference.bytes)
+  })
+
+  it('rejects output schedule changes between declared plugin cadence events', async () => {
+    const evidence = await createPhysiologyClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' }).evidence()
+    const definition = unsignedReferenceDefinitions(evidence)[1]
+    const schedule = definition.model.outputSchedules[0]
+    const misaligned = {
+      ...definition.model,
+      outputSchedules: [{ ...schedule, intervals: [{ ...schedule.intervals[0], endMinute: 1 }, { ...schedule.intervals[0], startMinute: 1 }] }]
+    }
+
+    expect(() => verifyDescriptorClosure(definition.manifest, misaligned, definition.coupling, evidence)).toThrow(/between declared cadence events/i)
   })
 
   it('rejects content and signature tampering, revoked trust, traversal, and oversized archives', async () => {

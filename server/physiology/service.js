@@ -22,7 +22,7 @@ import { checkBubblewrapSandbox, runBubblewrapPlugin } from './sandbox.js'
 import { digestBuffer, validateBppPackage } from './package.js'
 
 const BUILT_IN_AT = '2026-07-13T00:00:00.000Z'
-const ENGINE_VERSION = 'physiology-coupler-v1.0.0'
+const ENGINE_VERSION = 'physiology-coupler-v1.1.0'
 const REQUIRED_PLUGINS = ['PLUGIN:CIRCULATION-REFERENCE', 'PLUGIN:LIVER-REFERENCE', 'PLUGIN:KIDNEY-REFERENCE']
 const now = () => new Date().toISOString()
 const ProcessOutputSchema = z.object({
@@ -80,9 +80,7 @@ function revokedCertification(certification) {
   }
 }
 
-function due(time, cadence) {
-  return Math.abs(time / cadence - Math.round(time / cadence)) < 1e-12
-}
+const due = (time, cadence) => Math.abs(time / cadence - Math.round(time / cadence)) < 1e-12
 
 function outputRate(model, portId, time) {
   const schedule = model.outputSchedules.find((item) => item.portId === portId)
@@ -90,15 +88,24 @@ function outputRate(model, portId, time) {
   return schedule.intervals.find((interval) => time >= interval.startMinute && time < interval.endMinute)?.value ?? 0
 }
 
-function processOutputRates(plugin, sandbox, time, interval, massMg) {
+function validateOutputRates(plugin, rates) {
+  if (!(rates instanceof Map)) throw new PhysiologyRequestError('plugin_output_mismatch', `${plugin.record.manifest.pluginId} did not publish output rates as a port map.`)
+  const declared = new Set(plugin.coupling.ports.filter((port) => port.direction === 'output').map((port) => port.id))
+  for (const [portId, value] of rates) {
+    if (!declared.has(portId) || typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw new PhysiologyRequestError('plugin_output_mismatch', `${plugin.record.manifest.pluginId} returned an undeclared or invalid output rate.`)
+  }
+  return rates
+}
+
+function processOutputRates(plugin, runtime, event) {
   let output
   try {
-    output = ProcessOutputSchema.parse(runBubblewrapPlugin(sandbox, plugin.processPath, {
+    output = ProcessOutputSchema.parse(runtime.processRunner(runtime.sandbox, plugin.processPath, {
       schemaVersion: '1.0.0',
       event: 'advance',
-      timeMinutes: time,
-      intervalMinutes: interval,
-      state: { id: 'STATE:DRUG-MASS', value: massMg, unit: 'mg', shape: [1] },
+      timeMinutes: event.timeMinutes,
+      intervalMinutes: event.intervalMinutes,
+      state: { id: 'STATE:DRUG-MASS', value: event.massMg, unit: 'mg', shape: [1] },
       outputPorts: plugin.coupling.ports.filter((port) => port.direction === 'output')
     }, plugin.record.manifest.resources))
   } catch {
@@ -109,25 +116,56 @@ function processOutputRates(plugin, sandbox, time, interval, massMg) {
   return new Map(output.outputs.map((item) => [item.portId, item.value]))
 }
 
-function simulate(coupling, plugins, factor, includeTrace, sandbox) {
+function publishOutputRates(plugin, runtime, event) {
+  if (runtime.outputPublisher) return validateOutputRates(plugin, runtime.outputPublisher(plugin, event))
+  if (plugin.record.manifest.pluginKind === 'process') return processOutputRates(plugin, runtime, event)
+  return validateOutputRates(plugin, new Map(plugin.coupling.ports.filter((port) => port.direction === 'output').map((port) => [port.id, outputRate(plugin.model, port.id, event.timeMinutes)])))
+}
+
+function simulate(coupling, plugins, factor, includeTrace, runtime) {
   const step = coupling.couplingCadenceMinutes / factor
+  const requestedIntervals = coupling.durationMinutes / step
+  const intervalCount = Math.round(requestedIntervals)
+  if (Math.abs(requestedIntervals - intervalCount) > 1e-12) throw new PhysiologyRequestError('cadence_misalignment', `Refinement factor ${factor} does not align with the coupling duration.`)
   const masses = Object.fromEntries(plugins.map((plugin) => [plugin.record.manifest.pluginId, plugin.model.state.initial]))
   const initialMass = Object.values(masses).reduce((sum, value) => sum + value, 0)
   const states = includeTrace ? [{ timeMinutes: 0, massesMg: { ...masses }, totalMassMg: initialMass, massConservationResidualMg: 0 }] : []
   const exchanges = []
+  const heldOutputs = new Map(plugins.map((plugin) => [plugin.record.manifest.pluginId, new Map()]))
+  const protocolEvents = []
+  let sequence = 1
+  if (includeTrace) for (const plugin of plugins) protocolEvents.push({ sequence: sequence++, timeMinutes: 0, pluginId: plugin.record.manifest.pluginId, event: 'initialize', cadenceDue: true })
   let maximumAbsoluteResidual = 0
-  for (let start = 0; start < coupling.durationMinutes - 1e-12; start += step) {
-    const end = Math.min(coupling.durationMinutes, start + step)
+  for (let index = 0; index < intervalCount; index += 1) {
+    const start = index * step
+    const end = (index + 1) * step
     const interval = end - start
-    const processRates = new Map(plugins.filter((plugin) => plugin.record.manifest.pluginKind === 'process').map((plugin) => [plugin.record.manifest.pluginId, processOutputRates(plugin, sandbox, start, interval, masses[plugin.record.manifest.pluginId])]))
+    for (const plugin of plugins.filter((item) => due(start, item.model.cadenceMinutes))) {
+      const pluginId = plugin.record.manifest.pluginId
+      if (includeTrace) protocolEvents.push({ sequence: sequence++, timeMinutes: start, pluginId, event: 'read-inputs', cadenceDue: true })
+      if (includeTrace) protocolEvents.push({ sequence: sequence++, timeMinutes: start, pluginId, event: 'advance', cadenceDue: true })
+      heldOutputs.set(pluginId, publishOutputRates(plugin, runtime, { timeMinutes: start, intervalMinutes: Math.min(plugin.model.cadenceMinutes, coupling.durationMinutes - start), massMg: masses[pluginId], refinementFactor: factor }))
+      if (includeTrace) protocolEvents.push({ sequence: sequence++, timeMinutes: start, pluginId, event: 'publish-outputs', cadenceDue: true })
+    }
+    const intervalExchanges = []
+    const outgoingByPlugin = Object.fromEntries(plugins.map((plugin) => [plugin.record.manifest.pluginId, 0]))
     for (const exchange of coupling.exchanges) {
-      const sourcePlugin = plugins.find((plugin) => plugin.record.manifest.pluginId === exchange.source.plugin_id)
-      const rate = sourcePlugin.record.manifest.pluginKind === 'process' ? processRates.get(exchange.source.plugin_id).get(exchange.source.port_id) ?? 0 : outputRate(sourcePlugin.model, exchange.source.port_id, start)
+      const rate = heldOutputs.get(exchange.source.plugin_id).get(exchange.source.port_id) ?? 0
       const amount = rate * interval
-      if (amount > masses[exchange.source.plugin_id] + 1e-12) throw new PhysiologyRequestError('negative_plugin_state', `${exchange.source.plugin_id} cannot supply ${amount} mg at minute ${start}.`)
-      masses[exchange.source.plugin_id] -= amount
-      masses[exchange.target.plugin_id] += amount
-      const residual = amount - amount
+      outgoingByPlugin[exchange.source.plugin_id] += amount
+      intervalExchanges.push({ exchange, rate, amount })
+    }
+    for (const [pluginId, amount] of Object.entries(outgoingByPlugin)) {
+      if (amount > masses[pluginId]) throw new PhysiologyRequestError('negative_plugin_state', `${pluginId} cannot supply the aggregate ${amount} mg requested at minute ${start}.`)
+    }
+    const deltas = Object.fromEntries(plugins.map((plugin) => [plugin.record.manifest.pluginId, 0]))
+    for (const { exchange, amount } of intervalExchanges) {
+      deltas[exchange.source.plugin_id] -= amount
+      deltas[exchange.target.plugin_id] += amount
+    }
+    for (const pluginId of Object.keys(masses)) masses[pluginId] += deltas[pluginId]
+    for (const { exchange, rate, amount } of intervalExchanges) {
+      const residual = 0
       maximumAbsoluteResidual = Math.max(maximumAbsoluteResidual, Math.abs(residual))
       if (includeTrace) exchanges.push({ intervalStartMinutes: start, intervalEndMinutes: end, quantityId: exchange.quantityId, rateMgPerMinute: rate, integratedAmountMg: amount, sourceLossMg: amount, targetGainMg: amount, residualMg: residual })
     }
@@ -138,7 +176,7 @@ function simulate(coupling, plugins, factor, includeTrace, sandbox) {
   }
   const finalMass = Object.values(masses).reduce((sum, value) => sum + value, 0)
   maximumAbsoluteResidual = Math.max(maximumAbsoluteResidual, Math.abs(finalMass - initialMass))
-  return { finalMassesMg: { ...masses }, initialMassMg: initialMass, finalMassMg: finalMass, maximumAbsoluteResidualMg: maximumAbsoluteResidual, states, exchanges, stepMinutes: step }
+  return { finalMassesMg: { ...masses }, initialMassMg: initialMass, finalMassMg: finalMass, maximumAbsoluteResidualMg: maximumAbsoluteResidual, states, exchanges, protocolEvents, stepMinutes: step }
 }
 
 function benchmarkDifference(run, observations) {
@@ -166,6 +204,7 @@ export async function createPhysiologyService(options = {}) {
   const database = openPhysiologyDatabase(selectedRoot.root)
   const objects = await createObjectStore(selectedRoot.root)
   const sandbox = await checkBubblewrapSandbox(env)
+  const runtime = { sandbox, processRunner: runBubblewrapPlugin, outputPublisher: options.outputPublisher }
   const createdAt = now()
   database.prepare('INSERT OR IGNORE INTO trust_keys (key_id, algorithm, publisher, public_key_spki_base64, status, created_at, revoked_at) VALUES (?, ?, ?, ?, ?, ?, NULL)').run(REFERENCE_KEY_ID, 'Ed25519', REFERENCE_PUBLISHER, REFERENCE_PUBLIC_KEY_SPKI_BASE64, 'trusted', createdAt)
 
@@ -180,10 +219,19 @@ export async function createPhysiologyService(options = {}) {
   }
   const packageRecord = (row) => {
     const stored = PhysiologyPackageSchema.parse(JSON.parse(row.payload_json))
+    const persistedConformance = database.prepare('SELECT payload_json FROM conformance_results WHERE package_digest = ?').get(stored.packageDigest)
+    const baseCertification = { ...stored.certification, status: 'not-certified', checks: { ...stored.certification.checks, conformanceBenchmark: false }, protocolConformance: 'not-run' }
+    let certification = baseCertification
+    if (persistedConformance) {
+      const result = ConformanceResultSchema.parse(JSON.parse(persistedConformance.payload_json))
+      if (result.benchmark.passed && result.certification.status === 'certified-conformant' && Object.values(result.certification.checks).every(Boolean)) certification = result.certification
+      else certification = { ...result.certification, status: 'not-certified' }
+    }
+    const current = PhysiologyPackageSchema.parse({ ...stored, certification })
     const trust = trustKey(stored.signature.keyId)
-    if (!trust) return PhysiologyPackageSchema.parse({ ...stored, trust: { ...stored.trust, status: 'unknown' }, certification: revokedCertification(stored.certification) })
-    if (trust.status === 'revoked') return PhysiologyPackageSchema.parse({ ...stored, trust: { keyId: trust.keyId, status: trust.status, publisher: trust.publisher }, certification: revokedCertification(stored.certification) })
-    return PhysiologyPackageSchema.parse({ ...stored, trust: { keyId: trust.keyId, status: trust.status, publisher: trust.publisher } })
+    if (!trust) return PhysiologyPackageSchema.parse({ ...current, trust: { ...current.trust, status: 'unknown' }, certification: revokedCertification(current.certification) })
+    if (trust.status === 'revoked') return PhysiologyPackageSchema.parse({ ...current, trust: { keyId: trust.keyId, status: trust.status, publisher: trust.publisher }, certification: revokedCertification(current.certification) })
+    return PhysiologyPackageSchema.parse({ ...current, trust: { keyId: trust.keyId, status: trust.status, publisher: trust.publisher } })
   }
   const packageRuntime = (digest) => {
     const row = packageRow(digest)
@@ -267,12 +315,17 @@ export async function createPhysiologyService(options = {}) {
     const request = CouplingCreateRequestSchema.parse(input)
     if (request.taxonId !== 'NCBITaxon:9606') throw new PhysiologyRequestError('unsupported_extrapolation', 'The pinned reference packages are human-only; mouse extrapolation is blocked.')
     if (request.couplingCadenceMinutes !== 1) throw new PhysiologyRequestError('unsupported_cadence', 'The bounded conformance fixture supports an explicit 1 minute coupling cadence only.')
+    if (!due(request.durationMinutes, request.couplingCadenceMinutes)) throw new PhysiologyRequestError('cadence_misalignment', 'Coupling cadence must divide the requested duration exactly.')
     const uniqueDigests = [...new Set(request.packageDigests)]
     if (uniqueDigests.length !== 3) throw new PhysiologyRequestError('package_closure', 'Coupling requires three distinct package digests.')
     const plugins = uniqueDigests.map(packageRuntime).sort((left, right) => left.record.manifest.pluginId.localeCompare(right.record.manifest.pluginId))
     if (plugins.map((item) => item.record.manifest.pluginId).sort().join(',') !== [...REQUIRED_PLUGINS].sort().join(',')) throw new PhysiologyRequestError('plugin_closure', 'Coupling requires exactly the circulation, liver, and kidney reference plugins.')
     if (plugins.some((item) => item.record.trust.status !== 'trusted')) throw new PhysiologyRequestError('untrusted_package', 'Coupling refuses an unknown or revoked publisher package.', 403)
     if (plugins.some((item) => item.record.manifest.pluginKind === 'process') && !sandbox.available) throw new PhysiologyRequestError('process_sandbox_unavailable', 'Process plugin execution is refused because Bubblewrap capability checks did not pass.', 403)
+    for (const plugin of plugins) {
+      if (plugin.model.cadenceMinutes < request.couplingCadenceMinutes || !due(plugin.model.cadenceMinutes, request.couplingCadenceMinutes)) throw new PhysiologyRequestError('cadence_misalignment', `${plugin.record.manifest.pluginId} cadence must be an integer multiple of the coupling cadence.`)
+      for (const factor of request.refinementFactors) if (!due(plugin.model.cadenceMinutes, request.couplingCadenceMinutes / factor)) throw new PhysiologyRequestError('cadence_misalignment', `${plugin.record.manifest.pluginId} cadence does not align with refinement factor ${factor}.`)
+    }
     const ports = new Map(plugins.flatMap((plugin) => plugin.coupling.ports.map((port) => [`${plugin.record.manifest.pluginId}:${port.id}`, port])))
     const exchanges = evidence.quantities.map((quantity) => {
       const source = ports.get(`${quantity.source.plugin_id}:${quantity.source.port_id}`)
@@ -314,10 +367,10 @@ export async function createPhysiologyService(options = {}) {
     const request = PhysiologyRunRequestSchema.parse(input)
     const coupling = getCoupling(request.couplingDigest)
     const runDigest = canonicalDigest({ couplingDigest: coupling.couplingDigest, engineVersion: ENGINE_VERSION })
-    const existing = database.prepare('SELECT payload_json FROM physiology_runs WHERE run_digest = ?').get(runDigest)
-    if (existing) return PhysiologyRunSchema.parse(JSON.parse(existing.payload_json))
     const plugins = coupling.packageDigests.map(packageRuntime)
     if (plugins.some((item) => item.record.trust.status !== 'trusted')) throw new PhysiologyRequestError('trust_revoked', 'Run refused because a coupled publisher key is revoked.', 403)
+    const existing = database.prepare('SELECT payload_json FROM physiology_runs WHERE run_digest = ?').get(runDigest)
+    if (existing) return PhysiologyRunSchema.parse(JSON.parse(existing.payload_json))
     if (plugins.some((item) => item.record.manifest.pluginKind === 'process')) {
       if (!sandbox.available) throw new PhysiologyRequestError('process_sandbox_unavailable', 'Process plugin execution is refused because Bubblewrap capability checks did not pass.', 403)
       for (const plugin of plugins.filter((item) => item.record.manifest.pluginKind === 'process')) {
@@ -325,27 +378,16 @@ export async function createPhysiologyService(options = {}) {
         plugin.processPath = (await objects.put(plugin.processContent)).path
       }
     }
-    const primary = simulate(coupling, plugins, 1, true, sandbox)
+    const primary = simulate(coupling, plugins, 1, true, runtime)
     if (plugins.some((item) => item.record.manifest.pluginKind === 'process')) {
-      const repeatedPrimary = simulate(coupling, plugins, 1, true, sandbox)
+      const repeatedPrimary = simulate(coupling, plugins, 1, true, runtime)
       if (canonicalJson(primary) !== canonicalJson(repeatedPrimary)) throw new PhysiologyRequestError('process_nondeterministic', 'Sandboxed process outputs changed under identical inputs; deterministic coupling is refused.')
     }
-    const refinement = coupling.refinementFactors.map((factor) => ({ factor, ...simulate(coupling, plugins, factor, false, sandbox) })).map((item) => ({ factor: item.factor, stepMinutes: item.stepMinutes, finalMassesMg: item.finalMassesMg, maximumAbsoluteResidualMg: item.maximumAbsoluteResidualMg }))
+    const refinement = coupling.refinementFactors.map((factor) => ({ factor, ...(factor === 1 ? primary : simulate(coupling, plugins, factor, false, runtime)) })).map((item) => ({ factor: item.factor, stepMinutes: item.stepMinutes, finalMassesMg: item.finalMassesMg, maximumAbsoluteResidualMg: item.maximumAbsoluteResidualMg }))
     let convergenceMaximumDifferenceMg = 0
     for (let index = 1; index < refinement.length; index += 1) for (const pluginId of REQUIRED_PLUGINS) convergenceMaximumDifferenceMg = Math.max(convergenceMaximumDifferenceMg, Math.abs(refinement[index].finalMassesMg[pluginId] - refinement[index - 1].finalMassesMg[pluginId]))
     const schedule = []
-    for (let time = 0; time <= coupling.durationMinutes; time += coupling.couplingCadenceMinutes) schedule.push({ timeMinutes: time, duePluginIds: plugins.filter((plugin) => due(time, plugin.model.cadenceMinutes)).map((plugin) => plugin.record.manifest.pluginId).sort() })
-    const protocolEvents = []
-    let sequence = 1
-    for (const plugin of plugins) protocolEvents.push({ sequence: sequence++, timeMinutes: 0, pluginId: plugin.record.manifest.pluginId, event: 'initialize', cadenceDue: true })
-    for (const tick of schedule.slice(0, -1)) {
-      for (const plugin of plugins) {
-        const cadenceDue = tick.duePluginIds.includes(plugin.record.manifest.pluginId)
-        protocolEvents.push({ sequence: sequence++, timeMinutes: tick.timeMinutes, pluginId: plugin.record.manifest.pluginId, event: 'read-inputs', cadenceDue })
-        if (cadenceDue) protocolEvents.push({ sequence: sequence++, timeMinutes: tick.timeMinutes, pluginId: plugin.record.manifest.pluginId, event: 'advance', cadenceDue: true })
-        if (cadenceDue) protocolEvents.push({ sequence: sequence++, timeMinutes: tick.timeMinutes, pluginId: plugin.record.manifest.pluginId, event: 'publish-outputs', cadenceDue: true })
-      }
-    }
+    for (let time = 0; time <= coupling.durationMinutes; time += coupling.couplingCadenceMinutes) schedule.push({ timeMinutes: time, duePluginIds: time < coupling.durationMinutes ? plugins.filter((plugin) => due(time, plugin.model.cadenceMinutes)).map((plugin) => plugin.record.manifest.pluginId).sort() : [] })
     const completedAt = now()
     const record = PhysiologyRunSchema.parse({
       runDigest,
@@ -353,7 +395,7 @@ export async function createPhysiologyService(options = {}) {
       packageDigests: coupling.packageDigests,
       pluginDigests: coupling.pluginDigests,
       status: 'completed',
-      protocolEvents,
+      protocolEvents: primary.protocolEvents,
       schedule,
       states: primary.states,
       exchanges: primary.exchanges,
