@@ -9,7 +9,7 @@ import {
   ApapRunRecordSchema
 } from '../../shared/apap-contracts.js'
 import { BundleSubmissionSchema, DERIVED_CONTRACT_VERSION, DerivedAssertionSchema, SubmissionBundleSchema } from '../../shared/derived-contracts.js'
-import { APAP_EQUATIONS, APAP_EQUATION_SET_DIGEST, NAC_AFFECTED_TERMS } from '../apap/model.js'
+import { APAP_EQUATION_DEFINITION, APAP_EQUATION_SET_DIGEST } from '../apap/model.js'
 
 const dimension = (changes = {}) => ({ amount: 0, mass: 0, length: 0, time: 0, temperature: 0, current: 0, luminosity: 0, ...changes })
 const unit = (id, symbol, scaleToSi, changes = {}) => ({ id, symbol, scale_to_si: scaleToSi, dimension: dimension(changes) })
@@ -40,8 +40,7 @@ export function apapModelContent() {
     engine_version: APAP_ENGINE_VERSION,
     lobule_bins: 12,
     taxon_branches: false,
-    equations: APAP_EQUATIONS,
-    nac_affected_terms: NAC_AFFECTED_TERMS
+    equation_definition: APAP_EQUATION_DEFINITION
   }
 }
 
@@ -118,7 +117,7 @@ function qualitativeUncertainty() {
     measurement: 'Measurement uncertainty is unavailable because the compared benchmark observations are equation-generated.',
     structural: 'Model-form uncertainty is unquantified for the illustrative systemic, lobule, and injury equations.',
     contextual: 'Translation outside the exact human or mouse synthetic context is unsupported.',
-    numerical: 'The deterministic RK4 result passes declared diagnostics, but no solver or timestep uncertainty distribution is established.'
+    numerical: 'The deterministic RK4 result passes the declared 1x/2x/4x timestep-refinement diagnostic, but no numerical uncertainty distribution is established.'
   }
   return {
     interpretation: 'epistemic',
@@ -175,7 +174,11 @@ export function verifyDerivedBundle(submission) {
   const used = new Set()
   for (const wrapped of parsed.bundle.assertions) {
     for (const dependency of wrapped.assertion.dependencies.filter((item) => ['model', 'transform', 'artifact'].includes(item.type))) {
-      if (!objectMap.has(dependency.digest)) throw new TypeError(`Derived dependency is not closed: ${dependency.digest}`)
+      const object = objectMap.get(dependency.digest)
+      if (!object) throw new TypeError(`Derived dependency is not closed: ${dependency.digest}`)
+      const expectedId = dependency.type === 'model' ? dependency.model_id : dependency.type === 'transform' ? dependency.transform_id : dependency.artifact_id
+      const identityMatches = object.kind === dependency.type && object.object_id === expectedId && (dependency.type === 'artifact' || object.version === dependency.version)
+      if (!identityMatches) throw new TypeError(`Derived dependency identity does not match its ${dependency.type} object: ${dependency.digest}`)
       used.add(dependency.digest)
     }
   }

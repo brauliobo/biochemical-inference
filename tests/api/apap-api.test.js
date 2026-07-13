@@ -74,6 +74,8 @@ describe('APAP benchmark API v4', () => {
     expect(record.result.diagnostics.mass.passed).toBe(true)
     expect(record.result.diagnostics.cellState.passed).toBe(true)
     expect(record.result.diagnostics.limitingCases.every((item) => item.passed)).toBe(true)
+    expect(record.result.diagnostics.timestepRefinement).toMatchObject({ tolerance: 1e-8, passed: true })
+    expect(record.result.equationSet.identityIncludes).toEqual({ formulas: true, boundaryConditions: true, initialConditions: true, events: true, constants: true })
     expect(record.result.validationMatrix.every((item) => item.validation_status === 'unsupported')).toBe(true)
   }, 30_000)
 

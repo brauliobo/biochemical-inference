@@ -187,14 +187,16 @@ function eventRecord(row) {
   return WorkspaceEventSchema.parse({ eventId: row.event_id, attemptId: row.attempt_id, sequence: row.sequence, type: row.type, at: row.at, data: parseJson(row.data_json) })
 }
 
-function compareNumerical(left, right, contract) {
+export function compareNumerical(left, right, contract) {
   const differences = []
   let structural = true
+  let allWithinContract = true
   const visit = (a, b, path) => {
     if (typeof a === 'number' && typeof b === 'number') {
       if (Object.is(a, b)) return
       const absoluteDifference = Math.abs(a - b)
       const withinContract = contract.kind === 'exact' ? false : absoluteDifference <= contract.absolute + contract.relative * Math.max(Math.abs(a), Math.abs(b))
+      if (!withinContract) allWithinContract = false
       if (differences.length < 10_000) differences.push({ path, left: a, right: b, absoluteDifference, withinContract })
       return
     }
@@ -216,7 +218,7 @@ function compareNumerical(left, right, contract) {
     if (!Object.is(a, b)) structural = false
   }
   visit(left, right, '')
-  return { structural, differences, pass: structural && differences.every((item) => item.withinContract) }
+  return { structural, differences, pass: structural && allWithinContract }
 }
 
 export async function createWorkspaceService(options = {}) {
@@ -405,6 +407,9 @@ export async function createWorkspaceService(options = {}) {
     active.set(attemptId, {
       cancel() {
         for (const execution of executions) execution.cancel()
+      },
+      interrupt() {
+        for (const execution of executions) execution.interrupt()
       }
     })
     const lane = async () => {
@@ -418,12 +423,15 @@ export async function createWorkspaceService(options = {}) {
         try {
           execution = executeInWorker(entry.model, entry.experiment, { timeoutMs: profileValue.wallTimeMs, maxOutputBytes: profileValue.maxOutputBytes, memoryMb: profileValue.memoryMb })
           executions.add(execution)
-          slots[index] = { entryId: entry.id, result: PortfolioResultSchema.parse(await execution.promise) }
+          const result = PortfolioResultSchema.parse(await execution.promise)
+          if (closing) return
+          slots[index] = { entryId: entry.id, result }
         } catch (error) {
           throw new WorkspaceRequestError('worker_start_failed', error instanceof Error ? error.message : 'Worker could not start.', 500)
         } finally {
           if (execution) executions.delete(execution)
         }
+        if (closing) return
         completed += 1
         transaction(database, () => appendEvent(attemptId, 'progress', { completed, total: revision.specification.entries.length }))
       }
@@ -433,10 +441,12 @@ export async function createWorkspaceService(options = {}) {
       await Promise.all(Array.from({ length: Math.min(profileValue.concurrency, revision.specification.entries.length) }, lane))
     } catch (error) {
       active.delete(attemptId)
+      if (closing) return
       finalizeWithoutArtifact(attemptId, 'failed', { code: 'worker_execution', message: error instanceof Error ? error.message : 'Portfolio worker failed.' }, 'failed')
       return
     }
     active.delete(attemptId)
+    if (closing) return
     if (Boolean(attemptRow(attemptId).cancellation_requested)) {
       finalizeWithoutArtifact(attemptId, 'cancelled', { code: 'cancelled_by_request', message: 'Execution was cancelled before terminal publication.' }, 'cancelled')
       return
@@ -461,6 +471,7 @@ export async function createWorkspaceService(options = {}) {
       return
     }
     const published = await objects.put(resultBytes)
+    if (closing) return
     objectMetadata(published)
     const artifactId = artifactIdentity(attemptId, 'result.json', published.digest)
     const nonSuccessful = entries.find((entry) => entry.result.outcome !== 'successful')
@@ -469,6 +480,7 @@ export async function createWorkspaceService(options = {}) {
     let rerunVerification = row.expected_result_object_digest ? 'pending' : 'not-declared'
     if (row.expected_result_object_digest) {
       const expected = WorkspaceRunResultSchema.parse(JSON.parse((await objects.get(row.expected_result_object_digest)).toString('utf8')))
+      if (closing) return
       const comparison = compareNumerical(expected.entries, aggregate.entries, revision.specification.numericalContract)
       rerunVerification = comparison.pass ? 'pass' : 'fail'
       if (!comparison.pass) {
@@ -578,7 +590,7 @@ export async function createWorkspaceService(options = {}) {
     root,
     async close() {
       closing = true
-      for (const execution of active.values()) execution.cancel()
+      for (const execution of active.values()) execution.interrupt()
       await Promise.allSettled([...tasks])
       database.close()
       if (ephemeral) await rm(root, { recursive: true, force: true })

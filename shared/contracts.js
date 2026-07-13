@@ -35,6 +35,13 @@ const ProvenanceSourceObjectSchema = z.object({
   recordType: z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']),
   digest: Sha256Schema,
   bytes: z.number().int().positive(),
+  objectClass: z.enum(['repository-authored-normalized-fixture', 'upstream-source-object']),
+  upstreamResponse: z.boolean(),
+  originUrl: z.string().regex(/^(?:file|https):\/\/\S+$/),
+  artifactRepository: z.string().regex(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+$/).nullable(),
+  artifactCommit: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
+  sourceRelease: z.string().min(1),
+  retrievedAt: z.string().datetime({ offset: true }),
   sourceIds: z.array(z.string().regex(/^[A-Z][A-Z0-9_]*$/)).min(1),
   licenseId: z.string().min(1)
 }).strict()

@@ -48,7 +48,10 @@ exact-context candidate.
   explicit assumed observation sigma. Success requires R-hat at most `1.05`
   and every chain acceptance rate in `[0.10, 0.70]`.
 - Posterior predictive validation is evaluated only against the three fixed
-  held-out IDs and reports pointwise 95% intervals and empirical coverage.
+  held-out IDs and reports pointwise 95% intervals and empirical coverage only
+  when optimization, identifiability, and all chain diagnostics pass. Otherwise
+  validation is suppressed and the result contains diagnostic-only reasons with
+  no intervals or coverage statistic.
 - The robustness matrix varies parameter starts, analytic versus RK4 execution,
   RK4 timesteps, and an optional deliberately misspecified fixed-offset model.
   A row supports recovery only when `k` is within `0.005 s^-1` and held-out RMSE

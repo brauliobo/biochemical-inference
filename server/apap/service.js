@@ -14,6 +14,7 @@ import {
   integrateApap,
   resolveContextBinding,
   runLimitingCaseDiagnostics,
+  runTimestepRefinement,
   systemicSeries
 } from './model.js'
 
@@ -101,14 +102,6 @@ export function createApapRunService(client) {
       const durationHours = protocol.observation_window.upper
       const antidote = protocol.interventions.find((item) => item.role === 'antidote')
       const controls = { durationHours, stepHours: specification.stepHours, outputEveryHours: specification.outputEveryHours, nacStartHours: antidote?.start_time.lower ?? null }
-      const integrated = integrateApap(binding.values, controls)
-      const limitingCases = runLimitingCaseDiagnostics(binding.values, controls)
-      if (!limitingCases.every((item) => item.passed)) throw new ApapRequestError('APAP equation set failed a required limiting-case diagnostic', { statusCode: 500, code: 'APAP_LIMITING_CASE_FAILED' })
-      const systemicOutputs = systemicSeries(integrated)
-      const finalOutput = integrated.outputs.at(-1)
-      const peakCentralApap = Math.max(...integrated.outputs.map((item) => item.centralApap))
-      const peakInjuredFraction = Math.max(...integrated.outputs.map((item) => item.injuredFraction))
-      const minimumOxygen = Math.min(...integrated.snapshots.flatMap((item) => item.oxygen))
       const identityInput = {
         release: closure.detail.release,
         modelVersion: APAP_MODEL_VERSION,
@@ -120,6 +113,18 @@ export function createApapRunService(client) {
         controls
       }
       const runId = digest(identityInput)
+      const existing = records.get(runId)
+      if (existing) return existing
+      const integrated = integrateApap(binding.values, controls)
+      const timestepRefinement = runTimestepRefinement(binding.values, controls, integrated)
+      if (!timestepRefinement.passed) throw new ApapRequestError('APAP equation set failed the declared timestep-refinement tolerance', { statusCode: 500, code: 'APAP_REFINEMENT_FAILED' })
+      const limitingCases = runLimitingCaseDiagnostics(binding.values, controls)
+      if (!limitingCases.every((item) => item.passed)) throw new ApapRequestError('APAP equation set failed a required limiting-case diagnostic', { statusCode: 500, code: 'APAP_LIMITING_CASE_FAILED' })
+      const systemicOutputs = systemicSeries(integrated)
+      const finalOutput = integrated.outputs.at(-1)
+      const peakCentralApap = Math.max(...integrated.outputs.map((item) => item.centralApap))
+      const peakInjuredFraction = Math.max(...integrated.outputs.map((item) => item.injuredFraction))
+      const minimumOxygen = Math.min(...integrated.snapshots.flatMap((item) => item.oxygen))
       const result = {
         contractVersion: APAP_CONTRACT_VERSION,
         runId,
@@ -129,7 +134,7 @@ export function createApapRunService(client) {
         release: closure.detail.release,
         context,
         protocol,
-        equationSet: { id: APAP_EQUATION_SET_ID, version: APAP_MODEL_VERSION, digest: APAP_EQUATION_SET_DIGEST, taxonBranches: false, lobuleBins: 12 },
+        equationSet: { id: APAP_EQUATION_SET_ID, version: APAP_MODEL_VERSION, digest: APAP_EQUATION_SET_DIGEST, taxonBranches: false, lobuleBins: 12, identityIncludes: { formulas: true, boundaryConditions: true, initialConditions: true, events: true, constants: true } },
         engine: { version: APAP_ENGINE_VERSION, method: 'fixed-step RK4', stepHours: specification.stepHours, outputEveryHours: specification.outputEveryHours, deterministic: true },
         effectiveParameters: binding.effectiveParameters,
         assumptions: resultAssumptions(binding.effectiveParameters, closure.detail.benchmark.assumptions.filter((item) => item.context_id === context.id)),
@@ -152,6 +157,7 @@ export function createApapRunService(client) {
           cellState: { maximumSumError: round(integrated.maximumSumError), minimumFraction: round(integrated.minimumFraction), passed: true },
           state: { minimumValue: round(integrated.minimumValue), finite: true, nonNegative: true },
           limitingCases,
+          timestepRefinement,
           integrationSteps: integrated.steps
         },
         limitations: internalLimitations(closure.detail.benchmark.limitations)

@@ -64,4 +64,16 @@ describe('APAP reviewed-derived bundle', () => {
 
     expect(() => verifyDerivedBundle(changed)).toThrow()
   })
+
+  it.each([
+    ['kind', (object) => { object.kind = 'transform' }],
+    ['object ID', (object) => { object.object_id = 'substituted-model' }],
+    ['version', (object) => { object.version = '9.9.9' }]
+  ])('rejects a digest-matching object with a substituted dependency %s', (_label, mutate) => {
+    const changed = structuredClone(submission)
+    mutate(changed.bundle.objects[0])
+    changed.digest = canonicalDigest(changed.bundle)
+
+    expect(() => verifyDerivedBundle(changed)).toThrow(/dependency identity/)
+  })
 })

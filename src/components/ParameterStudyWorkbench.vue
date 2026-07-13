@@ -178,8 +178,13 @@ section.parameter-study-panel(aria-labelledby="parameter-study-title")
         p {{ result.calibration.iterations }} bounded Nelder-Mead iterations · objective {{ result.calibration.objective.toExponential(3) }}.
       section.study-card
         h3 Held-out posterior predictive validation
-        p {{ result.validation.covered }}/{{ result.validation.total }} held-out observations covered ({{ (result.validation.coverageProbability * 100).toFixed(0) }}%).
-        table
+        template(v-if="result.validation.status === 'available'")
+          p {{ result.validation.covered }}/{{ result.validation.total }} held-out observations covered ({{ (result.validation.coverageProbability * 100).toFixed(0) }}%).
+        template(v-else)
+          p Posterior predictive validation suppressed. Diagnostic information only; no coverage result was computed.
+          ul.study-limitations
+            li(v-for="diagnostic in result.validation.diagnostics" :key="diagnostic") {{ diagnostic }}
+        table(v-if="result.validation.status === 'available'")
           caption Validation IDs were not used for calibration or posterior fitting
           thead
             tr

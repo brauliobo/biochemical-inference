@@ -65,8 +65,12 @@ GET /api/v1/releases/{release_id}/snapshots/network?taxon_id=NCBITaxon:...
 The client validates the complete strict snapshot schema, requires canonical
 RFC 8785 response bytes, recomputes `snapshot_digest` after removing only that
 field, verifies the release/taxon/manifest/provenance closure and response
-headers, checks record links and taxon isolation, and requires a self-contained
-snapshot with no restricted dependency. The canonical snapshot is retained as
+headers, reconstructs the canonical bytes of all seven authenticated
+`release_payloads`, checks each manifest path/hash/byte count/record count, and
+requires the selected taxon, network, and limitations to be the exact projection
+of those payloads. Fixture-source classification, repository artifact fields,
+source-namespace resolution, record links, and taxon isolation are also checked,
+and the snapshot must be self-contained with no restricted dependency. The canonical snapshot is retained as
 a content-addressed object. Imported bundles use their verified embedded
 snapshot and do not contact biochemical-db.
 
@@ -94,6 +98,11 @@ serializable mid-state. Consequently:
 Cancellation is recorded in SQLite before workers are signaled. Terminal result
 publication checks that flag in the same transaction that publishes the result
 artifact, so an accepted cancellation wins a completion race.
+
+Graceful server shutdown is not user cancellation. It stops active workers but
+leaves their durable attempts in `running` with no cancellation event or flag.
+On reopen, normal recovery marks each one interrupted with `process_restart` and
+creates a new restart-from-specification attempt.
 
 ## Resource Profiles
 

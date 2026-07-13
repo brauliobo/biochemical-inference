@@ -3,7 +3,8 @@ import { rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createKnowledgeClient } from '../../server/knowledge/client.js'
-import { createWorkspaceService } from '../../server/workspace/service.js'
+import { compareNumerical, createWorkspaceService } from '../../server/workspace/service.js'
+import { SSA_MODEL } from '../../server/portfolio/registry.js'
 import { workspaceSpecification } from '../fixtures/workspace.js'
 import { isolatedTestRoot } from '../fixtures/test-root.js'
 
@@ -34,6 +35,16 @@ async function experiment(workspace, specification = workspaceSpecification(), r
 }
 
 describe('durable workspace service', () => {
+  it('keeps uncapped all-within truth when difference diagnostics reach their cap', () => {
+    const left = Array.from({ length: 10_001 }, () => 0)
+    const right = Array.from({ length: 10_001 }, (_item, index) => index === 10_000 ? 2 : 0.5)
+    const comparison = compareNumerical(left, right, { kind: 'tolerance', absolute: 1, relative: 0 })
+
+    expect(comparison.differences).toHaveLength(10_000)
+    expect(comparison.differences.every((item) => item.withinContract)).toBe(true)
+    expect(comparison.pass).toBe(false)
+  })
+
   it('separates scientific runs from attempts and applies exact history filters', async () => {
     const root = await isolatedTestRoot('workspace-service-test')
     roots.push(root)
@@ -125,4 +136,31 @@ describe('durable workspace service', () => {
     expect(run.attempts[1]).toMatchObject({ kind: 'restart', restartMode: 'from-specification' })
     expect((await terminal(workspace, run.attempts[1].attemptId)).outcome).toBe('successful')
   })
+
+  it('preserves a running attempt on graceful shutdown for interrupted restart recovery', async () => {
+    const root = await isolatedTestRoot('workspace-graceful-shutdown-test')
+    roots.push(root)
+    let workspace = await service(root)
+    const specification = workspaceSpecification({ model: SSA_MODEL, experiment: { controls: { duration: 100, outputInterval: 1, replicates: 10_000 } } })
+    const created = await experiment(workspace, specification)
+    const queued = workspace.queueRun({ revisionId: created.revisions[0].revisionId })
+    for (let index = 0; index < 200 && workspace.getAttempt(queued.attemptId).attempt.state !== 'running'; index += 1) await new Promise((resolve) => setTimeout(resolve, 1))
+    expect(workspace.getAttempt(queued.attemptId).attempt).toMatchObject({ state: 'running', cancellationRequested: false })
+
+    await workspace.close()
+    services.splice(services.indexOf(workspace), 1)
+    const database = new DatabaseSync(join(root, 'workspace.sqlite3'))
+    const preserved = database.prepare('SELECT state, cancellation_requested FROM attempts WHERE attempt_id = ?').get(queued.attemptId)
+    const eventTypes = database.prepare('SELECT type FROM events WHERE attempt_id = ? ORDER BY sequence').all(queued.attemptId).map((item) => item.type)
+    database.close()
+    expect(preserved).toEqual({ state: 'running', cancellation_requested: 0 })
+    expect(eventTypes).not.toContain('cancellation-requested')
+    expect(eventTypes).not.toContain('cancelled')
+
+    workspace = await service(root)
+    const run = workspace.getRun(queued.runId)
+    expect(run.attempts).toHaveLength(2)
+    expect(run.attempts[0]).toMatchObject({ state: 'terminal', outcome: 'failed', cancellationRequested: false, failure: { code: 'process_restart' } })
+    expect(run.attempts[1]).toMatchObject({ kind: 'restart', restartMode: 'from-specification', cancellationRequested: false })
+  }, 30_000)
 })

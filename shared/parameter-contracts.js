@@ -258,6 +258,11 @@ export const StudyRequestSchema = z.object({
 
 const IntervalSchema = z.object({ lower: FiniteSchema, median: FiniteSchema, upper: FiniteSchema }).strict()
 const OutcomeSchema = z.enum(['successful', 'non-converged'])
+const ValidationPredictionSchema = z.object({ observationId: QualifiedIdSchema, observed: FiniteSchema, interval: IntervalSchema, covered: z.boolean() }).strict()
+const PosteriorValidationSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('available'), diagnosticOnly: z.literal(false), heldOutOnly: z.literal(true), observationIds: z.array(QualifiedIdSchema).min(1), coverageProbability: FiniteSchema.min(0).max(1), covered: z.number().int().nonnegative(), total: z.number().int().positive(), predictions: z.array(ValidationPredictionSchema).min(1), diagnostics: z.array(z.string()).max(0) }).strict(),
+  z.object({ status: z.literal('suppressed'), diagnosticOnly: z.literal(true), heldOutOnly: z.literal(true), observationIds: z.array(QualifiedIdSchema).min(1), coverageProbability: z.null(), covered: z.null(), total: z.number().int().positive(), predictions: z.array(ValidationPredictionSchema).max(0), diagnostics: z.array(z.string().min(1)).min(1) }).strict()
+])
 
 export const StudyResultSchema = z.object({
   contractVersion: z.literal(PARAMETER_CONTRACT_VERSION),
@@ -279,7 +284,7 @@ export const StudyResultSchema = z.object({
   calibration: z.object({ status: OutcomeSchema, converged: z.boolean(), estimate: FiniteSchema.nullable(), bestSoFar: FiniteSchema, objective: FiniteSchema.nonnegative(), iterations: z.number().int().nonnegative(), calibrationObservationIds: z.array(QualifiedIdSchema).min(1), validationObservationIdsAccessed: z.array(QualifiedIdSchema).max(0) }).strict(),
   identifiability: z.object({ identifiable: z.boolean(), parameterIds: z.array(QualifiedIdSchema).min(1), rank: z.number().int().nonnegative(), columns: z.number().int().positive(), conditionNumber: FiniteSchema.nonnegative().or(z.literal('infinite')), fisherInformation: z.array(z.array(FiniteSchema)) }).strict(),
   posterior: z.object({ status: OutcomeSchema, converged: z.boolean(), interval: IntervalSchema.nullable(), rHat: FiniteSchema.positive(), acceptanceRates: z.array(FiniteSchema.min(0).max(1)).min(2), chains: z.number().int().min(2), samplesPerChain: z.number().int().positive(), diagnostics: z.array(z.string()) }).strict(),
-  validation: z.object({ heldOutOnly: z.literal(true), observationIds: z.array(QualifiedIdSchema).min(1), coverageProbability: FiniteSchema.min(0).max(1), covered: z.number().int().nonnegative(), total: z.number().int().positive(), predictions: z.array(z.object({ observationId: QualifiedIdSchema, observed: FiniteSchema, interval: IntervalSchema, covered: z.boolean() }).strict()) }).strict(),
+  validation: PosteriorValidationSchema,
   robustness: z.object({ status: z.enum(['robust', 'downgraded']), conclusion: z.string().min(1), matrix: z.array(z.object({ id: z.string().min(1), parameterStart: FiniteSchema, solver: z.enum(['analytic', 'rk4']), timestep: FiniteSchema.nonnegative(), modelForm: z.enum(['first-order', 'first-order-offset']), outcome: OutcomeSchema, estimate: FiniteSchema.nullable(), heldOutRmse: FiniteSchema.nonnegative().nullable(), supportsConclusion: z.boolean(), rationale: z.string().min(1) }).strict()).min(4) }).strict(),
   uncertainty: z.array(z.object({ category: z.enum(['biological', 'measurement', 'structural', 'contextual', 'numerical']), label: z.enum(['synthetic', 'assumption']), description: z.string().min(1) }).strict()).min(5),
   limitations: z.array(z.string().min(1)).min(1)

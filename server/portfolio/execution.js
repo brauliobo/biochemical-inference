@@ -27,7 +27,7 @@ export function validateExperimentForModel(model, rawExperiment) {
       : new Map([...model.definition.species.map((item) => [item.id, item.unit]), ...model.definition.parameters.map((item) => [item.id, item.unit])])
     for (const intervention of experiment.interventions) {
       const unit = targets.get(intervention.targetId)
-      if (!unit || !dimensionsEqual(unit.dimension, intervention.unit.dimension)) throw new PortfolioRequestError('intervention_unit_mismatch', `Intervention ${intervention.targetId} has incompatible units.`)
+      if (!unit || !dimensionsEqual(unit.dimension, intervention.unit.dimension) || unit.scaleToSI !== intervention.unit.scaleToSI) throw new PortfolioRequestError('intervention_unit_mismatch', `Intervention ${intervention.targetId} must use the target's exact execution unit scale.`)
       if (intervention.value < 0) throw new PortfolioRequestError('intervention_value_invalid', `Intervention ${intervention.targetId} must assign a non-negative value.`)
       if (model.engine.type === 'ssa' && model.definition.species.some((item) => item.id === intervention.targetId) && !Number.isInteger(intervention.value)) throw new PortfolioRequestError('intervention_value_invalid', `SSA state intervention ${intervention.targetId} must assign an integer molecule count.`)
       if (model.engine.type === 'fba') {
@@ -134,6 +134,12 @@ export function executeInWorker(model, experiment, options = {}) {
       if (settled) return false
       child.kill('SIGTERM')
       finish(boundedFailure(model, experiment, runId, 'cancelled', 'cancelled_by_request', 'Execution was cancelled before terminal completion.'))
+      return true
+    },
+    interrupt() {
+      if (settled) return false
+      child.kill('SIGTERM')
+      finish(boundedFailure(model, experiment, runId, 'failed', 'server_shutdown', 'Execution was interrupted by server shutdown before terminal completion.'))
       return true
     }
   }

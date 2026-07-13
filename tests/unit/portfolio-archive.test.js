@@ -45,6 +45,29 @@ describe('SBML, SED-ML, and COMBINE profile', () => {
     expect(() => importSedml(exportSedml(benchmarkExperiment(ODE_MODEL)).replace('KISAO:0000087', 'KISAO:0000032'))).toThrow(/KiSAO algorithm does not match/)
   })
 
+  it('rejects independently tampered SBML and FBC executable projections', () => {
+    const dynamic = exportSbml(ODE_MODEL)
+    const fba = exportSbml(FBA_MODEL)
+    const tampered = [
+      dynamic.replace('reversible="false"', 'reversible="true"'),
+      dynamic.replace('species="A" stoichiometry="1"', 'species="A" stoichiometry="2"'),
+      dynamic.replace('species="B" stoichiometry="1"', 'species="B" stoichiometry="2"'),
+      dynamic.replace('<times/>', '<plus/>'),
+      dynamic.replace('<ci>k</ci><ci>A</ci>', '<ci>A</ci><ci>k</ci>'),
+      dynamic.replace('<listOfProducts>', '<listOfModifiers><modifierSpeciesReference species="A"/></listOfModifiers><listOfProducts>'),
+      dynamic.replace('value="0.3" units="per_second"', 'value="0.3" units="molar"'),
+      dynamic.replace('kind="second" exponent="-1" scale="0" multiplier="1"', 'kind="second" exponent="-1" scale="0" multiplier="60"'),
+      fba.replace('fbc:lowerFluxBound="LB_uptake"', 'fbc:lowerFluxBound="LB_biomass"'),
+      fba.replace('id="UB_uptake" value="10"', 'id="UB_uptake" value="11"'),
+      fba.replace('species="precursor" stoichiometry="1"', 'species="precursor" stoichiometry="2"'),
+      fba.replace('</listOfProducts></reaction>', '</listOfProducts><kineticLaw><math><cn>1</cn></math></kineticLaw></reaction>'),
+      fba.replace('fbc:coefficient="1"', 'fbc:coefficient="2"'),
+      fba.replace('fbc:reaction="biomass"', 'fbc:reaction="uptake"')
+    ]
+
+    for (const xml of tampered) expect(() => importSbml(xml)).toThrow()
+  })
+
   it('rejects archive path traversal and oversized compressed input', async () => {
     const archive = await exportCombineArchive(ODE_MODEL, benchmarkExperiment(ODE_MODEL))
     const traversal = replaceAllBytes(archive, 'model.xml', '../xx.xml')

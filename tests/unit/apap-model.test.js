@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  APAP_EQUATION_DEFINITION,
+  APAP_EQUATION_SET_DIGEST,
   apapDerivative,
   buildZonation,
   integrateApap,
-  resolveContextBinding
+  resolveContextBinding,
+  runTimestepRefinement
 } from '../../server/apap/model.js'
+import { digest } from '../../server/portfolio/identity.js'
+import { APAP_ENGINE_VERSION, APAP_EQUATION_SET_ID, APAP_MODEL_VERSION } from '../../shared/apap-contracts.js'
 
 const controls = { durationHours: 4, stepHours: 0.01, outputEveryHours: 0.5, nacStartHours: null }
 const human = () => resolveContextBinding('CONTEXT:APAP-HUMAN-LIVER', { cypActivity: 1, adductBinding: 1, zonation: 1, nacGsh: 1 }).values
@@ -75,6 +80,27 @@ describe('APAP multiscale equation set', () => {
     expect(mouseBinding.values.cypRate).not.toBe(humanBinding.values.cypRate)
     expect(mouseBinding.effectiveParameters.find((item) => item.symbol === 'initialApap')).toMatchObject({ sourceId: 'PARAMETER:APAP-MOUSE-DOSE', value: 30 })
     expect(humanBinding.effectiveParameters.find((item) => item.symbol === 'eliminationRate')).toMatchObject({ sourceId: 'PARAMETER:APAP-HUMAN-ELIMINATION', value: 0.2 })
+    expect(humanBinding.effectiveParameters).toEqual(expect.arrayContaining([
+      expect.objectContaining({ symbol: 'damageHalfSaturation', value: 0.2, unit: 'model-unit' }),
+      expect.objectContaining({ symbol: 'recoveryAdductScale', value: 1, unit: 'model-unit' })
+    ]))
+  })
+
+  it('binds complete equations, boundaries, initial conditions, events, and constants into identity', () => {
+    expect(APAP_EQUATION_SET_DIGEST).toBe(digest({ id: APAP_EQUATION_SET_ID, version: APAP_MODEL_VERSION, engine: APAP_ENGINE_VERSION, bins: 12, definition: APAP_EQUATION_DEFINITION }))
+    expect(APAP_EQUATION_DEFINITION.formulas).toMatchObject({ damageSignal: expect.any(String), stressedToRecovering: expect.any(String), injuredToRecovering: expect.any(String) })
+    expect(APAP_EQUATION_DEFINITION.boundaryConditions).toMatchObject({ leftNoFlux: expect.any(String), rightNoFlux: expect.any(String) })
+    expect(APAP_EQUATION_DEFINITION.events.nac).toMatch(/nacStartHours/)
+  })
+
+  it('passes declared 1x, 2x, and 4x timestep refinement diagnostics', () => {
+    const parameters = human()
+    const baseline = integrateApap(parameters, controls)
+    const refinement = runTimestepRefinement(parameters, controls, baseline)
+
+    expect(refinement).toMatchObject({ tolerance: 1e-8, passed: true, runs: [{ factor: 1 }, { factor: 2 }, { factor: 4 }] })
+    expect(refinement.comparisons).toHaveLength(2)
+    expect(refinement.comparisons.every((item) => item.maximumAbsoluteDifference <= refinement.tolerance)).toBe(true)
   })
 
   it('is deterministic for identical bindings and numerical controls', () => {

@@ -13,6 +13,11 @@ The multiscale equation set is an inference-side algorithm benchmark. Every adde
 - Internal run requests and results are strict Zod contracts in `shared/apap-contracts.js`.
 - Canonical model ID: `MODEL:APAP-LIVER-MULTISCALE`.
 - Canonical equation-set ID: `EQUATION-SET:APAP-LIVER-MULTISCALE-V1`.
+- The equation-set digest covers every derivative and flux formula, transition
+  formula, no-flux and serial-perfusion boundary, initial condition, NAC event,
+  invariant, and numerical constant used by the evaluator. The damage half
+  saturation and recovery adduct scale are visible effective parameters rather
+  than hidden literals.
 - Engine: `fixed-step-rk4-1.0.0`, fixed `0.01 h` step, `0.5 h` output interval.
 - Run identity is SHA-256 over the pinned release, equation digest, model/engine versions, protocol/context IDs, exact effective parameters, and numerical controls.
 
@@ -42,9 +47,12 @@ dRepaired_i/dt = v_repair,i
 dO_i/dt = supply_i - k_O O_i(H_i + S_i + R_i)
           - oxygen_cost v_CYP,i + D_O lap(O)_i
 
-H_i -> S_i: k_stress [B_i/(0.2 + B_i)] H_i
-S_i -> I_i: k_injury [B_i/(0.2 + B_i)] S_i
-S_i -> R_i, I_i -> R_i, R_i -> H_i: explicit recovery rates
+damage_i = B_i/(K_damage + B_i)
+H_i -> S_i: k_stress damage_i H_i
+S_i -> I_i: k_injury damage_i S_i
+S_i -> R_i: k_SR S_i/(K_recovery + B_i)
+I_i -> R_i: k_IR I_i/(K_recovery + B_i)
+R_i -> H_i: k_RH R_i
 
 dX/dt = -k_NAC,el X
 ```
@@ -82,6 +90,11 @@ Every run reports:
 - Executed zero-CYP case: NAPQI, adduct, and APAP-mediated injury remain zero.
 - Executed zero-binding case: adduct and APAP-mediated injury remain zero while NAPQI may form.
 - Uniform-zonation case: all CYP zonation coefficients become identical.
+- Fixed-step refinement at `0.01 h`, `0.005 h`, and `0.0025 h` (1x, 2x,
+  and 4x) compares the complete common-grid outputs, snapshots, and final state.
+  Both adjacent refinements must have maximum absolute difference at most
+  `1e-8`. This is a software convergence diagnostic, not biological validation
+  or a numerical uncertainty distribution.
 - Synthetic source observation comparisons with calibration/validation partitions retained and validation status `unsupported`.
 - The complete producer validation matrix, whose biological claims remain `unsupported`.
 
@@ -108,4 +121,4 @@ Every run reports:
 - The model omits population variability, covariates, uncertainty distributions, detailed PBPK anatomy, immune response, necrosis biomarkers, histology, regeneration biology, and clinical outcomes.
 - The one-dimensional 12-bin lobule is a numerical topology, not anatomical geometry.
 - Oxygen, GSH, NAPQI, adduct, and cell-state outputs use synthetic model units or fractions.
-- Fixed-step stability, conservation, and limiting-case checks establish software behavior only, not biological validity.
+- Fixed-step refinement, conservation, and limiting-case checks establish software behavior only, not biological validity.

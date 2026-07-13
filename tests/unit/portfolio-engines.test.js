@@ -4,6 +4,7 @@ import { runFba } from '../../server/portfolio/engines/fba.js'
 import { runOde } from '../../server/portfolio/engines/ode.js'
 import { createXoshiro128StarStar, runSsa } from '../../server/portfolio/engines/ssa.js'
 import { FBA_MODEL, ODE_MODEL, SSA_MODEL } from '../../server/portfolio/registry.js'
+import { validateExperimentForModel } from '../../server/portfolio/execution.js'
 import { benchmarkExperiment } from '../fixtures/portfolio/experiments.js'
 import { incompatibleUnitModel } from '../fixtures/portfolio/invalid-unit-model.js'
 
@@ -73,5 +74,40 @@ describe('Goal 4 numerical conformance', () => {
 
   it('rejects incompatible state and observable dimensions in strict model contracts', () => {
     expect(PortfolioModelSchema.safeParse(incompatibleUnitModel())).toMatchObject({ success: false })
+  })
+
+  it('rejects dimension-compatible cross-scale execution values and interventions', () => {
+    const odeState = structuredClone(ODE_MODEL)
+    odeState.definition.species[1].unit.scaleToSI *= 1000
+    const odeRate = structuredClone(ODE_MODEL)
+    odeRate.definition.parameters[0].unit.scaleToSI = 1 / 60
+    const ssaState = structuredClone(SSA_MODEL)
+    ssaState.definition.species.forEach((item) => { item.unit.scaleToSI = 1 })
+    const fbaFlux = structuredClone(FBA_MODEL)
+    fbaFlux.definition.reactions[1].unit.scaleToSI *= 1000
+    const intervention = benchmarkExperiment(ODE_MODEL)
+    intervention.interventions = [{ targetId: 'A', time: 0, value: 1, unit: { ...ODE_MODEL.definition.species[0].unit, scaleToSI: 1 } }]
+    const hours = benchmarkExperiment(ODE_MODEL)
+    hours.controls.timeUnit = 'hour'
+
+    for (const model of [odeState, odeRate, ssaState, fbaFlux]) expect(PortfolioModelSchema.safeParse(model).success).toBe(false)
+    expect(() => validateExperimentForModel(ODE_MODEL, intervention)).toThrow(/exact execution unit scale/)
+    expect(() => validateExperimentForModel(ODE_MODEL, hours)).toThrow()
+    expect(PortfolioModelSchema.safeParse(ODE_MODEL).success).toBe(true)
+  })
+
+  it('enforces unique executable, observable, and participant identifiers', () => {
+    const duplicateSpecies = structuredClone(ODE_MODEL)
+    duplicateSpecies.definition.species[1].id = duplicateSpecies.definition.species[0].id
+    const crossNamespace = structuredClone(ODE_MODEL)
+    crossNamespace.definition.parameters[0].id = crossNamespace.definition.species[0].id
+    const duplicateProducts = structuredClone(ODE_MODEL)
+    duplicateProducts.definition.reactions[0].products.push(structuredClone(duplicateProducts.definition.reactions[0].products[0]))
+    const duplicateObservables = structuredClone(ODE_MODEL)
+    duplicateObservables.observables[1].id = duplicateObservables.observables[0].id
+    const duplicateMetabolites = structuredClone(FBA_MODEL)
+    duplicateMetabolites.definition.metabolites.push(structuredClone(duplicateMetabolites.definition.metabolites[0]))
+
+    for (const model of [duplicateSpecies, crossNamespace, duplicateProducts, duplicateObservables, duplicateMetabolites]) expect(PortfolioModelSchema.safeParse(model).success).toBe(false)
   })
 })

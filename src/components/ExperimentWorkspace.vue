@@ -77,9 +77,9 @@ function chooseModel() {
 
 function portfolioExperiment(selected, entrySeed, interventions) {
   const controls = selected.engine.type === 'ode'
-    ? { method: 'dormand-prince-5-4', duration: duration.value, outputInterval: 1, fixedStep: 0.1, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
+    ? { method: 'dormand-prince-5-4', timeUnit: 'second', duration: duration.value, outputInterval: 1, fixedStep: 0.1, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
     : selected.engine.type === 'ssa'
-      ? { method: 'gillespie-direct', duration: duration.value, outputInterval: 1, replicates: 128, maxEventsPerReplicate: 100000 }
+      ? { method: 'gillespie-direct', timeUnit: 'second', duration: duration.value, outputInterval: 1, replicates: 128, maxEventsPerReplicate: 100000 }
       : { method: 'two-phase-simplex', feasibilityTolerance: 1e-8, maxIterations: 10000 }
   return {
     contractVersion: '2.0.0',

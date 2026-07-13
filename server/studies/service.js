@@ -185,7 +185,14 @@ export async function executeStudy(parameterClient, requestInput) {
     samplesPerChain: controls.posteriorSamples,
     diagnostics: sampled.diagnostics
   }
-  const validation = posteriorPredictive({ posteriorSamples: flattenedSamples, observations: validationObservations, sigma: controls.observationSigma, seed: (request.seed ^ 0xa5a5a5a5) >>> 0 })
+  const validationDiagnostics = [
+    ...fitted.converged ? [] : ['Posterior predictive validation was suppressed because calibration did not converge.'],
+    ...identifiability.identifiable ? [] : ['Posterior predictive validation was suppressed because the fitted parameterization is not identifiable.'],
+    ...sampled.converged ? [] : ['Posterior predictive validation was suppressed because chain diagnostics did not pass.']
+  ]
+  const validation = posteriorConverged
+    ? { status: 'available', diagnosticOnly: false, ...posteriorPredictive({ posteriorSamples: flattenedSamples, observations: validationObservations, sigma: controls.observationSigma, seed: (request.seed ^ 0xa5a5a5a5) >>> 0 }), diagnostics: [] }
+    : { status: 'suppressed', diagnosticOnly: true, heldOutOnly: true, observationIds: validationObservations.map((item) => item.id), coverageProbability: null, covered: null, total: validationObservations.length, predictions: [], diagnostics: validationDiagnostics }
   const robustness = robustnessMatrix(options, calibrationObservations, validationObservations, controls)
   const outcome = fitted.converged && identifiability.identifiable && posteriorConverged ? 'successful' : 'non-converged'
   const studyId = digest({ parameterRelease: options.release, model: { id: MODEL_ID, version: MODEL_VERSION }, algorithms: ALGORITHMS, request })

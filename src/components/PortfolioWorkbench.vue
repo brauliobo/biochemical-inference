@@ -51,9 +51,9 @@ async function initialize() {
 function experiment() {
   const selected = model.value
   const controls = selected.engine.type === 'ode'
-    ? { method: method.value, duration: duration.value, outputInterval: outputInterval.value, fixedStep: fixedStep.value, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
+    ? { method: method.value, timeUnit: 'second', duration: duration.value, outputInterval: outputInterval.value, fixedStep: fixedStep.value, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
     : selected.engine.type === 'ssa'
-      ? { method: 'gillespie-direct', duration: duration.value, outputInterval: outputInterval.value, replicates: replicates.value, maxEventsPerReplicate: 100000 }
+      ? { method: 'gillespie-direct', timeUnit: 'second', duration: duration.value, outputInterval: outputInterval.value, replicates: replicates.value, maxEventsPerReplicate: 100000 }
       : { method: 'two-phase-simplex', feasibilityTolerance: 1e-8, maxIterations: 10000 }
   return {
     contractVersion: '2.0.0',

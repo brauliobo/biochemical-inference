@@ -49,4 +49,20 @@ describe('ParameterStudyWorkbench', () => {
     expect(screen.getByText('Robustness matrix · robust')).toBeTruthy()
     expect(screen.getByText('measurement')).toBeTruthy()
   })
+
+  it('renders failed inference prerequisites as diagnostics without predictive coverage', async () => {
+    const suppressed = structuredClone(record)
+    suppressed.outcome = 'non-converged'
+    suppressed.result.outcome = 'non-converged'
+    suppressed.result.posterior = { ...suppressed.result.posterior, status: 'non-converged', converged: false, interval: null }
+    suppressed.result.validation = { status: 'suppressed', diagnosticOnly: true, heldOutOnly: true, observationIds: record.result.validation.observationIds, coverageProbability: null, covered: null, total: record.result.validation.total, predictions: [], diagnostics: ['Posterior predictive validation was suppressed because chain diagnostics did not pass.'] }
+    api.runParameterStudy.mockResolvedValue(suppressed)
+    render(ParameterStudyWorkbench)
+    const button = await screen.findByRole('button', { name: 'Run inference study' })
+    await fireEvent.submit(button.closest('form'))
+
+    expect(await screen.findByText(/Posterior predictive validation suppressed/)).toBeTruthy()
+    expect(screen.getByText(/chain diagnostics did not pass/)).toBeTruthy()
+    expect(screen.queryByText(/held-out observations covered/)).toBeNull()
+  })
 })

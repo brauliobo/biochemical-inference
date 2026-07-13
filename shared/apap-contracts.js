@@ -7,6 +7,7 @@ export const APAP_MODEL_ID = 'MODEL:APAP-LIVER-MULTISCALE'
 export const APAP_MODEL_VERSION = '1.0.0'
 export const APAP_ENGINE_VERSION = 'fixed-step-rk4-1.0.0'
 export const APAP_EQUATION_SET_ID = 'EQUATION-SET:APAP-LIVER-MULTISCALE-V1'
+export const APAP_REFINEMENT_TOLERANCE = 1e-8
 export const APAP_WARNING = 'Synthetic, non-clinical algorithm benchmark. Not medical advice, treatment guidance, or validated human or mouse toxicology.'
 
 const FiniteSchema = z.number().finite()
@@ -271,6 +272,8 @@ const LobuleSnapshotSchema = z.object({
 }).strict()
 
 const LimitingCaseSchema = z.object({ id: z.enum(['zero-cyp', 'zero-binding', 'uniform-zonation']), passed: z.boolean(), expectation: z.string().min(1), maximumSignal: FiniteSchema.nonnegative(), tolerance: FiniteSchema.nonnegative() }).strict()
+const refinementRunSchema = (factor) => z.object({ factor: z.literal(factor), stepHours: FiniteSchema.positive(), integrationSteps: z.number().int().positive() }).strict()
+const refinementComparisonSchema = (coarseFactor, fineFactor) => z.object({ coarseFactor: z.literal(coarseFactor), fineFactor: z.literal(fineFactor), maximumAbsoluteDifference: FiniteSchema.nonnegative(), passed: z.literal(true) }).strict()
 
 export const ApapRunResultSchema = z.object({
   contractVersion: z.literal(APAP_CONTRACT_VERSION),
@@ -281,7 +284,7 @@ export const ApapRunResultSchema = z.object({
   release: ApapReleaseRefSchema,
   context: ApapContextSchema,
   protocol: ApapProtocolSchema,
-  equationSet: z.object({ id: z.literal(APAP_EQUATION_SET_ID), version: z.literal(APAP_MODEL_VERSION), digest: CanonicalDigestSchema, taxonBranches: z.literal(false), lobuleBins: z.literal(12) }).strict(),
+  equationSet: z.object({ id: z.literal(APAP_EQUATION_SET_ID), version: z.literal(APAP_MODEL_VERSION), digest: CanonicalDigestSchema, taxonBranches: z.literal(false), lobuleBins: z.literal(12), identityIncludes: z.object({ formulas: z.literal(true), boundaryConditions: z.literal(true), initialConditions: z.literal(true), events: z.literal(true), constants: z.literal(true) }).strict() }).strict(),
   engine: z.object({ version: z.literal(APAP_ENGINE_VERSION), method: z.literal('fixed-step RK4'), stepHours: z.literal(0.01), outputEveryHours: z.literal(0.5), deterministic: z.literal(true) }).strict(),
   effectiveParameters: z.array(EffectiveParameterSchema).min(20),
   assumptions: z.array(z.object({ id: z.string().min(1), statement: z.string().min(1), origin: z.enum(['upstream', 'internal', 'run-control']), validationStatus: z.literal('unsupported') }).strict()).min(1),
@@ -296,6 +299,7 @@ export const ApapRunResultSchema = z.object({
     cellState: z.object({ maximumSumError: FiniteSchema.nonnegative(), minimumFraction: FiniteSchema.nonnegative(), passed: z.literal(true) }).strict(),
     state: z.object({ minimumValue: FiniteSchema.nonnegative(), finite: z.literal(true), nonNegative: z.literal(true) }).strict(),
     limitingCases: z.array(LimitingCaseSchema).length(3),
+    timestepRefinement: z.object({ tolerance: z.literal(APAP_REFINEMENT_TOLERANCE), runs: z.tuple([refinementRunSchema(1), refinementRunSchema(2), refinementRunSchema(4)]), comparisons: z.tuple([refinementComparisonSchema(1, 2), refinementComparisonSchema(2, 4)]), passed: z.literal(true) }).strict(),
     integrationSteps: z.number().int().positive()
   }).strict(),
   limitations: z.array(ApapLimitationSchema).min(6)

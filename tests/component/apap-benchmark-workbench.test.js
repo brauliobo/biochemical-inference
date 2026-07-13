@@ -59,6 +59,7 @@ describe('APAPBenchmarkWorkbench', () => {
     expect(await screen.findByText('Synthetic lobule spatial view')).toBeTruthy()
     expect(screen.getByText('Synthetic geometry · HRA unavailable')).toBeTruthy()
     expect(screen.getByText('Conservation diagnostics')).toBeTruthy()
+    expect(screen.getByText(/1x\/2x\/4x timestep refinement/)).toBeTruthy()
     expect(screen.getByText('Pass · zero-cyp')).toBeTruthy()
     expect(screen.getByText('Pass · zero-binding')).toBeTruthy()
     expect(screen.getByText('Pass · uniform-zonation')).toBeTruthy()

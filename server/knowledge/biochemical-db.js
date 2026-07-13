@@ -50,6 +50,13 @@ const ProvenanceSourceObjectSchema = z.object({
   record_type: z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']),
   sha256: DigestSchema,
   bytes: z.number().int().positive(),
+  object_class: z.enum(['repository-authored-normalized-fixture', 'upstream-source-object']),
+  upstream_response: z.boolean(),
+  origin_url: z.string().regex(/^(?:file|https):\/\/\S+$/),
+  artifact_repository: z.string().regex(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+$/).nullable(),
+  artifact_commit: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
+  source_release: z.string().min(1),
+  retrieved_at: z.string().datetime({ offset: true }),
   source_ids: z.array(SourceIdSchema).min(1),
   license_id: z.string().min(1)
 }).strict()
@@ -181,6 +188,13 @@ export function adaptProvenance(payload) {
       recordType: sourceObject.record_type,
       digest: `sha256:${sourceObject.sha256}`,
       bytes: sourceObject.bytes,
+      objectClass: sourceObject.object_class,
+      upstreamResponse: sourceObject.upstream_response,
+      originUrl: sourceObject.origin_url,
+      artifactRepository: sourceObject.artifact_repository,
+      artifactCommit: sourceObject.artifact_commit,
+      sourceRelease: sourceObject.source_release,
+      retrievedAt: sourceObject.retrieved_at,
       sourceIds: sourceObject.source_ids,
       licenseId: sourceObject.license_id
     })),

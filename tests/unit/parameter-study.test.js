@@ -44,6 +44,7 @@ describe('Goal 5 parameter selection and inference algorithms', () => {
     expect(first.calibration.estimate).toBeCloseTo(0.1, 8)
     expect(first.calibration.validationObservationIdsAccessed).toEqual([])
     expect(first.validation.observationIds.every((id) => !calibration.has(id))).toBe(true)
+    expect(first.validation.status).toBe('available')
     expect(first.validation.coverageProbability).toBe(1)
   })
 
@@ -62,6 +63,14 @@ describe('Goal 5 parameter selection and inference algorithms', () => {
   it('never presents optimizer best-so-far as a converged estimate', async () => {
     const result = await executeStudy(createParameterFixtureClient(), { controls: { optimizerMaxIterations: 1 } })
     expect(result).toMatchObject({ outcome: 'non-converged', calibration: { status: 'non-converged', converged: false, estimate: null, bestSoFar: expect.any(Number) }, posterior: { status: 'non-converged', converged: false, interval: null } })
+    expect(result.validation).toMatchObject({ status: 'suppressed', diagnosticOnly: true, coverageProbability: null, covered: null, predictions: [], diagnostics: [expect.stringMatching(/calibration did not converge/)] })
+  })
+
+  it('suppresses posterior predictive validation when chain diagnostics fail', async () => {
+    const result = await executeStudy(createParameterFixtureClient(), { controls: { posteriorWarmup: 0, posteriorSamples: 100, posteriorProposalScale: 1 } })
+
+    expect(result.posterior).toMatchObject({ status: 'non-converged', converged: false, interval: null })
+    expect(result.validation).toMatchObject({ status: 'suppressed', diagnosticOnly: true, predictions: [], diagnostics: [expect.stringMatching(/chain diagnostics/)] })
   })
 
   it('downgrades robustness when a misspecified model alternative violates held-out thresholds', async () => {

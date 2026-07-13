@@ -289,6 +289,9 @@ section.apap-panel(aria-labelledby="apap-title")
           div
             dt Fixed integration
             dd {{ result.diagnostics.integrationSteps }} × {{ result.engine.stepHours }} h
+          div
+            dt 1x/2x/4x timestep refinement
+            dd {{ result.diagnostics.timestepRefinement.passed ? 'Pass' : 'Fail' }} · max {{ Math.max(...result.diagnostics.timestepRefinement.comparisons.map(item => item.maximumAbsoluteDifference)).toExponential(3) }} / {{ result.diagnostics.timestepRefinement.tolerance }}
         h3 Limiting cases
         ul.limiting-cases
           li(v-for="item in result.diagnostics.limitingCases" :key="item.id")

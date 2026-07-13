@@ -18,7 +18,17 @@ Units carry a symbol, SI scale, and all seven SI base-dimension exponents. The c
 - SSA state: integer `molecule` counts; first-order rates: `s^-1`; time: `s`.
 - FBA flux: `mmol gDW^-1 h^-1`.
 
-All dynamic state dimensions must agree, first-order constants must have inverse-time dimensions, FBA flux dimensions must agree, and observables/interventions must match their targets. Goal 9 executes ordered, unit-compatible intervention assignments: ODE and SSA state/rate assignments occur at exact declared times, while FBA time-zero assignments replace reaction upper bounds. See `EXPERIMENT_WORKSPACE.md` for portfolio and discontinuity semantics.
+ODE and SSA controls explicitly declare `timeUnit: second`. Dynamic states and
+FBA fluxes must use one exact execution scale, SSA states must use the exact
+molecule scale, and first-order constants must be in inverse seconds.
+Observables and interventions must use the exact target scale, not merely a
+dimensionally compatible unit. Cross-scale input is rejected rather than
+silently interpreted. Species, parameter, reaction, metabolite, observable, and
+participant identifiers and references are checked for uniqueness and closure.
+Goal 9 executes ordered intervention assignments: ODE and SSA state/rate
+assignments occur at exact declared seconds, while FBA time-zero assignments
+replace reaction upper bounds. See `EXPERIMENT_WORKSPACE.md` for portfolio and
+discontinuity semantics.
 
 ## Standards Profile
 
@@ -30,6 +40,11 @@ The supported profile is named `portfolio-combine-1.0`.
 - FBC Version 2 syntax for FBA bounds and a single maximize objective.
 - One constant compartment, explicit species, constant scalar parameters, irreversible reactions, fixed stoichiometry, and first-order mass-action MathML for ODE/SSA.
 - A required `portfolio:contract` annotation contains the strict, digest-verified model contract. The executable species, reaction, bound, objective, and kinetic structures remain represented in standard SBML elements.
+- Import verifies exact supported unit definitions/references, irreversible
+  reaction flags, every reactant/product coefficient, the ordered two-operand
+  first-order MathML multiply AST, all FBC bound references and values, and the
+  active maximize objective reaction and coefficient. Re-signing or retaining
+  the embedded contract cannot hide a changed executable projection.
 
 Events, rules, function definitions, algebraic rules, delays, assignment/rate rules, spatial semantics, comp, qual, distrib, dynamic stoichiometry, non-first-order kinetic laws, multiple objectives, integer programs, and unsupported package semantics are rejected rather than approximated.
 

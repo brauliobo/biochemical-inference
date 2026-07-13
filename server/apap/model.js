@@ -2,21 +2,82 @@ import { digest } from '../portfolio/identity.js'
 import {
   APAP_ENGINE_VERSION,
   APAP_EQUATION_SET_ID,
-  APAP_MODEL_VERSION
+  APAP_MODEL_VERSION,
+  APAP_REFINEMENT_TOLERANCE
 } from '../../shared/apap-contracts.js'
 
-export const LOBULE_BINS = 12
+export const APAP_EQUATION_CONSTANTS = Object.freeze({
+  lobuleBins: 12,
+  zonationPortalOffset: 0.35,
+  initialHealthyFraction: 1,
+  initialZero: 0,
+  noFluxBoundary: 'nearest-boundary-value',
+  massRelativeTolerance: 1e-7,
+  cellStateSumTolerance: 1e-10,
+  limitingCaseTolerance: 1e-12,
+  outputDecimalPlaces: 10,
+  refinementTolerance: APAP_REFINEMENT_TOLERANCE
+})
+
+export const LOBULE_BINS = APAP_EQUATION_CONSTANTS.lobuleBins
 export const NAC_AFFECTED_TERMS = Object.freeze(['nac', 'gsh'])
 
 export const APAP_EQUATIONS = Object.freeze({
-  exposure: 'dG/dt=-ka*G; dC/dt=ka*G-kel*C-q*C+q*A[11]; dA[i]/dt=q*upstream-q*A[i]-vCYP[i]+D_A*lap(A)[i]',
-  metabolism: 'vCYP[i]=kCYP*z[i]*A[i]; vGSH[i]=kGSH*N[i]*GSH[i]; vBind[i]=kBind*N[i]',
-  napqi: 'dN[i]/dt=vCYP[i]-vGSH[i]-vBind[i]+D_N*lap(N)[i]',
-  glutathione: 'dGSH[i]/dt=kGSyn*(GSHcap-GSH[i])+kNAC*NAC*(GSHcap-GSH[i])-vGSH[i]',
-  adduct: 'dB[i]/dt=vBind[i]-kRepair*B[i]; dRepaired[i]/dt=kRepair*B[i]',
-  oxygen: 'dO[i]/dt=supply[i]-kO2*O[i]*viable[i]-o2Cost*vCYP[i]+D_O*lap(O)[i]',
-  cells: 'H->S and S->I depend only on adduct burden; S->R, I->R, and R->H are conservative recovery transitions',
-  nac: 'dNAC/dt=-kNACel*NAC; NAC enters no equation except dNAC and the explicit GSH synthesis term'
+  zonation: 'z[i]=1+zonationAmplitude*(i/(lobuleBins-1)-zonationPortalOffset)',
+  oxygenSupply: 'supply[i]=oxygenSupplyPortal+(oxygenSupplyCentral-oxygenSupplyPortal)*i/(lobuleBins-1)',
+  laplacian: 'lap(X)[i]=left(X,i)-2*X[i]+right(X,i)',
+  cypFlux: 'vCYP[i]=cypRate*z[i]*A[i]',
+  detoxFlux: 'vGSH[i]=detoxRate*N[i]*GSH[i]',
+  bindingFlux: 'vBind[i]=bindingRate*N[i]',
+  repairFlux: 'vRepair[i]=adductRepairRate*B[i]',
+  damageSignal: 'damage[i]=B[i]/(damageHalfSaturation+B[i])',
+  healthyToStressed: 'vHS[i]=stressRate*damage[i]*H[i]',
+  stressedToInjured: 'vSI[i]=injuryRate*damage[i]*S[i]',
+  stressedToRecovering: 'vSR[i]=stressedRecoveryRate*S[i]/(recoveryAdductScale+B[i])',
+  injuredToRecovering: 'vIR[i]=injuredRecoveryRate*I[i]/(recoveryAdductScale+B[i])',
+  recoveringToHealthy: 'vRH[i]=recoveringHealthyRate*R[i]',
+  gut: 'dG/dt=-absorptionRate*G',
+  central: 'dC/dt=absorptionRate*G-eliminationRate*C-perfusionRate*C+perfusionRate*A[lobuleBins-1]',
+  eliminated: 'dEliminated/dt=eliminationRate*C',
+  nac: 'dNAC/dt=-nacEliminationRate*NAC',
+  totalNapqiFormed: 'dTotalNapqiFormed/dt=sum_i(vCYP[i])',
+  apap: 'dA[i]/dt=perfusionRate*(upstream[i]-A[i])-vCYP[i]+apapExchange*lap(A)[i]',
+  napqi: 'dN[i]/dt=vCYP[i]-vGSH[i]-vBind[i]+napqiExchange*lap(N)[i]',
+  glutathione: 'dGSH[i]/dt=gshSynthesisRate*(gshCapacity-GSH[i])+nacGshRate*NAC*(gshCapacity-GSH[i])-vGSH[i]',
+  detoxified: 'dDetoxified[i]/dt=vGSH[i]',
+  adduct: 'dB[i]/dt=vBind[i]-vRepair[i]',
+  repaired: 'dRepaired[i]/dt=vRepair[i]',
+  oxygen: 'dO[i]/dt=supply[i]-oxygenConsumption*O[i]*(H[i]+S[i]+R[i])-oxygenMetabolismCost*vCYP[i]+oxygenExchange*lap(O)[i]',
+  healthy: 'dH[i]/dt=-vHS[i]+vRH[i]',
+  stressed: 'dS[i]/dt=vHS[i]-vSI[i]-vSR[i]',
+  injured: 'dI[i]/dt=vSI[i]-vIR[i]',
+  recovering: 'dR[i]/dt=vSR[i]+vIR[i]-vRH[i]'
+})
+
+export const APAP_EQUATION_DEFINITION = Object.freeze({
+  formulas: APAP_EQUATIONS,
+  boundaryConditions: {
+    portalUpstream: 'upstream[0]=central',
+    serialUpstream: 'upstream[i]=A[i-1] for i>0',
+    leftNoFlux: 'left(X,0)=X[0]',
+    rightNoFlux: 'right(X,lobuleBins-1)=X[lobuleBins-1]'
+  },
+  initialConditions: {
+    gut: 'G(0)=initialApap',
+    centralAndCumulativeFates: 'C(0)=Eliminated(0)=TotalNapqiFormed(0)=0',
+    lobuleChemistry: 'A[i](0)=N[i](0)=Detoxified[i](0)=B[i](0)=Repaired[i](0)=0',
+    glutathione: 'GSH[i](0)=gshCapacity',
+    oxygen: 'O[i](0)=supply[i]/oxygenConsumption',
+    cells: 'H[i](0)=1; S[i](0)=I[i](0)=R[i](0)=0',
+    nac: 'NAC(0)=0'
+  },
+  events: { nac: 'at nacStartHours: NAC := NAC+nacDose; absent when nacStartHours is null' },
+  invariants: {
+    cellState: 'H[i]+S[i]+I[i]+R[i]=1',
+    apapAccounting: 'G+C+Eliminated+sum_i(A[i]+N[i]+Detoxified[i]+B[i]+Repaired[i])=initialApap'
+  },
+  constants: APAP_EQUATION_CONSTANTS,
+  nacAffectedTerms: NAC_AFFECTED_TERMS
 })
 
 export const APAP_EQUATION_SET_DIGEST = digest({
@@ -24,8 +85,7 @@ export const APAP_EQUATION_SET_DIGEST = digest({
   version: APAP_MODEL_VERSION,
   engine: APAP_ENGINE_VERSION,
   bins: LOBULE_BINS,
-  equations: APAP_EQUATIONS,
-  nacAffectedTerms: NAC_AFFECTED_TERMS
+  definition: APAP_EQUATION_DEFINITION
 })
 
 const INTERNAL_STATEMENT = 'Internal illustrative assumption introduced by biochemical-inference; unsupported and not measured biology.'
@@ -57,6 +117,8 @@ const bindingValues = {
     stressedRecoveryRate: 0.025,
     injuredRecoveryRate: 0.008,
     recoveringHealthyRate: 0.018,
+    damageHalfSaturation: 0.2,
+    recoveryAdductScale: 1,
     zonationAmplitude: 0.65
   },
   'CONTEXT:APAP-MOUSE-LIVER': {
@@ -85,6 +147,8 @@ const bindingValues = {
     stressedRecoveryRate: 0.022,
     injuredRecoveryRate: 0.007,
     recoveringHealthyRate: 0.016,
+    damageHalfSaturation: 0.2,
+    recoveryAdductScale: 1,
     zonationAmplitude: 0.8
   }
 }
@@ -125,6 +189,8 @@ const units = {
   stressedRecoveryRate: 'h^-1',
   injuredRecoveryRate: 'h^-1',
   recoveringHealthyRate: 'h^-1',
+  damageHalfSaturation: 'model-unit',
+  recoveryAdductScale: 'model-unit',
   zonationAmplitude: '1'
 }
 
@@ -173,7 +239,7 @@ export function resolveContextBinding(contextId, mechanismScales = { cypActivity
 }
 
 export function buildZonation(amplitude) {
-  return Array.from({ length: LOBULE_BINS }, (_, index) => 1 + amplitude * (index / (LOBULE_BINS - 1) - 0.35))
+  return Array.from({ length: LOBULE_BINS }, (_, index) => 1 + amplitude * (index / (LOBULE_BINS - 1) - APAP_EQUATION_CONSTANTS.zonationPortalOffset))
 }
 
 function oxygenSupply(parameters) {
@@ -199,7 +265,7 @@ function initialState(parameters) {
     adduct: array(0),
     repaired: array(0),
     oxygen: supplies.map((supply) => supply / parameters.oxygenConsumption),
-    healthy: array(1),
+    healthy: array(APAP_EQUATION_CONSTANTS.initialHealthyFraction),
     stressed: array(0),
     injured: array(0),
     recovering: array(0)
@@ -234,7 +300,7 @@ export function assertValidApapState(state, stage) {
   }
   for (let index = 0; index < LOBULE_BINS; index += 1) {
     const total = state.healthy[index] + state.stressed[index] + state.injured[index] + state.recovering[index]
-    if (Math.abs(total - 1) > 1e-10) throw new ApapNumericalError(`Cell-state fractions do not sum to one in bin ${index} during ${stage}: ${total}`)
+    if (Math.abs(total - 1) > APAP_EQUATION_CONSTANTS.cellStateSumTolerance) throw new ApapNumericalError(`Cell-state fractions do not sum to one in bin ${index} during ${stage}: ${total}`)
   }
   return state
 }
@@ -259,11 +325,11 @@ export function apapDerivative(state, parameters) {
     const binding = parameters.bindingRate * state.napqi[index]
     const repair = parameters.adductRepairRate * state.adduct[index]
     const viable = state.healthy[index] + state.stressed[index] + state.recovering[index]
-    const damageSignal = state.adduct[index] / (0.2 + state.adduct[index])
+    const damageSignal = state.adduct[index] / (parameters.damageHalfSaturation + state.adduct[index])
     const healthyToStressed = parameters.stressRate * damageSignal * state.healthy[index]
     const stressedToInjured = parameters.injuryRate * damageSignal * state.stressed[index]
-    const stressedToRecovering = parameters.stressedRecoveryRate * state.stressed[index] / (1 + state.adduct[index])
-    const injuredToRecovering = parameters.injuredRecoveryRate * state.injured[index] / (1 + state.adduct[index])
+    const stressedToRecovering = parameters.stressedRecoveryRate * state.stressed[index] / (parameters.recoveryAdductScale + state.adduct[index])
+    const injuredToRecovering = parameters.injuredRecoveryRate * state.injured[index] / (parameters.recoveryAdductScale + state.adduct[index])
     const recoveringToHealthy = parameters.recoveringHealthyRate * state.recovering[index]
 
     result.apap[index] = parameters.perfusionRate * (upstream - state.apap[index]) - cyp + parameters.apapExchange * laplacian(state.apap, index)
@@ -302,7 +368,7 @@ function rk4(state, dt, parameters) {
 
 const mean = (values) => values.reduce((sum, value) => sum + value, 0) / values.length
 const sum = (values) => values.reduce((total, value) => total + value, 0)
-const round = (value) => Number(value.toFixed(10))
+const round = (value) => Number(value.toFixed(APAP_EQUATION_CONSTANTS.outputDecimalPlaces))
 const rounded = (values) => values.map(round)
 
 function output(state) {
@@ -363,11 +429,46 @@ export function integrateApap(parameters, controls) {
   }
 
   const massResidual = accountedApap(state) - initialApap
-  const massTolerance = 1e-7 * Math.max(1, initialApap)
+  const massTolerance = APAP_EQUATION_CONSTANTS.massRelativeTolerance * Math.max(1, initialApap)
   if (Math.abs(massResidual) > massTolerance) throw new ApapNumericalError(`APAP mass residual ${massResidual} exceeds tolerance ${massTolerance}`)
-  if (minimumValue < 0 || minimumFraction < 0 || maximumSumError > 1e-10) throw new ApapNumericalError('Integrated state violated non-negativity or cell-state conservation')
+  if (minimumValue < 0 || minimumFraction < 0 || maximumSumError > APAP_EQUATION_CONSTANTS.cellStateSumTolerance) throw new ApapNumericalError('Integrated state violated non-negativity or cell-state conservation')
 
   return { state, initialApap, times, outputs, snapshots, steps, minimumValue, minimumFraction, maximumSumError, massResidual, massTolerance }
+}
+
+function refinementVector(integrated) {
+  return [
+    ...integrated.outputs.flatMap((item) => Object.values(item)),
+    ...integrated.snapshots.flatMap((item) => Object.entries(item).filter(([key]) => key !== 'timeHours').flatMap(([, values]) => values)),
+    ...allValues(integrated.state)
+  ]
+}
+
+export function runTimestepRefinement(parameters, controls, baseline) {
+  const runs = [
+    baseline ?? integrateApap(parameters, controls),
+    integrateApap(parameters, { ...controls, stepHours: controls.stepHours / 2 }),
+    integrateApap(parameters, { ...controls, stepHours: controls.stepHours / 4 })
+  ]
+  const factors = [1, 2, 4]
+  const comparisons = [[0, 1], [1, 2]].map(([coarseIndex, fineIndex]) => {
+    const coarse = refinementVector(runs[coarseIndex])
+    const fine = refinementVector(runs[fineIndex])
+    if (coarse.length !== fine.length) throw new ApapNumericalError('APAP timestep refinement grids are not structurally comparable')
+    const maximumAbsoluteDifference = Math.max(...coarse.map((value, index) => Math.abs(value - fine[index])), 0)
+    return {
+      coarseFactor: factors[coarseIndex],
+      fineFactor: factors[fineIndex],
+      maximumAbsoluteDifference,
+      passed: maximumAbsoluteDifference <= APAP_REFINEMENT_TOLERANCE
+    }
+  })
+  return {
+    tolerance: APAP_REFINEMENT_TOLERANCE,
+    runs: runs.map((item, index) => ({ factor: factors[index], stepHours: controls.stepHours / factors[index], integrationSteps: item.steps })),
+    comparisons,
+    passed: comparisons.every((item) => item.passed)
+  }
 }
 
 function maximumAcross(integrated, selector) {
@@ -381,7 +482,7 @@ export function runLimitingCaseDiagnostics(parameters, controls) {
   const zeroBindingSignal = Math.max(maximumAcross(zeroBinding, (item) => item.adductBurden), maximumAcross(zeroBinding, (item) => item.injuredFraction))
   const uniform = buildZonation(0)
   const uniformSignal = Math.max(...uniform) - Math.min(...uniform)
-  const tolerance = 1e-12
+  const tolerance = APAP_EQUATION_CONSTANTS.limitingCaseTolerance
   return [
     { id: 'zero-cyp', passed: zeroCypSignal <= tolerance, expectation: 'Zero CYP activity yields zero NAPQI, adduct, and APAP-mediated injury.', maximumSignal: round(zeroCypSignal), tolerance },
     { id: 'zero-binding', passed: zeroBindingSignal <= tolerance, expectation: 'Zero adduct binding yields zero adduct and APAP-mediated injury.', maximumSignal: round(zeroBindingSignal), tolerance },

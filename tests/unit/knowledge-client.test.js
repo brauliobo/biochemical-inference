@@ -29,6 +29,13 @@ const provenance = {
       record_type: 'compounds',
       sha256: 'c'.repeat(64),
       bytes: 2182,
+      object_class: 'repository-authored-normalized-fixture',
+      upstream_response: false,
+      origin_url: `https://raw.githubusercontent.com/example/biochemical-db/${'f'.repeat(40)}/knowledge/sources/objects/sha256/${'c'.repeat(64)}`,
+      artifact_repository: 'https://github.com/example/biochemical-db',
+      artifact_commit: 'f'.repeat(40),
+      source_release: 'fixture-1',
+      retrieved_at: '2026-01-01T00:00:00Z',
       source_ids: ['CHEBI'],
       license_id: 'CC-BY-4.0'
     }],

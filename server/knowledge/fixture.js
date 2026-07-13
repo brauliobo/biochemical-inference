@@ -9,6 +9,18 @@ export const BUNDLED_RELEASE = {
 }
 
 const fixtureDigest = (character) => `sha256:${character.repeat(64)}`
+const FIXTURE_REPOSITORY = 'https://github.com/brauliobo/biochemical-inference'
+const FIXTURE_COMMIT = 'aab059b38ff9cad2cc278fa16d874eb78c2f020c'
+const fixtureSourceObject = (value) => ({
+  ...value,
+  objectClass: 'repository-authored-normalized-fixture',
+  upstreamResponse: false,
+  originUrl: `https://raw.githubusercontent.com/brauliobo/biochemical-inference/${FIXTURE_COMMIT}/knowledge/sources/objects/sha256/${value.digest.slice('sha256:'.length)}`,
+  artifactRepository: FIXTURE_REPOSITORY,
+  artifactCommit: FIXTURE_COMMIT,
+  sourceRelease: 'fixture-2026.1',
+  retrievedAt: '2026-01-01T00:00:00Z'
+})
 
 export const BUNDLED_PROVENANCE = {
   releaseId: BUNDLED_RELEASE.id,
@@ -16,13 +28,13 @@ export const BUNDLED_PROVENANCE = {
   recipe: { path: `recipes/${BUNDLED_RELEASE.id}.json`, digest: fixtureDigest('a') },
   sourceLock: { path: `sources/locks/${BUNDLED_RELEASE.id}.json`, digest: fixtureDigest('b') },
   sourceObjects: [
-    { name: 'demo-catalysis', recordType: 'catalysis', digest: fixtureDigest('1'), bytes: 320, sourceIds: ['RHEA', 'UNIPROTKB'], licenseId: 'CC-BY-4.0' },
-    { name: 'demo-compounds', recordType: 'compounds', digest: fixtureDigest('2'), bytes: 480, sourceIds: ['CHEBI'], licenseId: 'CC-BY-4.0' },
-    { name: 'demo-limitations', recordType: 'limitations', digest: fixtureDigest('3'), bytes: 128, sourceIds: ['CURATION'], licenseId: 'MIT' },
-    { name: 'demo-proteins', recordType: 'proteins', digest: fixtureDigest('4'), bytes: 256, sourceIds: ['UNIPROTKB'], licenseId: 'CC-BY-4.0' },
-    { name: 'demo-reactions', recordType: 'reactions', digest: fixtureDigest('5'), bytes: 384, sourceIds: ['RHEA'], licenseId: 'CC-BY-4.0' },
-    { name: 'demo-references', recordType: 'references', digest: fixtureDigest('6'), bytes: 256, sourceIds: ['PUBMED'], licenseId: 'NLM-TERMS' },
-    { name: 'demo-taxa', recordType: 'taxa', digest: fixtureDigest('7'), bytes: 128, sourceIds: ['NCBI_TAXONOMY'], licenseId: 'US-GOVERNMENT-WORK' }
+    fixtureSourceObject({ name: 'demo-catalysis', recordType: 'catalysis', digest: fixtureDigest('1'), bytes: 320, sourceIds: ['RHEA', 'UNIPROTKB'], licenseId: 'CC-BY-4.0' }),
+    fixtureSourceObject({ name: 'demo-compounds', recordType: 'compounds', digest: fixtureDigest('2'), bytes: 480, sourceIds: ['CHEBI'], licenseId: 'CC-BY-4.0' }),
+    fixtureSourceObject({ name: 'demo-limitations', recordType: 'limitations', digest: fixtureDigest('3'), bytes: 128, sourceIds: ['CURATION'], licenseId: 'MIT' }),
+    fixtureSourceObject({ name: 'demo-proteins', recordType: 'proteins', digest: fixtureDigest('4'), bytes: 256, sourceIds: ['UNIPROTKB'], licenseId: 'CC-BY-4.0' }),
+    fixtureSourceObject({ name: 'demo-reactions', recordType: 'reactions', digest: fixtureDigest('5'), bytes: 384, sourceIds: ['RHEA'], licenseId: 'CC-BY-4.0' }),
+    fixtureSourceObject({ name: 'demo-references', recordType: 'references', digest: fixtureDigest('6'), bytes: 256, sourceIds: ['PUBMED'], licenseId: 'NLM-TERMS' }),
+    fixtureSourceObject({ name: 'demo-taxa', recordType: 'taxa', digest: fixtureDigest('7'), bytes: 128, sourceIds: ['NCBI_TAXONOMY'], licenseId: 'US-GOVERNMENT-WORK' })
   ],
   transformer: { id: 'normalized-json', version: '1.0.0', digest: fixtureDigest('c') },
   validation: { id: 'mvp-scientific', version: '1.0.0', digest: fixtureDigest('d') }

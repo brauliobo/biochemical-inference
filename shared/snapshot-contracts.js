@@ -42,9 +42,21 @@ const ProvenanceSourceObjectSchema = z.object({
   record_type: RecordTypeSchema,
   sha256: DigestSchema,
   bytes: z.number().int().positive(),
+  object_class: z.enum(['repository-authored-normalized-fixture', 'upstream-source-object']),
+  upstream_response: z.boolean(),
+  origin_url: z.string().regex(/^(?:file|https):\/\/\S+$/),
+  artifact_repository: z.string().regex(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+$/).nullable(),
+  artifact_commit: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
+  source_release: z.string().min(1),
+  retrieved_at: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/),
   source_ids: z.array(SourceIdSchema).min(1),
   license_id: z.string().min(1)
-}).strict()
+}).strict().superRefine((value, context) => {
+  const fixture = value.object_class === 'repository-authored-normalized-fixture'
+  if (value.upstream_response === fixture) context.addIssue({ code: z.ZodIssueCode.custom, path: ['upstream_response'], message: 'source object class and upstream_response conflict' })
+  if (fixture && (value.artifact_repository === null || value.artifact_commit === null)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['artifact_repository'], message: 'repository fixtures require repository and commit fields' })
+  if (!fixture && (value.artifact_repository !== null || value.artifact_commit !== null)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['artifact_repository'], message: 'upstream source objects cannot claim repository artifact fields' })
+})
 
 const TaxonSchema = z.object({
   id: TaxonIdSchema,
@@ -108,22 +120,44 @@ const CatalysisSchema = z.object({
 const LimitationSchema = z.object({ id: z.string().regex(/^LIMITATION:[A-Z0-9-]+$/), statement: z.string().min(1) }).strict()
 const LicenseSchema = z.object({ id: z.string().min(1), name: z.string().min(1), url: z.string().url(), redistribution: z.enum(['public', 'restricted']) }).strict()
 
+const ReleasePayloadsSchema = z.object({
+  taxa: z.object({ schema_version: z.literal('1.0.0'), records: z.array(TaxonSchema).min(1) }).strict(),
+  compounds: z.object({ schema_version: z.literal('1.0.0'), records: z.array(CompoundSchema).min(1) }).strict(),
+  reactions: z.object({ schema_version: z.literal('1.0.0'), records: z.array(ReactionSchema).min(1) }).strict(),
+  proteins: z.object({ schema_version: z.literal('1.0.0'), records: z.array(ProteinSchema).min(1) }).strict(),
+  references: z.object({ schema_version: z.literal('1.0.0'), records: z.array(ReferenceSchema).min(1) }).strict(),
+  catalysis: z.object({ schema_version: z.literal('1.0.0'), records: z.array(CatalysisSchema).min(1) }).strict(),
+  limitations: z.object({ schema_version: z.literal('1.0.0'), records: z.array(LimitationSchema).min(1) }).strict()
+}).strict()
+
 const SnapshotSourceObjectSchema = z.object({
   name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   record_type: RecordTypeSchema,
   sha256: DigestSchema,
   bytes: z.number().int().positive(),
   media_type: z.literal('application/json'),
+  object_class: z.enum(['repository-authored-normalized-fixture', 'upstream-source-object']),
+  upstream_response: z.boolean(),
   origin_url: z.string().regex(/^(?:file|https):\/\/\S+$/),
+  artifact_repository: z.string().regex(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+$/).nullable(),
+  artifact_commit: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
   source_release: z.string().min(1),
   retrieved_at: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/),
   source_ids: z.array(SourceIdSchema).min(1),
   license: LicenseSchema,
   included_content: z.literal('normalized-public-release-records'),
   included_record_ids: z.array(z.string().min(1)).min(1),
+  resolved_source_ids: z.array(SourceIdSchema),
+  unresolved_source_ids: z.array(SourceIdSchema),
+  source_namespace_resolution: z.enum(['record-source-ids', 'linked-record-source-ids', 'unavailable-in-core-schema']),
   upstream_source_bytes_included: z.literal(false),
   content_limitations: z.array(z.string().min(1))
-}).strict()
+}).strict().superRefine((value, context) => {
+  const fixture = value.object_class === 'repository-authored-normalized-fixture'
+  if (value.upstream_response === fixture) context.addIssue({ code: z.ZodIssueCode.custom, path: ['upstream_response'], message: 'source object class and upstream_response conflict' })
+  if (fixture && (value.artifact_repository === null || value.artifact_commit === null)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['artifact_repository'], message: 'repository fixtures require repository and commit fields' })
+  if (!fixture && (value.artifact_repository !== null || value.artifact_commit !== null)) context.addIssue({ code: z.ZodIssueCode.custom, path: ['artifact_repository'], message: 'upstream source objects cannot claim repository artifact fields' })
+})
 
 export const KnowledgeSnapshotSchema = z.object({
   snapshot_schema_version: z.literal('1.0.0'),
@@ -162,6 +196,7 @@ export const KnowledgeSnapshotSchema = z.object({
     catalysis: z.array(CatalysisSchema),
     references: z.array(ReferenceSchema)
   }).strict(),
+  release_payloads: ReleasePayloadsSchema,
   source_metadata: z.object({ sources: z.array(SourceSchema).min(1), source_objects: z.array(SnapshotSourceObjectSchema).min(1) }).strict(),
   limitations: z.array(LimitationSchema),
   self_contained: z.boolean(),
