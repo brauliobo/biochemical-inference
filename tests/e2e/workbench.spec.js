@@ -34,6 +34,50 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
   await expect(page.getByRole('img', { name: /Homocysteine concentration over time/ })).toBeVisible()
 })
 
+test('explores human atlas traversal, identity ambiguity, mouse orthology, gaps, and species isolation', async ({ page }) => {
+  await page.goto('/')
+
+  const atlas = page.locator('.atlas-panel')
+  await expect(atlas.getByRole('heading', { name: 'MTHFR evidence atlas' })).toBeVisible()
+  await expect(atlas.getByText('contextual-mthfr-human-mouse-v2.0.0')).toBeVisible()
+  await expect(atlas.locator('.digest')).toHaveText('sha256:79c9cb88780e71898b1efa7470ef314d5de5ff8ca89815f461b381cfa6b2d65f')
+  await expect(atlas.locator('.atlas-entity-list')).toContainText('HGNC:7436')
+  await expect(atlas.locator('.atlas-entity-list')).not.toContainText('MGI:106639')
+  await expect(atlas.getByText(/Ambiguous candidates: UniProtKB:P42898-1, UniProtKB:P42898-2/)).toBeVisible()
+
+  await page.getByLabel('Taxon and protein evidence').selectOption('10090')
+  await expect(atlas.locator('.atlas-provenance')).toContainText('Mouse · Mus musculus')
+  await expect(atlas.locator('.atlas-entity-list')).toContainText('MGI:106639')
+  await expect(atlas.locator('.atlas-entity-list')).not.toContainText('HGNC:7436')
+  await expect(atlas.locator('.derivation-orthology-transferred').first()).toBeVisible()
+  await expect(atlas.getByText('Unknown / measured gap · isoform')).toBeVisible()
+  await expect(atlas.getByText('Unknown / measured gap · disease')).toBeVisible()
+  await expect(atlas.getByText('Unknown / measured gap · cell')).toBeVisible()
+
+  const transformation = atlas.locator('.transformation-details').first()
+  await transformation.locator('summary').click()
+  await expect(transformation).toContainText('orthology')
+  await expect(transformation).toContainText(/not direct mouse|taxon-neutral|related rather than an identity mapping/)
+
+  await atlas.getByLabel('Seed CURIE or unique label').fill('Mthfr')
+  await atlas.getByLabel('Seed CURIE or unique label').press('Enter')
+  await expect(atlas.locator('.atlas-entity-list')).toContainText('MGI:106639')
+})
+
+test('fails atlas verification visibly on a browser digest mismatch without disabling simulation', async ({ page }) => {
+  await page.route('**/api/v2/releases', async (route) => {
+    const response = await route.fetch()
+    const payload = await response.json()
+    await route.fulfill({ response, json: payload.map((release) => ({ ...release, digest: `sha256:${'0'.repeat(64)}` })) })
+  })
+  await page.goto('/')
+
+  const atlas = page.locator('.atlas-panel')
+  await expect(atlas.getByText('Context atlas unavailable')).toBeVisible()
+  await expect(atlas.getByText('Atlas manifest does not match the independently verified release and digest.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Run deterministic model' })).toBeEnabled()
+})
+
 test('rejects mismatched browser provenance without overstating reproducibility', async ({ page }) => {
   await page.route('**/api/v1/releases/*/provenance', async (route) => {
     const response = await route.fetch()
@@ -64,6 +108,7 @@ test('validates controls before sending a simulation request', async ({ page }) 
 test('has no essential horizontal overflow at 360px', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('button', { name: 'Run deterministic model' })).toBeVisible()
+  await expect(page.locator('.atlas-panel').getByRole('button', { name: 'Traverse bounded graph' })).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
 })

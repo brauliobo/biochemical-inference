@@ -4,6 +4,7 @@ import { TAXA, SimulationRequestSchema } from '../shared/contracts.js'
 import { loadNetwork, loadProvenance, loadWorkspace, runSimulation } from './api.js'
 import { compatibleRuns } from './comparison.js'
 import BuildProvenance from './components/BuildProvenance.vue'
+import AtlasExplorer from './components/AtlasExplorer.vue'
 import TimeSeriesChart from './components/TimeSeriesChart.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
@@ -312,6 +313,8 @@ main#main
         li(v-for="evidence in selectedEvidence" :key="evidence.id")
           a(:href="evidence.url" target="_blank" rel="noreferrer") {{ evidence.citation }}
           span {{ evidence.kind }} · {{ evidence.evidenceClass }} evidence
+
+    AtlasExplorer(:taxon-id="taxonId")
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading

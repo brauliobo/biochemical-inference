@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism simulation. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism simulation and a bounded contextual MTHFR evidence explorer. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, and Three.js. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -48,9 +48,20 @@ BIOCHEMICAL_DB_EXPECTED_DIGEST=b72d00c072551a6babd348cf88302788e9a7b547cca17f9fb
 
 The upstream must expose the biochemical-db 1.0 catalog, network, and provenance contracts. The client validates those responses with strict upstream Zod schemas, verifies the pinned release and digest across the catalog, endpoint envelope, and provenance closure, sends URL-encoded canonical taxon identifiers such as `NCBITaxon%3A9606`, and then adapts the responses into workbench contracts. An unsupported catalog or network schema, release mismatch, digest mismatch, or unavailable knowledge service disables simulation; there is no production fixture fallback.
 
+The contextual atlas is pinned and verified independently from the simulation release:
+
+```sh
+BIOCHEMICAL_DB_ATLAS_RELEASE_ID=contextual-mthfr-human-mouse-v2.0.0
+BIOCHEMICAL_DB_ATLAS_EXPECTED_DIGEST=79c9cb88780e71898b1efa7470ef314d5de5ff8ca89815f461b381cfa6b2d65f
+```
+
+Atlas catalog, release detail, typed entities, qualified claims, evidence, identity mappings, orthology transformations, coverage, limitations, network, and bounded subgraph payloads have separate strict v2 upstream Zod schemas and adapters. Every atlas read verifies the v2 catalog pin and the endpoint release envelope without consulting the v1 simulation catalog. An atlas failure is visible in the explorer but does not relabel simulation knowledge or disable an independently verified v1 simulation.
+
+The explorer traverses only the selected human or mouse taxon context with depth `0..6` and node limit `1..100`. Claim labels come from claim-level `derivation` and `polarity`; evidence records never turn an `orthology-transferred` claim into a direct claim. Coverage denominators show curated gaps as `Unknown / measured gap`, not biological absence. Unknown and cross-species roots are not substituted.
+
 Build provenance is loaded through the inference service's same-origin proxy and shown in an expandable section. It includes recipe, source-lock, transformer, validator, and source-object digests, plus record types, source namespaces, and license identifiers. A provenance-only request failure is displayed explicitly and the UI states that reproducibility is not established; simulation remains available only when the release and network verification have succeeded.
 
-The bundled fixture is available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`.
+The bundled v1 and atlas v2 fixtures are available only for tests or explicit demonstrations with `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true`. The atlas fixture follows the real v2 response contracts and release identifiers while its source is visibly marked `bundled-demonstration`.
 
 ### Identifier integrity
 
@@ -77,5 +88,14 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v1/releases/:releaseId/network?taxon_id=9606`
 - `GET /api/v1/models/one-carbon`
 - `POST /api/v1/models/one-carbon/simulations`
+- `GET /api/v2/releases`
+- `GET /api/v2/releases/:releaseId`
+- `GET /api/v2/releases/:releaseId/entities/:entityId?taxon_id=9606`
+- `GET /api/v2/releases/:releaseId/claims?taxon_id=9606`
+- `GET /api/v2/releases/:releaseId/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_depth=4&max_nodes=50`
+- `GET /api/v2/releases/:releaseId/coverage?taxon_id=9606`
+- `GET /api/v2/releases/:releaseId/network?taxon_id=9606`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
+
+See `docs/ATLAS_EXPLORER.md` for atlas contract, interpretation, and failure boundaries.

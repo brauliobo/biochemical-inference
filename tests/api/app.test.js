@@ -3,12 +3,49 @@ import { buildApp } from '../../server/app.js'
 import { createKnowledgeClient } from '../../server/knowledge/client.js'
 import { BUNDLED_RELEASE } from '../../server/knowledge/fixture.js'
 import { ModelSchema, NetworkSchema, ProvenanceSchema, ReleaseSchema } from '../../shared/contracts.js'
+import { AtlasCoverageResponseSchema, AtlasEntityResponseSchema, AtlasNetworkSchema, AtlasSubgraphSchema } from '../../shared/atlas-contracts.js'
+import { BUNDLED_ATLAS_RELEASE } from '../../server/knowledge/atlas-fixture.js'
 
 let app
 afterEach(async () => app?.close())
 const fixtureKnowledge = () => createKnowledgeClient({ BIOCHEMICAL_INFERENCE_USE_FIXTURE: 'true' })
 
 describe('simulation API', () => {
+  it('proxies independently pinned atlas release, entity, traversal, claims, coverage, and network contracts', async () => {
+    app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
+    const base = `/api/v2/releases/${BUNDLED_ATLAS_RELEASE.id}`
+    const releases = await app.inject({ method: 'GET', url: '/api/v2/releases' })
+    const detail = await app.inject({ method: 'GET', url: base })
+    const entity = await app.inject({ method: 'GET', url: `${base}/entities/HGNC%3A7436?taxon_id=9606` })
+    const graph = await app.inject({ method: 'GET', url: `${base}/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_depth=6&max_nodes=100` })
+    const mouseClaims = await app.inject({ method: 'GET', url: `${base}/claims?taxon_id=10090&derivation=orthology-transferred` })
+    const gaps = await app.inject({ method: 'GET', url: `${base}/coverage?taxon_id=10090&evidence_class=uncovered` })
+    const mouseNetwork = await app.inject({ method: 'GET', url: `${base}/network?taxon_id=10090` })
+
+    expect(releases.json()).toEqual([expect.objectContaining({ id: BUNDLED_ATLAS_RELEASE.id, digest: BUNDLED_ATLAS_RELEASE.digest })])
+    expect(detail.json()).toMatchObject({ release: { id: BUNDLED_ATLAS_RELEASE.id }, apiContract: '2.0.0' })
+    expect(() => AtlasEntityResponseSchema.parse(entity.json())).not.toThrow()
+    expect(() => AtlasSubgraphSchema.parse(graph.json())).not.toThrow()
+    expect(graph.json().entities.map((item) => item.id)).not.toContain('MGI:106639')
+    expect(mouseClaims.json().items.every((item) => item.derivation === 'orthology-transferred')).toBe(true)
+    expect(() => AtlasCoverageResponseSchema.parse(gaps.json())).not.toThrow()
+    expect(gaps.json().items.map((item) => item.entityType).sort()).toEqual(['cell', 'disease', 'isoform'])
+    expect(() => AtlasNetworkSchema.parse(mouseNetwork.json())).not.toThrow()
+    expect(mouseNetwork.json().entities.map((item) => item.id)).not.toContain('HGNC:7436')
+    expect(mouseNetwork.json().transformations).toHaveLength(3)
+  })
+
+  it('rejects unbounded atlas traversal parameters before contacting knowledge', async () => {
+    app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
+    const base = `/api/v2/releases/${BUNDLED_ATLAS_RELEASE.id}`
+    const depth = await app.inject({ method: 'GET', url: `${base}/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_depth=7` })
+    const nodes = await app.inject({ method: 'GET', url: `${base}/subgraph?root_id=HGNC%3A7436&taxon_id=9606&max_nodes=101` })
+
+    expect(depth.statusCode).toBe(400)
+    expect(nodes.statusCode).toBe(400)
+    expect(depth.json()).toMatchObject({ code: 'INVALID_ATLAS_QUERY' })
+  })
+
   it('serves model, release, and taxon-filtered network contracts', async () => {
     app = await buildApp({ serveClient: false, knowledgeClient: fixtureKnowledge() })
     const releases = await app.inject({ method: 'GET', url: '/api/v1/releases' })

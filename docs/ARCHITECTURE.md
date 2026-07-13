@@ -8,9 +8,9 @@
 
 ```text
 biochemical-db API
-        |
-        v
-knowledge client + digest pin
+        | v1 simulation release         | v2 contextual atlas release
+        v                               v
+strict adapters + independent digest pins
         |
         v
 controlled simulation API
@@ -49,7 +49,9 @@ The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the 
 - `GET /api/v1/models/one-carbon`
 - `POST /api/v1/models/one-carbon/simulations`
 
-The inference service proxies knowledge requests so the browser has one origin and every simulation can verify the same release used by the workbench.
+The inference service proxies knowledge requests so the browser has one origin and every simulation can verify the same release used by the workbench. Atlas v2 has a separate catalog, release ID, digest, strict schemas, adapters, and endpoint envelope checks; it never inherits verification from the v1 release.
+
+Atlas v2 adds read-only same-origin release detail, entity, claims, bounded subgraph, coverage, and taxon network routes. The network projection supplies mappings and limitations that are not present in the producer's subgraph response. Traversal bounds are validated at the Fastify boundary before upstream access.
 
 ## Model Contract
 
@@ -87,3 +89,5 @@ Display formatting, object key order, UI state, and locale must not change run i
 ## Failure Contract
 
 The interface distinguishes loading, invalid, incompatible, running, successful, failed, and cancelled states. A failed request cannot reuse stale data. Changing a completed run configuration marks existing results as belonging to the previous specification until a new run succeeds.
+
+The atlas independently distinguishes release loading, traversal loading, unavailable data, unknown or ambiguous seeds, bounded/truncated results, denominator gaps, and successful results. Unknown roots are never replaced with a default. Atlas compatibility failure does not disable a separately verified v1 simulation, and v1 readiness does not establish atlas compatibility.
