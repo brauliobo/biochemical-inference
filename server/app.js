@@ -101,6 +101,20 @@ import {
 import { DataPlaneUpstreamError } from './data-plane/client.js'
 import { createDataPlaneService, DataPlaneRequestError } from './data-plane/service.js'
 import { DataPlaneVerificationError } from './data-plane/verification.js'
+import {
+  CalibrationRequestSchema,
+  DisclosureIntentSchema,
+  FreezeIntentSchema,
+  MEASURED_CSRF_HEADER,
+  MEASURED_CSRF_VALUE,
+  MeasuredLocalPageQuerySchema,
+  MeasuredLocalRecordTypeSchema,
+  MeasuredSyncRequestSchema,
+  Sha256Schema as MeasuredSha256Schema
+} from '../shared/measured-contracts.js'
+import { MeasuredUpstreamError } from './measured/client.js'
+import { createMeasuredService, MeasuredRequestError } from './measured/service.js'
+import { MeasuredVerificationError } from './measured/verification.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -173,6 +187,9 @@ const DataPlaneRecordParamSchema = z.object({ releaseId: ReleaseIdSchema, record
 const DataPlanePageParamSchema = z.object({ releaseId: ReleaseIdSchema, recordType: DataPlaneRecordTypeSchema }).strict()
 const DataPlaneDiffQuerySchema = z.object({ base_release_id: ReleaseIdSchema, candidate_release_id: ReleaseIdSchema }).strict()
 const DataPlaneAuditParamSchema = z.object({ reportDigest: DataPlaneSha256Schema }).strict()
+const MeasuredPageParamSchema = z.object({ recordType: MeasuredLocalRecordTypeSchema }).strict()
+const MeasuredLineageParamSchema = z.object({ measurementId: z.string().min(1).max(160) }).strict()
+const MeasuredArtifactParamSchema = z.object({ artifactDigest: MeasuredSha256Schema }).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function fixedAllowedOrigins(env) {
@@ -226,8 +243,16 @@ export async function buildApp(options = {}) {
   const dataPlane = options.dataPlaneService ?? await createDataPlaneService({
     env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env
   })
+  const measured = options.measuredService ?? await createMeasuredService({
+    env: process.env.VITEST ? {
+      ...env,
+      NODE_ENV: 'test',
+      BIOCHEMICAL_MEASURED_ALLOWED_ORIGIN: env.BIOCHEMICAL_MEASURED_ALLOWED_ORIGIN ?? 'http://127.0.0.1:5173',
+      BIOCHEMICAL_MEASURED_CSRF_TOKEN: env.BIOCHEMICAL_MEASURED_CSRF_TOKEN ?? 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+    } : env
+  })
   app.addHook('onClose', async () => {
-    await Promise.allSettled([workspace.close?.(), physiology.close?.(), dataPlane.close?.()])
+    await Promise.allSettled([workspace.close?.(), physiology.close?.(), dataPlane.close?.(), measured.close?.()])
   })
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
@@ -264,6 +289,9 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof DataPlaneRequestError || error instanceof DataPlaneUpstreamError || error instanceof DataPlaneVerificationError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof MeasuredRequestError || error instanceof MeasuredUpstreamError || error instanceof MeasuredVerificationError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof DOMException && error.name === 'AbortError') {
@@ -931,6 +959,54 @@ export async function buildApp(options = {}) {
     const parsed = DataPlaneAuditParamSchema.safeParse(request.params)
     if (!parsed.success) return invalidDataPlane(reply, parsed)
     return dataPlane.auditDetail(parsed.data.reportDigest)
+  })
+  const invalidMeasured = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_MEASURED_REQUEST', error: 'Unprocessable Entity', message: 'Measured request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireMeasuredMutation = async (request) => {
+    if (!requireFixedOrigin(request, MEASURED_CSRF_HEADER, MEASURED_CSRF_VALUE)) throw new MeasuredRequestError('MEASURED_CSRF_REJECTED', 'Measured mutation requires a startup-allowlisted Origin and browser CSRF header.', 403)
+  }
+  const protectedMeasuredHeaders = (reply) => reply.headers({ 'cache-control': 'private, no-store', pragma: 'no-cache' })
+  const measuredProtectedRoute = { onRequest: async (_request, reply) => { protectedMeasuredHeaders(reply) }, preHandler: requireMeasuredMutation }
+
+  app.get('/api/v10/measured', async () => measured.discovery())
+  app.get('/api/v10/measured/status', async () => measured.status())
+  app.post('/api/v10/measured/sync', { preHandler: requireMeasuredMutation }, async (request, reply) => {
+    const parsed = MeasuredSyncRequestSchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return measured.sync()
+  })
+  app.get('/api/v10/measured/pages/:recordType', async (request, reply) => {
+    const params = MeasuredPageParamSchema.safeParse(request.params)
+    const query = MeasuredLocalPageQuerySchema.safeParse(request.query)
+    if (!params.success) return invalidMeasured(reply, params)
+    if (!query.success) return invalidMeasured(reply, query)
+    return measured.page(params.data.recordType, query.data)
+  })
+  app.get('/api/v10/measured/lineages/:measurementId', async (request, reply) => {
+    const parsed = MeasuredLineageParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return measured.lineage(parsed.data.measurementId)
+  })
+  app.post('/api/v10/measured/calibrations', { preHandler: requireMeasuredMutation }, async (request, reply) => {
+    const parsed = CalibrationRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return reply.status(201).send(await measured.calibrate(parsed.data))
+  })
+  app.get('/api/v10/measured/calibrations', async () => measured.listCalibrations())
+  app.get('/api/v10/measured/calibrations/:artifactDigest', async (request, reply) => {
+    const parsed = MeasuredArtifactParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return measured.calibration(parsed.data.artifactDigest)
+  })
+  app.get('/api/v10/measured/integrity', async () => measured.integrity())
+  app.post('/api/v10/measured/commitments', measuredProtectedRoute, async (request, reply) => {
+    const parsed = FreezeIntentSchema.safeParse(request.body)
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return measured.freeze(parsed.data, request.raw.signal)
+  })
+  app.post('/api/v10/measured/evaluation', measuredProtectedRoute, async (request, reply) => {
+    const parsed = DisclosureIntentSchema.safeParse(request.body)
+    if (!parsed.success) return invalidMeasured(reply, parsed)
+    return measured.disclose(parsed.data, request.raw.signal)
   })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {

@@ -118,6 +118,20 @@ import {
   DataPlaneStatusSchema,
   FactorySemanticDiffSchema
 } from '../shared/data-plane-contracts.js'
+import {
+  CalibrationArtifactSchema,
+  CalibrationRequestSchema,
+  DisclosureIntentSchema,
+  EvaluationResponseSchema,
+  FreezeIntentSchema,
+  FreezeResponseSchema,
+  MEASURED_CSRF_HEADER,
+  MEASURED_CSRF_VALUE,
+  MeasuredLocalDiscoverySchema,
+  MeasuredLocalLineageResponseSchema,
+  MeasuredLocalPageSchema,
+  MeasuredStatusSchema
+} from '../shared/measured-contracts.js'
 
 export class ApiError extends Error {
   constructor(message, { status, code, payload } = {}) {
@@ -150,6 +164,7 @@ const withSignal = (signal) => signal ? { signal } : {}
 const derivedMutationHeaders = { 'content-type': 'application/json', [DERIVED_CSRF_HEADER]: DERIVED_CSRF_VALUE }
 const physiologyMutationHeaders = { 'content-type': 'application/json', [PHYSIOLOGY_CSRF_HEADER]: PHYSIOLOGY_CSRF_VALUE }
 const dataPlaneMutationHeaders = { 'content-type': 'application/json', [DATA_PLANE_CSRF_HEADER]: DATA_PLANE_CSRF_VALUE }
+const measuredMutationHeaders = { 'content-type': 'application/json', [MEASURED_CSRF_HEADER]: MEASURED_CSRF_VALUE }
 
 function queryString(values) {
   const query = new URLSearchParams()
@@ -724,4 +739,55 @@ export async function loadAuthorityClosureAudits(signal) {
 
 export async function loadAuthorityClosureAudit(reportDigest, signal) {
   return AuthorityClosureAuditReportSchema.parse(await requestJson(`/api/v9/data-plane/audits/${encodeURIComponent(reportDigest)}`, withSignal(signal)))
+}
+
+export async function loadMeasuredDiscovery(signal) {
+  return MeasuredLocalDiscoverySchema.parse(await requestJson('/api/v10/measured', withSignal(signal)))
+}
+
+export async function loadMeasuredStatus(signal) {
+  return MeasuredStatusSchema.parse(await requestJson('/api/v10/measured/status', withSignal(signal)))
+}
+
+export async function syncMeasured(signal) {
+  return MeasuredStatusSchema.parse(await requestJson('/api/v10/measured/sync', {
+    method: 'POST', headers: measuredMutationHeaders, body: '{}', ...withSignal(signal)
+  }))
+}
+
+export async function loadMeasuredPage(recordType, query = {}, signal) {
+  const encoded = queryString(query)
+  return MeasuredLocalPageSchema.parse(await requestJson(`/api/v10/measured/pages/${encodeURIComponent(recordType)}${encoded ? `?${encoded}` : ''}`, withSignal(signal)))
+}
+
+export async function loadMeasuredLineage(measurementId, signal) {
+  return MeasuredLocalLineageResponseSchema.parse(await requestJson(`/api/v10/measured/lineages/${encodeURIComponent(measurementId)}`, withSignal(signal)))
+}
+
+export async function runMeasuredCalibration(input, signal) {
+  const request = CalibrationRequestSchema.parse(input)
+  return CalibrationArtifactSchema.parse(await requestJson('/api/v10/measured/calibrations', {
+    method: 'POST', headers: measuredMutationHeaders, body: JSON.stringify(request), ...withSignal(signal)
+  }))
+}
+
+async function protectedMeasuredRequest(path, body, schema, signal) {
+  const response = await fetch(path, { method: 'POST', headers: measuredMutationHeaders, body: JSON.stringify(body), ...withSignal(signal) })
+  const payload = await response.json().catch(() => null)
+  if (!response.ok) {
+    const message = payload && typeof payload === 'object' && 'message' in payload ? String(payload.message) : `Request failed with status ${response.status}`
+    throw new ApiError(message, { status: response.status, code: payload?.code ?? 'HTTP_ERROR', payload })
+  }
+  if (response.headers.get('cache-control') !== 'private, no-store') throw new ApiError('Protected measured response did not preserve the required no-store policy.', { status: response.status, code: 'MEASURED_CACHE_POLICY_INVALID', payload: null })
+  return { value: schema.parse(payload), cacheControl: response.headers.get('cache-control') }
+}
+
+export async function freezeMeasuredCommitment(input, signal) {
+  const request = FreezeIntentSchema.parse(input)
+  return protectedMeasuredRequest('/api/v10/measured/commitments', request, FreezeResponseSchema, signal)
+}
+
+export async function discloseMeasuredEvaluation(input, signal) {
+  const request = DisclosureIntentSchema.parse(input)
+  return protectedMeasuredRequest('/api/v10/measured/evaluation', request, EvaluationResponseSchema, signal)
 }

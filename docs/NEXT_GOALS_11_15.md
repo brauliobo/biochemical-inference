@@ -11,7 +11,7 @@ validation by being reused here.
 | Goal | Status |
 | --- | --- |
 | 11. Authoritative Release Factory And Local Data Plane | **Delivered** |
-| 12. Measured Parameter And Observation Commons | **Pending** |
+| 12. Measured Parameter And Observation Commons | **Delivered** |
 | 13. Externally Challenged APAP Benchmark | **Pending** |
 | 14. Measured Spatial Liver Atlas And Registration | **Pending** |
 | 15. Local Revalidation Campaigns At Scale | **Pending** |
@@ -141,7 +141,7 @@ enforcement, the local mirror, offline use, and user-visible pins and failures.
 
 ## Goal 12: Measured Parameter And Observation Commons
 
-**Status: Pending**
+**Status: Delivered**
 
 Replace assumption-only parameter selection with a reusable commons of
 measured, context-qualified parameters and observations without weakening the

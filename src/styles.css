@@ -71,7 +71,7 @@ dd { margin: .35rem 0 0; font-weight: 600; }
 .controls-panel { grid-column: 1; }
 .network-panel { grid-column: 2; }
 .details-panel { grid-column: 3; }
-.atlas-panel, .evidence-panel, .portfolio-panel, .experiment-workspace, .parameter-study-panel, .apap-panel, .review-panel, .physiology-panel, .data-plane-panel, .results-panel, .limitations { grid-column: 1 / -1; }
+.atlas-panel, .evidence-panel, .portfolio-panel, .experiment-workspace, .parameter-study-panel, .apap-panel, .review-panel, .physiology-panel, .data-plane-panel, .measured-workbench, .results-panel, .limitations { grid-column: 1 / -1; }
 .controls-panel form { display: grid; }
 label { margin: 1.05rem 0 .45rem; font-weight: 600; font-size: .86rem; }
 select, input, textarea { width: 100%; min-height: 46px; border: 1px solid #3b5752; border-radius: 2px; background: #0d1816; color: var(--ink); padding: .72rem; }
@@ -567,6 +567,35 @@ tr.emphasized { background: #1b312c; }
 .limitations ul { columns: 2; gap: 3rem; padding-left: 1.2rem; color: #bbc9b4; line-height: 1.65; }
 footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3rem; color: var(--muted); font-size: .75rem; }
 
+.measured-workbench { min-width: 0; max-width: 100%; overflow-x: hidden; background: linear-gradient(145deg, rgba(18, 31, 29, .97), rgba(24, 41, 38, .94)); }
+.measured-sync-strip { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; padding: 1rem; border: 1px solid #3e625b; background: #0d1917; }
+.measured-sync-strip div, .commitment-receipt { display: grid; gap: .35rem; }
+.measured-sync-strip span, .measured-pins span { color: var(--muted); font-size: .78rem; }
+.measured-pins { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1px; margin-top: 1px; background: var(--line); }
+.measured-pins > * { min-width: 0; padding: .8rem; background: #10201d; }
+.measured-family-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin-top: 1.5rem; }
+.measured-family { padding: 1rem; border: 1px solid var(--line); background: #101b19; }
+.measured-family > span { color: var(--mint); font: .68rem ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
+.measured-family.external-held-out { border-color: var(--amber); background: #211b14; }
+.measured-family.external-held-out > span { color: var(--amber); }
+.measured-family p, .measured-rights p, .measured-calibration p, .measured-disclosure p { color: var(--muted); font-size: .82rem; line-height: 1.55; }
+.measured-rights { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: .75rem 0 1.5rem; }
+.measured-rights article { padding: 1rem; border-left: 3px solid var(--lime); background: #111d1b; }
+.measured-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr); gap: 1rem; }
+.measured-grid > section, .measured-calibration, .measured-disclosure { min-width: 0; padding: 1rem; border: 1px solid var(--line); background: #0f1a18; }
+.measured-grid h3, .measured-calibration h3, .measured-disclosure h3 { margin-top: .4rem; }
+.measured-grid table code { display: block; min-width: 14rem; }
+.measured-calibration, .measured-disclosure { margin-top: 1rem; }
+.calibration-artifact { display: grid; gap: .6rem; margin-top: 1rem; padding: 1rem; border: 1px solid var(--amber); background: #201a14; }
+.calibration-artifact > strong { color: var(--amber); text-transform: uppercase; }
+.digest-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.digest-form label { color: var(--muted); font: .7rem ui-monospace, monospace; text-transform: uppercase; }
+.digest-form input { margin-top: .35rem; font: .72rem ui-monospace, monospace; }
+.commitment-receipt { margin: 1rem 0; padding: 1rem; border: 1px solid var(--mint); background: #10231f; }
+.commitment-receipt span { color: var(--muted); font-size: .76rem; }
+.disclosure-values { margin-top: 1rem; padding: 1rem; border-left: 3px solid var(--amber); background: #211b14; }
+.disclosure-values li { margin: .45rem 0; }
+
 @media (max-width: 1100px) {
   .workspace { grid-template-columns: minmax(250px, .75fr) minmax(480px, 1.5fr); }
   .details-panel { grid-column: 1 / -1; }
@@ -575,7 +604,7 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .atlas-controls .run-button { grid-column: 1 / -1; }
   .evidence-search { grid-template-columns: minmax(280px, 1.5fr) 1fr; }
   .evidence-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pin-ledger, .diff-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pin-ledger, .diff-grid, .measured-family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
@@ -606,6 +635,8 @@ footer { max-width: 1500px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 4rem) 3r
   .history-heading { display: grid; }
   .coupling-actions { grid-template-columns: 1fr; }
   .data-plane-state { justify-content: start; }
+  .measured-family-grid, .measured-rights, .measured-grid, .measured-pins, .digest-form { grid-template-columns: minmax(0, 1fr); }
+  .measured-sync-strip { align-items: stretch; display: grid; }
   .data-plane-actions, .generation-heading, .source-ledger-heading, .records-toolbar { display: grid; }
   .data-plane-actions .run-button { width: 100%; }
   .source-ledger-heading, .nlm-courtesy { grid-column: auto; }

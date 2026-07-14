@@ -8,9 +8,13 @@ const evidenceRuntime = `${runtimeRoot}/evidence`
 const derivedRuntime = `${runtimeRoot}/derived`
 const workspaceRuntime = `${runtimeRoot}/workspace`
 const dataPlaneRuntime = `${runtimeRoot}/data-plane`
+const measuredRuntime = `${runtimeRoot}/measured-local`
+const measuredProducerRuntime = `${runtimeRoot}/measured-producer`
 const derivedToken = randomBytes(32).toString('hex')
 const factoryCursorSecret = randomBytes(32).toString('base64url')
 const dataPlaneCursorSecret = randomBytes(32).toString('base64url')
+const measuredCursorSecret = randomBytes(32).toString('base64url')
+const measuredCsrfToken = randomBytes(32).toString('base64url')
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -29,8 +33,13 @@ export default defineConfig({
       url: 'http://127.0.0.1:8010/api/factory/v1',
       reuseExistingServer: false,
       timeout: 120_000
+    }, {
+      command: `PORT=8011 MEASURED_FIXTURE_ALLOWED_ORIGIN=http://127.0.0.1:5173 MEASURED_FIXTURE_CSRF=${measuredCsrfToken} node tests/fixtures/measured-server.js`,
+      url: 'http://127.0.0.1:8011/api/measured/v1',
+      reuseExistingServer: false,
+      timeout: 120_000
     }] : [{
-      command: `BIOCHEMICAL_FACTORY_CURSOR_SECRET=${factoryCursorSecret} uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000`,
+      command: `sh -c 'umask 077 && mkdir -p "${measuredProducerRuntime}" && BIOCHEMICAL_MEASURED_STATE_DB="${measuredProducerRuntime}/state.sqlite3" BIOCHEMICAL_MEASURED_ALLOWED_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_MEASURED_CSRF_TOKEN=${measuredCsrfToken} BIOCHEMICAL_FACTORY_CURSOR_SECRET=${factoryCursorSecret} uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000'`,
       cwd: '../biochemical-db/service',
       url: 'http://127.0.0.1:8000/healthz',
       reuseExistingServer: false,
@@ -50,8 +59,8 @@ export default defineConfig({
     }]),
     {
       command: useFixture
-        ? `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8010 BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm start`
-        : `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8000 BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm start`,
+        ? `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_MEASURED_ROOT=${measuredRuntime} BIOCHEMICAL_MEASURED_CURSOR_SECRET=${measuredCursorSecret} BIOCHEMICAL_MEASURED_URL=http://127.0.0.1:8011 BIOCHEMICAL_MEASURED_ALLOWED_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_MEASURED_CSRF_TOKEN=${measuredCsrfToken} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8010 BIOCHEMICAL_INFERENCE_USE_FIXTURE=true BIOCHEMICAL_EVIDENCE_USE_FIXTURE=true BIOCHEMICAL_DERIVED_USE_FIXTURE=true npm start`
+        : `npm run build && NODE_ENV=test PORT=5173 HOST=127.0.0.1 BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_WORKSPACE_ROOT=${workspaceRuntime} BIOCHEMICAL_DATA_PLANE_ROOT=${dataPlaneRuntime} BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET=${dataPlaneCursorSecret} BIOCHEMICAL_MEASURED_ROOT=${measuredRuntime} BIOCHEMICAL_MEASURED_CURSOR_SECRET=${measuredCursorSecret} BIOCHEMICAL_MEASURED_URL=http://127.0.0.1:8000 BIOCHEMICAL_MEASURED_ALLOWED_ORIGIN=http://127.0.0.1:5173 BIOCHEMICAL_MEASURED_CSRF_TOKEN=${measuredCsrfToken} BIOCHEMICAL_FACTORY_URL=http://127.0.0.1:8000 BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002 BIOCHEMICAL_DERIVED_WRITE_TOKEN=${derivedToken} npm start`,
       url: 'http://127.0.0.1:5173',
       reuseExistingServer: false,
       timeout: 120_000

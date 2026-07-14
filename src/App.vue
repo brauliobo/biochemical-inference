@@ -14,6 +14,7 @@ import APAPBenchmarkWorkbench from './components/APAPBenchmarkWorkbench.vue'
 import ReviewWorkbench from './components/ReviewWorkbench.vue'
 import PhysiologyPluginWorkbench from './components/PhysiologyPluginWorkbench.vue'
 import DataPlaneWorkbench from './components/DataPlaneWorkbench.vue'
+import MeasuredCommonsWorkbench from './components/MeasuredCommonsWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -344,6 +345,8 @@ main#main
     PhysiologyPluginWorkbench
 
     DataPlaneWorkbench
+
+    MeasuredCommonsWorkbench
 
     section.results-panel(aria-labelledby="results-title")
       .section-heading
