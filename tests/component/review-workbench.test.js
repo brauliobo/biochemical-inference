@@ -52,6 +52,7 @@ describe('ReviewWorkbench', () => {
     expect(screen.getByText('Qualitative uncertainty')).toBeTruthy()
     expect(screen.getByText('Unsupported limitations')).toBeTruthy()
     expect(screen.getByText('Source vs reviewed-derived')).toBeTruthy()
+    expect(screen.getByText(/No eligible verified parameter measurement/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Accept' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Reject' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Invalidate' })).toBeNull()

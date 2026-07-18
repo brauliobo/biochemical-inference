@@ -28,10 +28,11 @@ export function createParameterClient(env = process.env) {
   const timeoutMs = Number(env.BIOCHEMICAL_PARAMETERS_TIMEOUT_MS ?? 5000)
   if (!/^[a-f0-9]{64}$/.test(expectedDigest)) throw new ParameterCompatibilityError('BIOCHEMICAL_PARAMETERS_EXPECTED_DIGEST must be a lowercase SHA-256 digest')
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new ParameterCompatibilityError('BIOCHEMICAL_PARAMETERS_TIMEOUT_MS must be a positive number')
+  const requestSignal = (signal) => signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
 
-  async function fetchJson(path) {
+  async function fetchJson(path, signal) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: requestSignal(signal) })
       const payload = await response.json().catch(() => null)
       if (!response.ok) {
         const statusCode = response.status >= 400 && response.status < 500 ? response.status : 503
@@ -46,8 +47,8 @@ export function createParameterClient(env = process.env) {
     }
   }
 
-  async function catalog() {
-    const parsed = UpstreamParameterCatalogSchema.safeParse(await fetchJson('/api/parameters/v1/releases'))
+  async function catalog(signal) {
+    const parsed = UpstreamParameterCatalogSchema.safeParse(await fetchJson('/api/parameters/v1/releases', signal))
     if (!parsed.success) throw new ParameterCompatibilityError('Parameter release catalog schema is incompatible with 1.0.0')
     const release = parsed.data.releases.find((item) => item.release_id === releaseId)
     if (!release) throw new ParameterCompatibilityError(`Configured parameter release ${releaseId} was not returned`)
@@ -67,9 +68,9 @@ export function createParameterClient(env = process.env) {
     return encoded ? `?${encoded}` : ''
   }
 
-  async function verified(path, schema, description) {
-    await catalog()
-    const parsed = schema.safeParse(await fetchJson(`/api/parameters/v1/releases/${encodeURIComponent(releaseId)}${path}`))
+  async function verified(path, schema, description, signal) {
+    await catalog(signal)
+    const parsed = schema.safeParse(await fetchJson(`/api/parameters/v1/releases/${encodeURIComponent(releaseId)}${path}`, signal))
     if (!parsed.success) throw new ParameterCompatibilityError(`Parameter ${description} schema is incompatible with 1.0.0`)
     return verifyEnvelope(parsed.data, description)
   }
@@ -91,8 +92,8 @@ export function createParameterClient(env = process.env) {
     async datasets(filters = {}) {
       return verified(`/datasets${queryString({ dataset_id: filters.datasetId, parameter_id: filters.parameterId, context_id: filters.contextId, data_origin: filters.dataOrigin })}`, UpstreamParameterDatasetsResponseSchema, 'dataset response')
     },
-    async contexts() {
-      return verified('/contexts', UpstreamParameterContextsResponseSchema, 'context response')
+    async contexts(signal) {
+      return verified('/contexts', UpstreamParameterContextsResponseSchema, 'context response', signal)
     }
   }
 }

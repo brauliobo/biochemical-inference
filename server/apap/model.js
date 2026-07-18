@@ -436,6 +436,52 @@ export function integrateApap(parameters, controls) {
   return { state, initialApap, times, outputs, snapshots, steps, minimumValue, minimumFraction, maximumSumError, massResidual, massTolerance }
 }
 
+export function integrateApapAtTimes(parameters, controls) {
+  const { outputTimes, stepHours, nacStartHours } = controls
+  if (!Array.isArray(outputTimes) || outputTimes.length < 2 || outputTimes[0] !== 0 || outputTimes.some((time, index) => !Number.isFinite(time) || time < 0 || (index > 0 && time <= outputTimes[index - 1]))) throw new ApapNumericalError('Exact APAP output times must be finite, strictly increasing, and start at zero')
+  if (!Number.isFinite(stepHours) || stepHours <= 0) throw new ApapNumericalError('Exact APAP integration step must be finite and positive')
+  if (nacStartHours !== null) throw new ApapNumericalError('Exact irregular-grid APAP integration does not support an intervention event')
+  let state = assertValidApapState(initialState(parameters), 'initialization')
+  const initialApap = accountedApap(state)
+  const times = [0]
+  const outputs = [output(state)]
+  const snapshots = [snapshot(state, 0)]
+  let currentTime = 0
+  let steps = 0
+  let minimumValue = Math.min(...allValues(state))
+  let minimumFraction = 1
+  let maximumSumError = 0
+
+  for (const targetTime of outputTimes.slice(1)) {
+    while (targetTime - currentTime > Number.EPSILON * Math.max(1, targetTime) * 8) {
+      const step = Math.min(stepHours, targetTime - currentTime)
+      state = rk4(state, step, parameters)
+      currentTime += step
+      steps += 1
+      minimumValue = Math.min(minimumValue, ...allValues(state))
+      for (let index = 0; index < LOBULE_BINS; index += 1) {
+        const fractions = [state.healthy[index], state.stressed[index], state.injured[index], state.recovering[index]]
+        minimumFraction = Math.min(minimumFraction, ...fractions)
+        maximumSumError = Math.max(maximumSumError, Math.abs(sum(fractions) - 1))
+      }
+    }
+    currentTime = targetTime
+    times.push(targetTime)
+    outputs.push(output(state))
+    snapshots.push(snapshot(state, targetTime))
+  }
+
+  const massResidual = accountedApap(state) - initialApap
+  const massTolerance = APAP_EQUATION_CONSTANTS.massRelativeTolerance * Math.max(1, initialApap)
+  if (Math.abs(massResidual) > massTolerance) throw new ApapNumericalError(`APAP mass residual ${massResidual} exceeds tolerance ${massTolerance}`)
+  if (minimumValue < 0 || minimumFraction < 0 || maximumSumError > APAP_EQUATION_CONSTANTS.cellStateSumTolerance) throw new ApapNumericalError('Integrated state violated non-negativity or cell-state conservation')
+  return { state, initialApap, times, outputs, snapshots, steps, minimumValue, minimumFraction, maximumSumError, massResidual, massTolerance }
+}
+
+function integrateForControls(parameters, controls) {
+  return controls.outputTimes ? integrateApapAtTimes(parameters, controls) : integrateApap(parameters, controls)
+}
+
 function refinementVector(integrated) {
   return [
     ...integrated.outputs.flatMap((item) => Object.values(item)),
@@ -446,9 +492,9 @@ function refinementVector(integrated) {
 
 export function runTimestepRefinement(parameters, controls, baseline) {
   const runs = [
-    baseline ?? integrateApap(parameters, controls),
-    integrateApap(parameters, { ...controls, stepHours: controls.stepHours / 2 }),
-    integrateApap(parameters, { ...controls, stepHours: controls.stepHours / 4 })
+    baseline ?? integrateForControls(parameters, controls),
+    integrateForControls(parameters, { ...controls, stepHours: controls.stepHours / 2 }),
+    integrateForControls(parameters, { ...controls, stepHours: controls.stepHours / 4 })
   ]
   const factors = [1, 2, 4]
   const comparisons = [[0, 1], [1, 2]].map(([coarseIndex, fineIndex]) => {
@@ -476,9 +522,9 @@ function maximumAcross(integrated, selector) {
 }
 
 export function runLimitingCaseDiagnostics(parameters, controls) {
-  const zeroCyp = integrateApap({ ...parameters, cypRate: 0 }, controls)
+  const zeroCyp = integrateForControls({ ...parameters, cypRate: 0 }, controls)
   const zeroCypSignal = Math.max(maximumAcross(zeroCyp, (item) => item.liverNapqi), maximumAcross(zeroCyp, (item) => item.adductBurden), maximumAcross(zeroCyp, (item) => item.injuredFraction))
-  const zeroBinding = integrateApap({ ...parameters, bindingRate: 0 }, controls)
+  const zeroBinding = integrateForControls({ ...parameters, bindingRate: 0 }, controls)
   const zeroBindingSignal = Math.max(maximumAcross(zeroBinding, (item) => item.adductBurden), maximumAcross(zeroBinding, (item) => item.injuredFraction))
   const uniform = buildZonation(0)
   const uniformSignal = Math.max(...uniform) - Math.min(...uniform)

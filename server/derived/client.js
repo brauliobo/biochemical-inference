@@ -22,7 +22,7 @@ import {
 import { verifyDerivedBundle } from './bundle.js'
 import { createDerivedFixtureClient } from './fixture.js'
 
-export const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8002'
+export const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8000'
 
 export class DerivedCompatibilityError extends Error {
   constructor(message, options = {}) {
@@ -36,12 +36,13 @@ export class DerivedCompatibilityError extends Error {
 export function createDerivedClient(env = process.env) {
   if (env.BIOCHEMICAL_DERIVED_USE_FIXTURE === 'true' || env.BIOCHEMICAL_INFERENCE_USE_FIXTURE === 'true') return createDerivedFixtureClient()
 
-  const baseUrl = (env.BIOCHEMICAL_DERIVED_URL ?? DEFAULT_DERIVED_URL).replace(/\/$/, '')
+  const baseUrl = (env.BIOCHEMICAL_DERIVED_URL ?? env.BIOCHEMICAL_DB_URL ?? DEFAULT_DERIVED_URL).replace(/\/$/, '')
   const writeToken = env.BIOCHEMICAL_DERIVED_WRITE_TOKEN
+  const healthPath = env.BIOCHEMICAL_DERIVED_HEALTH_PATH ?? '/api/derived/v1/healthz'
   const timeoutMs = Number(env.BIOCHEMICAL_DERIVED_TIMEOUT_MS ?? 5000)
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new DerivedCompatibilityError('BIOCHEMICAL_DERIVED_TIMEOUT_MS must be positive')
 
-  async function request(path, { method = 'GET', payload, schema, write = false } = {}) {
+  async function request(path, { method = 'GET', payload, schema, signal, write = false } = {}) {
     if (write && !writeToken) throw new DerivedCompatibilityError('Derived writes are disabled because no server write token is configured.', { statusCode: 503, code: 'DERIVED_WRITE_DISABLED' })
     const headers = { accept: 'application/json' }
     if (payload !== undefined) headers['content-type'] = 'application/json'
@@ -51,7 +52,7 @@ export function createDerivedClient(env = process.env) {
         method,
         headers,
         body: payload === undefined ? undefined : JSON.stringify(payload),
-        signal: AbortSignal.timeout(timeoutMs)
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
       })
       const body = await response.json().catch(() => null)
       if (!response.ok) {
@@ -73,8 +74,8 @@ export function createDerivedClient(env = process.env) {
   }
 
   return {
-    async health() {
-      const upstream = await request('/healthz', { schema: DerivedHealthUpstreamSchema })
+    async health(signal) {
+      const upstream = await request(healthPath, { schema: DerivedHealthUpstreamSchema, signal })
       const { signing_key_id: _keyId, signing_public_key: _publicKey, ...safe } = upstream
       return safe
     },

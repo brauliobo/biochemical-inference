@@ -26,7 +26,7 @@ Vue/Pug workbench
   |       |       |
  chart   table   Three.js
 
-evidence API :8001
+integrated biochemical-db JS/PGlite API :8000
         | evidence v3 release + mutable candidate workspace
         v
 strict evidence adapter + independent release/digest pin

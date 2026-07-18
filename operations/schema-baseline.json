@@ -1,0 +1,36 @@
+{
+  "baseline_schema_version": "biochemical-inference-operational-baseline-v1",
+  "application_version": "0.1.0",
+  "backup_layout": "biochemical-inference-state-backup-v1",
+  "persistent_roots": [
+    "challenge",
+    "data-plane",
+    "measured",
+    "measured-spatial",
+    "physiology",
+    "revalidation",
+    "spatial-registration",
+    "workspace"
+  ],
+  "prior_release": {
+    "repository": "biochemical-inference",
+    "commit": "5e8b108e99fbab317da658051af4e518dbc15b83"
+  },
+  "sqlite_user_versions": {
+    "challenge": 2,
+    "data-plane": 2,
+    "measured": 2,
+    "measured-spatial": 1,
+    "physiology": 1,
+    "revalidation": 4,
+    "spatial-registration": 2,
+    "workspace": 1
+  },
+  "sqlite_schema": {
+    "constraints": 540,
+    "indexes": 12,
+    "tables": 57,
+    "triggers": 74,
+    "sha256": "183d76764a876e8dc1035a64dfbfe721711a8ec90d854e4651e6c3ebdfa509f6"
+  }
+}

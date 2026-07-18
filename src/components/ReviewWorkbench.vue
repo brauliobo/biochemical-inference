@@ -206,6 +206,7 @@ section.review-panel(aria-labelledby="review-title")
       h2#review-title Review workbench
     span.status-chip(:class="state" aria-live="polite") {{ health ? `${health.assertions} assertions · ${health.events} events` : state }}
   p.review-intro Simulation output remains a separate derived-review workspace. Only accepted assertions appear in the reviewed-derived layer; source APAP records are immutable and never overwritten.
+  p.measurement-note No eligible verified parameter measurement is available in the current synthetic parameter release. APAP protocol records are lineage inputs, not measurement-comparison inputs.
   .alert.error(v-if="state === 'failed'" role="alert")
     p {{ message }}
     button.secondary(type="button" @click="refresh()") Retry derived workspace

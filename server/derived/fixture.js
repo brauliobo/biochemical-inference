@@ -49,7 +49,7 @@ function nextState(state, event, assertions) {
   }
 }
 
-export function createDerivedFixtureClient() {
+export function createDerivedFixtureClient({ verifiedMeasurements = [] } = {}) {
   const bundles = new Map()
   const assertions = new Map()
   const apap = createApapFixtureClient()
@@ -156,17 +156,25 @@ export function createDerivedFixtureClient() {
       const request = MeasurementComparisonRequestSchema.parse(input)
       const item = assertions.get(request.assertion_digest)
       if (!item || item.state.review_status !== 'accepted') throw new Error('measurement comparison requires an accepted assertion')
-      const unitCompatible = canonicalJson(item.assertion.unit.dimension) === canonicalJson(request.measurement.unit.dimension)
-      const contextCompatible = canonicalJson(item.assertion.context) === canonicalJson(request.measurement.context)
+      const verified = verifiedMeasurements.find((candidate) => canonicalJson(candidate.record) === canonicalJson(request.measurement.record))
+      if (!verified) {
+        const error = new Error('No eligible verified parameter measurement is available for this derived assertion; APAP protocol records are not measurements.')
+        Object.assign(error, { name: 'DerivedFixtureMeasurementError', statusCode: 409, code: 'DERIVED_NO_ELIGIBLE_MEASUREMENT' })
+        throw error
+      }
+      if (!verified.parameter_ids.includes(item.assertion.subject_id)) throw new Error('measurement dataset does not measure the derived assertion subject')
+      if (request.measurement.value !== verified.value || canonicalJson(request.measurement.unit) !== canonicalJson(verified.unit) || canonicalJson(request.measurement.context) !== canonicalJson(verified.context)) throw new Error('caller measurement does not match the verified parameter observation')
+      const unitCompatible = canonicalJson(item.assertion.unit.dimension) === canonicalJson(verified.unit.dimension)
+      const contextCompatible = canonicalJson(item.assertion.context) === canonicalJson(verified.context)
       const derived = item.assertion.value.kind === 'scalar' ? item.assertion.value.value * item.assertion.unit.scale_to_si : null
-      const measured = request.measurement.value * request.measurement.unit.scale_to_si
+      const measured = verified.value * verified.unit.scale_to_si
       return MeasurementComparisonResponseSchema.parse({
         assertion_digest: request.assertion_digest,
-        measurement_record: request.measurement.record,
+        measurement: { record: verified.record, value: verified.value, unit: verified.unit, context: verified.context, trust: verified.trust },
         unit_compatible: unitCompatible,
         context_compatible: contextCompatible,
         comparable: unitCompatible && contextCompatible,
-        comparison: unitCompatible && contextCompatible && derived !== null ? { derived_si: derived, measurement_si: measured, absolute_difference_si: measured - derived, relative_difference: derived === 0 ? null : (measured - derived) / Math.abs(derived) } : null,
+        comparison: unitCompatible && contextCompatible && derived !== null ? { derived_si: derived, measurement_si: measured, absolute_difference_si: Math.abs(measured - derived), relative_difference: derived === 0 ? null : (measured - derived) / Math.abs(derived) } : null,
         automatically_invalidated: false
       })
     }

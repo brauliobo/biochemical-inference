@@ -13,7 +13,7 @@ async function collect(directory) {
   }
 }
 
-for (const directory of ['server', 'shared', 'src', 'tests']) await collect(directory)
+for (const directory of ['scripts', 'server', 'shared', 'src', 'tests']) await collect(directory)
 
 for (const file of files.sort()) {
   const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' })

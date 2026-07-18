@@ -1,0 +1,161 @@
+name: Operational hardening
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CI: "1"
+      VITEST_MAX_THREADS: "1"
+      VITEST_MAX_WORKERS: "1"
+    steps:
+      - name: Check out inference candidate
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          path: biochemical-inference
+          persist-credentials: false
+      - name: Check out database candidate
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          repository: ${{ github.repository_owner }}/biochemical-db
+          ref: ${{ vars.BIOCHEMICAL_DB_OPERATIONS_REF }}
+          path: biochemical-db
+          persist-credentials: false
+      - name: Verify immutable database companion
+        env:
+          SIBLING_REF: ${{ vars.BIOCHEMICAL_DB_OPERATIONS_REF }}
+        working-directory: biochemical-db
+        run: test "${#SIBLING_REF}" -eq 40 && test -z "${SIBLING_REF//[0-9a-f]/}" && test "$(git rev-parse HEAD)" = "$SIBLING_REF"
+      - name: Check out pinned inference prior release
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          path: prior/biochemical-inference
+          ref: 5e8b108e99fbab317da658051af4e518dbc15b83
+          persist-credentials: false
+      - name: Check out pinned database prior release
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          repository: ${{ github.repository_owner }}/biochemical-db
+          path: prior/biochemical-db
+          ref: ca3153802bbc72e897f70c697256fa40283d3a28
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.23.1
+          cache: npm
+          cache-dependency-path: |
+            biochemical-inference/package-lock.json
+            biochemical-db/service-js/package-lock.json
+            prior/biochemical-inference/package-lock.json
+            prior/biochemical-db/service-js/package-lock.json
+      - name: Clean installs
+        run: |
+          nice -n 10 npm --prefix biochemical-db/service-js ci --no-audit --no-fund
+          nice -n 10 npm --prefix biochemical-inference ci --no-audit --no-fund
+          nice -n 10 npm --prefix prior/biochemical-db/service-js ci --no-audit --no-fund
+          nice -n 10 npm --prefix prior/biochemical-inference ci --no-audit --no-fund
+      - name: Focused operational tests
+        run: |
+          nice -n 10 npm --prefix biochemical-db/service-js run test:selection
+          nice -n 10 npm --prefix biochemical-inference run test:selection
+          nice -n 10 npm --prefix biochemical-db/service-js run test:ops
+          nice -n 10 npm --prefix biochemical-inference run test:ops
+          nice -n 10 npm --prefix biochemical-db/service-js run check
+          nice -n 10 npm --prefix biochemical-inference run check:syntax
+      - name: Slow database actual-runtime acceptance
+        run: |
+          timeout --signal=TERM --kill-after=30s 8m nice -n 10 npm --prefix biochemical-db/service-js run test:ops:acceptance
+          timeout --signal=TERM --kill-after=30s 2m nice -n 10 npm --prefix biochemical-inference run test:ops:acceptance
+      - name: Build candidate and pinned prior binaries
+        run: |
+          nice -n 10 npm --prefix biochemical-db/service-js run build
+          nice -n 10 npm --prefix biochemical-inference run build
+          nice -n 10 npm --prefix prior/biochemical-db/service-js run build
+          nice -n 10 npm --prefix prior/biochemical-inference run build
+      - name: Build runnable candidate and prior deployment archives
+        run: |
+          DATABASE_COMMIT=$(git -C biochemical-db rev-parse 'HEAD^{commit}')
+          INFERENCE_COMMIT=$(git -C biochemical-inference rev-parse 'HEAD^{commit}')
+          nice -n 10 node biochemical-inference/scripts/deployment-archive.js --kind database --service-root biochemical-db/service-js --commit "$DATABASE_COMMIT" --output "$RUNNER_TEMP/database-deployment.tar"
+          nice -n 10 node biochemical-inference/scripts/deployment-archive.js --kind inference --source-root biochemical-inference --commit "$INFERENCE_COMMIT" --output "$RUNNER_TEMP/inference-deployment.tar"
+          nice -n 10 node biochemical-inference/scripts/deployment-archive.js --kind database --service-root prior/biochemical-db/service-js --commit ca3153802bbc72e897f70c697256fa40283d3a28 --output "$RUNNER_TEMP/prior-database-deployment.tar"
+          nice -n 10 node biochemical-inference/scripts/deployment-archive.js --kind inference --source-root prior/biochemical-inference --commit 5e8b108e99fbab317da658051af4e518dbc15b83 --output "$RUNNER_TEMP/prior-inference-deployment.tar"
+          mkdir -p "$RUNNER_TEMP/deployments/candidate" "$RUNNER_TEMP/deployments/prior"
+          tar -xf "$RUNNER_TEMP/database-deployment.tar" -C "$RUNNER_TEMP/deployments/candidate"
+          tar -xf "$RUNNER_TEMP/inference-deployment.tar" -C "$RUNNER_TEMP/deployments/candidate"
+          tar -xf "$RUNNER_TEMP/prior-database-deployment.tar" -C "$RUNNER_TEMP/deployments/prior"
+          tar -xf "$RUNNER_TEMP/prior-inference-deployment.tar" -C "$RUNNER_TEMP/deployments/prior"
+      - name: Capture exact cross-repository build context
+        run: |
+          nice -n 10 node biochemical-inference/scripts/operations/provenance-context.js "$RUNNER_TEMP/provenance-context.json" --inference-repo biochemical-inference --database-repo biochemical-db --inference-commit "$(git -C biochemical-inference rev-parse 'HEAD^{commit}')" --database-commit "$(git -C biochemical-db rev-parse 'HEAD^{commit}')"
+      - name: Deterministic offline supply-chain verification
+        run: |
+          nice -n 10 npm --prefix biochemical-db/service-js run supply-chain:generate -- "$RUNNER_TEMP/database-attestations-a" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 npm --prefix biochemical-db/service-js run supply-chain:generate -- "$RUNNER_TEMP/database-attestations-b" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 diff -r "$RUNNER_TEMP/database-attestations-a" "$RUNNER_TEMP/database-attestations-b"
+          nice -n 10 npm --prefix biochemical-db/service-js run supply-chain:verify -- "$RUNNER_TEMP/database-attestations-a" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 npm --prefix biochemical-inference run supply-chain:generate -- "$RUNNER_TEMP/inference-attestations-a" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 npm --prefix biochemical-inference run supply-chain:generate -- "$RUNNER_TEMP/inference-attestations-b" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 diff -r "$RUNNER_TEMP/inference-attestations-a" "$RUNNER_TEMP/inference-attestations-b"
+          nice -n 10 npm --prefix biochemical-inference run supply-chain:verify -- "$RUNNER_TEMP/inference-attestations-a" --context "$RUNNER_TEMP/provenance-context.json"
+          nice -n 10 tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf "$RUNNER_TEMP/database-build.tar" -C biochemical-db/service-js dist
+          nice -n 10 tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf "$RUNNER_TEMP/inference-build.tar" -C biochemical-inference dist server-dist
+          nice -n 10 tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf "$RUNNER_TEMP/database-evidence.tar" -C "$RUNNER_TEMP/database-attestations-a" .
+          nice -n 10 tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf "$RUNNER_TEMP/inference-evidence.tar" -C "$RUNNER_TEMP/inference-attestations-a" .
+      - name: Slow actual-process archive restart, candidate migration, and old-binary rollback
+        working-directory: biochemical-inference
+        run: |
+          timeout --signal=TERM --kill-after=30s 20m nice -n 10 node scripts/operations.js init --database-repo ../biochemical-db --runtime-root "$RUNNER_TEMP/biochemical-runtime" --origin https://biochemical.invalid --inference-host 127.0.0.1 --inference-port 3000 --database-host 127.0.0.1 --database-port 8000
+          timeout --signal=TERM --kill-after=30s 10m nice -n 10 node scripts/operations.js smoke --runtime-root "$RUNNER_TEMP/biochemical-runtime"
+          timeout --signal=TERM --kill-after=30s 10m nice -n 10 node scripts/operations.js backup --runtime-root "$RUNNER_TEMP/biochemical-runtime" --destination "$RUNNER_TEMP/biochemical-backup"
+          timeout --signal=TERM --kill-after=30s 10m nice -n 10 node scripts/operations.js verify-backup --runtime-root "$RUNNER_TEMP/biochemical-runtime" --backup "$RUNNER_TEMP/biochemical-backup"
+          timeout --signal=TERM --kill-after=30s 20m nice -n 10 node scripts/operations.js dr-test --runtime-root "$RUNNER_TEMP/biochemical-runtime" --backup "$RUNNER_TEMP/biochemical-backup" --target "$RUNNER_TEMP/biochemical-dr" --candidate-inference-repo "$RUNNER_TEMP/deployments/candidate/biochemical-inference" --candidate-database-repo "$RUNNER_TEMP/deployments/candidate/biochemical-db" --candidate-inference-commit "$(git rev-parse 'HEAD^{commit}')" --candidate-database-commit "$(git -C ../biochemical-db rev-parse 'HEAD^{commit}')" --prior-inference-repo "$RUNNER_TEMP/deployments/prior/biochemical-inference" --prior-database-repo "$RUNNER_TEMP/deployments/prior/biochemical-db"
+      - name: Sign uploaded cross-repository provenance
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
+        with:
+          subject-path: |
+            ${{ runner.temp }}/provenance-context.json
+            ${{ runner.temp }}/database-build.tar
+            ${{ runner.temp }}/inference-build.tar
+            ${{ runner.temp }}/database-evidence.tar
+            ${{ runner.temp }}/inference-evidence.tar
+            ${{ runner.temp }}/database-deployment.tar
+            ${{ runner.temp }}/inference-deployment.tar
+            ${{ runner.temp }}/prior-database-deployment.tar
+            ${{ runner.temp }}/prior-inference-deployment.tar
+            ${{ runner.temp }}/database-deployment.tar.owner.json
+            ${{ runner.temp }}/inference-deployment.tar.owner.json
+            ${{ runner.temp }}/prior-database-deployment.tar.owner.json
+            ${{ runner.temp }}/prior-inference-deployment.tar.owner.json
+      - name: Upload operational evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: signed-cross-repository-operational-evidence
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            ${{ runner.temp }}/provenance-context.json
+            ${{ runner.temp }}/database-attestations-a
+            ${{ runner.temp }}/inference-attestations-a
+            ${{ runner.temp }}/database-build.tar
+            ${{ runner.temp }}/inference-build.tar
+            ${{ runner.temp }}/database-evidence.tar
+            ${{ runner.temp }}/inference-evidence.tar
+            ${{ runner.temp }}/database-deployment.tar
+            ${{ runner.temp }}/inference-deployment.tar
+            ${{ runner.temp }}/prior-database-deployment.tar
+            ${{ runner.temp }}/prior-inference-deployment.tar
+            ${{ runner.temp }}/database-deployment.tar.owner.json
+            ${{ runner.temp }}/inference-deployment.tar.owner.json
+            ${{ runner.temp }}/prior-database-deployment.tar.owner.json
+            ${{ runner.temp }}/prior-inference-deployment.tar.owner.json

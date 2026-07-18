@@ -34,10 +34,11 @@ export function createApapClient(env = process.env) {
   if (releaseId !== APAP_RELEASE_ID) throw new ApapCompatibilityError(`Only ${APAP_RELEASE_ID} is supported`)
   if (expectedDigest !== APAP_RELEASE_DIGEST) throw new ApapCompatibilityError(`Configured APAP digest must equal the trusted ${APAP_RELEASE_ID} digest`)
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new ApapCompatibilityError('BIOCHEMICAL_APAP_TIMEOUT_MS must be positive')
+  const requestSignal = (signal) => signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
 
-  async function fetchJson(path) {
+  async function fetchJson(path, signal) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: requestSignal(signal) })
       const payload = await response.json().catch(() => null)
       if (!response.ok) {
         const statusCode = response.status >= 400 && response.status < 500 ? response.status : 503
@@ -57,17 +58,17 @@ export function createApapClient(env = process.env) {
     return payload
   }
 
-  async function catalog() {
-    const parsed = UpstreamApapCatalogSchema.safeParse(await fetchJson('/api/benchmarks/apap/v1/releases'))
+  async function catalog(signal) {
+    const parsed = UpstreamApapCatalogSchema.safeParse(await fetchJson('/api/benchmarks/apap/v1/releases', signal))
     if (!parsed.success) throw new ApapCompatibilityError('APAP release catalog schema is incompatible with 1.0.0')
     const release = parsed.data.releases.find((item) => item.release_id === releaseId)
     if (!release || release.release_digest !== expectedDigest) throw new ApapCompatibilityError(`APAP release ${releaseId} and its trusted digest were not returned`)
     return parsed.data
   }
 
-  async function verified(path, schema, description) {
-    await catalog()
-    const parsed = schema.safeParse(await fetchJson(`/api/benchmarks/apap/v1/releases/${encodeURIComponent(releaseId)}${path}`))
+  async function verified(path, schema, description, signal) {
+    await catalog(signal)
+    const parsed = schema.safeParse(await fetchJson(`/api/benchmarks/apap/v1/releases/${encodeURIComponent(releaseId)}${path}`, signal))
     if (!parsed.success) throw new ApapCompatibilityError(`APAP ${description} schema is incompatible with 1.0.0`)
     return verifyEnvelope(parsed.data, description)
   }
@@ -79,7 +80,7 @@ export function createApapClient(env = process.env) {
   return {
     catalog,
     detail,
-    async contexts() { return verified('/contexts', UpstreamApapContextsSchema, 'contexts') },
+    async contexts(signal) { return verified('/contexts', UpstreamApapContextsSchema, 'contexts', signal) },
     async parameters() { return verified('/parameters', UpstreamApapParametersSchema, 'parameters') },
     async protocols() { return verified('/protocols', UpstreamApapProtocolsSchema, 'protocols') },
     async observations() { return verified('/observations', UpstreamApapObservationsSchema, 'observations') },

@@ -58,6 +58,7 @@ test('synchronizes, paginates, inspects lineage, isolates calibration, then expl
   await expect(values).toContainText('2.700 mmol/g')
   await expect(values).toContainText('Labels remain external-held-out')
   const firstDisclosureTime = (await values.getByText(/Immutable disclosure receipt/).textContent()).match(/[0-9]{4}-[^.]+Z/)[0]
+  await page.reload()
   const retry = await page.evaluate(async (request) => {
     const response = await fetch('/api/v10/measured/evaluation', {
       method: 'POST',

@@ -107,9 +107,11 @@ export function createKnowledgeClient(env = process.env) {
   if (!/^[a-f0-9]{64}$/.test(atlasExpectedDigest)) throw new KnowledgeCompatibilityError('BIOCHEMICAL_DB_ATLAS_EXPECTED_DIGEST must be a lowercase SHA-256 digest without a prefix')
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new KnowledgeCompatibilityError('BIOCHEMICAL_DB_TIMEOUT_MS must be a positive number')
 
-  async function fetchJson(path) {
+  const requestSignal = (signal) => signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
+
+  async function fetchJson(path, signal) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: requestSignal(signal) })
       if (!response.ok) throw new Error(`biochemical-db returned ${response.status} for ${path}`)
       return response.json()
     } catch (error) {
@@ -121,9 +123,9 @@ export function createKnowledgeClient(env = process.env) {
     }
   }
 
-  async function fetchCanonicalJson(path) {
+  async function fetchCanonicalJson(path, signal) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) })
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, signal: requestSignal(signal) })
       if (!response.ok) throw new Error(`biochemical-db returned ${response.status} for ${path}`)
       const text = await response.text()
       const payload = JSON.parse(text)
@@ -136,8 +138,8 @@ export function createKnowledgeClient(env = process.env) {
     }
   }
 
-  async function verifiedRelease() {
-    const payload = await fetchJson('/api/v1/releases')
+  async function verifiedRelease(signal) {
+    const payload = await fetchJson('/api/v1/releases', signal)
     const parsed = BiochemicalDbCatalogSchema.safeParse(payload)
     if (!parsed.success) throw new KnowledgeCompatibilityError('biochemical-db release schema is incompatible with 1.0.0')
     const entry = parsed.data.releases.find((candidate) => candidate.release_id === releaseId)
@@ -146,8 +148,8 @@ export function createKnowledgeClient(env = process.env) {
     return adaptCatalogEntry(entry)
   }
 
-  async function verifiedAtlasRelease() {
-    const payload = await fetchJson('/api/v2/releases')
+  async function verifiedAtlasRelease(signal) {
+    const payload = await fetchJson('/api/v2/releases', signal)
     const parsed = BiochemicalDbAtlasCatalogSchema.safeParse(payload)
     if (!parsed.success) throw new KnowledgeCompatibilityError('biochemical-db atlas catalog schema is incompatible with 2.0.0')
     const entry = parsed.data.releases.find((candidate) => candidate.release_id === atlasReleaseId)
@@ -182,7 +184,7 @@ export function createKnowledgeClient(env = process.env) {
   }
 
   return {
-    async releases() { return [await verifiedRelease()] },
+    async releases(signal) { return [await verifiedRelease(signal)] },
     async snapshot(taxonId) {
       const release = await verifiedRelease()
       const upstreamTaxonId = canonicalTaxonId(taxonId)
@@ -226,7 +228,7 @@ export function createKnowledgeClient(env = process.env) {
       }
       return adaptNetwork(parsed.data)
     },
-    async atlasReleases() { return [await verifiedAtlasRelease()] },
+    async atlasReleases(signal) { return [await verifiedAtlasRelease(signal)] },
     async atlasRelease(requestedReleaseId) {
       const release = await verifiedAtlasRelease()
       if (requestedReleaseId !== atlasReleaseId) throw new KnowledgeCompatibilityError(`Only pinned atlas release ${atlasReleaseId} is available`)

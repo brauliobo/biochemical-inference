@@ -1,0 +1,65 @@
+name: Goal 15 cross-repository revalidation
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+env:
+  GOAL15_REVALIDATION_CONTRACT: "1.0.0"
+
+jobs:
+  consumer-and-http-acceptance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Check out inference
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          path: biochemical-inference
+          persist-credentials: false
+      - name: Require immutable producer revision pin
+        env:
+          PRODUCER_REF: ${{ vars.BIOCHEMICAL_DB_GOAL15_REF }}
+        run: test "${#PRODUCER_REF}" -eq 40 && test -z "${PRODUCER_REF//[0-9a-f]/}"
+      - name: Check out producer
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          repository: ${{ github.repository_owner }}/biochemical-db
+          ref: ${{ vars.BIOCHEMICAL_DB_GOAL15_REF }}
+          path: biochemical-db
+          persist-credentials: false
+      - name: Verify exact producer checkout
+        env:
+          PRODUCER_REF: ${{ vars.BIOCHEMICAL_DB_GOAL15_REF }}
+        working-directory: biochemical-db
+        run: test "$(git rev-parse HEAD)" = "$PRODUCER_REF"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.23.1
+          cache: npm
+          cache-dependency-path: |
+            biochemical-inference/package-lock.json
+            biochemical-db/service-js/package-lock.json
+      - run: nice -n 10 npm --prefix biochemical-db/service-js ci --no-audit --no-fund
+      - run: nice -n 10 npm --prefix biochemical-inference ci --no-audit --no-fund
+      - name: Verify complete inference routine selection
+        working-directory: biochemical-inference
+        run: timeout --signal=TERM --kill-after=30s 20m nice -n 10 npm run test:routine
+      - name: Verify complete inference node acceptance
+        working-directory: biochemical-inference
+        env:
+          GOAL15_ACCEPTANCE_TMPDIR: /dev/shm
+          TMPDIR: ${{ runner.temp }}
+        run: timeout --signal=TERM --kill-after=30s 20m nice -n 10 npm run test:acceptance:node
+      - run: nice -n 10 npm --prefix biochemical-inference run check:syntax
+      - run: nice -n 10 npm --prefix biochemical-inference run build
+      - name: Install Chromium
+        working-directory: biochemical-inference
+        run: nice -n 10 npx playwright install --with-deps chromium
+      - name: Verify production-built desktop and mobile campaign flow
+        working-directory: biochemical-inference
+        run: timeout --signal=TERM --kill-after=30s 22m nice -n 10 npm run test:acceptance:e2e:built -- tests/e2e/revalidation.spec.js

@@ -75,8 +75,7 @@ describe('reviewed-derived API v6', () => {
           record: { type: 'record', family: 'apap', release_id: APAP_RELEASE_ID, release_digest: sourceRecord.release_digest, collection: 'protocols', record_id: sourceRecord.record.id, digest: sourceRecord.record_digest },
           value: assertion.value.value,
           unit: assertion.unit,
-          context: assertion.context,
-          uncertainty: assertion.uncertainty
+          context: assertion.context
         }
       }
     })
@@ -86,13 +85,35 @@ describe('reviewed-derived API v6', () => {
 
     expect(detail.json().assertion.dependencies.map((item) => item.type)).toEqual(['release', 'model', 'artifact', 'artifact'])
     expect(accepted.json().state.review_status).toBe('accepted')
-    expect(comparison.json()).toMatchObject({ comparable: true, unit_compatible: true, context_compatible: true, automatically_invalidated: false })
+    expect(comparison.statusCode).toBe(409)
+    expect(comparison.json()).toMatchObject({ code: 'DERIVED_NO_ELIGIBLE_MEASUREMENT' })
+    expect(comparison.headers['cache-control']).toBe('no-store')
     expect(reproduced.json().state.reproduction_verified).toBe(true)
     expect(history.json().items.map((item) => item.action)).toEqual(['accepted', 'reproduction-verified'])
     expect(history.json().items[1].previous_event_digest).toBe(history.json().items[0].event_digest)
     expect(sourceAfter.json().source).toEqual(sourceBefore.json().source)
     expect(sourceAfter.json()['reviewed-derived']).toHaveLength(1)
   }, 30_000)
+
+  it('compares only an injected verified parameter observation with the exact Python wire shape', async () => {
+    const submission = buildApapDerivedBundle(baseRecord)
+    const assertion = submission.bundle.assertions[0].assertion
+    const measurement = {
+      record: { type: 'record', family: 'parameters', release_id: 'parameters-verified-fixture-v1', release_digest: `sha256:${'9'.repeat(64)}`, collection: 'observations', record_id: 'OBSERVATION:VERIFIED', digest: `sha256:${'8'.repeat(64)}` },
+      value: assertion.value.value + 1,
+      unit: assertion.unit,
+      context: assertion.context,
+      parameter_ids: [assertion.subject_id],
+      trust: { eligibility: 'verified-measured-observation', data_origin: 'measured', source_id: 'VERIFIED_FIXTURE', source_class: 'trusted-external', evidence_locator_ids: ['EVIDENCE:VERIFIED'], evidence_class: 'measured' }
+    }
+    const derived = createDerivedFixtureClient({ verifiedMeasurements: [measurement] })
+    const submitted = await derived.submitBundle(submission); const assertionDigest = submitted.assertion_digests[0]
+    await derived.appendEvent(assertionDigest, { action: 'accepted', reviewer, reason: 'Accept verified comparison fixture.', related_assertion_digest: null, reproduction_artifact_digest: null })
+    const compared = await derived.compare({ assertion_digest: assertionDigest, measurement: { record: measurement.record, value: measurement.value, unit: measurement.unit, context: measurement.context } })
+    expect(compared.measurement).toMatchObject({ record: measurement.record, trust: measurement.trust })
+    expect(compared).not.toHaveProperty('measurement_record')
+    expect(compared.comparison.absolute_difference_si).toBeGreaterThanOrEqual(0)
+  })
 
   it('does not append reproduction verification when the canonical rerun differs', async () => {
     const derived = createDerivedFixtureClient()

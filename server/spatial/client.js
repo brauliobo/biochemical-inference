@@ -57,7 +57,8 @@ export function createSpatialClient(env = process.env) {
 
   async function request(path, options = {}) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: options.accept ?? 'application/json', ...options.headers }, redirect: 'error', signal: AbortSignal.timeout(timeoutMs) })
+      const signal = options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: options.accept ?? 'application/json', ...options.headers }, redirect: 'error', signal })
       if (!response.ok && !options.allowedStatuses?.includes(response.status)) {
         const statusCode = response.status >= 400 && response.status < 500 ? response.status : 503
         throw new SpatialCompatibilityError(`Spatial service returned ${response.status} for ${path}`, { statusCode, code: response.status === 404 ? 'SPATIAL_NOT_FOUND' : 'SPATIAL_UPSTREAM_ERROR' })
@@ -71,13 +72,13 @@ export function createSpatialClient(env = process.env) {
     }
   }
 
-  async function fetchJson(path) {
-    const response = await request(path)
+  async function fetchJson(path, signal) {
+    const response = await request(path, { signal })
     return response.json().catch(() => { throw new SpatialCompatibilityError(`Spatial service returned non-JSON metadata for ${path}`) })
   }
 
-  async function catalog() {
-    const parsed = SpatialCatalogSchema.safeParse(await fetchJson('/api/spatial/v1/releases'))
+  async function catalog(signal) {
+    const parsed = SpatialCatalogSchema.safeParse(await fetchJson('/api/spatial/v1/releases', signal))
     if (!parsed.success || parsed.data.releases[0]?.release_digest !== expectedDigest) throw new SpatialCompatibilityError('Spatial catalog does not contain the trusted release and digest')
     return parsed.data
   }
@@ -88,9 +89,9 @@ export function createSpatialClient(env = process.env) {
     return parsed.data
   }
 
-  async function detail() {
-    await catalog()
-    const parsed = SpatialDetailSchema.safeParse(await fetchJson(base))
+  async function detail(signal) {
+    await catalog(signal)
+    const parsed = SpatialDetailSchema.safeParse(await fetchJson(base, signal))
     const payload = verifyEnvelope(parsed, 'release detail')
     const digestPayload = { ...payload.manifest }
     delete digestPayload.release_digest
@@ -121,8 +122,8 @@ export function createSpatialClient(env = process.env) {
     },
     async assets(query = {}) { return verified(`/assets${queryString({ taxon_id: query.taxonId, structure_id: query.structureId, asset_type: query.assetType })}`, SpatialAssetsSchema, 'assets') },
     async descriptors(assetId) { return verified(`/descriptors${queryString({ asset_id: assetId })}`, SpatialDescriptorsSchema, 'descriptors') },
-    async mappings() {
-      const payload = await detail()
+    async mappings(signal) {
+      const payload = await detail(signal)
       return SpatialMappingsSchema.parse({ release: payload.release, items: payload.mappings })
     },
     inventory,

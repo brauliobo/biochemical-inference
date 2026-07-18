@@ -439,9 +439,12 @@ export async function createPhysiologyService(options = {}) {
     return result
   }
 
-  function coverage() {
+  function coverage(signal) {
+    signal?.throwIfAborted()
     const installed = new Set(listPackages().filter((item) => item.trust.status === 'trusted').map((item) => item.manifest.pluginId))
-    return { release: evidence.release, items: evidence.coverage.map((item) => ({ ...item, installed: item.plugin_id ? installed.has(item.plugin_id) : false })), warning: PHYSIOLOGY_WARNING }
+    const value = { release: evidence.release, items: evidence.coverage.map((item) => ({ ...item, installed: item.plugin_id ? installed.has(item.plugin_id) : false })), warning: PHYSIOLOGY_WARNING }
+    signal?.throwIfAborted()
+    return value
   }
 
   return {

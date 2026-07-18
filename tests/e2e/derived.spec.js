@@ -13,7 +13,8 @@ test('submits, accepts, reproduces, and inspects an APAP derived assertion witho
   expect((await submission).ok()).toBe(true)
   await expect(review.getByText('Claim')).toBeVisible()
   await expect(review.getByText('Source vs reviewed-derived')).toBeVisible()
-  await expect(review.getByText('Lineage')).toBeVisible()
+  await expect(review.getByText(/No eligible verified parameter measurement/)).toBeVisible()
+  await expect(review.getByRole('heading', { name: 'Lineage', exact: true })).toBeVisible()
   await expect(review.getByText('Full scientific context')).toBeVisible()
   await expect(review.getByText('Unsupported limitations')).toBeVisible()
 

@@ -14,7 +14,7 @@ import {
 } from '../../shared/evidence-contracts.js'
 import { createEvidenceFixtureClient, EVIDENCE_LICENSES } from './fixture.js'
 
-export const DEFAULT_EVIDENCE_URL = 'http://127.0.0.1:8001'
+export const DEFAULT_EVIDENCE_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_EVIDENCE_RELEASE_ID = 'mthfr-evidence-v1.0.0'
 export const DEFAULT_EVIDENCE_RELEASE_DIGEST = '93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701'
 
@@ -35,7 +35,7 @@ function upstreamErrorCode(payload, status) {
   const explicit = payload && typeof payload === 'object' && 'code' in payload && typeof payload.code === 'string' ? payload.code : ''
   if (explicit === 'EVIDENCE_MODEL_UNAVAILABLE' || explicit === 'MODEL_UNAVAILABLE') return 'EVIDENCE_MODEL_UNAVAILABLE'
   const detail = detailMessage(payload, '')
-  if (status === 503 && /^Ollama (?:model is not installed|request failed:)/.test(detail)) return 'EVIDENCE_MODEL_UNAVAILABLE'
+  if (status === 503 && /^Ollama (?:capability is unavailable in this runtime|model is not installed|request failed:)/.test(detail)) return 'EVIDENCE_MODEL_UNAVAILABLE'
   if (status === 404) return 'EVIDENCE_NOT_FOUND'
   return 'EVIDENCE_UPSTREAM_ERROR'
 }
@@ -43,19 +43,24 @@ function upstreamErrorCode(payload, status) {
 export function createEvidenceClient(env = process.env) {
   if (env.BIOCHEMICAL_EVIDENCE_USE_FIXTURE === 'true') return createEvidenceFixtureClient()
 
-  const baseUrl = (env.BIOCHEMICAL_EVIDENCE_URL ?? DEFAULT_EVIDENCE_URL).replace(/\/$/, '')
+  const baseUrl = (env.BIOCHEMICAL_EVIDENCE_URL ?? env.BIOCHEMICAL_DB_URL ?? DEFAULT_EVIDENCE_URL).replace(/\/$/, '')
   const releaseId = env.BIOCHEMICAL_EVIDENCE_RELEASE_ID ?? DEFAULT_EVIDENCE_RELEASE_ID
   const expectedDigest = env.BIOCHEMICAL_EVIDENCE_EXPECTED_DIGEST ?? DEFAULT_EVIDENCE_RELEASE_DIGEST
+  const healthPath = env.BIOCHEMICAL_EVIDENCE_HEALTH_PATH ?? '/api/evidence/v1/healthz'
+  const candidateOrigin = env.BIOCHEMICAL_EVIDENCE_ALLOWED_ORIGIN
+  const candidateCsrfToken = env.BIOCHEMICAL_EVIDENCE_CSRF_TOKEN
   const timeoutMs = Number(env.BIOCHEMICAL_EVIDENCE_TIMEOUT_MS ?? 10000)
   if (!/^[a-f0-9]{64}$/.test(expectedDigest)) throw new EvidenceCompatibilityError('BIOCHEMICAL_EVIDENCE_EXPECTED_DIGEST must be a lowercase SHA-256 digest')
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new EvidenceCompatibilityError('BIOCHEMICAL_EVIDENCE_TIMEOUT_MS must be a positive number')
+
+  const requestSignal = (signal) => signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
 
   async function fetchJson(path, init = {}) {
     try {
       const response = await fetch(`${baseUrl}${path}`, {
         ...init,
         headers: { accept: 'application/json', ...init.headers },
-        signal: AbortSignal.timeout(timeoutMs)
+        signal: requestSignal(init.signal)
       })
       const payload = await response.json().catch(() => null)
       if (!response.ok) {
@@ -77,8 +82,18 @@ export function createEvidenceClient(env = process.env) {
     return release
   }
 
-  async function health() {
-    const parsed = EvidenceHealthSchema.safeParse(await fetchJson('/healthz'))
+  function candidateHeaders() {
+    if (!candidateOrigin || !candidateCsrfToken) throw new EvidenceCompatibilityError('Evidence candidate access is disabled because no fixed origin and CSRF token are configured.', { statusCode: 503, code: 'EVIDENCE_CANDIDATE_WRITE_DISABLED' })
+    return { origin: candidateOrigin, 'x-csrf-token': candidateCsrfToken }
+  }
+
+  function verifyCandidate(candidate, description) {
+    if (candidate.release_id !== releaseId || candidate.release_digest !== expectedDigest) throw new EvidenceCompatibilityError(`Evidence ${description} candidate provenance does not match the pinned release ${releaseId} and digest`)
+    return candidate
+  }
+
+  async function health(signal) {
+    const parsed = EvidenceHealthSchema.safeParse(await fetchJson(healthPath, { signal }))
     if (!parsed.success) throw new EvidenceCompatibilityError('Evidence health schema is incompatible with 1.0.0')
     verifyRelease(parsed.data.release, 'health response')
     return parsed.data
@@ -114,16 +129,19 @@ export function createEvidenceClient(env = process.env) {
     async extract(input) {
       const request = EvidenceCandidateExtractionRequestSchema.parse(input)
       const { payload } = await verifiedPayload('/api/v1/candidates/extract', EvidenceCandidateResponseSchema, 'candidate extraction response', {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(request)
+        method: 'POST', headers: { 'content-type': 'application/json', ...candidateHeaders() }, body: JSON.stringify(request)
       })
+      verifyCandidate(payload.candidate, 'extraction response')
       return payload
     },
     async candidates() {
-      const { verified, payload } = await verifiedPayload('/api/v1/candidates', UpstreamEvidenceCandidateListResponseSchema, 'candidate list response')
+      const { verified, payload } = await verifiedPayload('/api/v1/candidates', UpstreamEvidenceCandidateListResponseSchema, 'candidate list response', { headers: candidateHeaders() })
+      payload.items.forEach((candidate) => verifyCandidate(candidate, 'list response'))
       return EvidenceCandidateListResponseSchema.parse({ release: verified.release, items: payload.items })
     },
     async candidate(identifier) {
-      const { verified, payload } = await verifiedPayload(`/api/v1/candidates/${encodeURIComponent(identifier)}`, UpstreamEvidenceCandidateResponseSchema, 'candidate detail response')
+      const { verified, payload } = await verifiedPayload(`/api/v1/candidates/${encodeURIComponent(identifier)}`, UpstreamEvidenceCandidateResponseSchema, 'candidate detail response', { headers: candidateHeaders() })
+      verifyCandidate(payload.candidate, 'detail response')
       return EvidenceCandidateResponseSchema.parse({ release: verified.release, candidate: payload.candidate })
     }
   }

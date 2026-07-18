@@ -1,0 +1,40 @@
+{
+  "selection_schema_version": "test-selection-closure-v1",
+  "test_root": "tests",
+  "categories": {
+    "routine": {
+      "rule": "Every *.test.js not selected by node_acceptance"
+    },
+    "node_acceptance": {
+      "files": [
+        "tests/acceptance/operations-process.test.js",
+        "tests/acceptance/operations-supervisor.test.js",
+        "tests/acceptance/revalidation-process.test.js",
+        "tests/revalidation/cross-repo-scale-http.test.js",
+        "tests/revalidation/planning-performance.test.js",
+        "tests/revalidation/scale-acceptance.test.js"
+      ]
+    },
+    "browser_e2e": {
+      "directory": "tests/e2e",
+      "suffix": ".spec.js"
+    },
+    "exclusions": []
+  },
+  "command_scripts": {
+    "routine": "test:routine",
+    "node_acceptance": "test:acceptance:node",
+    "browser_e2e": "test:acceptance:e2e"
+  },
+  "certification_workflow": ".github/workflows/certification.yml",
+  "certification_sibling": {
+    "repository": "biochemical-db",
+    "ref_variable": "BIOCHEMICAL_DB_CERTIFICATION_REF"
+  },
+  "workflow_actions": [
+    "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
+    "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+    "actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+  ]
+}

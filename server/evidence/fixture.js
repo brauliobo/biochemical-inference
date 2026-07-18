@@ -97,6 +97,8 @@ export function createEvidenceFixtureClient() {
       const candidate = {
         id: `CANDIDATE:${digest(seed).slice(0, 32)}`,
         status: 'unreviewed',
+        release_id: FIXTURE_EVIDENCE_RELEASE.id,
+        release_digest: FIXTURE_EVIDENCE_RELEASE.digest,
         document_id: request.document_id,
         span_ids: request.span_ids,
         model: 'fixture-generation-model',

@@ -115,6 +115,60 @@ import {
 import { MeasuredUpstreamError } from './measured/client.js'
 import { createMeasuredService, MeasuredRequestError } from './measured/service.js'
 import { MeasuredVerificationError } from './measured/verification.js'
+import {
+  CHALLENGE_CSRF_HEADER,
+  CHALLENGE_CSRF_VALUE,
+  CHALLENGE_REQUEST_BODY_LIMIT,
+  ChallengeArtifactParamSchema,
+  ChallengeCommitmentParamSchema,
+  ChallengeDisclosureIntentSchema,
+  ChallengeEmptyObjectSchema,
+  ChallengeFreezeIntentSchema,
+  ChallengeReportParamSchema,
+  ChallengeRunListQuerySchema
+} from '../shared/challenge-contracts.js'
+import { ChallengeUpstreamError } from './challenge/client.js'
+import { createChallengeService, ChallengeRequestError } from './challenge/service.js'
+import { ChallengeVerificationError } from './challenge/verification.js'
+import {
+  MEASURED_SPATIAL_CSRF_HEADER,
+  MEASURED_SPATIAL_CSRF_VALUE,
+  MEASURED_SPATIAL_PINS,
+  MeasuredSpatialChunkParamSchema,
+  MeasuredSpatialChunkQuerySchema,
+  MeasuredSpatialEmptySchema,
+  MeasuredSpatialRecordTypeSchema
+} from '../shared/measured-spatial-contracts.js'
+import { MeasuredSpatialUpstreamError } from './measured-spatial/client.js'
+import { createMeasuredSpatialService, MeasuredSpatialRequestError } from './measured-spatial/service.js'
+import { MeasuredSpatialVerificationError } from './measured-spatial/verification.js'
+import {
+  SPATIAL_REGISTRATION_CSRF_HEADER,
+  SPATIAL_REGISTRATION_CSRF_VALUE,
+  SPATIAL_REGISTRATION_PINS,
+  SPATIAL_REGISTRATION_RIGHTS_LINK,
+  SpatialRegistrationChunkParamSchema,
+  SpatialRegistrationChunkQuerySchema,
+  SpatialRegistrationEmptySchema,
+  SpatialRegistrationRecordTypeSchema,
+  SpatialRegistrationTransformRequestSchema
+} from '../shared/spatial-registration-contracts.js'
+import { SpatialRegistrationUpstreamError } from './spatial-registration/client.js'
+import { createSpatialRegistrationService, SpatialRegistrationRequestError } from './spatial-registration/service.js'
+import { SpatialRegistrationVerificationError } from './spatial-registration/verification.js'
+import {
+  REVALIDATION_CSRF_HEADER,
+  REVALIDATION_CSRF_VALUE,
+  RevalidationCampaignParamSchema,
+  RevalidationProjectionQuerySchema,
+  RevalidationSyncRequestSchema
+} from '../shared/revalidation-contracts.js'
+import {
+  createRevalidationIntegrationService,
+  RevalidationIntegrationError,
+  revalidationIntegrationError
+} from './revalidation/integration.js'
+import { createOperationalMetrics } from './operations/metrics.js'
 
 const AtlasCurieSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const OptionalAtlasTaxonSchema = z.preprocess((value) => value === undefined ? undefined : Number(value), TaxonIdSchema.optional())
@@ -190,6 +244,8 @@ const DataPlaneAuditParamSchema = z.object({ reportDigest: DataPlaneSha256Schema
 const MeasuredPageParamSchema = z.object({ recordType: MeasuredLocalRecordTypeSchema }).strict()
 const MeasuredLineageParamSchema = z.object({ measurementId: z.string().min(1).max(160) }).strict()
 const MeasuredArtifactParamSchema = z.object({ artifactDigest: MeasuredSha256Schema }).strict()
+const MeasuredSpatialRecordParamSchema = z.object({ recordType: MeasuredSpatialRecordTypeSchema }).strict()
+const RevalidationEmptySchema = z.object({}).strict()
 const SPATIAL_IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
 
 function fixedAllowedOrigins(env) {
@@ -217,10 +273,18 @@ function invalidAtlasQuery(reply, parsed) {
   })
 }
 
+export async function settleReadinessChecks(checks) {
+  const settled = await Promise.allSettled(checks)
+  const failure = settled.find((result) => result.status === 'rejected')
+  if (failure) throw failure.reason
+  return settled.map((result) => result.value)
+}
+
 export async function buildApp(options = {}) {
   const env = options.env ?? process.env
   const allowedOrigins = fixedAllowedOrigins(env)
   const app = Fastify({ bodyLimit: 1_048_576, logger: env.NODE_ENV !== 'test', routerOptions: { maxParamLength: 200 } })
+  const operations = createOperationalMetrics()
   const knowledge = options.knowledgeClient ?? createKnowledgeClient(env)
   const evidence = options.evidenceClient ?? createEvidenceClient(env)
   const parameters = options.parameterClient ?? createParameterClient(env)
@@ -251,11 +315,57 @@ export async function buildApp(options = {}) {
       BIOCHEMICAL_MEASURED_CSRF_TOKEN: env.BIOCHEMICAL_MEASURED_CSRF_TOKEN ?? 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
     } : env
   })
+  const challenge = options.challengeService ?? await createChallengeService({
+    env: process.env.VITEST ? {
+      ...env,
+      NODE_ENV: 'test',
+      BIOCHEMICAL_CHALLENGE_ALLOWED_ORIGIN: env.BIOCHEMICAL_CHALLENGE_ALLOWED_ORIGIN ?? 'http://127.0.0.1:5173',
+      BIOCHEMICAL_CHALLENGE_CSRF_TOKEN: env.BIOCHEMICAL_CHALLENGE_CSRF_TOKEN ?? 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+    } : env
+  })
+  const measuredSpatial = options.measuredSpatialService ?? await createMeasuredSpatialService({
+    env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env
+  })
+  const spatialRegistration = options.spatialRegistrationService ?? await createSpatialRegistrationService({
+    env: process.env.VITEST ? { ...env, NODE_ENV: 'test' } : env
+  })
+  const revalidation = Object.hasOwn(options, 'revalidationService')
+    ? options.revalidationService
+    : env.BIOCHEMICAL_REVALIDATION_URL ? await createRevalidationIntegrationService({ env }) : null
   app.addHook('onClose', async () => {
-    await Promise.allSettled([workspace.close?.(), physiology.close?.(), dataPlane.close?.(), measured.close?.()])
+    await Promise.allSettled([workspace.close?.(), physiology.close?.(), dataPlane.close?.(), measured.close?.(), challenge.close?.(), measuredSpatial.close?.(), spatialRegistration.close?.(), revalidation?.close?.()])
   })
   await app.register(cors, {
     origin: (origin, callback) => callback(null, !origin || allowedOrigins.has(origin))
+  })
+  app.addHook('onRequest', async () => { operations.requestStarted() })
+  app.addHook('onResponse', async (_request, reply) => { operations.requestFinished(reply.statusCode) })
+  app.addHook('onSend', async (request, reply, payload) => {
+    if (reply.getHeader('content-type')?.toString().startsWith('text/html')) {
+      if (!reply.hasHeader('content-security-policy')) reply.header('content-security-policy', "frame-ancestors 'none'")
+      reply.header('x-frame-options', 'DENY')
+    }
+    if (request.url.startsWith('/api/v6/derived')) {
+      reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' })
+      reply.removeHeader('etag')
+    }
+    if (request.url.startsWith('/api/v11/challenge')) {
+      reply.headers({ 'cache-control': 'private, no-store', pragma: 'no-cache' })
+      reply.removeHeader('etag')
+    }
+    if (request.url.startsWith('/api/v12/measured-spatial') && reply.statusCode >= 400) {
+      reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' })
+      reply.removeHeader('etag')
+    }
+    if (request.url.startsWith('/api/v14/spatial-registration') && reply.statusCode >= 400) {
+      reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' })
+      reply.removeHeader('etag')
+    }
+    if (request.url.startsWith('/api/v13/revalidation')) {
+      reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' })
+      reply.removeHeader('etag')
+    }
+    return payload
   })
 
   const requireFixedOrigin = (request, csrfHeader, csrfValue) => allowedOrigins.has(request.headers.origin) && request.headers[csrfHeader] === csrfValue
@@ -265,7 +375,7 @@ export async function buildApp(options = {}) {
       return reply.status(409).send({ statusCode: 409, code: 'KNOWLEDGE_INCOMPATIBLE', error: 'Conflict', message: error.message })
     }
     if (error instanceof EvidenceCompatibilityError) {
-      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof ParameterCompatibilityError || error instanceof ParameterSelectionError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
@@ -280,7 +390,7 @@ export async function buildApp(options = {}) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof DerivedCompatibilityError || error instanceof DerivedRequestError) {
-      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
     }
     if (error instanceof WorkspaceRequestError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
@@ -293,6 +403,19 @@ export async function buildApp(options = {}) {
     }
     if (error instanceof MeasuredRequestError || error instanceof MeasuredUpstreamError || error instanceof MeasuredVerificationError) {
       return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof ChallengeRequestError || error instanceof ChallengeUpstreamError || error instanceof ChallengeVerificationError) {
+      return reply.status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof MeasuredSpatialRequestError || error instanceof MeasuredSpatialUpstreamError || error instanceof MeasuredSpatialVerificationError) {
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof SpatialRegistrationRequestError || error instanceof SpatialRegistrationUpstreamError || error instanceof SpatialRegistrationVerificationError) {
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(error.statusCode).send({ statusCode: error.statusCode, code: error.code, error: error.name, message: error.message })
+    }
+    if (error instanceof RevalidationIntegrationError || error.name === 'RevalidationProducerError' || error.name === 'RevalidationEngineError') {
+      const selected = revalidationIntegrationError(error)
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(selected.statusCode).send({ statusCode: selected.statusCode, code: selected.code, error: selected.name, message: selected.message })
     }
     if (error instanceof DOMException && error.name === 'AbortError') {
       return reply.status(409).send({ statusCode: 409, code: 'DATA_PLANE_SYNC_SUPERSEDED', error: 'Conflict', message: error.message })
@@ -320,13 +443,55 @@ export async function buildApp(options = {}) {
   })
 
   app.get('/api/v1/health', async () => ({ status: 'ok', modelVersion: MODEL.version }))
+  const optionalUninitialized = new Set((env.BIOCHEMICAL_OPTIONAL_UNINITIALIZED_DOMAINS ?? '').split(',').filter(Boolean))
+  const requireReadyResult = (label, value) => {
+    if (value?.status === 'failed' || value?.integrity === 'failed') throw new Error(`${label} is not ready`)
+    const counters = value && !Array.isArray(value) && typeof value === 'object'
+      ? Object.entries(value).filter(([name, selected]) => ['artifacts', 'bundles', 'cachedChunks', 'commitments', 'disclosures', 'objects', 'records', 'releases'].includes(name) && Number.isInteger(selected))
+      : []
+    const uninitialized = ['empty', 'not-configured', 'uninitialized'].includes(value?.status) || (Array.isArray(value) && value.length === 0) || (value?.status === 'valid' && counters.length > 0 && counters.every(([, selected]) => selected === 0))
+    if (uninitialized && !optionalUninitialized.has(label)) throw new Error(`${label} has no configured domain state`)
+    return uninitialized ? 'uninitialized' : 'configured'
+  }
+  const readiness = async (signal) => {
+    signal?.throwIfAborted()
+    const results = await settleReadinessChecks([
+      knowledge.releases(signal),
+      knowledge.atlasReleases(signal),
+      evidence.health(signal),
+      parameters.contexts(signal),
+      apap.contexts(signal),
+      spatial.mappings(signal),
+      derived.health(signal),
+      physiologyEvidence.contexts(signal),
+      Promise.resolve(workspace.listResourceProfiles(signal)),
+      Promise.resolve(physiology.coverage(signal)),
+      dataPlane.integrity(signal),
+      measured.integrity(signal),
+      challenge.integrity(signal),
+      measuredSpatial.integrity(signal),
+      spatialRegistration.integrity(signal),
+      revalidation?.integrity(signal) ?? Promise.resolve({ status: 'not-configured' })
+    ])
+    signal?.throwIfAborted()
+    const labels = ['core', 'atlas', 'evidence', 'parameters', 'apap', 'spatial', 'derived', 'physiology-evidence', 'workspace', 'physiology', 'data-plane', 'measured', 'challenge', 'measured-spatial', 'spatial-registration', 'revalidation']
+    const domains = Object.fromEntries(results.map((value, index) => [labels[index], requireReadyResult(labels[index], value)]))
+    return { domains, releases: results[0] }
+  }
+  app.get('/ops/readyz', async (_request, reply) => {
+    try {
+      return await operations.readiness(readiness)
+    } catch {
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(503).send({ statusCode: 503, code: 'NOT_READY', error: 'Service Unavailable', message: 'Runtime is not ready.' })
+    }
+  })
+  app.get('/metrics', async (_request, reply) => reply.header('cache-control', 'no-store').type('text/plain; version=0.0.4').send(operations.prometheus()))
   app.get('/api/v1/ready', async (_request, reply) => {
     try {
-      const releases = await knowledge.releases()
-      return { status: 'ready', release: releases[0] }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Pinned biochemical knowledge is unavailable'
-      return reply.status(503).send({ statusCode: 503, code: 'KNOWLEDGE_NOT_READY', error: 'Service Unavailable', message })
+      const result = await readiness()
+      return { status: 'ready', release: result.releases[0], domains: result.domains }
+    } catch {
+      return reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(503).send({ statusCode: 503, code: 'KNOWLEDGE_NOT_READY', error: 'Service Unavailable', message: 'Runtime is not ready.' })
     }
   })
   app.get('/api/v1/releases', async () => knowledge.releases())
@@ -1008,6 +1173,290 @@ export async function buildApp(options = {}) {
     if (!parsed.success) return invalidMeasured(reply, parsed)
     return measured.disclose(parsed.data, request.raw.signal)
   })
+  const invalidChallenge = (reply, parsed) => reply.status(422).send({ statusCode: 422, code: 'INVALID_CHALLENGE_REQUEST', error: 'Unprocessable Entity', message: 'Goal 13 request does not match the strict v1 contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const challengeRequestOrigin = (request) => {
+    if (request.headers.origin) return request.headers.origin
+    if (request.method !== 'GET' || !request.headers.referer) return null
+    try {
+      const referer = new URL(request.headers.referer)
+      return ['http:', 'https:'].includes(referer.protocol) && !referer.username && !referer.password ? referer.origin : null
+    } catch {
+      return null
+    }
+  }
+  const requireChallengeAccess = async (request) => {
+    if (!allowedOrigins.has(challengeRequestOrigin(request)) || request.headers[CHALLENGE_CSRF_HEADER] !== CHALLENGE_CSRF_VALUE) throw new ChallengeRequestError('CHALLENGE_CSRF_REJECTED', 'Goal 13 protected access requires a startup-allowlisted browser origin and CSRF header.', 403)
+  }
+  const challengeMutation = { bodyLimit: CHALLENGE_REQUEST_BODY_LIMIT, preHandler: requireChallengeAccess }
+  const challengeProtectedRead = { preHandler: requireChallengeAccess }
+  const challengeQuery = (request, reply) => {
+    const parsed = ChallengeEmptyObjectSchema.safeParse(request.query)
+    return parsed.success ? true : invalidChallenge(reply, parsed)
+  }
+
+  app.get('/api/v11/challenge', async (request, reply) => challengeQuery(request, reply) === true ? challenge.discovery() : reply)
+  app.get('/api/v11/challenge/status', async (request, reply) => challengeQuery(request, reply) === true ? challenge.status() : reply)
+  app.post('/api/v11/challenge/sync', challengeMutation, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const parsed = ChallengeEmptyObjectSchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return challenge.sync(request.raw.signal)
+  })
+  app.post('/api/v11/challenge/commitments', challengeMutation, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const parsed = ChallengeFreezeIntentSchema.safeParse(request.body)
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return reply.status(201).send(await challenge.prepare(parsed.data, request.raw.signal))
+  })
+  app.post('/api/v11/challenge/commitments/:commitmentDigest/disclose', challengeMutation, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const params = ChallengeCommitmentParamSchema.safeParse(request.params)
+    const body = ChallengeDisclosureIntentSchema.safeParse(request.body)
+    if (!params.success) return invalidChallenge(reply, params)
+    if (!body.success) return invalidChallenge(reply, body)
+    if (body.data.commitmentDigest !== params.data.commitmentDigest) return reply.status(409).send({ statusCode: 409, code: 'CHALLENGE_IDENTITY_MISMATCH', error: 'Conflict', message: 'Goal 13 commitment path and body identities differ.' })
+    return reply.status(201).send(await challenge.disclose(body.data, request.raw.signal))
+  })
+  app.get('/api/v11/challenge/runs', challengeProtectedRead, async (request, reply) => {
+    const parsed = ChallengeRunListQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return challenge.listRuns(parsed.data.limit)
+  })
+  app.get('/api/v11/challenge/reports/:resultDigest', challengeProtectedRead, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const parsed = ChallengeReportParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return challenge.report(parsed.data.resultDigest)
+  })
+  app.post('/api/v11/challenge/reports/:resultDigest/replay', challengeMutation, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const body = ChallengeEmptyObjectSchema.safeParse(request.body ?? {})
+    if (!body.success) return invalidChallenge(reply, body)
+    const parsed = ChallengeReportParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return challenge.replay(parsed.data.resultDigest)
+  })
+  app.get('/api/v11/challenge/artifacts/:artifactDigest', challengeProtectedRead, async (request, reply) => {
+    if (challengeQuery(request, reply) !== true) return reply
+    const parsed = ChallengeArtifactParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidChallenge(reply, parsed)
+    return challenge.artifact(parsed.data.artifactDigest)
+  })
+  app.get('/api/v11/challenge/integrity', challengeProtectedRead, async (request, reply) => challengeQuery(request, reply) === true ? challenge.integrity() : reply)
+  const invalidMeasuredSpatial = (reply, parsed) => reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(422).send({ statusCode: 422, code: 'INVALID_MEASURED_SPATIAL_REQUEST', error: 'Unprocessable Entity', message: 'Goal 14 request does not match the strict bounded measured-spatial contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireMeasuredSpatialMutation = async (request) => {
+    if (!requireFixedOrigin(request, MEASURED_SPATIAL_CSRF_HEADER, MEASURED_SPATIAL_CSRF_VALUE)) throw new MeasuredSpatialRequestError('MEASURED_SPATIAL_CSRF_REJECTED', 'Goal 14 cache mutation requires a startup-allowlisted browser origin and CSRF header.', 403)
+  }
+  const measuredSpatialMutation = { preHandler: requireMeasuredSpatialMutation }
+  const measuredSpatialQuery = (request, reply) => {
+    const parsed = MeasuredSpatialEmptySchema.safeParse(request.query)
+    return parsed.success ? true : invalidMeasuredSpatial(reply, parsed)
+  }
+  const measuredSpatialMutable = (reply) => reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).removeHeader('etag')
+  const measuredSpatialImmutable = (reply) => reply.headers({
+    'cache-control': 'public, max-age=31536000, immutable',
+    'x-release-id': MEASURED_SPATIAL_PINS.releaseId,
+    'x-release-digest': MEASURED_SPATIAL_PINS.releaseDigest
+  })
+
+  app.get('/api/v12/measured-spatial', async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    measuredSpatialMutable(reply)
+    return measuredSpatial.discovery()
+  })
+  app.get('/api/v12/measured-spatial/status', async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    measuredSpatialMutable(reply)
+    return measuredSpatial.status()
+  })
+  app.post('/api/v12/measured-spatial/sync', measuredSpatialMutation, async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    const parsed = MeasuredSpatialEmptySchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidMeasuredSpatial(reply, parsed)
+    measuredSpatialMutable(reply)
+    return measuredSpatial.sync(request.raw.signal)
+  })
+  app.get('/api/v12/measured-spatial/records/:recordType', async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    const parsed = MeasuredSpatialRecordParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidMeasuredSpatial(reply, parsed)
+    measuredSpatialImmutable(reply)
+    return measuredSpatial.recordPage(parsed.data.recordType)
+  })
+  app.get('/api/v12/measured-spatial/chunks', async (request, reply) => {
+    const parsed = MeasuredSpatialChunkQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidMeasuredSpatial(reply, parsed)
+    measuredSpatialImmutable(reply)
+    return measuredSpatial.chunkInventory({ arrayId: parsed.data.array_id ?? null, level: parsed.data.level ?? null, offset: parsed.data.offset, limit: parsed.data.limit })
+  })
+  app.get('/api/v12/measured-spatial/chunks/:arrayId/:level/:z/:y/:x', async (request, reply) => {
+    if (request.headers.range || Object.keys(request.query).length > 0) return reply.headers({ 'accept-ranges': 'none', 'cache-control': 'no-store' }).status(416).send({ statusCode: 416, code: 'MEASURED_SPATIAL_RANGE_REJECTED', error: 'Range Not Satisfiable', message: 'Goal 14 chunks are atomic and do not accept ranges or query parameters.' })
+    const parsed = MeasuredSpatialChunkParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidMeasuredSpatial(reply, parsed)
+    const selected = await measuredSpatial.chunk(parsed.data.arrayId, parsed.data.level, [parsed.data.z, parsed.data.y, parsed.data.x], request.raw.signal)
+    const descriptor = selected.descriptor
+    return measuredSpatialImmutable(reply).headers({
+      'accept-ranges': 'none',
+      'content-length': descriptor.encoded_bytes,
+      etag: `"sha256:${descriptor.encoded_sha256}"`,
+      'x-content-sha256': descriptor.encoded_sha256,
+      'x-decoded-sha256': descriptor.decoded_sha256,
+      'x-array-id': descriptor.array_id,
+      'x-level': descriptor.level,
+      'x-chunk-grid': descriptor.grid_zyx.join('.'),
+      'x-cache-source': selected.source
+    }).type(descriptor.media_type).send(selected.bytes)
+  })
+  app.post('/api/v12/measured-spatial/offline-completion', measuredSpatialMutation, async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    const parsed = MeasuredSpatialEmptySchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidMeasuredSpatial(reply, parsed)
+    measuredSpatialMutable(reply)
+    return measuredSpatial.completeOffline(request.raw.signal)
+  })
+  app.get('/api/v12/measured-spatial/integrity', async (request, reply) => {
+    if (measuredSpatialQuery(request, reply) !== true) return reply
+    measuredSpatialMutable(reply)
+    return measuredSpatial.integrity()
+  })
+  const invalidSpatialRegistration = (reply, parsed) => reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(422).send({ statusCode: 422, code: 'INVALID_SPATIAL_REGISTRATION_REQUEST', error: 'Unprocessable Entity', message: 'Goal 14 registration request does not match the strict bounded contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireSpatialRegistrationMutation = async (request) => {
+    if (!requireFixedOrigin(request, SPATIAL_REGISTRATION_CSRF_HEADER, SPATIAL_REGISTRATION_CSRF_VALUE)) throw new SpatialRegistrationRequestError('SPATIAL_REGISTRATION_CSRF_REJECTED', 'Goal 14 registration cache and transform intents require the startup-allowlisted browser origin and CSRF header.', 403)
+  }
+  const spatialRegistrationMutation = { preHandler: requireSpatialRegistrationMutation }
+  const spatialRegistrationQuery = (request, reply) => {
+    const parsed = SpatialRegistrationEmptySchema.safeParse(request.query)
+    return parsed.success ? true : invalidSpatialRegistration(reply, parsed)
+  }
+  const spatialRegistrationMutable = (reply) => reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).removeHeader('etag')
+  const spatialRegistrationImmutable = (reply) => reply.headers({ 'cache-control': 'public, max-age=31536000, immutable', link: SPATIAL_REGISTRATION_RIGHTS_LINK, 'x-release-id': SPATIAL_REGISTRATION_PINS.releaseId, 'x-release-digest': SPATIAL_REGISTRATION_PINS.releaseDigest })
+
+  app.get('/api/v14/spatial-registration', async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.discovery()
+  })
+  app.get('/api/v14/spatial-registration/status', async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.status()
+  })
+  app.post('/api/v14/spatial-registration/sync', spatialRegistrationMutation, async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    const parsed = SpatialRegistrationEmptySchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.sync(request.raw.signal)
+  })
+  app.get('/api/v14/spatial-registration/records/:recordType', async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    const parsed = SpatialRegistrationRecordTypeSchema.safeParse(request.params.recordType)
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationImmutable(reply)
+    return spatialRegistration.recordPage(parsed.data)
+  })
+  app.get('/api/v14/spatial-registration/chunks', async (request, reply) => {
+    const parsed = SpatialRegistrationChunkQuerySchema.safeParse(request.query)
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationImmutable(reply)
+    return spatialRegistration.chunkInventory({ arrayId: parsed.data.array_id ?? null, offset: parsed.data.offset, limit: parsed.data.limit })
+  })
+  app.get('/api/v14/spatial-registration/chunks/:arrayId/:z/:y/:x', async (request, reply) => {
+    if (request.headers.range || Object.keys(request.query).length > 0) return reply.headers({ 'accept-ranges': 'none', 'cache-control': 'no-store' }).status(416).send({ statusCode: 416, code: 'SPATIAL_REGISTRATION_RANGE_REJECTED', error: 'Range Not Satisfiable', message: 'Goal 14 registration chunks are atomic and reject ranges and query parameters.' })
+    const parsed = SpatialRegistrationChunkParamSchema.safeParse(request.params)
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    const selected = await spatialRegistration.chunk(parsed.data.arrayId, [parsed.data.z, parsed.data.y, parsed.data.x], request.raw.signal)
+    const descriptor = selected.descriptor
+    return spatialRegistrationImmutable(reply).headers({ 'accept-ranges': 'none', 'content-length': descriptor.encoded_bytes, etag: `"sha256:${descriptor.encoded_sha256}"`, 'x-content-sha256': descriptor.encoded_sha256, 'x-decoded-sha256': descriptor.decoded_sha256, 'x-array-id': descriptor.array_id, 'x-level': '0', 'x-chunk-grid': descriptor.grid_zyx.join('.'), 'x-cache-source': selected.source }).type(descriptor.media_type).send(selected.bytes)
+  })
+  app.post('/api/v14/spatial-registration/residual-overlap', spatialRegistrationMutation, async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    const parsed = SpatialRegistrationEmptySchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.recomputeResidualOverlap(request.raw.signal)
+  })
+  app.post('/api/v14/spatial-registration/transform', spatialRegistrationMutation, async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    const parsed = SpatialRegistrationTransformRequestSchema.safeParse(request.body)
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.transform(parsed.data, request.raw.signal)
+  })
+  app.post('/api/v14/spatial-registration/offline-completion', spatialRegistrationMutation, async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    const parsed = SpatialRegistrationEmptySchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidSpatialRegistration(reply, parsed)
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.completeOffline(request.raw.signal)
+  })
+  app.get('/api/v14/spatial-registration/integrity', async (request, reply) => {
+    if (spatialRegistrationQuery(request, reply) !== true) return reply
+    spatialRegistrationMutable(reply)
+    return spatialRegistration.integrity()
+  })
+  const invalidRevalidation = (reply, parsed) => reply.headers({ 'cache-control': 'no-store', pragma: 'no-cache' }).status(422).send({ statusCode: 422, code: 'INVALID_REVALIDATION_REQUEST', error: 'Unprocessable Entity', message: 'Goal 15 request does not match the strict bounded revalidation contract.', fieldErrors: parsed.error.flatten().fieldErrors })
+  const requireRevalidation = () => {
+    if (!revalidation) throw new RevalidationIntegrationError('revalidation-not-configured', 'Goal 15 producer integration is not configured.', 503)
+    return revalidation
+  }
+  const requireRevalidationMutation = async (request) => {
+    if (!requireFixedOrigin(request, REVALIDATION_CSRF_HEADER, REVALIDATION_CSRF_VALUE)) throw new RevalidationIntegrationError('revalidation-csrf-rejected', 'Goal 15 campaign mutation requires a startup-allowlisted browser origin and CSRF header.', 403)
+  }
+  const revalidationMutation = { preHandler: requireRevalidationMutation }
+  const revalidationQuery = (request, reply) => {
+    const parsed = RevalidationEmptySchema.safeParse(request.query)
+    return parsed.success ? true : invalidRevalidation(reply, parsed)
+  }
+  const revalidationParams = (request, reply) => {
+    const parsed = RevalidationCampaignParamSchema.safeParse(request.params)
+    return parsed.success ? parsed.data : invalidRevalidation(reply, parsed)
+  }
+  const revalidationProjection = (request, reply) => {
+    const parsed = RevalidationProjectionQuerySchema.safeParse(request.query)
+    if (parsed.success) return parsed.data
+    invalidRevalidation(reply, parsed)
+    return null
+  }
+
+  app.get('/api/v13/revalidation/status', async (request, reply) => revalidationQuery(request, reply) === true ? requireRevalidation().status() : reply)
+  app.get('/api/v13/revalidation/campaigns', async (request, reply) => revalidationQuery(request, reply) === true ? requireRevalidation().campaigns() : reply)
+  app.post('/api/v13/revalidation/campaigns', revalidationMutation, async (request, reply) => {
+    if (revalidationQuery(request, reply) !== true) return reply
+    const parsed = RevalidationSyncRequestSchema.safeParse(request.body ?? {})
+    if (!parsed.success) return invalidRevalidation(reply, parsed)
+    return reply.status(201).send(await requireRevalidation().sync(parsed.data))
+  })
+  app.get('/api/v13/revalidation/campaigns/:campaignId', async (request, reply) => {
+    const query = revalidationProjection(request, reply)
+    if (!query) return reply
+    const parsed = revalidationParams(request, reply)
+    return parsed?.campaignId ? requireRevalidation().detail(parsed.campaignId, { limit: query.limit, cursor: query.cursor ?? null }) : reply
+  })
+  app.get('/api/v13/revalidation/campaigns/:campaignId/report', async (request, reply) => {
+    if (revalidationQuery(request, reply) !== true) return reply
+    const parsed = revalidationParams(request, reply)
+    return parsed?.campaignId ? requireRevalidation().report(parsed.campaignId) : reply
+  })
+  app.post('/api/v13/revalidation/campaigns/:campaignId/reconcile', revalidationMutation, async (request, reply) => {
+    if (revalidationQuery(request, reply) !== true) return reply
+    const body = RevalidationEmptySchema.safeParse(request.body ?? {})
+    if (!body.success) return invalidRevalidation(reply, body)
+    const parsed = revalidationParams(request, reply)
+    return parsed?.campaignId ? requireRevalidation().reconcile(parsed.campaignId) : reply
+  })
+  app.post('/api/v13/revalidation/campaigns/:campaignId/cancel', revalidationMutation, async (request, reply) => {
+    if (revalidationQuery(request, reply) !== true) return reply
+    const body = RevalidationEmptySchema.safeParse(request.body ?? {})
+    if (!body.success) return invalidRevalidation(reply, body)
+    const parsed = revalidationParams(request, reply)
+    return parsed?.campaignId ? requireRevalidation().cancel(parsed.campaignId) : reply
+  })
+  app.get('/api/v13/revalidation/integrity', async (request, reply) => revalidationQuery(request, reply) === true ? requireRevalidation().integrity() : reply)
+  app.get('/api/v13/revalidation/events', async (request, reply) => {
+    const query = revalidationProjection(request, reply)
+    return query === null ? reply : requireRevalidation().events(query)
+  })
   app.get('/api/v1/models/one-carbon', async () => MODEL)
   app.post('/api/v1/models/one-carbon/simulations', async (request, reply) => {
     const parsed = SimulationRequestSchema.safeParse(request.body)
@@ -1022,7 +1471,7 @@ export async function buildApp(options = {}) {
     return reply.send(simulate(parsed.data, release, network))
   })
 
-  const clientRoot = resolve(process.cwd(), 'dist')
+  const clientRoot = options.clientRoot ?? resolve(process.cwd(), 'dist')
   if (options.serveClient !== false && existsSync(clientRoot)) {
     await app.register(fastifyStatic, { root: clientRoot })
     app.setNotFoundHandler((request, reply) => request.raw.url?.startsWith('/api/')

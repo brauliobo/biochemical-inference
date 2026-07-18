@@ -2,7 +2,7 @@
 
 ## Pinned Boundary
 
-The workbench consumes the separate evidence service at `http://127.0.0.1:8001` through Fastify only. It pins:
+The workbench consumes the integrated JavaScript evidence routes through Fastify only. `BIOCHEMICAL_DB_URL` defaults to `http://127.0.0.1:8000`, and evidence health defaults to `/api/evidence/v1/healthz`; `BIOCHEMICAL_EVIDENCE_URL` and `BIOCHEMICAL_EVIDENCE_HEALTH_PATH` remain explicit domain overrides. It pins:
 
 - Release: `mthfr-evidence-v1.0.0`
 - Schema: `3.0.0`

@@ -247,7 +247,9 @@ export async function createDataPlaneService(options = {}) {
     return { partitionRows, snapshot, verified: verifyStoredRelease(snapshot) }
   }
 
-  async function scanIntegrityIsolated() {
+  async function scanIntegrityIsolated(signal) {
+    const assertActive = () => signal?.throwIfAborted()
+    assertActive()
     const checkedAt = now()
     const findings = []
     let releaseCount = safeCount(database, 'generations')
@@ -269,6 +271,7 @@ export async function createDataPlaneService(options = {}) {
       if (generations.length === 0) {
         if (activeRows.length || diffRows.length || partitionCount || recordCount || objectCount || auditRows.length) throw new DataPlaneVerificationError('Empty data-plane metadata contains extra rows.')
         const files = await objects.inventory()
+        assertActive()
         if (files.length) throw new DataPlaneVerificationError('Empty data-plane CAS contains unindexed object files.')
         return { status: 'valid', checkedAt, releases: 0, objects: 0, records: 0, findings: [] }
       }
@@ -295,7 +298,9 @@ export async function createDataPlaneService(options = {}) {
       let expectedPartitions = 0
       let expectedRecords = 0
       for (const generation of generations) {
+        assertActive()
         const { partitionRows, snapshot, verified } = await storedRelease(generation)
+        assertActive()
         verifiedReleases.set(verified.release.id, verified)
         const expectedPin = DATA_PLANE_RELEASE_PINS.find((pin) => pin.releaseId === generation.release_id)
         const exactGeneration = verified.release.id === generation.release_id &&
@@ -351,6 +356,7 @@ export async function createDataPlaneService(options = {}) {
       const expectedAuditValue = authorityAuditValue(candidate, baseline, verifiedReleases.get(candidate.release_id), verifiedReleases.get(baseline.release_id), diffRow, diff)
 
       for (const auditRow of auditRows) {
+        assertActive()
         const encoded = Buffer.from(auditRow.encoded)
         const report = parseCanonicalBytes(encoded, AuthorityClosureAuditReportSchema, `Authority closure audit ${auditRow.report_digest}`)
         const digestValue = { ...report }
@@ -367,9 +373,11 @@ export async function createDataPlaneService(options = {}) {
         if (!expected || row.bytes !== expected.bytes || row.media_type !== expected.media_type) throw new DataPlaneVerificationError(`Data-plane object row is unreferenced or inconsistent: ${row.digest}.`)
       }
       const files = await objects.inventory()
+      assertActive()
       if (!sameValue(files, [...expectedObjects.keys()].sort())) throw new DataPlaneVerificationError('Data-plane CAS contains missing, extra, or unindexed object files.')
       return { status: 'valid', checkedAt, releases: generations.length, objects: objectRows.length, records: expectedRecords, findings: [] }
     } catch (error) {
+      if (signal?.aborted) throw signal.reason
       findings.push(error instanceof Error ? error.message : 'Unknown integrity failure.')
       return { status: 'failed', checkedAt, releases: releaseCount, objects: objectCount, records: recordCount, findings }
     }
@@ -692,8 +700,8 @@ export async function createDataPlaneService(options = {}) {
       const bytes = await rowObject(database, objects, row, 'object_digest')
       return parseCanonicalBytes(bytes, FactorySemanticDiffSchema, 'Local semantic diff', row.response_digest)
     },
-    async integrity() {
-      const result = await withStorageLock(scanIntegrityIsolated)
+    async integrity(signal) {
+      const result = await withStorageLock(() => scanIntegrityIsolated(signal))
       applyIntegrity(result)
       return result
     },

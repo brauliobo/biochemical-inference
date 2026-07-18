@@ -180,8 +180,8 @@ sort, page limit, and last ID.
 - `npm audit`: zero vulnerabilities.
 - Exact-fixture Playwright: 40 passed and 14 intentionally skipped across
   Chromium desktop and 360 px mobile projects.
-- Real-producer Playwright: 40 passed and 14 intentionally skipped against the
-  sibling Python factory, evidence, and derived services across both projects.
+- Real-producer Playwright: 43 passed and 15 intentionally skipped against the
+  sibling JavaScript/PGlite factory, evidence, and derived routes.
 - Adversarial coverage includes denormalized index corruption, unknown and extra
   rows, unindexed object files, dirty staging, symlinked root/database/CAS/object
   destinations, Host/Origin rebinding for all mutation families, stale sync

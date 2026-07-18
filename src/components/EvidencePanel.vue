@@ -355,6 +355,7 @@ section.evidence-panel(aria-labelledby="literature-title")
         strong.trust-label Unreviewed, not trusted knowledge
         h4 {{ selectedCandidate.subject }} · {{ selectedCandidate.relation }} · {{ selectedCandidate.object }}
         p Model {{ selectedCandidate.model }} · {{ selectedCandidate.id }}
+        p Candidate release {{ selectedCandidate.release_id }} · sha256:{{ selectedCandidate.release_digest }}
         p Supporting spans: {{ selectedCandidate.span_ids.join(', ') }}
         p Unresolved: {{ selectedCandidate.unresolved_entities.join(', ') || 'none declared' }}
         p Missing context: {{ selectedCandidate.missing_context.join(', ') || 'none declared' }}
@@ -366,5 +367,6 @@ section.evidence-panel(aria-labelledby="literature-title")
       button.candidate-row(v-for="candidate in candidates" :key="candidate.id" type="button" @click="openCandidate(candidate.id)")
         strong Unreviewed, not trusted knowledge
         span {{ candidate.subject }} · {{ candidate.relation }} · {{ candidate.object }}
+        small {{ candidate.release_id }} · sha256:{{ candidate.release_digest }}
         code {{ candidate.id }}
 </template>

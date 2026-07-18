@@ -282,11 +282,21 @@ const ImpactItemSchema = z.object({
 }).strict()
 export const ImpactResponseSchema = z.object({ items: z.array(ImpactItemSchema), automatic_invalidation: z.literal(false) }).strict()
 
-export const MeasurementSchema = z.object({ record: RecordDependencySchema, value: FiniteSchema, unit: DerivedUnitSchema, context: ScientificContextSchema, uncertainty: UncertaintySchema }).strict()
+export const MeasurementSchema = z.object({ record: RecordDependencySchema, value: FiniteSchema, unit: DerivedUnitSchema, context: ScientificContextSchema }).strict()
 export const MeasurementComparisonRequestSchema = z.object({ assertion_digest: DerivedDigestSchema, measurement: MeasurementSchema }).strict()
+export const VerifiedMeasurementSchema = MeasurementSchema.extend({
+  trust: z.object({
+    eligibility: z.literal('verified-measured-observation'),
+    data_origin: z.literal('measured'),
+    source_id: z.string().min(1),
+    source_class: z.literal('trusted-external'),
+    evidence_locator_ids: z.array(z.string().min(1)),
+    evidence_class: z.literal('measured')
+  }).strict()
+}).strict()
 export const MeasurementComparisonResponseSchema = z.object({
   assertion_digest: DerivedDigestSchema,
-  measurement_record: RecordDependencySchema,
+  measurement: VerifiedMeasurementSchema,
   unit_compatible: z.boolean(),
   context_compatible: z.boolean(),
   comparable: z.boolean(),

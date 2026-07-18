@@ -2,9 +2,9 @@
 
 ## Boundary
 
-Goal 8 submits completed APAP algorithm runs to the independent biochemical-db reviewed-derived v1 service on `127.0.0.1:8002`. Simulation results never modify a source release. Submitted scientific content is immutable and content-addressed; review is represented only by signed append-only events.
+Goal 8 submits completed APAP algorithm runs to the integrated biochemical-db JavaScript reviewed-derived v1 routes on `127.0.0.1:8000`. State is persisted in PGlite with a separate filesystem CAS. Simulation results never modify a source release. Submitted scientific content is immutable and content-addressed; review is represented only by signed append-only events.
 
-The browser contacts same-origin `/api/v6/derived` routes. The Fastify server is the only holder of `BIOCHEMICAL_DERIVED_WRITE_TOKEN` and the only process that contacts port 8002. The proxy removes the signing public key and key identifier from health responses and never returns bearer credentials or private key material. Event records retain their public event digest, key identifier, chain link, and signature for audit display.
+The browser contacts same-origin `/api/v6/derived` routes. The Fastify server is the only holder of `BIOCHEMICAL_DERIVED_WRITE_TOKEN` and the only process that contacts the upstream service. The proxy removes the signing public key and key identifier from health responses and never returns bearer credentials or private key material. Event records retain their public event digest, key identifier, chain link, and signature for audit display.
 
 Browser mutation routes require both an exact configured or directly served scheme-and-host `Origin` match and `x-biochemical-csrf: derived-review-v1`. `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` declares the browser-facing origin only when a trusted development reverse proxy changes the Fastify request host. This public custom-header value is not an authentication secret; its purpose is to prevent form-based CSRF while Origin enforcement rejects cross-site requests. The upstream bearer token independently authorizes writes.
 
@@ -41,10 +41,12 @@ The layered query has no implicit source/derived merge. The UI asks explicitly f
 ## Configuration
 
 ```sh
-BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8002
+BIOCHEMICAL_DB_URL=http://127.0.0.1:8000
 BIOCHEMICAL_DERIVED_WRITE_TOKEN='runtime-secret'
 BIOCHEMICAL_DERIVED_TIMEOUT_MS=5000
 ```
+
+The derived health path defaults to `/api/derived/v1/healthz`. `BIOCHEMICAL_DERIVED_URL` and `BIOCHEMICAL_DERIVED_HEALTH_PATH` remain explicit domain overrides.
 
 `BIOCHEMICAL_DERIVED_USE_FIXTURE=true` enables the explicit in-memory fixture ledger. The general `BIOCHEMICAL_INFERENCE_USE_FIXTURE=true` also enables it. Production has no fixture fallback.
 
@@ -57,4 +59,4 @@ Real Playwright mode creates a run-isolated database, object root, Ed25519 priva
 - Qualitative uncertainty identifies unsupported categories but is not a confidence interval, posterior, or error model.
 - V1 review authentication uses the derived service's single shared bearer token and signing key; multi-user authorization and key rotation belong to the producer service roadmap.
 - Impact requests require explicit previous dependencies and current digests. The inference application does not discover source updates automatically.
-- Measurement comparison requires a caller-supplied verified source record and exact context compatibility; the UI currently emphasizes source-vs-reviewed layering and does not provide a measurement authoring form.
+- Measurement comparison requires a verified parameter-observation source record with exact value, unit, and context pins. The current synthetic parameter release has no eligible observation, so the UI reports that limitation explicitly and never substitutes an APAP protocol record. Requests contain `measurement.record`, `value`, `unit`, and `context`; successful responses return the verified `measurement` plus trust metadata. The retained wire contract has no `uncertainty` request field or `measurement_record` response alias.

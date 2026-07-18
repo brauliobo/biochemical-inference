@@ -15,6 +15,10 @@ import ReviewWorkbench from './components/ReviewWorkbench.vue'
 import PhysiologyPluginWorkbench from './components/PhysiologyPluginWorkbench.vue'
 import DataPlaneWorkbench from './components/DataPlaneWorkbench.vue'
 import MeasuredCommonsWorkbench from './components/MeasuredCommonsWorkbench.vue'
+import ChallengeWorkbench from './components/ChallengeWorkbench.vue'
+import MeasuredSpatialLiverAtlas from './components/MeasuredSpatialLiverAtlas.vue'
+import SpatialRegistrationWorkbench from './components/SpatialRegistrationWorkbench.vue'
+import RevalidationCampaignWorkbench from './components/RevalidationCampaignWorkbench.vue'
 import { METABOLITE_IDS } from '../shared/identifiers.js'
 
 const NetworkView = defineAsyncComponent(() => import('./components/NetworkView.vue'))
@@ -235,6 +239,14 @@ main#main
           dd {{ model.version }} / {{ model.engineVersion }}
       p.source-note Curated network evidence is kept separate from model-only concentrations and kinetics.
       BuildProvenance(:provenance="provenance" :status="provenanceState" :error="provenanceError" @retry="requestProvenance()")
+
+  ChallengeWorkbench
+
+  MeasuredSpatialLiverAtlas
+
+  SpatialRegistrationWorkbench
+
+  RevalidationCampaignWorkbench
 
   .workspace(v-if="release && model")
     aside.controls-panel(aria-labelledby="experiment-title")

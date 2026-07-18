@@ -130,7 +130,8 @@ export const EvidenceVectorMetadataSchema = z.object({
   release_digest: EvidenceDigestSchema,
   model: z.string().min(1),
   model_digest: EvidenceDigestSchema,
-  dimensions: z.number().int().positive()
+  dimensions: z.number().int().positive(),
+  attribution: z.enum(['digest-bound', 'trusted-local-unverified']).optional()
 }).strict()
 
 export const EvidenceSearchResultSchema = z.object({
@@ -173,6 +174,8 @@ export const UpstreamEvidenceDocumentResponseSchema = EvidenceDocumentResponseSc
 export const EvidenceCandidateSchema = z.object({
   id: z.string().regex(/^CANDIDATE:[a-f0-9]{32}$/),
   status: z.literal('unreviewed'),
+  release_id: EvidenceReleaseRefSchema.shape.id,
+  release_digest: EvidenceDigestSchema,
   document_id: EvidenceDocumentIdSchema,
   span_ids: z.array(EvidenceSpanIdSchema).min(1),
   model: z.string().min(1),

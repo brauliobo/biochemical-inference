@@ -1,6 +1,6 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, a durable local experiment workspace, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, Three.js, and Node 22 `node:sqlite`. It does not use or build the legacy Jekyll/Riot prototype.
+A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, a durable local experiment workspace, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, Three.js, Node 22 `node:sqlite`, and the sibling JavaScript/PGlite biochemical-db service. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
 
@@ -8,28 +8,51 @@ This software is an educational systems model. Its initial conditions and kineti
 
 - Node.js 22
 - npm 10 or newer
-- Python 3.12 and `uv` for the sibling `../biochemical-db` service
 - OpenSSL for runtime-only reviewed-derived Ed25519 keys
+
+For a fresh-machine production workflow, explicit key/token generation, supervised startup, deterministic backup/restore, upgrade/rollback rehearsal, metrics, and SBOM/provenance commands, use [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
 ## Start
 
 ```sh
-cd ../biochemical-db/service
-uv sync --frozen
-uv run uvicorn biochemical_db_api.app:app --host 127.0.0.1 --port 8000
-BIOCHEMICAL_EVIDENCE_INDEX=/tmp/biochemical-evidence-index.sqlite3 \
-BIOCHEMICAL_EVIDENCE_WORKSPACE=/tmp/biochemical-evidence-candidates.sqlite3 \
-uv run uvicorn biochemical_db_api.evidence_app:app --host 127.0.0.1 --port 8001
-```
+DB_RUNTIME="${XDG_DATA_HOME:-$HOME/.local/share}/biochemical-db/service-js"
+mkdir -p "$DB_RUNTIME"
+test -f "$DB_RUNTIME/derived.pem" || openssl genpkey -algorithm Ed25519 -out "$DB_RUNTIME/derived.pem"
+export BIOCHEMICAL_JS_KNOWLEDGE_ROOT=../knowledge
+export BIOCHEMICAL_JS_STATE_ROOT="$DB_RUNTIME/state"
+export BIOCHEMICAL_JS_ALLOWED_ORIGIN=http://127.0.0.1:5173
+export BIOCHEMICAL_JS_MEASURED_CSRF_TOKEN="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+export BIOCHEMICAL_JS_CHALLENGE_CSRF_TOKEN="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+export BIOCHEMICAL_JS_EVIDENCE_CSRF_TOKEN="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+export BIOCHEMICAL_JS_DERIVED_PRIVATE_KEY="$DB_RUNTIME/derived.pem"
+export BIOCHEMICAL_JS_DERIVED_BEARER_TOKEN="$(openssl rand -hex 32)"
+export BIOCHEMICAL_JS_FACTORY_CURSOR_SECRET="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+export BIOCHEMICAL_JS_MEASURED_CURSOR_SECRET="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+export BIOCHEMICAL_JS_CHALLENGE_CURSOR_SECRET="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+# Provision an external Ed25519 revalidation keyring and canonical role policy,
+# then set the producer variables documented in docs/REVALIDATION_CAMPAIGNS.md.
+export BIOCHEMICAL_JS_REVALIDATION_STATE_PATH="$BIOCHEMICAL_JS_STATE_ROOT/revalidation-state-v1"
+npm --prefix ../biochemical-db/service-js ci
+PORT=8000 npm --prefix ../biochemical-db/service-js start &
 
-In another shell, from this repository:
-
-```sh
-npm install
+export BIOCHEMICAL_EVIDENCE_URL=http://127.0.0.1:8000
+export BIOCHEMICAL_EVIDENCE_HEALTH_PATH=/api/evidence/v1/healthz
+export BIOCHEMICAL_DERIVED_URL=http://127.0.0.1:8000
+export BIOCHEMICAL_DERIVED_HEALTH_PATH=/api/derived/v1/healthz
+export BIOCHEMICAL_DERIVED_WRITE_TOKEN="$BIOCHEMICAL_JS_DERIVED_BEARER_TOKEN"
+export BIOCHEMICAL_CHALLENGE_URL=http://127.0.0.1:8000
+export BIOCHEMICAL_CHALLENGE_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/biochemical-inference/goal13-challenge-v1"
+export BIOCHEMICAL_CHALLENGE_ALLOWED_ORIGIN="$BIOCHEMICAL_JS_ALLOWED_ORIGIN"
+export BIOCHEMICAL_CHALLENGE_CSRF_TOKEN="$BIOCHEMICAL_JS_CHALLENGE_CSRF_TOKEN"
+# Configure the inference revalidation client with the same producer Origin,
+# bearer token, bootstrap public-key pin, and active signing-key ID.
+export BIOCHEMICAL_REVALIDATION_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/biochemical-inference/revalidation-v1"
+export BIOCHEMICAL_REVALIDATION_CURSOR_SECRET="$(openssl rand -base64 32 | tr '+/' '-_' | tr -d '=\n')"
+npm ci
 npm run dev
 ```
 
-The workbench is served at `http://localhost:5173`; Vite proxies `/api` to the inference API at `http://localhost:3000`.
+The workbench is served at the configured exact origin, `http://127.0.0.1:5173`; Vite proxies `/api` to the inference API at `http://127.0.0.1:3000`.
 
 For production-like local operation:
 
@@ -87,13 +110,14 @@ Strict upstream and internal Zod schemas cover release references, contexts, poi
 The independent Goal 3 evidence service is consumed server-to-server and pinned separately:
 
 ```sh
-BIOCHEMICAL_EVIDENCE_URL=http://127.0.0.1:8001
+BIOCHEMICAL_EVIDENCE_URL=http://127.0.0.1:8000
+BIOCHEMICAL_EVIDENCE_HEALTH_PATH=/api/evidence/v1/healthz
 BIOCHEMICAL_EVIDENCE_RELEASE_ID=mthfr-evidence-v1.0.0
 BIOCHEMICAL_EVIDENCE_EXPECTED_DIGEST=93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701
 BIOCHEMICAL_EVIDENCE_TIMEOUT_MS=10000
 ```
 
-The browser never contacts port 8001. Fastify verifies `/healthz` before each evidence operation, validates strict search/document/candidate payloads, checks every available release reference, and exposes same-origin `/api/v3/evidence` routes. Cross-origin API access is denied unless `CORS_ORIGINS` explicitly allowlists an origin; no Ollama address, model service, or secret is sent to the browser.
+The browser never contacts the upstream port. Fastify verifies `/api/evidence/v1/healthz` before each evidence operation, validates strict search/document/candidate payloads, checks every available release reference, and exposes same-origin `/api/v3/evidence` routes. Cross-origin API access is denied unless `CORS_ORIGINS` explicitly allowlists an origin; no Ollama address, model service, or secret is sent to the browser.
 
 Exact identifier and annotation matches, SQLite BM25, optional vector cosine ranking, and reciprocal-rank-fusion contributions remain separately visible. Vector retrieval is opt-in. If Ollama embedding fails, that vector request fails visibly and can be retried; the UI does not silently substitute lexical results. Exact/BM25 search does not depend on Ollama.
 
@@ -115,17 +139,7 @@ The same-origin `/api/v5/spatial` proxy validates strict metadata closures, cont
 
 ### Reviewed derived knowledge
 
-Goal 8 uses the independent reviewed-derived service on `http://127.0.0.1:8002`. Configure `BIOCHEMICAL_DERIVED_URL`, `BIOCHEMICAL_DERIVED_WRITE_TOKEN`, and optional `BIOCHEMICAL_DERIVED_TIMEOUT_MS`. Generate the service key and token only at runtime; do not place either in this repository:
-
-```sh
-DERIVED_RUNTIME="$(mktemp -d)"
-openssl genpkey -algorithm Ed25519 -out "$DERIVED_RUNTIME/events.pem"
-export BIOCHEMICAL_DERIVED_DATABASE="$DERIVED_RUNTIME/derived.sqlite3"
-export BIOCHEMICAL_DERIVED_OBJECT_ROOT="$DERIVED_RUNTIME/objects"
-export BIOCHEMICAL_DERIVED_SIGNING_KEY="$DERIVED_RUNTIME/events.pem"
-export BIOCHEMICAL_DERIVED_WRITE_TOKEN="$(openssl rand -hex 32)"
-uv run biochemical-db-derived
-```
+Goal 8 uses the reviewed-derived routes in the integrated JavaScript service on `http://127.0.0.1:8000`. Configure `BIOCHEMICAL_DERIVED_URL`, `BIOCHEMICAL_DERIVED_HEALTH_PATH=/api/derived/v1/healthz`, `BIOCHEMICAL_DERIVED_WRITE_TOKEN`, and optional `BIOCHEMICAL_DERIVED_TIMEOUT_MS`. The server startup above generates the key and token only at runtime and stores derived metadata in persistent PGlite with a separate filesystem CAS.
 
 Pass the same runtime `BIOCHEMICAL_DERIVED_WRITE_TOKEN` only to the inference server. The browser uses same-origin `/api/v6/derived` routes and never receives the bearer token, signing key material, or upstream service address. Completed APAP runs become three-object RFC 8785 content-addressed bundles with one explicitly synthetic prediction, complete lineage/context/applicability/qualitative uncertainty/limitations, and signed append-only review. Exact reproduction must match the complete canonical result artifact before verification can be appended. `BIOCHEMICAL_DERIVED_USE_FIXTURE=true` enables the explicit in-memory test/demo ledger. See `docs/DERIVED_KNOWLEDGE.md`.
 
@@ -160,18 +174,44 @@ BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN=http://127.0.0.1:3000
 
 Only explicit `POST /api/v9/data-plane/sync` contacts the factory. Sync verifies canonical signed metadata, both exact release closures, every partition, producer cursor equality and binding, source/adapter/license/accession closure, biochemical links, and the attributed cross-release diff before publishing both generations and one separate diff row atomically. Reads, local HMAC pagination, integrity, diff, and persisted authority-closure audits never contact or fall back to the producer. See `docs/DATA_PLANE.md`.
 
+### External APAP challenge
+
+Goal 13 is delivered. It independently pins `apap-human-pk-challenge-v1.0.0` with release digest `3c1c7e50b8b9e10b9912802e471a07d9df50ee5088b441784fb39e441663ffb7`, held-out partition digest `aaba147a203d1b43055a273b1a7a7fb076015377084defe5172d2a38ddcb8cd9`, and the complete signed catalog, trust, manifest, envelope, sampling-grid, and twelve public-view roots. Explicit sync reads only public metadata. The inference service freezes content-addressed model, equation-set, parameter-policy, concentration-mapping, solver, software, diagnostics, prediction, and public-lineage artifacts before the first protected observation read, independently recomputes both endpoint scores, rejects producer-score drift, and persists an immutable report for network-free replay.
+
+The workbench keeps predictions, measured observations, absent source uncertainty, diagnostics, source locators, and scores in separate named regions. Both frozen aggregate parent-APAP Cmax endpoints exceed the predeclared `<= 0.30` absolute-relative-error threshold, so the honest overall result is `failed`. Tmax, AUC, bioequivalence statistics, sequence effects, variance, full curves, population subgroups, and tramadol/safety remain explicitly not evaluable. This is not broad model validation and makes no clinical, treatment, dose-selection, safety, or bioequivalence claim. Configure `BIOCHEMICAL_CHALLENGE_URL`, `BIOCHEMICAL_CHALLENGE_ROOT`, `BIOCHEMICAL_CHALLENGE_TIMEOUT_MS`, `BIOCHEMICAL_CHALLENGE_ALLOWED_ORIGIN`, and `BIOCHEMICAL_CHALLENGE_CSRF_TOKEN`; the producer and inference client must receive the same exact allowed origin and token values. See `docs/CHALLENGE.md`.
+
+### Local revalidation campaigns
+
+Goal 15 consumes the sibling producer's protected `/api/revalidation/v1`
+state, plan, campaign, outcome, event, and key-lifecycle contracts. Production
+loads the configured 1,024-work Goal 15 plan through bounded pages. The inference
+consumer independently verifies its snapshot/change/policy closure, signed event
+chain, historical materialized state, immutable campaign/outcome receipts, and
+bootstrap/rotation trust before running bounded local work. SQLite WAL/FULL,
+content-addressed artifacts, deterministic attempts, retries, cancellation,
+worker-loss recovery, restart closure, and exactly-once accepted results remain
+local concerns. The `/api/v13/revalidation` workbench separates execution from
+scientific review and cannot label or automatically accept conclusions. Configure
+the `BIOCHEMICAL_REVALIDATION_*` variables listed in
+`docs/REVALIDATION_CAMPAIGNS.md`. Goal 15's declared 1,024-work scale and
+interruption/recovery acceptance drill is complete; scientific interpretation
+remains unsupported and review-required.
+
 Optional server settings are `PORT` (default `3000`) and `HOST` (default `127.0.0.1`). `BIOCHEMICAL_INFERENCE_PUBLIC_ORIGIN` and comma-separated `CORS_ORIGINS` are validated once at startup into one exact allowed-origin set. Every derived, physiology, and data-plane mutation requires an `Origin` in that set plus its family CSRF header; `Host` is never an authority source. Configure at least one allowed browser origin wherever mutations are enabled. The development and Playwright commands pin their public origin explicitly.
 
 ## Verification
 
 ```sh
 npm run check
+npm run test:acceptance:revalidation
+npm run test:acceptance:operations
+npm run test:acceptance:node
 npm audit
 E2E_USE_FIXTURE=true npm run test:e2e
 npm run test:e2e
 ```
 
-Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts the sibling biochemical-db API on port 8000, the evidence API on port 8001, and a production-built inference server on port 5173. It configures separate random producer and local cursor secrets plus run-isolated data-plane and workspace roots outside the source tree. Real E2E exercises the signed factory sync, local pages, canonical network snapshot, non-vector search, document retrieval, and pinned physiology release. Fixture mode starts an exact public factory artifact server and enables explicit inference, evidence, physiology, and deterministic workspace fixtures.
+`npm test` and `npm run check` are the complete routine unit/integration path. `npm run test:acceptance:node` is the complete single-worker node acceptance selection: actual process crash/restart, the 1,024-work campaign, reciprocal cross-repository HTTP, and operations process-group/restore. `npm run test:acceptance` adds Playwright. `test-selection.json` and `npm run test:selection` prove that every test belongs to routine, node acceptance, browser/E2E, or a justified exclusion (currently none), and track every pinned workflow action. CI can run `test:acceptance:e2e:built` after `npm run build` to avoid rebuilding the same production artifacts. Playwright browsers must be installed once with `npx playwright install chromium` before running E2E tests. Real mode starts one integrated sibling JavaScript/PGlite biochemical-db service on port 8000 and a production-built inference server on port 5173. It configures separate random producer and local cursor secrets, one shared producer/inference Goal 13 origin and CSRF token, deterministic test-only external Goal 15 key/policy material, and run-isolated PGlite, data-plane, workspace, measured, challenge, and revalidation roots outside the source tree. Real E2E exercises the signed challenge workflow and the producer-bound revalidation campaign, progress, technical report, receipts, integrity, restart view, and scientific-review separation, plus the existing signed factory, canonical network, evidence, reviewed-derived, and physiology paths on desktop and 360 px mobile. Fixture mode retains the real Goal 13 and Goal 15 producers while enabling explicit factory, measured, inference, evidence, physiology, and deterministic workspace fixtures.
 
 ## API
 
@@ -266,6 +306,23 @@ Playwright browsers must be installed once with `npx playwright install chromium
 - `GET /api/v9/data-plane/integrity`
 - `GET/POST /api/v9/data-plane/audits`
 - `GET /api/v9/data-plane/audits/:reportDigest`
+- `GET /api/v11/challenge`
+- `GET /api/v11/challenge/status`
+- `POST /api/v11/challenge/sync`
+- `POST /api/v11/challenge/commitments`
+- `POST /api/v11/challenge/commitments/:commitmentDigest/disclose`
+- `GET /api/v11/challenge/runs`
+- `GET /api/v11/challenge/reports/:resultDigest`
+- `POST /api/v11/challenge/reports/:resultDigest/replay`
+- `GET /api/v11/challenge/artifacts/:artifactDigest`
+- `GET /api/v11/challenge/integrity`
+- `GET /api/v13/revalidation/status`
+- `GET/POST /api/v13/revalidation/campaigns`
+- `GET /api/v13/revalidation/campaigns/:campaignId`
+- `GET /api/v13/revalidation/campaigns/:campaignId/report`
+- `POST /api/v13/revalidation/campaigns/:campaignId/{reconcile|cancel}`
+- `GET /api/v13/revalidation/integrity`
+- `GET /api/v13/revalidation/events`
 
 Every successful run includes the exact release digest, model and engine versions, normalized effective inputs, a deterministic SHA-256 identity, trajectories, summaries, warnings, and numerical diagnostics.
 
@@ -288,3 +345,7 @@ See `docs/EXPERIMENT_WORKSPACE.md` for durable identity, queue recovery, resourc
 See `docs/PHYSIOLOGY_PLUGINS.md` for the `.bpp` profile, publisher trust, process sandbox gate, persistence, exact coupling identity, conservation/convergence diagnostics, certification boundary, and unsupported scientific scope.
 
 See `docs/DATA_PLANE.md` for factory trust verification, exact artifact and scientific closure, persistent publication, offline reads, cursor binding, API security, test evidence, and limitations.
+
+See `docs/CHALLENGE.md` for the external APAP release pins, commitment/disclosure isolation, exact failed result, absent uncertainty, source locators, offline replay, bounded presentation, and explicit non-validation limits.
+
+See `docs/REVALIDATION_CAMPAIGNS.md` for producer trust, action-bearing impact identity, durable execution/recovery, exact signed receipts, API security, workbench review separation, and the completed scale gate.

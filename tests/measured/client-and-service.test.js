@@ -25,6 +25,9 @@ const clientEnv = {
   BIOCHEMICAL_MEASURED_CSRF_TOKEN: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 }
 const serviceEnv = { ...clientEnv, NODE_ENV: 'test', BIOCHEMICAL_MEASURED_CURSOR_SECRET: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' }
+const fixtureFiles = new Map()
+let fixtureIndexPromise
+let exactBundlePromise
 const selection = {
   familyId: 'family:cebs:study-c55801c', groupIds: MEASURED_GROUP_IDS, observableId: 'observable:cebs:alt',
   partitionId: 'partition:calibration:cebs-c55801c', studyId: 'study:cebs:002-01586-0004-0000-6', timeUnit: 'h', timeValue: '24'
@@ -41,7 +44,8 @@ afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { recur
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
 
 async function fixtureFetch(log = [], mutate = {}) {
-  const index = JSON.parse(await readFile(resolve(fixtureRoot, 'index.json'), 'utf8'))
+  fixtureIndexPromise ??= readFile(resolve(fixtureRoot, 'index.json'), 'utf8').then(JSON.parse)
+  const index = await fixtureIndexPromise
   return async (raw, init = {}) => {
     const url = new URL(raw)
     const key = `${url.pathname}${url.search}`
@@ -49,7 +53,8 @@ async function fixtureFetch(log = [], mutate = {}) {
     if (url.searchParams.has('cursor') && !index[key]) return new Response(null, { status: 422 })
     const filename = index[key]
     if (!filename) return new Response(null, { status: 404 })
-    let bytes = await readFile(resolve(fixtureRoot, filename))
+    if (!fixtureFiles.has(filename)) fixtureFiles.set(filename, readFile(resolve(fixtureRoot, filename)))
+    let bytes = await fixtureFiles.get(filename)
     if (mutate[key]) bytes = Buffer.from(canonicalJson(mutate[key](JSON.parse(bytes))))
     const releaseBound = url.pathname.includes(`/releases/${MEASURED_RELEASE_ID}`)
     return new Response(bytes, { status: 200, headers: {
@@ -61,7 +66,8 @@ async function fixtureFetch(log = [], mutate = {}) {
 }
 
 async function exactBundle() {
-  return createMeasuredClient(clientEnv, { fetchImpl: await fixtureFetch() }).synchronize()
+  exactBundlePromise ??= createMeasuredClient(clientEnv, { fetchImpl: await fixtureFetch() }).synchronize()
+  return exactBundlePromise
 }
 
 function fakeUpstream(bundle, overrides = {}) {

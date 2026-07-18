@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
 import { MODEL } from '../../server/model.js'
 import { simulate } from '../../server/simulation.js'
+import { CHALLENGE_PINS } from '../../shared/challenge-contracts.js'
 
 const api = vi.hoisted(() => ({
   loadWorkspace: vi.fn(),
@@ -10,7 +11,12 @@ const api = vi.hoisted(() => ({
   loadProvenance: vi.fn(),
   runSimulation: vi.fn(),
   loadPortfolioModels: vi.fn(),
-  runPortfolioExperiment: vi.fn()
+  runPortfolioExperiment: vi.fn(),
+  loadChallengeDiscovery: vi.fn(),
+  loadChallengeStatus: vi.fn(),
+  loadChallengeRuns: vi.fn(),
+  loadMeasuredSpatialDiscovery: vi.fn(),
+  loadMeasuredSpatialStatus: vi.fn()
 }))
 
 vi.mock('../../src/api.js', () => api)
@@ -29,9 +35,26 @@ beforeEach(() => {
   api.loadProvenance.mockResolvedValue(BUNDLED_PROVENANCE)
   api.runSimulation.mockImplementation(async (request) => simulate(request, BUNDLED_RELEASE, bundledNetwork(request.taxonId)))
   api.loadPortfolioModels.mockResolvedValue([])
+  api.loadChallengeDiscovery.mockResolvedValue({ pins: CHALLENGE_PINS })
+  api.loadChallengeStatus.mockResolvedValue({ state: 'empty', integrity: 'empty', releaseId: null, disclosureEpoch: null, lastError: null })
+  api.loadChallengeRuns.mockResolvedValue({ items: [], limit: 20 })
+  api.loadMeasuredSpatialDiscovery.mockResolvedValue({
+    pins: {},
+    status: { state: 'empty' }
+  })
+  api.loadMeasuredSpatialStatus.mockResolvedValue({ state: 'empty', integrity: 'empty', releaseId: null, cachedChunks: 0, totalChunks: 400, offlineComplete: false, lastError: null })
 })
 
 describe('workbench request hardening', () => {
+  it('mounts Goal 13 independently when Goal 1 initialization fails', async () => {
+    api.loadWorkspace.mockRejectedValue(new Error('Goal 1 unavailable'))
+    render(App)
+
+    expect(await screen.findByRole('heading', { name: 'Frozen APAP challenge workbench' })).toBeTruthy()
+    expect(await screen.findByText('Explicit synchronization required')).toBeTruthy()
+    expect(screen.getByText('Goal 1 unavailable')).toBeTruthy()
+  })
+
   it('hides the stale network and ignores out-of-order taxon responses', async () => {
     const mouse = deferred()
     const human = deferred()

@@ -601,8 +601,11 @@ export async function createWorkspaceService(options = {}) {
       database.close()
       if (ephemeral) await rm(root, { recursive: true, force: true })
     },
-    listResourceProfiles() {
-      return database.prepare('SELECT payload_json FROM resource_profiles ORDER BY id').all().map((row) => ResourceProfileSchema.parse(JSON.parse(row.payload_json)))
+    listResourceProfiles(signal) {
+      signal?.throwIfAborted()
+      const profiles = database.prepare('SELECT payload_json FROM resource_profiles ORDER BY id').all().map((row) => ResourceProfileSchema.parse(JSON.parse(row.payload_json)))
+      signal?.throwIfAborted()
+      return profiles
     },
     createResourceProfile(input) {
       const value = ResourceProfileSchema.parse(input)

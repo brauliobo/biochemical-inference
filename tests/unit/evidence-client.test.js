@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   EvidenceAnnotationSchema,
+  EvidenceCandidateSchema,
   EvidenceDocumentSchema,
   EvidenceLicenseSchema,
   EvidenceLifecycleSchema,
@@ -30,6 +31,23 @@ describe('evidence service boundary', () => {
       expect(schema.safeParse(value).success).toBe(true)
       expect(schema.safeParse({ ...value, undocumented: true }).success).toBe(false)
     }
+  })
+
+  it('requires candidate release provenance and rejects pinned-release drift', async () => {
+    const candidate = {
+      id: `CANDIDATE:${'a'.repeat(32)}`, status: 'unreviewed', release_id: DEFAULT_EVIDENCE_RELEASE_ID,
+      release_digest: '0'.repeat(64), document_id: 'EVIDENCE-DOC:1', span_ids: ['SPAN:TEST'], model: 'model',
+      model_digest: '1'.repeat(64), prompt_digest: '2'.repeat(64), input_digest: '3'.repeat(64), output_digest: '4'.repeat(64),
+      subject: 'subject', relation: 'relation', object: 'object', unresolved_entities: [], missing_context: []
+    }
+    expect(EvidenceCandidateSchema.safeParse(candidate).success).toBe(true)
+    expect(EvidenceCandidateSchema.safeParse(Object.fromEntries(Object.entries(candidate).filter(([key]) => key !== 'release_digest'))).success).toBe(false)
+    const health = { status: 'ok', release: { id: DEFAULT_EVIDENCE_RELEASE_ID, schema_version: '3.0.0', digest: DEFAULT_EVIDENCE_RELEASE_DIGEST }, documents: 3 }
+    const fetchMock = vi.fn(async (url) => new Response(JSON.stringify(String(url).endsWith('/healthz') ? health : { items: [candidate] }), { status: 200, headers: { 'content-type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetchMock)
+    const client = createEvidenceClient({ BIOCHEMICAL_EVIDENCE_ALLOWED_ORIGIN: 'https://inference.test', BIOCHEMICAL_EVIDENCE_CSRF_TOKEN: 'E'.repeat(43) })
+    await expect(client.candidates()).rejects.toThrow('candidate provenance does not match the pinned release')
+    expect(fetchMock.mock.calls[1][1].headers).toMatchObject({ origin: 'https://inference.test', 'x-csrf-token': 'E'.repeat(43) })
   })
 
   it('fails closed when health reports a different evidence digest', async () => {
@@ -67,12 +85,36 @@ describe('evidence service boundary', () => {
       status: String(url).endsWith('/healthz') ? 200 : 503,
       headers: { 'content-type': 'application/json' }
     })))
-    const client = createEvidenceClient()
+    const client = createEvidenceClient({ BIOCHEMICAL_EVIDENCE_ALLOWED_ORIGIN: 'http://127.0.0.1:5173', BIOCHEMICAL_EVIDENCE_CSRF_TOKEN: 'E'.repeat(43) })
     const request = { document_id: 'EVIDENCE-DOC:1', span_ids: ['SPAN:TEST'], instruction: 'Extract.' }
 
     await expect(client.extract(request)).rejects.toMatchObject({ code: 'EVIDENCE_UPSTREAM_ERROR' })
 
     detail = 'Ollama model is not installed: qwen3:4b'
     await expect(client.extract(request)).rejects.toMatchObject({ code: 'EVIDENCE_MODEL_UNAVAILABLE' })
+
+    detail = 'Ollama capability is unavailable in this runtime'
+    await expect(client.extract(request)).rejects.toMatchObject({ code: 'EVIDENCE_MODEL_UNAVAILABLE' })
+  })
+
+  it('uses integrated defaults and preserves explicit evidence URL and health overrides', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      status: 'ok', release: { id: DEFAULT_EVIDENCE_RELEASE_ID, schema_version: '3.0.0', digest: DEFAULT_EVIDENCE_RELEASE_DIGEST }, documents: 3
+    }), { status: 200, headers: { 'content-type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await createEvidenceClient({}).health()
+    await createEvidenceClient({ BIOCHEMICAL_DB_URL: 'http://database.test/' }).health()
+    await createEvidenceClient({
+      BIOCHEMICAL_DB_URL: 'http://database.test',
+      BIOCHEMICAL_EVIDENCE_URL: 'http://evidence.test/',
+      BIOCHEMICAL_EVIDENCE_HEALTH_PATH: '/custom/evidence-healthz'
+    }).health()
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      'http://127.0.0.1:8000/api/evidence/v1/healthz',
+      'http://database.test/api/evidence/v1/healthz',
+      'http://evidence.test/custom/evidence-healthz'
+    ])
   })
 })

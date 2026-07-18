@@ -82,9 +82,10 @@ export function createPhysiologyClient(env = process.env) {
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) throw new PhysiologyCompatibilityError('BIOCHEMICAL_PHYSIOLOGY_TIMEOUT_MS must be positive')
   const releaseBase = `/api/physiology/v1/releases/${encodeURIComponent(releaseId)}`
 
-  async function request(path, immutable = true) {
+  async function request(path, immutable = true, signal) {
     try {
-      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(timeoutMs) })
+      const selectedSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs)
+      const response = await fetch(`${baseUrl}${path}`, { headers: { accept: 'application/json' }, redirect: 'error', signal: selectedSignal })
       if (!response.ok) {
         const statusCode = response.status >= 400 && response.status < 500 ? response.status : 503
         throw new PhysiologyCompatibilityError(`Physiology service returned ${response.status} for ${path}`, { statusCode, code: response.status === 404 ? 'PHYSIOLOGY_NOT_FOUND' : 'PHYSIOLOGY_UPSTREAM_ERROR' })
@@ -99,8 +100,8 @@ export function createPhysiologyClient(env = process.env) {
     }
   }
 
-  async function catalog() {
-    const parsed = PhysiologyCatalogSchema.safeParse(await request('/api/physiology/v1/releases', false))
+  async function catalog(signal) {
+    const parsed = PhysiologyCatalogSchema.safeParse(await request('/api/physiology/v1/releases', false, signal))
     if (!parsed.success || parsed.data.releases[0]?.release_digest !== expectedDigest) throw new PhysiologyCompatibilityError('Physiology catalog does not contain the trusted release and digest')
     return parsed.data
   }
@@ -118,15 +119,15 @@ export function createPhysiologyClient(env = process.env) {
     return payload
   }
 
-  async function envelope(path, schema, description) {
-    await catalog()
-    return verifyEnvelope(schema.safeParse(await request(`${releaseBase}${path}`)), description)
+  async function envelope(path, schema, description, signal) {
+    await catalog(signal)
+    return verifyEnvelope(schema.safeParse(await request(`${releaseBase}${path}`, true, signal)), description)
   }
 
   const client = {
     catalog,
     detail,
-    async contexts() { return envelope('/contexts', PhysiologyContextsResponseSchema, 'contexts') },
+    async contexts(signal) { return envelope('/contexts', PhysiologyContextsResponseSchema, 'contexts', signal) },
     async applicability() { return envelope('/applicability', PhysiologyApplicabilityResponseSchema, 'applicability') },
     async quantities() { return envelope('/quantities', PhysiologyQuantitiesResponseSchema, 'quantities') },
     async modelEvidence() { return envelope('/model-evidence', PhysiologyModelEvidenceResponseSchema, 'model evidence') },
