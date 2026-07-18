@@ -12,9 +12,9 @@ validation by being reused here.
 | --- | --- |
 | 11. Authoritative Release Factory And Local Data Plane | **Delivered** |
 | 12. Measured Parameter And Observation Commons | **Delivered** |
-| 13. Externally Challenged APAP Benchmark | **Pending** |
-| 14. Measured Spatial Liver Atlas And Registration | **Pending** |
-| 15. Local Revalidation Campaigns At Scale | **Pending** |
+| 13. Externally Challenged APAP Benchmark | **Delivered** |
+| 14. Measured Spatial Liver Atlas And Registration | **Active; bounded measured atlas slice delivered, real registration pending** |
+| 15. Local Revalidation Campaigns At Scale | **Delivered; scale gate complete** |
 
 Status is changed only by evidence that the acceptance gates are met. These
 goals have no dates, duration estimates, or delivery timelines.
@@ -197,7 +197,13 @@ and complete lineage in run artifacts.
 
 ## Goal 13: Externally Challenged APAP Benchmark
 
-**Status: Pending**
+**Status: Delivered**
+
+The signed producer contract, inference-owned freeze, isolated disclosure,
+independent scoring, immutable report, offline replay, bounded Vue presentation,
+focused service/API/component tests, and real desktop/mobile browser acceptance
+are implemented. The exact two-endpoint result is `failed`; this does not
+validate the model more broadly. See `docs/CHALLENGE.md`.
 
 Challenge a frozen APAP model against independently sourced, measured, held-out
 data instead of interpreting the completed synthetic APAP fixture as biological
@@ -246,14 +252,19 @@ validation.
 
 ### Cross-Repository Ownership
 
-`biochemical-db` owns the measured challenge releases, immutable partitions,
-endpoint mappings, and scoring contract. `biochemical-inference` owns model
-freeze evidence, isolated execution, diagnostics, scoring, and bounded
-conclusion presentation.
+`biochemical-db` owns the licensed measured release, source locators, immutable
+partition, protocol, endpoint definitions, mapping, metric, threshold,
+exclusions, not-evaluable rules, protected disclosure, and authoritative result
+contract. `biochemical-inference` owns independent pins and verification, the
+local immutable snapshot and artifact closure, model and parameter-policy freeze
+evidence, isolated execution, numerical diagnostics, independent score
+recomputation and producer comparison, offline replay and integrity, and the
+bounded conclusion presentation. The browser supplies intents only and cannot
+author digests, measured values, scores, or conclusions.
 
 ## Goal 14: Measured Spatial Liver Atlas And Registration
 
-**Status: Pending**
+**Status: Active; Bounded Atlas And Source-Prealigned Pair Delivered**
 
 Add measured liver imagery and explicit registration contracts while keeping
 synthetic lobule geometry and unsupported coordinate mappings visibly separate.
@@ -308,9 +319,22 @@ spaces, registration evidence, and delivery contracts. `biochemical-inference`
 owns verified chunk caching, transform-aware analysis, linked views, and
 semantic alternatives to 3D.
 
+The signed producer and inference consumer deliver the bounded CC BY-SA 4.0
+DigiMouse atlas slice plus a separate CC BY 3.0 Learn2Reg human MR-fixed/
+CT-moving pair. Both use independently pinned trust, catalog, release,
+manifest, metadata, inventory, and array identities; strict signature and chunk
+verification; release-bound caching; complete offline closure; and responsive
+semantic/tabular access without WebGL. The Learn2Reg release materializes an
+identity affine only between equal source-prealigned NIfTI sforms, binds every
+array to an exact space/index transform, and recomputes residual organ overlap
+inside a repository-derived evaluation ROI from 288 evidence chunks. The ROI
+scopes metrics and does not invalidate outside-ROI transforms. It cannot connect DigiMouse, HRA, synthetic
+lobule geometry, another subject, or another taxon. The biologically relevant
+lobule registration remains unavailable, so Goal 14 remains active.
+
 ## Goal 15: Local Revalidation Campaigns At Scale
 
-**Status: Pending**
+**Status: Delivered; Scale Gate Complete**
 
 Turn source, model, and trust changes into recoverable local campaigns that
 revalidate only the affected scientific work and preserve an auditable history.
@@ -362,3 +386,23 @@ revalidate only the affected scientific work and preserve an auditable history.
 contracts, and signing-key lifecycle records. `biochemical-inference` owns local
 campaign planning, durable execution and recovery, resource enforcement,
 artifact verification, and review-facing impact reports.
+
+The producer/consumer slice independently agrees on action-bearing dependency,
+semantic-change, policy, impact, work-item, plan, and campaign identities for the
+Goal 11 release pair. The durable local queue now covers leases, attempts,
+checkpoints, cancellation, retries, worker-loss and restart recovery, bounded
+subprocesses, CAS closure, and exactly-once accepted technical results. Signed
+producer campaign/outcome events and activation/rotation/retirement/revocation
+rules are verified against an independent bootstrap pin; exact requests,
+receipts, events, and historical heads persist locally and verify on restart.
+The no-store v13 API and responsive workbench expose technical progress and
+review requirements without authoring scientific labels or automatic acceptance.
+The delivered scale gate now loads the configured 1,024-work producer plan over
+bounded HTTP pages, executes the exact independently recomputed work closure,
+and returns 1,024 campaign-scoped outcomes through bounded HTTP batches. The
+cross-repository acceptance ledger closes at exactly 1,029 signed events after
+the four key-lifecycle transitions and campaign creation. Worker PID readiness,
+automatic lease expiry/renewal, process RSS/runtime/output/storage enforcement,
+crash-atomic cancellation, and computed report assertions are covered by the
+focused CI workflow. CPU cores remain an honest concurrency ceiling rather than
+an unenforceable OS CPU-time claim.
