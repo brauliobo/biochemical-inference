@@ -10,7 +10,7 @@
       "identity": "The complete source_files path/hash map is authoritative for generator code; source_parent_commit is only its committed ancestry anchor.",
       "local_validation": "A local producer may be dirty or contain uncommitted files, but every authoritative source path must exist with the recorded hash before regeneration.",
       "certification_ref": "Certification requires a clean immutable 40-hex producer commit equal to or descended from source_parent_commit and containing every authoritative source path at its recorded hash.",
-      "current_status": "blocked by conditional source rights without a reviewed immutable simulation-handoff rights disposition; immutable producer certification is also unavailable until commit"
+      "current_status": "blocked by conditional source rights without a reviewed immutable simulation-handoff rights disposition"
     },
     "source_files": {
       "package-lock.json": "57ce2969cd2632501c01e7c11c881a3686f9fb1df364e81c642ed3708f41c6eb",

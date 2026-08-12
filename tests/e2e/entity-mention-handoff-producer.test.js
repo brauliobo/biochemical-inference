@@ -80,7 +80,7 @@ it('certifies static bytes and the authoritative blocked handoff outcome', async
     identity: 'The complete source_files path/hash map is authoritative for generator code; source_parent_commit is only its committed ancestry anchor.',
     local_validation: 'A local producer may be dirty or contain uncommitted files, but every authoritative source path must exist with the recorded hash before regeneration.',
     certification_ref: 'Certification requires a clean immutable 40-hex producer commit equal to or descended from source_parent_commit and containing every authoritative source path at its recorded hash.',
-    current_status: 'blocked by conditional source rights without a reviewed immutable simulation-handoff rights disposition; immutable producer certification is also unavailable until commit'
+    current_status: 'blocked by conditional source rights without a reviewed immutable simulation-handoff rights disposition'
   })
   expect(Object.keys(provenance.producer.source_files).sort()).toEqual(await authoritativeSourcePaths())
   const producerCommit = (await execute('git', ['rev-parse', 'HEAD'], { cwd: resolve(producerRoot, '..') })).stdout.trim()
