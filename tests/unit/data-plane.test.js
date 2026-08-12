@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { DatabaseSync } from 'node:sqlite'
-import { mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rename, rm, symlink, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import {
@@ -18,6 +18,7 @@ import {
 } from '../../shared/data-plane-contracts.js'
 import { createFactoryClient, validateLoopbackFactoryUrl } from '../../server/data-plane/client.js'
 import { createDataPlaneService } from '../../server/data-plane/service.js'
+import { createDataPlaneObjectStore } from '../../server/data-plane/object-store.js'
 import {
   parseCanonicalBytes,
   parsePartition,
@@ -168,6 +169,23 @@ describe('Goal 11 producer verification', () => {
 })
 
 describe('Goal 11 persistent local mirror', () => {
+  it('fails closed when the named CAS root is replaced during publication', async () => {
+    const parent = await persistentRoot('data-plane-cas-race-')
+    const root = resolve(parent, 'store')
+    const displaced = resolve(parent, 'store-pinned')
+    const attacker = resolve(parent, 'attacker')
+    await mkdir(attacker)
+    const objects = await createDataPlaneObjectStore(root, {
+      beforePublish: async () => {
+        await rename(root, displaced)
+        await symlink(attacker, root)
+      }
+    })
+    try { await expect(objects.put(Buffer.from('pinned bytes'))).rejects.toThrow(/symbolic links|no longer identifies/) }
+    finally { await objects.close() }
+    expect(await readdir(attacker)).toEqual([])
+  })
+
   it('publishes two releases and one separate diff atomically, rolling back staged failures', async () => {
     const { client } = await fixtureClient()
     const root = await persistentRoot('data-plane-rollback')

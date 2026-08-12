@@ -738,6 +738,7 @@ export async function createDataPlaneService(options = {}) {
       await Promise.allSettled([...activeSyncs])
       await storageTail.catch(() => {})
       database.close()
+      await objects.close()
       if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true })
     },
     testing: options.exposeTesting ? { root: selectedRoot.root, database, objects, client, decodeCursor: (value) => strictCursorDecode(value, secret), scanIntegrity: scanIntegrityIsolated } : undefined

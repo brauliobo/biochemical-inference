@@ -535,6 +535,7 @@ export async function createChallengeService(options = {}) {
       if (closed) return
       closed = true
       await storageTail
+      await objects.close()
       database.close()
       if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true })
     },

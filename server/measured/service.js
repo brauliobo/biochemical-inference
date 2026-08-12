@@ -605,7 +605,7 @@ export async function createMeasuredService(options = {}) {
     freeze(intent) { return track(executeFreeze(intent)) },
     disclose(intent) { return track(executeDisclosure(intent)) },
     integrity(signal) { return track(withStorage(async () => { signal?.throwIfAborted(); await recoverMeasuredJournal(selectedRoot.root, database, objects); signal?.throwIfAborted(); const result = await scanIntegrity(() => signal?.throwIfAborted()); signal?.throwIfAborted(); applyIntegrity(result); return result })) },
-    async close() { if (closed) return; closed = true; syncGeneration += 1; syncController?.abort(new MeasuredRequestError('MEASURED_CLOSED', 'Measured service is closing.', 503)); await Promise.allSettled([...active]); await storageTail.catch(() => {}); database.close(); if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true }) },
+    async close() { if (closed) return; closed = true; syncGeneration += 1; syncController?.abort(new MeasuredRequestError('MEASURED_CLOSED', 'Measured service is closing.', 503)); await Promise.allSettled([...active]); await storageTail.catch(() => {}); await objects.close(); database.close(); if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true }) },
     testing: options.exposeTesting ? { root: selectedRoot.root, database, objects, scanIntegrity, upstream, recoverJournal: () => recoverMeasuredJournal(selectedRoot.root, database, objects) } : undefined
   }
   return service

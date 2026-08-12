@@ -358,6 +358,7 @@ export async function createMeasuredSpatialService(options = {}) {
       if (closed) return
       closed = true
       await storageTail.catch(() => {})
+      await objects.close()
       database.close()
       if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true })
     },

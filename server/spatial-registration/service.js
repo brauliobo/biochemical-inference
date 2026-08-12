@@ -198,7 +198,7 @@ export async function createSpatialRegistrationService(options = {}) {
       if (failed) { state = 'failed'; integrityState = 'failed'; lastError = summary.findings[0] }
       return { status: failed ? 'failed' : 'valid', releaseId: SPATIAL_REGISTRATION_PINS.releaseId, metadataVerified: true, cachedChunks: summary.cached, verifiedEncodedChunks: summary.encoded, verifiedDecodedChunks: summary.decoded, residualOverlapRecomputed: Boolean(residualOverlapRow()), offlineComplete: !failed && Boolean(completionRow()) && summary.cached === 304, networkAccess: false, findings: failed ? summary.findings : summary.cached === 304 ? [] : [`${304 - summary.cached} manifest-owned chunks are not cached.`] }
     },
-    async close() { if (closed) return; closed = true; await storageTail.catch(() => {}); database.close(); if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true }) },
+    async close() { if (closed) return; closed = true; await storageTail.catch(() => {}); await objects.close(); database.close(); if (selectedRoot.ephemeral) await rm(selectedRoot.root, { recursive: true, force: true }) },
     root: selectedRoot.root
   }
 }
