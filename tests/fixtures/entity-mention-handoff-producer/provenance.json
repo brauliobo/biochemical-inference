@@ -19,7 +19,7 @@
       "scripts/nutrient-reaction-simulation-handoff.js": "fb319987032d200d895b17ff059de0ab3bb5bb0acc99771926c6ea12271a3c2c",
       "src/artifacts/source-node.js": "15ac61beabe9ce0d86b398ee2c0d91cff17385e2266eaf2ce5d40593b09cba8f",
       "src/artifacts/source.js": "7a0b005ad3f7a5811d1265a0983284d5ece1cdf635943764c09d6b22a7c7e145",
-      "src/domains/factory/safeio-node.js": "bd4390e5c5b93f706d52a11dc92d7a6c087298f622f37dfe2f80bbca68f8cd5b",
+      "src/domains/factory/safeio-node.js": "b33e371c33ec71896144c56da014d7d85230cd0e05da5df3a673d2662e70f24c",
       "src/domains/nutrient-reaction-atlas/entity-mention-handoff-node.js": "112b319ea4bb3415c5d141a75106a9e0f2fa3f938bebe8d3d98c92679a7c8e93",
       "src/domains/nutrient-reaction-atlas/entity-mention-shards.js": "4e26e121d7fc27a8b51d44a795de3ebf2a23082d01626d3ff6f6aebdc07cdfc3",
       "src/domains/nutrient-reaction-atlas/entity-mention-slice.js": "61ed58972e197da4383d414166c56e9c307ee65ad2f6808a4dee079b55586ac7",
