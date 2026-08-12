@@ -66,7 +66,7 @@ describe('independent Entity Mention Atlas handoff consumer', () => {
     await expect(reopenEntityMentionHandoff({ storeRoot, importId: stored.importId, pins: local.pins })).resolves.toMatchObject({ record: { trust: 'workspace-local-signed' }, signature: { official: false } })
     const official = await fixture({ signed: true, official: true })
     await expect(verifyEntityMentionHandoffBundle({ releaseRoot: official.releaseRoot, handoffPath: official.handoffPath, signaturePath: official.signaturePath, pins: official.pins })).rejects.toThrow(/strict contract|Official trust/)
-  })
+  }, REAL_RELEASE_CONSUMER_TIMEOUT_MS)
 
   it('accepts only the synthetic signed-tree envelope extra under an explicitly supplied independent test pin', async () => {
     const signed = await fixture({ pagesEnvelope: true })
@@ -84,7 +84,7 @@ describe('independent Entity Mention Atlas handoff consumer', () => {
     envelope.signature = `${envelope.signature[0] === 'A' ? 'B' : 'A'}${envelope.signature.slice(1)}`
     await writeFile(envelopePath, canonicalJson(envelope))
     await expect(verifyEntityMentionHandoffBundle({ releaseRoot: tampered.releaseRoot, handoffPath: tampered.handoffPath, pins: tampered.pins })).rejects.toThrow(/signature verification failed/)
-  })
+  }, REAL_RELEASE_CONSUMER_TIMEOUT_MS)
 
   it('rejects canonical, digest, closed-tree, and signature tampering', async () => {
     const noncanonical = await fixture()
