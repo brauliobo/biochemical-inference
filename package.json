@@ -2,6 +2,7 @@
   "name": "biochemical-inference",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=22 <23"
@@ -32,6 +33,7 @@
     "test:ops:acceptance": "npm run test:acceptance:operations",
     "test:acceptance": "npm run test:acceptance:node && npm run test:acceptance:e2e",
     "test:acceptance:node": "nice -n 10 vitest run tests/acceptance/operations-process.test.js tests/acceptance/operations-supervisor.test.js tests/acceptance/revalidation-process.test.js tests/revalidation/planning-performance.test.js tests/revalidation/scale-acceptance.test.js tests/revalidation/cross-repo-scale-http.test.js --maxWorkers=1 --no-file-parallelism",
+    "test:certification:producer": "nice -n 10 vitest run tests/e2e/entity-mention-handoff-producer.test.js --maxWorkers=1 --no-file-parallelism",
     "test:acceptance:revalidation": "nice -n 10 vitest run tests/acceptance/revalidation-process.test.js tests/revalidation/planning-performance.test.js tests/revalidation/scale-acceptance.test.js tests/revalidation/cross-repo-scale-http.test.js --maxWorkers=1 --no-file-parallelism",
     "test:acceptance:operations": "nice -n 10 vitest run tests/acceptance/operations-process.test.js tests/acceptance/operations-supervisor.test.js --maxWorkers=1 --no-file-parallelism",
     "test:acceptance:e2e": "nice -n 10 playwright test --workers=1",

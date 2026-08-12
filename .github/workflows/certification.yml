@@ -53,6 +53,11 @@ jobs:
       - run: nice -n 10 npm --prefix biochemical-inference run test:selection
       - run: nice -n 10 npm --prefix biochemical-inference run check:syntax
       - run: nice -n 10 npm --prefix biochemical-inference run build
+      - name: Certify live Entity Mention producer handoff
+        working-directory: biochemical-inference
+        env:
+          BIOCHEMICAL_DB_CERTIFICATION_REF: ${{ vars.BIOCHEMICAL_DB_CERTIFICATION_REF }}
+        run: timeout --signal=TERM --kill-after=30s 3m nice -n 10 npm run test:certification:producer
       - name: Complete routine selection
         working-directory: biochemical-inference
         run: timeout --signal=TERM --kill-after=30s 22m nice -n 10 npm run test:routine

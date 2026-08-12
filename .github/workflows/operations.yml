@@ -7,11 +7,11 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-  attestations: write
 
 jobs:
   verify:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -120,27 +120,10 @@ jobs:
           timeout --signal=TERM --kill-after=30s 10m nice -n 10 node scripts/operations.js backup --runtime-root "$RUNNER_TEMP/biochemical-runtime" --destination "$RUNNER_TEMP/biochemical-backup"
           timeout --signal=TERM --kill-after=30s 10m nice -n 10 node scripts/operations.js verify-backup --runtime-root "$RUNNER_TEMP/biochemical-runtime" --backup "$RUNNER_TEMP/biochemical-backup"
           timeout --signal=TERM --kill-after=30s 20m nice -n 10 node scripts/operations.js dr-test --runtime-root "$RUNNER_TEMP/biochemical-runtime" --backup "$RUNNER_TEMP/biochemical-backup" --target "$RUNNER_TEMP/biochemical-dr" --candidate-inference-repo "$RUNNER_TEMP/deployments/candidate/biochemical-inference" --candidate-database-repo "$RUNNER_TEMP/deployments/candidate/biochemical-db" --candidate-inference-commit "$(git rev-parse 'HEAD^{commit}')" --candidate-database-commit "$(git -C ../biochemical-db rev-parse 'HEAD^{commit}')" --prior-inference-repo "$RUNNER_TEMP/deployments/prior/biochemical-inference" --prior-database-repo "$RUNNER_TEMP/deployments/prior/biochemical-db"
-      - name: Sign uploaded cross-repository provenance
-        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
-        with:
-          subject-path: |
-            ${{ runner.temp }}/provenance-context.json
-            ${{ runner.temp }}/database-build.tar
-            ${{ runner.temp }}/inference-build.tar
-            ${{ runner.temp }}/database-evidence.tar
-            ${{ runner.temp }}/inference-evidence.tar
-            ${{ runner.temp }}/database-deployment.tar
-            ${{ runner.temp }}/inference-deployment.tar
-            ${{ runner.temp }}/prior-database-deployment.tar
-            ${{ runner.temp }}/prior-inference-deployment.tar
-            ${{ runner.temp }}/database-deployment.tar.owner.json
-            ${{ runner.temp }}/inference-deployment.tar.owner.json
-            ${{ runner.temp }}/prior-database-deployment.tar.owner.json
-            ${{ runner.temp }}/prior-inference-deployment.tar.owner.json
       - name: Upload operational evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: signed-cross-repository-operational-evidence
+          name: cross-repository-operational-subjects
           if-no-files-found: error
           retention-days: 30
           path: |
@@ -159,3 +142,23 @@ jobs:
             ${{ runner.temp }}/inference-deployment.tar.owner.json
             ${{ runner.temp }}/prior-database-deployment.tar.owner.json
             ${{ runner.temp }}/prior-inference-deployment.tar.owner.json
+
+  attest:
+    if: github.event_name == 'push'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download immutable operational subjects
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: cross-repository-operational-subjects
+          path: ${{ runner.temp }}/operational-subjects
+      - name: Attest uploaded cross-repository provenance
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be
+        with:
+          subject-path: ${{ runner.temp }}/operational-subjects/**

@@ -9,6 +9,15 @@ node_modules/
 dist/
 server-dist/
 coverage/
+coverage-*/
+coverage-increment*/
+coverage-runs/
+coverage-combined.*
+retirement-reports/
+retirement-logs/
+retirement-*.log
+audit-reports/
+*.audit-report.json
 playwright-report/
 test-results/
 .env

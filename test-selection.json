@@ -15,6 +15,11 @@
         "tests/revalidation/scale-acceptance.test.js"
       ]
     },
+    "live_certification": {
+      "files": [
+        "tests/e2e/entity-mention-handoff-producer.test.js"
+      ]
+    },
     "browser_e2e": {
       "directory": "tests/e2e",
       "suffix": ".spec.js"
@@ -24,6 +29,7 @@
   "command_scripts": {
     "routine": "test:routine",
     "node_acceptance": "test:acceptance:node",
+    "live_certification": "test:certification:producer",
     "browser_e2e": "test:acceptance:e2e"
   },
   "certification_workflow": ".github/workflows/certification.yml",
@@ -34,6 +40,7 @@
   "workflow_actions": [
     "actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be",
     "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5",
+    "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
     "actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
     "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
   ]

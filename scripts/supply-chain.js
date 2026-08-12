@@ -2,6 +2,7 @@
 import { createHash } from 'node:crypto'
 import { lstat, mkdir, readFile, readdir, rename, rmdir, unlink, writeFile } from 'node:fs/promises'
 import { dirname, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { canonicalJson } from '../shared/canonical-json.js'
 import { inspectNoSymlinkPath, syncPath } from '../server/operations/path-safety.js'
 
@@ -43,7 +44,9 @@ function purl(name, version) {
   return `pkg:npm/${selected}@${encodeURIComponent(version)}`
 }
 
-async function sbom() {
+const licenseName = (value) => typeof value === 'string' && value ? [{ license: { name: value } }] : undefined
+
+export async function buildSbom() {
   const lock = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'))
   const packageValue = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'))
   const components = []
@@ -51,7 +54,8 @@ async function sbom() {
     if (!path || !value?.version) continue
     const name = value.name ?? path.slice(path.lastIndexOf('node_modules/') + 'node_modules/'.length)
     if (!name) continue
-    const component = { type: 'library', name, version: value.version, purl: purl(name, value.version) }
+    const component = { type: 'library', 'bom-ref': purl(name, value.version), name, version: value.version, purl: purl(name, value.version) }
+    if (licenseName(value.license)) component.licenses = licenseName(value.license)
     if (typeof value.integrity === 'string') component.properties = [{ name: 'npm:integrity', value: value.integrity }]
     components.push(component)
   }
@@ -60,7 +64,7 @@ async function sbom() {
     bomFormat: 'CycloneDX',
     specVersion: '1.5',
     version: 1,
-    metadata: { component: { type: 'application', name: packageValue.name, version: packageValue.version, purl: purl(packageValue.name, packageValue.version) }, tools: { components: [{ type: 'application', name: 'biochemical-supply-chain', version: '1.0.0' }] } },
+    metadata: { component: { type: 'application', 'bom-ref': purl(packageValue.name, packageValue.version), name: packageValue.name, version: packageValue.version, purl: purl(packageValue.name, packageValue.version), licenses: [{ license: { id: 'MIT' } }] }, tools: { components: [{ type: 'application', name: 'biochemical-supply-chain', version: '1.0.0', licenses: [{ license: { id: 'MIT' } }] }] } },
     components
   }
 }
@@ -149,7 +153,7 @@ async function generate(output, contextPath) {
   const context = await readContext(contextPath)
   const target = resolve(output)
   const checksumManifest = await checksums()
-  const values = { 'checksums.json': checksumManifest, 'provenance.json': await provenance(checksumManifest, context), 'sbom.cdx.json': await sbom() }
+  const values = { 'checksums.json': checksumManifest, 'provenance.json': await provenance(checksumManifest, context), 'sbom.cdx.json': await buildSbom() }
   const owned = await createOwnedOutput(target)
   try {
     for (const [name, value] of Object.entries(values)) await writeFile(resolve(owned.stage, name), canonicalJson(value), { flag: 'wx', mode: 0o600 })
@@ -175,7 +179,7 @@ async function verify(output, contextPath) {
   const marker = await readCanonical(resolve(target, OUTPUT_FILES[0]), 'supply-chain output owner marker')
   if (canonicalJson(marker) !== canonicalJson(OUTPUT_MARKER)) throw new Error('supply-chain output owner marker is invalid')
   const checksumManifest = await checksums()
-  const values = { 'checksums.json': checksumManifest, 'provenance.json': await provenance(checksumManifest, context), 'sbom.cdx.json': await sbom() }
+  const values = { 'checksums.json': checksumManifest, 'provenance.json': await provenance(checksumManifest, context), 'sbom.cdx.json': await buildSbom() }
   for (const [name, expected] of Object.entries(values)) if (canonicalJson(await readCanonical(resolve(target, name), name)) !== canonicalJson(expected)) throw new Error(`${name} failed offline regeneration`)
   const checksummed = { ...values, [OUTPUT_FILES[0]]: OUTPUT_MARKER }
   const expectedSums = `${Object.keys(checksummed).sort(compareUtf8).map((name) => `${digest(canonicalJson(checksummed[name]))}  ${name}`).join('\n')}\n`
@@ -183,8 +187,10 @@ async function verify(output, contextPath) {
   return { components: values['sbom.cdx.json'].components.length, source_files: checksumManifest.files.length, status: 'verified' }
 }
 
-const [command, output = resolve(root, '.supply-chain'), contextFlag, contextValue] = process.argv.slice(2)
-if (contextFlag !== '--context' || !contextValue) throw new Error('usage: supply-chain.js generate|verify [output-directory] --context PROVENANCE_CONTEXT.json')
-const result = command === 'generate' ? await generate(output, contextValue) : command === 'verify' ? await verify(output, contextValue) : null
-if (!result) throw new Error('usage: supply-chain.js generate|verify [output-directory] --context PROVENANCE_CONTEXT.json')
-process.stdout.write(`${JSON.stringify(result)}\n`)
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const [command, output = resolve(root, '.supply-chain'), contextFlag, contextValue] = process.argv.slice(2)
+  if (contextFlag !== '--context' || !contextValue) throw new Error('usage: supply-chain.js generate|verify [output-directory] --context PROVENANCE_CONTEXT.json')
+  const result = command === 'generate' ? await generate(output, contextValue) : command === 'verify' ? await verify(output, contextValue) : null
+  if (!result) throw new Error('usage: supply-chain.js generate|verify [output-directory] --context PROVENANCE_CONTEXT.json')
+  process.stdout.write(`${JSON.stringify(result)}\n`)
+}
