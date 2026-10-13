@@ -22,7 +22,8 @@ export default [
       { rel: "interacts-with", to: "enzyme:gnmt" },
       { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Adds to an already pathological glycine load." },
       { rel: "increases", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep quality in small trials from one research group." },
-      { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." }
+      { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." },
+      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia" }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-nmda"]
   },
@@ -43,7 +44,8 @@ export default [
       { rel: "increases", to: "compound:hydroxyproline" },
       { rel: "increases", to: "pathway:collagen-synthesis", note: "Substrate supply; clinical benefit modest" },
       { rel: "causes", to: "outcome:belching", note: "Reported by some users; mechanism unresolved" },
-      { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" }
+      { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" },
+      { rel: "mitigates", to: "disease:osteoarthritis", note: "Mixed small trials." }
     ],
     refs: ["article:iwai-2005-collagen-peptides-blood", "article:clark-2008-collagen-hydrolysate", "article:knight-2006-hydroxyproline-oxalate"]
   },
@@ -62,7 +64,8 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:collagen-type-ii" },
       { rel: "increases", to: "compound:glycine", note: "Negligible at 40 mg" },
-      { rel: "causes", to: "outcome:belching", note: "Reported by some users; likely not a glycine-load effect at 40 mg" }
+      { rel: "causes", to: "outcome:belching", note: "Reported by some users; likely not a glycine-load effect at 40 mg" },
+      { rel: "mitigates", to: "disease:osteoarthritis", note: "One RCT of UC-II in knee osteoarthritis; modest effect." }
     ],
     refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
@@ -102,7 +105,9 @@ export default [
       { rel: "increases", to: "compound:betaine" },
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "interacts-with", to: "enzyme:bhmt" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" },
+      { rel: "mitigates", to: "disease:mthfr-deficiency", note: "Betaine is part of the treatment of the severe inherited form." },
+      { rel: "mitigates", to: "state:methyl-donor-depletion" }
     ],
     refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
@@ -126,7 +131,12 @@ export default [
       { rel: "aggravates", to: "outcome:throat-burning", note: "Via reflux of acidified contents; plausible" },
       { rel: "mitigates", to: "state:hypochlorhydria", note: "Transient pH effect only; clinical value unproven" },
       { rel: "contraindicated-in", to: "disease:gastritis", note: "Acid on inflamed lining; convention and mechanism, not trial evidence." },
-      { rel: "contraindicated-in", to: "disease:esophagitis" }
+      { rel: "contraindicated-in", to: "disease:esophagitis" },
+      { rel: "aggravates", to: "disease:peptic-ulcer", note: "Acid on a broken lining; mechanistic and conventional caution, no trial." },
+      { rel: "aggravates", to: "disease:gerd", note: "Adds acid to the refluxate; no trial." },
+      { rel: "aggravates", to: "disease:lpr", note: "Adds acid to the refluxate; no trial." },
+      { rel: "aggravates", to: "disease:gastritis", note: "Acid on inflamed lining; burning after a dose is a reason to stop." },
+      { rel: "aggravates", to: "disease:esophagitis" }
     ],
     refs: ["article:yago-2013-betaine-hcl-reacidification"]
   },
@@ -147,7 +157,9 @@ export default [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:trimethylamine", note: "Dose-dependent; more with free choline salts" },
       { rel: "increases", to: "compound:acetylcholine", note: "Plausible; evidence in adults with adequate intake weak" },
-      { rel: "contraindicated-in", to: "disease:trimethylaminuria" }
+      { rel: "contraindicated-in", to: "disease:trimethylaminuria" },
+      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Adds substrate for TMA formation." },
+      { rel: "causes", to: "state:choline-excess", note: "Only when the dose exceeds the 3.5 g/day upper level of choline." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"]
   },
@@ -243,7 +255,8 @@ export default [
       { rel: "mitigates", to: "state:b6-functional-deficiency" },
       { rel: "increases", to: "compound:gaba", note: "Via GAD; effect size in humans uncertain" },
       { rel: "mitigates", to: "outcome:brain-fog", note: "Anecdotal; plausible" },
-      { rel: "mitigates", to: "disease:anxiety-disorder", note: "Weak trial evidence at about 100 mg B6" }
+      { rel: "mitigates", to: "disease:anxiety-disorder", note: "Weak trial evidence at about 100 mg B6" },
+      { rel: "mitigates", to: "disease:vitamin-b6-deficiency", note: "Repletes B6 status; nutritionally adequate forms work equally." }
     ]
   },
   {
@@ -281,7 +294,8 @@ export default [
     relations: [
       { rel: "increases", to: "compound:thf", note: "After DHFR reduction" },
       { rel: "decreases", to: "compound:homocysteine" },
-      { rel: "interacts-with", to: "compound:5-mthf", note: "Possible receptor competition at high doses (speculative)" }
+      { rel: "interacts-with", to: "compound:5-mthf", note: "Possible receptor competition at high doses (speculative)" },
+      { rel: "mitigates", to: "disease:neural-tube-defects", note: "Periconceptional folic acid lowered recurrence in a randomised trial." }
     ],
     refs: ["article:bailey-2009-dhfr-slow-human-liver"]
   },
@@ -507,7 +521,8 @@ export default [
     relations: [
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Small trials of gastric emptying" },
       { rel: "increases", to: "system:gastric-physiology", note: "Faster emptying in some studies" },
-      { rel: "aggravates", to: "disease:gerd", note: "Pungent irritant in some people" }
+      { rel: "aggravates", to: "disease:gerd", note: "Pungent irritant in some people" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Faster emptying in small trials; symptom benefit uncertain." }
     ],
     refs: ["article:wu-2008-ginger-gastric-emptying"]
   },
@@ -526,7 +541,8 @@ export default [
     relations: [
       { rel: "increases", to: "system:bile", note: "Choleretic" },
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Functional dyspepsia RCT" },
-      { rel: "interacts-with", to: "compound:cynarin" }
+      { rel: "interacts-with", to: "compound:cynarin" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "One six-week RCT; mechanism untested." }
     ],
     refs: ["article:holtmann-2003-artichoke-leaf-functional-dyspepsia"]
   },
@@ -564,7 +580,8 @@ export default [
       { rel: "decreases", to: "disease:sibo", note: "In vitro and weak clinical data" },
       { rel: "aggravates", to: "outcome:throat-burning", note: "Mucosal irritant" },
       { rel: "aggravates", to: "disease:lpr" },
-      { rel: "contraindicated-in", to: "disease:esophagitis", note: "Pungent phenols on inflamed oesophageal lining; general caution." }
+      { rel: "contraindicated-in", to: "disease:esophagitis", note: "Pungent phenols on inflamed oesophageal lining; general caution." },
+      { rel: "aggravates", to: "disease:esophagitis", note: "Pungent phenols on inflamed lining; general caution." }
     ]
   },
   {
@@ -607,7 +624,9 @@ export default [
       { rel: "decreases", to: "compound:vitamin-b12", note: "Food-bound B12 absorption falls with long-term use" },
       { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" },
       { rel: "mitigates", to: "disease:lpr", note: "Trial evidence is mixed; benefit is likeliest when typical reflux symptoms coexist." },
-      { rel: "mitigates", to: "disease:esophagitis", note: "First-line healing therapy for erosive oesophagitis." }
+      { rel: "mitigates", to: "disease:esophagitis", note: "First-line healing therapy for erosive oesophagitis." },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "First-line for epigastric pain syndrome; small benefit." },
+      { rel: "causes", to: "state:acid-suppression" }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid", "article:katz-2022-acg-gerd-guideline"]
   },
@@ -627,7 +646,8 @@ export default [
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "interacts-with", to: "compound:histamine" },
       { rel: "mitigates", to: "disease:peptic-ulcer", note: "Healing agents in meta-analysis, less effective than PPIs." },
-      { rel: "decreases", to: "pathway:histamine-receptor-signalling", note: "Block H2 receptors only; H1 effects such as flushing are not blocked." }
+      { rel: "decreases", to: "pathway:histamine-receptor-signalling", note: "Block H2 receptors only; H1 effects such as flushing are not blocked." },
+      { rel: "causes", to: "state:acid-suppression" }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -645,7 +665,9 @@ export default [
     relations: [
       { rel: "mitigates", to: "state:gastric-dysmotility" },
       { rel: "interacts-with", to: "compound:motilin" },
-      { rel: "mitigates", to: "disease:sibo", note: "Relapse prevention; off-label" }
+      { rel: "mitigates", to: "disease:sibo", note: "Relapse prevention; off-label" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Option for some patients in guidelines; modest benefit." },
+      { rel: "mitigates", to: "disease:gastroparesis", note: "Metoclopramide is the guideline-listed prokinetic." }
     ],
     refs: ["article:camilleri-2022-acg-gastroparesis"]
   },
@@ -665,7 +687,8 @@ export default [
       { rel: "mitigates", to: "disease:h-pylori-infection" },
       { rel: "mitigates", to: "disease:peptic-ulcer" },
       { rel: "interacts-with", to: "system:gut-microbiota", note: "Short-term dysbiosis" },
-      { rel: "interacts-with", to: "intervention:zinc-carnosine", note: "Chelation with tetracycline; adjunct trials" }
+      { rel: "interacts-with", to: "intervention:zinc-carnosine", note: "Chelation with tetracycline; adjunct trials" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Small benefit in H. pylori-positive patients." }
     ],
     refs: ["article:malfertheiner-2022-maastricht-vi"]
   },
@@ -836,7 +859,8 @@ export default [
     relations: [
       { rel: "increases", to: "compound:creatine" },
       { rel: "decreases", to: "compound:guanidinoacetate", note: "Feedback repression of AGAT" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Methyl-sparing; plausible, indirect" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Methyl-sparing; plausible, indirect" },
+      { rel: "mitigates", to: "state:methyl-donor-depletion", note: "Dietary creatine spares the SAM spent on endogenous creatine synthesis." }
     ],
     refs: ["article:stead-2006-methyl-balance-reevaluation"]
   },
@@ -884,7 +908,7 @@ export default [
     id: "intervention:phased-reintroduction-protocol",
     type: "intervention",
     name: "Phased reintroduction protocol (heal, de-colonise, then re-supplement)",
-    aliases: ["protocolo em fases", "fase 1 curar a mucosa", "orthomolecular phased protocol", "medicina ortomolecular", "ortomolecular", "protocolo ortomolecular"],
+    aliases: ["protocolo em fases", "fase 1 curar a mucosa", "orthomolecular phased protocol", "medicina ortomolecular", "ortomolecular", "protocolo ortomolecular", "reintrodução em fases", "reintrodução da glicina", "curar a mucosa primeiro"],
     summary: "The conversation's three-phase sequence: protect mucosa and stop aggravators, investigate H. pylori/SIBO, then reintroduce methyl and amino-acid supplements; a heuristic with no trial support.",
     body: [
       "The conversation proposes: (1) suspend betaine HCl and free glycine/collagen while using mucosal protectants ([[intervention:zinc-carnosine]], [[intervention:dgl-licorice]], [[intervention:l-glutamine-supplement]]); (2) verify H. pylori eradication and evaluate SIBO ([[intervention:h-pylori-testing]], [[intervention:sibo-breath-test]]); (3) maintain choline, P5P and methylated B vitamins, then retry glycine within meals ([[intervention:p5p-supplement]], [[intervention:betaine-anhydrous]], [[intervention:amino-acids-with-meals]]). The ordering is a sensible clinical heuristic (confirm and treat structural disease before supplements), but it is not a validated protocol and several steps rest on weak evidence.",

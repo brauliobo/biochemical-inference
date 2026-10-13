@@ -8,6 +8,7 @@ export default [
     aliases: ["Úlcera péptica", "Úlcera gástrica", "Úlcera duodenal", "Gastric ulcer", "Duodenal ulcer"],
     summary: "Breaks in the gastric or duodenal mucosa reaching the muscularis, caused mainly by H. pylori infection or NSAIDs and healed with acid suppression and removal of the cause.",
     body: [
+      "In plain words: a peptic ulcer is a sore in the lining of the stomach or the first part of the small intestine. Most come from infection with H. pylori or from anti-inflammatory painkillers; stomach acid and pepsin keep the sore open. Treatment removes the cause and lowers acid. In the source conversation, ulcers earlier in the year explain why an acid supplement (betaine HCl) burned and why gut-protective products are discussed. This page is educational only; ulcer symptoms need a doctor.",
       "Ulcers arise when aggressive factors (acid, [[compound:pepsin]], bile, [[disease:h-pylori-infection]], NSAIDs) overwhelm the [[system:mucosal-barrier]]. Standard care is to find and remove the cause (test and treat H. pylori, stop NSAIDs), use [[intervention:ppi-therapy|PPIs]] for healing, and confirm eradication afterwards ([[claim:confirm-h-pylori-eradication]]). Complications are bleeding, perforation and gastric-outlet obstruction.",
       "In the source conversation the user's early-year gastric and duodenal ulcers are the pivot for caution about acidifying supplements ([[claim:betaine-hcl-contraindicated-post-ulcer]]) and for suggestions such as [[intervention:zinc-carnosine]], [[intervention:dgl-licorice]] and [[intervention:espinheira-santa]]. Whether those add benefit beyond standard therapy is uncertain ([[claim:zinc-carnosine-ulcer-healing]]). Educational only; ulcer symptoms need clinical evaluation."
     ],
@@ -54,6 +55,7 @@ export default [
     aliases: ["SIBO", "Supercrescimento bacteriano do intestino delgado", "Proximal SIBO", "Small bowel bacterial overgrowth", "SIBO proximal", "sobrecrescimento bacteriano", "supercrescimento bacteriano"],
     summary: "Excess bacteria in the small bowel producing bloating, diarrhoea or malabsorption; breath testing is common but imprecise, and its role in belching or amino-acid fermentation is unproven.",
     body: [
+      "In plain words: SIBO means too many bacteria in the small intestine, where numbers are normally low. Typical complaints are bloating, gas and diarrhoea, and it is looked for with breath tests that are imperfect. The conversation suggests that bacteria high in the gut could ferment glycine powder and cause belching. That is chemically possible but unproven, and most SIBO gas is hydrogen and methane from carbohydrate.",
       "Defence against overgrowth comes from gastric acid, the migrating motor complex, bile, pancreatic enzymes, the ileocaecal valve and mucosal immunity. Risk rises with reduced motility, anatomy changes and probably prolonged acid suppression ([[state:acid-suppression]], [[claim:ppis-cause-sibo]]). Typical features are bloating, flatulence, diarrhoea and, in severe cases, steatorrhoea and B12 deficiency. The ACG 2020 guideline and the North American consensus use glucose or lactulose hydrogen/methane breath tests, but sensitivity and specificity versus aspirate culture are modest ([[intervention:sibo-breath-test]], [[outcome:breath-hydrogen-methane]]), and a 2024 expert update called for a more critical view of the SIBO hypothesis.",
       "The source conversation proposes that proximal SIBO rapidly ferments free glycine into CO2 and ammonia and so causes belching. Some gut anaerobes do metabolise glycine (glycine reductase, glycine cleavage), but clinical SIBO gas is mostly hydrogen and methane from carbohydrate fermentation, and belching mainly reflects swallowed air ([[claim:sibo-bacteria-metabolize-glycine-co2-nh3]], [[claim:sibo-gas-appears-in-15-45-min-as-belching]]). Educational only; antimicrobial therapy should be guided by a clinician."
     ],
@@ -100,6 +102,7 @@ export default [
     aliases: ["RLF", "Refluxo laringofaríngeo", "Silent reflux", "Refluxo silencioso", "Extraesophageal reflux (throat)"],
     summary: "A label for throat symptoms (burning, throat clearing, globus, hoarseness) attributed to reflux; it lacks standard criteria and objective proof, and PPI response is often no better than placebo.",
     body: [
+      "In plain words: LPR (\"silent reflux\") is the idea that stomach contents reach the throat and cause burning, throat clearing or a lump sensation, sometimes without heartburn. It is a common but debated label: the tests are imperfect, and acid-blocking drugs often do no better than placebo. The conversation links belches that carry pepsin to the throat; that link has not been tested. Throat symptoms deserve medical assessment.",
       "Proposed mechanisms are direct injury of the [[system:larynx-pharynx]] by acid, [[compound:pepsin]] and bile, and indirect vagal reflexes. Johnston and colleagues showed that pepsin can be taken up by hypopharyngeal epithelial cells and may damage them even at weakly acidic or neutral pH, and that laryngeal tissue has lower protective carbonic anhydrase and mucins than the oesophagus. The AGA 2023 update, however, states that LPR has no standardised diagnostic criteria or objective evidence of reflux in many labelled patients, discourages empiric PPIs for isolated throat symptoms, and prefers reflux testing first ([[claim:throat-burning-means-lpr]]).",
       "Alginates have promising but still limited evidence for LPR, including a non-inferiority RCT against PPIs ([[claim:alginate-rafts-reduce-lpr]]); in-vitro work shows that alkaline water can denature pepsin ([[claim:alkaline-water-inactivates-pepsin]]). The conversation's suggestion that belches aerosolise pepsin onto the larynx is untested ([[claim:belch-aerosol-deposits-pepsin]]). Throat burning has many other causes (voice use, allergy, post-nasal drip, oesophageal motility, anxiety). Educational only."
     ],
@@ -460,7 +463,7 @@ export default [
       { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" },
       { rel: "associated-with", to: "system:connective-tissue" }
     ],
-    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
+    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis", "article:bello-2006-collagen-hydrolysate-osteoarthritis"]
   },
   {
     id: "disease:choline-deficiency",

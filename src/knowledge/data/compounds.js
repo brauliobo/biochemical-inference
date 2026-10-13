@@ -8,6 +8,7 @@ export default [
     aliases: ["Gly", "G", "glicina", "aminoacetic acid", "glicocola", "zwitterion", "anfótero", "glicina livre"],
     summary: "Smallest proteinogenic amino acid; a collagen building block, inhibitory neurotransmitter, GNMT methyl acceptor and precursor of glutathione, creatine, heme, purines and bile-acid conjugates.",
     body: [
+      "In plain words: glycine is the smallest amino acid. The body makes it, eats it and uses it for collagen, the antioxidant glutathione, bile salts, creatine and as a calming messenger in the nervous system. Glycine powder (3 g at bedtime up to 10 g or more a day) is taken for sleep or \"collagen support\". In the source conversation it produced belching. This page separates what is known about glycine (how it is made and used) from the proposed reasons for the gas: a drain on methyl groups, extra stomach acid, CO2, and gas-forming bacteria. Most of those are unproven. It also shows the route that makes glycine inside liver cells from choline and betaine without passing through the gut.",
       "Glycine (H2N-CH2-COOH) is made in the body mainly from [[compound:serine]] by [[enzyme:shmt]] (a PLP-dependent reaction that also transfers a one-carbon unit onto [[compound:thf]]), and is broken down chiefly by the mitochondrial [[enzyme:glycine-cleavage-system|glycine cleavage system]], which yields CO2, ammonia and [[compound:5-10-methylene-thf]]. It can also be formed from [[compound:betaine]] through [[compound:dimethylglycine]] and [[compound:sarcosine]] (the [[pathway:choline-oxidation]] route), and from [[compound:hydroxyproline]] catabolism via glyoxylate.",
       "Glycine is consumed in many places: [[compound:collagen]] (about one residue in three), [[compound:glutathione]] synthesis, [[compound:guanidinoacetate]] and hence [[compound:creatine]], heme and purine synthesis, [[compound:bile-acids|bile acid]] conjugation ([[compound:glycocholic-acid]]), and xenobiotic conjugation such as [[compound:hippuric-acid]]. In the central nervous system it is an inhibitory neurotransmitter at strychnine-sensitive glycine receptors and a co-agonist at NMDA receptors. Glycine is the methyl acceptor of [[enzyme:gnmt]], which converts [[compound:sam]] to [[compound:sah]] and [[compound:sarcosine]].",
       "Evidence note: Melendez-Hevia and colleagues argued that endogenous synthesis (about 3 g/day) falls short of the glycine needed for collagen turnover, leaving a deficit near 10 g/day; this is a modelling argument and is contested, not a settled requirement. The idea that extra glycine strongly depletes methyl groups through GNMT is plausible but unproven in humans: GNMT is already near-saturated by hepatic glycine and is chiefly regulated by SAM and 5-methyl-THF. Gram-scale glycine has no formal UL; trials used about 3 g at bedtime for sleep and far larger daily doses in psychiatric research, with GI complaints reported at high doses."
@@ -36,7 +37,9 @@ export default [
       { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the glycine cleavage system is defective; supplements are avoided." },
       { rel: "mitigates", to: "state:glycine-insufficiency", note: "Direct repletion; whether a shortfall exists in healthy adults is contested." },
       { rel: "increases", to: "compound:glutathione", note: "Glycine is a substrate of glutathione synthetase; with cysteine it restored glutathione synthesis in older adults in one small study." },
-      { rel: "part-of", to: "compound:elastin" }
+      { rel: "part-of", to: "compound:elastin" },
+      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the cleavage system is defective." },
+      { rel: "causes", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep in small trials." }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:mudd-2007-methyl-balance", "article:bannai-2012-glycine-sleep"]
   },
@@ -107,6 +110,7 @@ export default [
     aliases: ["TMG", "trimethylglycine", "glycine betaine", "betaína", "betaína anidra", "trimetilglicina"],
     summary: "Fully methylated glycine; an osmolyte and the methyl donor for BHMT, formed from choline in liver and kidney mitochondria.",
     body: [
+      "In plain words: betaine, also called TMG or trimethylglycine, is glycine carrying three methyl groups. Liver and kidney make it from choline, and it gives one methyl to homocysteine to rebuild methionine, then loses its other two methyls and ends as plain glycine. \"Betaine anhydrous\" (TMG) is a neutral supplement. \"Betaine HCl\" is a different product that releases hydrochloric acid in the stomach. Confusing the two matters: the burning after betaine HCl described in the conversation is an acid effect, not a property of TMG.",
       "Betaine is N,N,N-trimethylglycine. It is made from [[compound:choline]] by [[enzyme:chdh]] (to [[compound:betaine-aldehyde]]) and [[enzyme:aldh7a1|BADH]], or taken in from foods such as wheat bran, spinach, beets and shellfish. In liver and kidney [[enzyme:bhmt]] transfers one methyl to [[compound:homocysteine]] giving [[compound:methionine]] and [[compound:dimethylglycine]]; the two remaining methyls are shed as one-carbon units by [[enzyme:dmgdh]] and [[enzyme:sardh]], ending at [[compound:glycine]]. So one mole of choline can in principle yield one mole of glycine plus one remethylation event and two folate-bound one-carbon units.",
       "Betaine is also an organic osmolyte protecting renal medullary and hepatic cells. Pharmacologically, anhydrous betaine (about 6 g/day in divided doses) is an approved treatment for homocystinuria. Do not confuse it with betaine hydrochloride, a different salt that releases HCl ([[intervention:betaine-hcl]]); anhydrous betaine is a neutral zwitterion ([[intervention:betaine-anhydrous]])."
     ],
@@ -158,6 +162,7 @@ export default [
     aliases: ["colina", "trimethylethanolamine"],
     summary: "Essential nutrient and quaternary amine feeding phosphatidylcholine, acetylcholine, sphingomyelin and (via betaine) the methyl and glycine pool.",
     body: [
+      "In plain words: choline is an essential nutrient found in eggs, liver, fish and soy. The body uses it to build cell membranes, to make acetylcholine (the messenger of the vagus nerve, which also steers digestion and the heartbeat) and, through betaine, to supply methyl groups and finally glycine. In the source conversation choline is the nutrient that seemed to help (night-time waking, racing heart) and the proposed \"clean\" source of glycine. This page covers the four routes of choline, safe intake levels (a US upper limit of 3.5 g a day; none set by EFSA), why 10 g of glycine from choline is not realistic, and what too much choline does.",
       "Choline has four main metabolic fates. (1) Phosphorylation by choline kinase starts the [[pathway:kennedy-pathway]] to [[compound:phosphatidylcholine]]; this is the dominant route in most tissues and makes membranes, bile phospholipid and VLDL. (2) Acetylation by choline acetyltransferase gives [[compound:acetylcholine]], the vagal and enteric neurotransmitter. (3) Irreversible oxidation by [[enzyme:chdh]] and [[enzyme:aldh7a1|BADH]] to [[compound:betaine]] ([[pathway:choline-oxidation]]), which connects to [[enzyme:bhmt]] and the [[pathway:methionine-cycle]]. (4) Gut bacterial cleavage to [[compound:trimethylamine]], which the liver oxidises to [[compound:tmao]]. The body can also make choline de novo through [[enzyme:pemt]], but this uses three [[compound:sam]] methyls per molecule and does not cover needs, so choline is a dietary requirement.",
       "Intake: adequate intake is 550 mg/day (men) and 425 mg/day (women) in the US (IOM 1998) and 400 mg/day for adults in the EU (EFSA 2016). The IOM UL is 3.5 g/day for adults, based on hypotension, fishy odour, sweating, salivation and GI effects. EFSA did not set an upper level, contrary to some secondary summaries. Good sources are eggs, liver, meat, fish and soy ([[intervention:dietary-choline-sources]]); typical intakes in many populations fall below the AI. Isolated salts such as [[intervention:choline-bitartrate]] are the usual supplement form.",
       "Evidence note: one mole of choline can yield at most one mole of glycine, so reaching 10 g glycine (about 0.133 mol) from choline would need about 14 g of choline cation (roughly 34 g choline bitartrate) at 100 % conversion, far above the UL and above realistic hepatic partitioning, because most choline goes to the Kennedy pathway. The arithmetic in the source conversation is therefore right in direction, and the conclusion (not a practical glycine source) is sound; glycine formed in liver mitochondria is also largely consumed locally by the glycine cleavage system rather than exported."
@@ -186,7 +191,9 @@ export default [
       { rel: "increases", to: "compound:tmao", note: "Via gut bacterial trimethylamine (CutC) and hepatic FMO3." },
       { rel: "decreases", to: "compound:homocysteine", note: "Through betaine and BHMT; phosphatidylcholine lowered fasting homocysteine in a randomised study." },
       { rel: "mitigates", to: "disease:choline-deficiency", note: "Repletion corrects the deficiency syndrome." },
-      { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." }
+      { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." },
+      { rel: "mitigates", to: "state:methyl-donor-depletion", note: "Supplies betaine for BHMT and, indirectly, SAM." },
+      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Choline is the substrate for gut TMA; dietary restriction is part of management." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri", "article:zeisel-2009-choline-essential-nutrient"]
   },
@@ -869,7 +876,8 @@ export default [
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses; methyl sink effect" },
       { rel: "interacts-with", to: "compound:sam", note: "Via NNMT consumption of nicotinamide" },
       { rel: "aggravates", to: "state:undermethylation", note: "NNMT uses SAM to methylate nicotinamide, so gram doses add a dose-dependent methyl load; relevance at ordinary doses is not established." },
-      { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." }
+      { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." },
+      { rel: "aggravates", to: "state:methyl-donor-depletion", note: "Nicotinamide is cleared by NNMT using SAM." }
     ]
   },
   {
@@ -1676,5 +1684,31 @@ export default [
       }
     ],
     refs: ["article:xu-2006-carvacrol-thymol-trp-channels"]
+  },
+  {
+    id: "compound:tannins-flavonoids",
+    type: "compound",
+    name: "Tannins and flavonoids (plant polyphenols)",
+    aliases: ["taninos", "flavonoides", "polifenóis", "taninos e flavonoides", "polyphenols"],
+    summary: "Plant polyphenols: tannins bind proteins and metals (astringent, can lower iron absorption); flavonoids are antioxidant pigments. The fractions credited for espinheira-santa.",
+    body: [
+      "Polyphenols are plant compounds built from phenol rings. Tannins are the larger ones that bind proteins and metal ions, which gives tea and unripe fruit their astringency and explains why tannin-rich herbs can reduce absorption of iron and some medicines. Flavonoids are a large family of polyphenol pigments (catechins and others) that act as antioxidants in test systems.",
+      "The conversation credits the tannins and flavonoids of espinheira-santa with a \"pro-prostaglandin\" action that thickens mucus and bicarbonate. In the rat study usually cited, a flavonoid-rich fraction protected the stomach by inhibiting the proton pump and nitric oxide formation, not by raising mucus ([[article:baggio-2007-maytenus-ilicifolia-gastroprotection]], [[claim:espinheira-santa-prostaglandin-mucus]]). Human evidence for these fractions in ulcer healing is thin ([[intervention:espinheira-santa]])."
+    ],
+    evidence: "plausible",
+    facts: { class: "plant polyphenols (tannins, flavonoids incl. catechins)" },
+    relations: [
+      {
+        rel: "part-of",
+        to: "intervention:espinheira-santa",
+        note: "Named constituents of Maytenus ilicifolia leaves."
+      },
+      {
+        rel: "decreases",
+        to: "enzyme:h-k-atpase",
+        note: "A flavonoid-rich fraction inhibited H+/K+-ATPase activity in rats; not shown in people."
+      }
+    ],
+    refs: ["article:baggio-2007-maytenus-ilicifolia-gastroprotection"]
   },
 ];

@@ -377,7 +377,7 @@ export default [
     id: "reaction:agat-guanidinoacetate-synthesis",
     type: "reaction",
     name: "AGAT: arginine + glycine <-> guanidinoacetate + ornithine",
-    aliases: ["arginina + glicina → guanidinoacetato + ornitina", "transamidinação", "primeiro passo da creatina"],
+    aliases: ["arginina + glicina → guanidinoacetato + ornitina", "transamidinação", "primeiro passo da creatina", "AGAT arginina glicina"],
     summary: "Mitochondrial transfer of the arginine amidino group to glycine, forming guanidinoacetate; the glycine-consuming first step of creatine synthesis.",
     body: [
       "[[compound:arginine]] + [[compound:glycine]] <-> [[compound:guanidinoacetate]] + [[compound:ornithine]] by [[enzyme:gatm]], mainly in kidney. About one glycine is used per creatine made, so creatine synthesis is a continuous modest sink of glycine as well as methyl groups ([[pathway:creatine-synthesis]])."
@@ -675,7 +675,7 @@ export default [
     id: "reaction:dmgdh-dimethylglycine-demethylation",
     type: "reaction",
     name: "DMGDH: dimethylglycine + THF + ETF(ox) -> sarcosine + 5,10-methylene-THF + ETF(red)",
-    aliases: ["DMG → sarcosina", "demetilação da dimetilglicina", "segundo metil da betaína"],
+    aliases: ["DMG → sarcosina", "demetilação da dimetilglicina", "segundo metil da betaína", "segundo grupo metil da betaína"],
     summary: "Oxidative demethylation of dimethylglycine to sarcosine; the removed carbon is trapped as 5,10-methylene-THF and electrons go to ETF.",
     body: [
       "[[compound:dimethylglycine]] + [[compound:thf]] + oxidised ETF -> [[compound:sarcosine]] + [[compound:5-10-methylene-thf]] + reduced ETF, by mitochondrial [[enzyme:dmgdh]]. The ETF pair is [[compound:etf-oxidized]] / [[compound:etf-reduced]] (reduced ETF = oxidised ETF + 2H, here written without a separate proton). Reactome R-HSA-6797653 depicts FAD/FADH2 in place of ETF."
@@ -708,7 +708,7 @@ export default [
     id: "reaction:sardh-sarcosine-demethylation",
     type: "reaction",
     name: "SARDH: sarcosine + THF + ETF(ox) -> glycine + 5,10-methylene-THF + ETF(red)",
-    aliases: ["sarcosina → glicina", "demetilação da sarcosina", "terceiro metil da betaína"],
+    aliases: ["sarcosina → glicina", "demetilação da sarcosina", "terceiro metil da betaína", "terceiro grupo metil da betaína"],
     summary: "Last demethylation of the betaine route: sarcosine becomes glycine and its methyl carbon becomes 5,10-methylene-THF.",
     body: [
       "[[compound:sarcosine]] + [[compound:thf]] + [[compound:etf-oxidized]] -> [[compound:glycine]] + [[compound:5-10-methylene-thf]] + [[compound:etf-reduced]], catalysed by [[enzyme:sardh]]. Handles sarcosine from both the betaine route and [[reaction:gnmt-glycine-methylation]], returning glycine intracellularly in the mitochondrion. This intracellular glycine is the origin of the conversation's 'clean' glycine from choline."
@@ -1741,7 +1741,7 @@ export default [
     id: "reaction:p4h-prolyl-hydroxylation",
     type: "reaction",
     name: "P4H: peptidyl-proline + 2-oxoglutarate + O2 -> peptidyl-4-hydroxyproline + succinate + CO2",
-    aliases: ["prolina → 4-hidroxiprolina", "hidroxilação do colágeno", "P4HA1"],
+    aliases: ["prolina → 4-hidroxiprolina", "hidroxilação do colágeno", "P4HA1", "hidroxilação da prolina", "prolil hidroxilase"],
     summary: "Iron/ascorbate-dependent hydroxylation of procollagen proline residues; recorded at the free-amino-acid level for stoichiometry.",
     body: [
       "[[compound:proline]] + [[compound:2-oxoglutarate]] + [[compound:oxygen]] -> [[compound:hydroxyproline]] + [[compound:succinate]] + [[compound:carbon-dioxide]], catalysed by [[enzyme:p4ha1]] in the ER lumen. In reality the substrate and product are proline and 4-hydroxyproline residues within procollagen chains (Rhea RHEA:18945, Reactome R-HSA-1650808); the monomer-level form shown here balances atoms without a protein formula. Ascorbate (not a stoichiometric reactant) re-reduces the active-site iron."
@@ -1805,7 +1805,7 @@ export default [
     id: "reaction:bacterial-glycine-reductase",
     type: "reaction",
     name: "Bacterial glycine reductase: glycine + Pi + thioredoxin(red) -> acetyl phosphate + NH3 + H2O + thioredoxin(ox)",
-    aliases: ["redução de Stickland da glicina", "glicina → acetil-fosfato + NH3", "glycine reductase"],
+    aliases: ["redução de Stickland da glicina", "glicina → acetil-fosfato + NH3", "glycine reductase", "glicina redutase bacteriana"],
     summary: "Stickland-type reductive deamination of glycine by certain anaerobic Clostridia; yields ammonia and acetyl phosphate, not CO2.",
     body: [
       "[[compound:glycine]] + [[compound:phosphate]] + [[compound:thioredoxin-dithiol]] -> [[compound:acetyl-phosphate]] + [[compound:ammonia]] + [[compound:water]] + [[compound:thioredoxin-disulfide]], by [[enzyme:bacterial-glycine-reductase]]. Rhea RHEA:12232 lists the reverse (glycine-forming) direction, but the organisms run it reductively, driven by thioredoxin reduced in Stickland oxidations of other amino acids. Acetyl phosphate gives ATP by substrate-level phosphorylation. CO2 arises from the oxidative branch (other amino acids), not from glycine here.",
@@ -1837,7 +1837,7 @@ export default [
     id: "reaction:bacterial-glycine-cleavage",
     type: "reaction",
     name: "Bacterial glycine cleavage: glycine + THF + NAD+ -> 5,10-methylene-THF + CO2 + NH3 + NADH + H+",
-    aliases: ["glicina descarboxilase bacteriana", "GCV bacteriano", "glicina → CO2 + NH3 por bactérias"],
+    aliases: ["glicina descarboxilase bacteriana", "GCV bacteriano", "glicina → CO2 + NH3 por bactérias", "descarboxilação bacteriana da glicina"],
     summary: "Bacterial homologue of the mitochondrial glycine cleavage system; releases CO2 and NH3 from glycine, mainly as an anabolic one-carbon source.",
     body: [
       "[[compound:glycine]] + [[compound:thf]] + [[compound:nad]] -> [[compound:5-10-methylene-thf]] + [[compound:carbon-dioxide]] + [[compound:ammonia]] + [[compound:nadh]] + H+, by [[enzyme:bacterial-glycine-cleavage-system]] (GcvP, GcvT, GcvH, Lpd). Same stoichiometry as [[reaction:glycine-cleavage-system]]. The only known 'glycine decarboxylase' that liberates CO2 and NH3 from glycine is this system; no simple glycine decarboxylase to methylamine is established. The conversation's SIBO-driven rapid gas production from free glycine via this enzyme is plausible in principle but unquantified (speculative)."

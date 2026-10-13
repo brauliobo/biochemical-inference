@@ -8,7 +8,9 @@ export default [
     "type": "article",
     "name": "A weak link in metabolism: the metabolic capacity for glycine biosynthesis does not satisfy the need for collagen synthesis",
     "aliases": [
-      "Meléndez-Hevia 2009"
+      "Meléndez-Hevia 2009",
+      "déficit de glicina Meléndez-Hevia",
+      "glicina é semiessencial"
     ],
     "summary": "Flux accounting argues endogenous glycine synthesis (~3 g/day) plus diet falls roughly 10 g/day short of total metabolic use, chiefly collagen, so glycine is semi-essential.",
     "body": [
@@ -2469,7 +2471,10 @@ export default [
     "type": "article",
     "name": "Dietary Reference Intakes for Thiamin, Riboflavin, Niacin, Vitamin B6, Folate, Vitamin B12, Pantothenic Acid, Biotin, and Choline",
     "aliases": [
-      "IOM 1998"
+      "IOM 1998",
+      "IOM colina",
+      "Institute of Medicine colina",
+      "ingestão adequada de colina"
     ],
     "summary": "IOM Dietary Reference Intakes set choline AI at 550 mg/day (men) and 425 mg/day (women) and an adult UL of 3.5 g/day based on hypotension, with fishy body odor as secondary effect.",
     "body": [
@@ -2528,7 +2533,9 @@ export default [
     "name": "Dietary Reference Values for choline",
     "aliases": [
       "EFSA 2016",
-      "EFSA NDA Panel 2016"
+      "EFSA NDA Panel 2016",
+      "EFSA colina",
+      "valores de referência de colina"
     ],
     "summary": "EFSA could not derive average requirements for choline, set an adequate intake of 400 mg/day for adults (480 pregnancy, 520 lactation), and derived no tolerable upper intake level.",
     "body": [
@@ -3292,7 +3299,9 @@ export default [
     "type": "article",
     "name": "Intestinal microbial metabolism of phosphatidylcholine and cardiovascular risk",
     "aliases": [
-      "Tang 2013"
+      "Tang 2013",
+      "TMAO e risco cardiovascular",
+      "fosfatidilcolina e risco cardiovascular"
     ],
     "summary": "Human phosphatidylcholine challenge showed TMAO production depends on gut microbes, and higher fasting TMAO predicted major cardiovascular events in 4,007 coronary-angiography patients (HR 2.54).",
     "body": [
