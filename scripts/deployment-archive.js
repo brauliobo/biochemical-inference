@@ -7,33 +7,13 @@ import { dirname, relative, resolve, sep } from 'node:path'
 import { canonicalJson } from '../shared/canonical-json.js'
 import { inspectNoSymlinkPath } from '../server/operations/path-safety.js'
 import { deploymentTreeDigest } from './operations/deployment-identity.js'
-
-function flags(values) {
-  const output = {}
-  for (let index = 0; index < values.length; index += 2) {
-    if (!values[index]?.startsWith('--') || values[index + 1] === undefined) throw new Error('arguments must use --name value pairs')
-    output[values[index].slice(2)] = values[index + 1]
-  }
-  return output
-}
+import { flags, git } from './operations/cli.js'
 
 function run(command, arguments_, options = {}) {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(command, arguments_, { stdio: 'inherit', ...options })
     child.once('error', reject)
     child.once('exit', (code, signal) => code === 0 ? resolvePromise() : reject(new Error(`${command} exited with ${code ?? signal}`)))
-  })
-}
-
-async function git(repository, ...arguments_) {
-  return new Promise((resolvePromise, reject) => {
-    const child = spawn('git', ['-C', repository, ...arguments_], { stdio: ['ignore', 'pipe', 'pipe'] })
-    const stdout = []
-    const stderr = []
-    child.stdout.on('data', (value) => stdout.push(value))
-    child.stderr.on('data', (value) => stderr.push(value))
-    child.once('error', reject)
-    child.once('exit', (code) => code === 0 ? resolvePromise(Buffer.concat(stdout).toString('utf8').trim()) : reject(new Error(Buffer.concat(stderr).toString('utf8').trim() || `git exited with ${code}`)))
   })
 }
 

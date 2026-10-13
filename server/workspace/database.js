@@ -1,14 +1,6 @@
-import { DatabaseSync } from 'node:sqlite'
-import { join } from 'node:path'
+import { openDatabase } from '../commons/sqlite.js'
 
-export function openWorkspaceDatabase(root) {
-  const database = new DatabaseSync(join(root, 'workspace.sqlite3'))
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
-
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS resource_profiles (
       id TEXT PRIMARY KEY,
       payload_json TEXT NOT NULL,
@@ -130,6 +122,8 @@ export function openWorkspaceDatabase(root) {
     CREATE TRIGGER IF NOT EXISTS events_immutable_update BEFORE UPDATE ON events BEGIN SELECT RAISE(ABORT, 'events are immutable'); END;
     CREATE TRIGGER IF NOT EXISTS events_immutable_delete BEFORE DELETE ON events BEGIN SELECT RAISE(ABORT, 'events are immutable'); END;
     PRAGMA user_version = 1;
-  `)
-  return database
+`
+
+export function openWorkspaceDatabase(root) {
+  return openDatabase(root, 'workspace.sqlite3', SCHEMA)
 }

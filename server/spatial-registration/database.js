@@ -1,32 +1,6 @@
-import { constants, chmodSync, closeSync, fstatSync, lstatSync, openSync } from 'node:fs'
-import { DatabaseSync } from 'node:sqlite'
-import { join } from 'node:path'
+import { openSecureDatabase } from '../commons/sqlite.js'
 
-const NOFOLLOW = constants.O_NOFOLLOW ?? 0
-
-function assertRegularOrMissing(path) {
-  try {
-    const details = lstatSync(path)
-    if (details.isSymbolicLink() || !details.isFile()) throw new Error(`Unsafe Goal 14 registration SQLite path: ${path}.`)
-  } catch (error) {
-    if (error?.code !== 'ENOENT') throw error
-  }
-}
-
-export function openSpatialRegistrationDatabase(root) {
-  const path = join(root, 'goal14-registration-v1-1.sqlite3')
-  for (const candidate of [path, `${path}-wal`, `${path}-shm`]) assertRegularOrMissing(candidate)
-  const descriptor = openSync(path, constants.O_CREAT | constants.O_RDWR | NOFOLLOW, 0o600)
-  try { if (!fstatSync(descriptor).isFile()) throw new Error(`Unsafe Goal 14 registration descriptor: ${path}.`) } finally { closeSync(descriptor) }
-  chmodSync(path, 0o600)
-  const database = new DatabaseSync(path)
-  const version = database.prepare('PRAGMA user_version').get().user_version
-  if (![0, 2].includes(version)) { database.close(); throw new Error(`Unsupported Goal 14 registration database version: ${version}.`) }
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS snapshot (
       singleton INTEGER PRIMARY KEY CHECK (singleton = 1), release_id TEXT NOT NULL UNIQUE,
       release_digest TEXT NOT NULL UNIQUE CHECK (length(release_digest) = 64), trust_digest TEXT NOT NULL CHECK (length(trust_digest) = 64),
@@ -50,6 +24,8 @@ export function openSpatialRegistrationDatabase(root) {
     CREATE TRIGGER IF NOT EXISTS goal14_registration_completion_update BEFORE UPDATE ON offline_completion BEGIN SELECT RAISE(ABORT, 'Goal 14 registration completion is immutable'); END;
     CREATE TRIGGER IF NOT EXISTS goal14_registration_completion_delete BEFORE DELETE ON offline_completion BEGIN SELECT RAISE(ABORT, 'Goal 14 registration completion is immutable'); END;
     PRAGMA user_version = 2;
-  `)
-  return database
+`
+
+export function openSpatialRegistrationDatabase(root) {
+  return openSecureDatabase(root, 'goal14-registration-v1-1.sqlite3', { label: 'Goal 14 registration', versions: [0, 2], schema: SCHEMA })
 }

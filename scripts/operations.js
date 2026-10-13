@@ -8,18 +8,11 @@ import { acquireInferenceBackupLock } from '../server/operations/runtime-lock.js
 import { inspectNoSymlinkPath, publishDirectoryAnchored, removeAnchored, syncPath, syncTree } from '../server/operations/path-safety.js'
 import { createInferenceBackup, INFERENCE_STATE_ROOTS, restoreInferenceBackup, snapshotInferenceStateManifest, verifyInferenceBackup, verifyInferenceStateIntegrity, verifyInferenceStateManifest, verifyRestoredInferenceState } from './operations/inference-state.js'
 import { verifyDeploymentTree } from './operations/deployment-identity.js'
+import { flags } from './operations/cli.js'
+import { inside } from '../server/commons/paths.js'
 
 const inferenceRoot = resolve(import.meta.dirname, '..')
 const defaultDatabaseRoot = resolve(inferenceRoot, '..', 'biochemical-db')
-
-function flags(values) {
-  const output = {}
-  for (let index = 0; index < values.length; index += 2) {
-    if (!values[index]?.startsWith('--') || values[index + 1] === undefined) throw new Error('arguments must use --name value pairs')
-    output[values[index].slice(2)] = values[index + 1]
-  }
-  return output
-}
 
 function requireNode22() {
   if (Number(process.versions.node.split('.')[0]) !== 22) throw new Error(`Node 22 is required; found ${process.versions.node}`)
@@ -27,11 +20,6 @@ function requireNode22() {
 
 function token() {
   return randomBytes(32).toString('base64url')
-}
-
-function inside(parent, child) {
-  const selected = relative(parent, child)
-  return selected === '' || (selected !== '..' && !selected.startsWith(`..${sep}`) && !isAbsolute(selected))
 }
 
 async function databaseModules(databaseRoot) {

@@ -1,7 +1,5 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdir, realpath, stat } from 'node:fs/promises'
+import { stat } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import {
   CampaignAttemptSchema,
@@ -15,8 +13,12 @@ import {
   ProducerSignedEventSchema,
   RevalidationWorkItemSchema
 } from '../../shared/revalidation-contracts.js'
+import { decodeCursor as verifyCursor, decodeSecret, encodeCursor } from '../commons/cursor.js'
+import { defineRequestError } from '../commons/errors.js'
+import { parseJsonColumn as parseJson, transaction } from '../commons/sqlite.js'
+import { selectStorageRoot } from '../commons/storage.js'
 import { createObjectStore } from '../workspace/object-store.js'
-import { acquireRevalidationEngineRootLock, openRevalidationDatabase, revalidationTransaction } from './database.js'
+import { acquireRevalidationEngineRootLock, openRevalidationDatabase } from './database.js'
 import { assertRssMeasurementAvailable, createRevalidationWorkerPool, REVALIDATION_EXECUTOR_ALLOWLIST } from './execution.js'
 import {
   campaignAttemptIdentity,
@@ -37,31 +39,18 @@ const PLANNING_INPUTS = Object.freeze([
 ])
 const TEST_CURSOR_SECRET = Buffer.alloc(32, 15).toString('base64url')
 
-export class RevalidationEngineError extends Error {
-  constructor(code, message, statusCode = 409) {
-    super(message)
-    this.name = 'RevalidationEngineError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
-
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
+export const RevalidationEngineError = defineRequestError('RevalidationEngineError', 409)
 
 async function selectRoot(options, env) {
-  const configured = options.root ?? env.BIOCHEMICAL_REVALIDATION_ROOT
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'revalidation-v1'))
-  if (inside(resolve(process.cwd()), root)) throw new RevalidationEngineError('root-in-source', 'BIOCHEMICAL_REVALIDATION_ROOT must be outside the source tree.', 500)
-  await mkdir(root, { recursive: true, mode: 0o700 })
-  const [sourceRealPath, rootRealPath] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceRealPath, rootRealPath)) throw new RevalidationEngineError('root-in-source', 'BIOCHEMICAL_REVALIDATION_ROOT must be outside the source tree.', 500)
-  return rootRealPath
+  const { root } = await selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_REVALIDATION_ROOT,
+    defaultName: 'revalidation-v1',
+    secure: false,
+    inSourceError: () => new RevalidationEngineError('root-in-source', 'BIOCHEMICAL_REVALIDATION_ROOT must be outside the source tree.', 500)
+  })
+  return root
 }
 
-const parseJson = (value) => value === null ? null : JSON.parse(value)
 const iso = (milliseconds) => new Date(milliseconds).toISOString()
 const producerEventBody = (event) => {
   const { event_digest: _digest, signature: _signature, ...body } = event
@@ -79,32 +68,14 @@ function backoffMilliseconds(policy, attemptNumber) {
 
 function cursorSecret(options, env) {
   const value = options.cursorSecret ?? env.BIOCHEMICAL_REVALIDATION_CURSOR_SECRET ?? (env.NODE_ENV === 'test' ? TEST_CURSOR_SECRET : null)
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value)) throw new RevalidationEngineError('cursor-secret-invalid', 'BIOCHEMICAL_REVALIDATION_CURSOR_SECRET must be canonical unpadded base64url for exactly 32 bytes.', 500)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== 32 || decoded.toString('base64url') !== value) throw new RevalidationEngineError('cursor-secret-invalid', 'BIOCHEMICAL_REVALIDATION_CURSOR_SECRET must encode exactly 32 bytes.', 500)
-  return decoded
+  return decodeSecret(value, (reason) => {
+    throw new RevalidationEngineError('cursor-secret-invalid', reason === 'shape' ? 'BIOCHEMICAL_REVALIDATION_CURSOR_SECRET must be canonical unpadded base64url for exactly 32 bytes.' : 'BIOCHEMICAL_REVALIDATION_CURSOR_SECRET must encode exactly 32 bytes.', 500)
+  })
 }
 
-function encodeCursor(payload, secret) {
-  const bytes = Buffer.from(canonicalJson(payload))
-  return Buffer.concat([bytes, createHmac('sha256', secret).update(bytes).digest()]).toString('base64url')
-}
-
-function decodeCursor(value, secret) {
-  try {
-    if (typeof value !== 'string' || value.length > 8192 || !/^[A-Za-z0-9_-]+$/.test(value)) throw new Error('shape')
-    const raw = Buffer.from(value, 'base64url')
-    if (raw.toString('base64url') !== value || raw.length <= 32) throw new Error('encoding')
-    const bytes = raw.subarray(0, -32)
-    const signature = raw.subarray(-32)
-    if (!timingSafeEqual(signature, createHmac('sha256', secret).update(bytes).digest())) throw new Error('signature')
-    const payload = JSON.parse(bytes.toString('utf8'))
-    if (canonicalJson(payload) !== bytes.toString('utf8')) throw new Error('canonical')
-    return payload
-  } catch {
-    throw new RevalidationEngineError('projection-cursor-invalid', 'Campaign projection cursor is invalid or tampered.')
-  }
-}
+const decodeCursor = (value, secret) => verifyCursor(value, secret, () => {
+  throw new RevalidationEngineError('projection-cursor-invalid', 'Campaign projection cursor is invalid or tampered.')
+})
 
 async function fileBytes(path) {
   try { return (await stat(path)).size } catch (error) { if (error?.code === 'ENOENT') return 0; throw error }
@@ -238,7 +209,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
     const checkpoints = Number(database.prepare('SELECT COALESCE(SUM(o.bytes), 0) AS bytes FROM checkpoints c JOIN objects o ON o.digest = c.state_digest WHERE c.campaign_id = ?').get(campaignId).bytes)
     return inputs + results + checkpoints
   }
-  const reserveStorage = (campaignId, reservationId, additionalBytes, specification) => revalidationTransaction(database, () => {
+  const reserveStorage = (campaignId, reservationId, additionalBytes, specification) => transaction(database, () => {
     const limit = specification.resource_profile.scratch_mib * 1024 * 1024
     const reserved = Number(database.prepare('SELECT COALESCE(SUM(bytes), 0) AS bytes FROM storage_reservations WHERE campaign_id = ?').get(campaignId).bytes)
     if (campaignLogicalBytes(campaignId) + reserved + additionalBytes > limit) throw new RevalidationEngineError('resource-exhausted', 'Campaign logical storage exceeds its scratch resource bound.')
@@ -310,7 +281,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
         scientifically_valid: true
       }
       const metadata = CampaignCheckpointSchema.parse({ ...payload, checkpoint_id: revalidationIdentity(payload) })
-      revalidationTransaction(database, () => {
+      transaction(database, () => {
         database.prepare('INSERT OR IGNORE INTO checkpoints (checkpoint_id, campaign_id, work_id, attempt_id, compatibility_id, state_digest, checkpoint_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
           metadata.checkpoint_id, specification.campaign_id, work.work_id, attempt.attempt_id, metadata.compatibility_id, metadata.state_digest, canonicalJson(metadata), nowIso()
         )
@@ -342,7 +313,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
 
   function finalizeFailure(attemptId, rawFailure, metrics = null) {
     const completedAt = nowIso()
-    return revalidationTransaction(database, () => {
+    return transaction(database, () => {
       const attempt = attemptRow(attemptId)
       if (attempt.state === 'terminal') return workRecord(workRow(attempt.work_id, attempt.campaign_id))
       const work = workRow(attempt.work_id, attempt.campaign_id)
@@ -409,7 +380,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
     }
     const acceptedAt = nowIso()
     try {
-      return revalidationTransaction(database, () => {
+      return transaction(database, () => {
         const currentAttempt = attemptRow(attemptId)
         const currentWork = workRow(currentAttempt.work_id, currentAttempt.campaign_id)
         const campaign = database.prepare('SELECT * FROM campaigns WHERE campaign_id = ?').get(currentAttempt.campaign_id)
@@ -441,7 +412,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
   }
 
   function claimWork() {
-    return revalidationTransaction(database, () => {
+    return transaction(database, () => {
       const candidates = database.prepare(`SELECT w.campaign_id, MIN(w.available_at) AS available_at FROM work_items w JOIN campaigns c ON c.campaign_id = w.campaign_id
         WHERE w.state = 'queued' AND w.available_at <= ? AND c.state = 'active' AND c.cancellation_requested = 0
         GROUP BY w.campaign_id ORDER BY available_at, w.campaign_id`).all(nowIso())
@@ -470,7 +441,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
   }
 
   function renewLease(attemptId) {
-    return revalidationTransaction(database, () => {
+    return transaction(database, () => {
       const attempt = attemptRow(attemptId)
       if (!['leased', 'running'].includes(attempt.state) || Date.parse(attempt.lease_expires_at) <= nowMilliseconds()) return false
       const specification = campaignSpec(attempt.campaign_id)
@@ -483,7 +454,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
 
   async function executeAttempt(attemptId) {
     const startedAt = nowIso()
-    const start = revalidationTransaction(database, () => {
+    const start = transaction(database, () => {
       const attempt = attemptRow(attemptId)
       const work = workRow(attempt.work_id, attempt.campaign_id)
       const campaign = database.prepare('SELECT * FROM campaigns WHERE campaign_id = ?').get(attempt.campaign_id)
@@ -512,7 +483,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
       checkpoint
     }
     if (closing) return
-    const launch = revalidationTransaction(database, () => {
+    const launch = transaction(database, () => {
       const currentAttempt = attemptRow(attemptId)
       const currentWork = workRow(currentAttempt.work_id, currentAttempt.campaign_id)
       const campaign = database.prepare('SELECT cancellation_requested FROM campaigns WHERE campaign_id = ?').get(currentAttempt.campaign_id)
@@ -957,7 +928,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
         return this.getCampaign(specification.campaign_id)
       }
       const createdAt = nowIso()
-      revalidationTransaction(database, () => {
+      transaction(database, () => {
         database.prepare('INSERT INTO campaign_specs VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
           specification.campaign_id,
           specificationObject.digest,
@@ -1014,7 +985,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
       if (canonicalJson(localSpecification.producer_campaign) !== canonicalJson({ campaign_id: producerCampaign.specification.campaign_id, name: producerCampaign.specification.name, reason: producerCampaign.specification.reason })) throw new RevalidationEngineError('producer-binding-invalid', 'Local campaign identity does not bind the producer campaign name and reason.')
       const campaignJson = canonicalJson(producerCampaign)
       const receiptJson = canonicalJson(producerReceipt)
-      revalidationTransaction(database, () => {
+      transaction(database, () => {
         persistProducerEvents(events)
         const existing = database.prepare('SELECT * FROM producer_campaigns WHERE local_campaign_id = ?').get(localCampaignId)
         if (existing) {
@@ -1043,7 +1014,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
         if (producerReceipt.outcome.campaign_id !== producer.producer_campaign_id || producerReceipt.outcome.work_id !== workId || producerReceipt.event_sequence !== signedEvent.sequence || signedEvent.event_digest !== revalidationIdentity(producerEventBody(signedEvent)) || canonicalJson(signedEvent.payload) !== canonicalJson(expectedPayload)) throw new RevalidationEngineError('producer-receipt-invalid', 'Producer outcome receipt/event binding is invalid.')
         return { events, producerReceipt, receiptJson: canonicalJson(producerReceipt), request, requestJson: canonicalJson(request), signedEvent, workId }
       })
-      revalidationTransaction(database, () => {
+      transaction(database, () => {
         for (const item of prepared) {
           persistProducerEvents(item.events)
           const existing = database.prepare('SELECT * FROM producer_outcome_receipts WHERE local_campaign_id = ? AND work_id = ?').get(localCampaignId, item.workId)
@@ -1089,7 +1060,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
     },
     recordProducerChain(localCampaignId, events, head) {
       if (!database.prepare('SELECT 1 FROM producer_campaigns WHERE local_campaign_id = ?').get(localCampaignId)) throw new RevalidationEngineError('producer-campaign-missing', 'Local campaign has no verified producer binding.')
-      revalidationTransaction(database, () => {
+      transaction(database, () => {
         persistProducerEvents(events)
         if (head.sequence > 0) database.prepare('INSERT OR IGNORE INTO producer_head_pins VALUES (?, ?, ?, ?)').run(localCampaignId, head.sequence, head.digest, nowIso())
         bumpProjection(localCampaignId)
@@ -1126,7 +1097,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
     },
     cancelWork(workId, campaignId) {
       const completedAt = nowIso()
-      const shouldInterrupt = revalidationTransaction(database, () => {
+      const shouldInterrupt = transaction(database, () => {
         const row = workRow(workId, campaignId)
         if (row.state === 'terminal') return false
         database.prepare('UPDATE work_items SET cancellation_requested = 1 WHERE campaign_id = ? AND work_id = ?').run(row.campaign_id, workId)
@@ -1144,7 +1115,7 @@ export async function createRevalidationCampaignEngine(options = {}) {
     },
     cancelCampaign(campaignId) {
       const completedAt = nowIso()
-      const activeAttemptIds = revalidationTransaction(database, () => {
+      const activeAttemptIds = transaction(database, () => {
         const row = database.prepare('SELECT * FROM campaigns WHERE campaign_id = ?').get(campaignId)
         if (!row) throw new RevalidationEngineError('campaign-not-found', `Campaign ${campaignId} does not exist.`, 404)
         if (row.state === 'terminal') return []

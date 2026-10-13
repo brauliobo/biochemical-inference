@@ -1,14 +1,9 @@
 import { createHash } from 'node:crypto'
 import { lstat, readFile, readdir, readlink } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
+import { dirname, relative, resolve, sep } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
-
-const compareUtf8 = (left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right))
-
-function inside(parent, child) {
-  const selected = relative(parent, child)
-  return selected === '' || (selected !== '..' && !selected.startsWith(`..${sep}`) && !isAbsolute(selected))
-}
+import { compareUtf8 } from '../../server/commons/digest.js'
+import { inside } from '../../server/commons/paths.js'
 
 export function deploymentClosure(root, repository) {
   if (repository === 'biochemical-db') return [

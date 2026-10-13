@@ -1,5 +1,6 @@
 import { DatabaseSync } from 'node:sqlite'
 import { join } from 'node:path'
+import { SQLITE_PRAGMAS } from '../commons/sqlite.js'
 
 export function acquireRevalidationEngineRootLock(root) {
   const lock = new DatabaseSync(join(root, 'engine-owner.sqlite3'))
@@ -29,11 +30,7 @@ export function acquireRevalidationEngineRootLock(root) {
 
 export function openRevalidationDatabase(root) {
   const database = new DatabaseSync(join(root, 'revalidation.sqlite3'))
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
+  database.exec(`${SQLITE_PRAGMAS}
 
     CREATE TABLE IF NOT EXISTS objects (
       digest TEXT PRIMARY KEY,
@@ -207,16 +204,4 @@ export function openRevalidationDatabase(root) {
   }
   database.exec('PRAGMA user_version = 4')
   return database
-}
-
-export function revalidationTransaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const result = action()
-    database.exec('COMMIT')
-    return result
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
 }

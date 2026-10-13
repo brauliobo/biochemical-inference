@@ -7,6 +7,8 @@ import {
   REVALIDATION_CHANGE_CLASSES,
   REVALIDATION_NODE_KINDS
 } from '../../shared/revalidation-contracts.js'
+import { compareUtf8 } from '../commons/digest.js'
+import { defineProblemError } from '../commons/errors.js'
 import { assertRevalidationIdentity, identityPayload, immutable } from './identity.js'
 
 export const MAX_REVALIDATION_WIRE_BYTES = 16 * 1024 * 1024
@@ -14,18 +16,7 @@ const utf8 = new TextDecoder('utf-8', { fatal: true })
 const classOrder = new Map(REVALIDATION_CHANGE_CLASSES.map((value, index) => [value, index]))
 const kindOrder = new Map(REVALIDATION_NODE_KINDS.map((value, index) => [value, index]))
 
-export class RevalidationVerificationError extends Error {
-  constructor(message) {
-    super(message)
-    this.name = 'RevalidationVerificationError'
-    this.code = 'REVALIDATION_VERIFICATION_FAILED'
-    this.statusCode = 409
-  }
-}
-
-export function compareUtf8(left, right) {
-  return Buffer.compare(Buffer.from(left, 'utf8'), Buffer.from(right, 'utf8'))
-}
+export const RevalidationVerificationError = defineProblemError('RevalidationVerificationError', { statusCode: 409, code: 'REVALIDATION_VERIFICATION_FAILED' })
 
 export function parseRevalidation(schema, value, label) {
   const parsed = schema.safeParse(value)

@@ -9,10 +9,10 @@ import {
   RevalidationWorkItemSchema,
   UnrelatedChangeClosureSchema
 } from '../../shared/revalidation-contracts.js'
+import { compareUtf8 } from '../commons/digest.js'
 import { identityPayload, immutable, revalidationIdentity } from './identity.js'
 import {
   RevalidationVerificationError,
-  compareUtf8,
   parseRevalidation,
   verifyDependencySnapshot,
   verifyImpactPolicy,

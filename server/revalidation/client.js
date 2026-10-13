@@ -21,6 +21,7 @@ import {
   ProducerSignedEventSchema,
   ProducerStateSchema
 } from '../../shared/revalidation-contracts.js'
+import { defineRequestError } from '../commons/errors.js'
 import { identityPayload, immutable, revalidationIdentity } from './identity.js'
 import { verifyImpactPlan } from './planning.js'
 
@@ -28,14 +29,7 @@ const MAX_PRODUCER_BYTES = 8 * 1024 * 1024
 const MAX_PRODUCER_COLLECTION_ITEMS = 10000
 const keyActions = new Set(['key-activated', 'key-rotated', 'key-retired', 'key-revoked'])
 
-export class RevalidationProducerError extends Error {
-  constructor(code, message, statusCode = 409) {
-    super(message)
-    this.name = 'RevalidationProducerError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const RevalidationProducerError = defineRequestError('RevalidationProducerError', 409)
 
 function strictBase64(value, bytes, label) {
   if (typeof value !== 'string' || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) throw new RevalidationProducerError('producer-key-invalid', `${label} is not strict standard base64.`)
