@@ -100,6 +100,13 @@ describe('evidence discipline', () => {
     expect(against('claim:p5p-bypasses-hepatic-activation')).toContain('article:middleton-1986-plp-intestinal-hydrolysis')
   })
 
+  it('never lists one article twice on a page (an article that both supports and contradicts a target is split across targets)', () => {
+    for (const entity of entities) {
+      const ids = pageModel(graph, entity.id).references.map((reference) => reference.id)
+      expect(ids, entity.id).toEqual([...new Set(ids)])
+    }
+  })
+
   it('references every established non-article entity to at least one article', () => {
     for (const entity of entities.filter((item) => item.evidence === 'established' && item.type !== 'article')) {
       const cited = graph.links(entity.id).some((link) => link.rel === 'has-evidence' && graph.get(link.other).type === 'article')

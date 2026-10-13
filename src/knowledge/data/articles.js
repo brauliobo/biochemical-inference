@@ -3508,8 +3508,8 @@ export default [
       },
       {
         "rel": "evidence-against",
-        "to": "compound:tmao",
-        "note": "Causal role in cardiovascular disease not yet validated."
+        "to": "claim:above-ul-tmao-endothelial-stress",
+        "note": "Causal role of TMAO in cardiovascular disease is not yet validated, so 'strong marker of endothelial stress' overstates it."
       }
     ]
   },
@@ -7597,12 +7597,7 @@ export default [
       {
         "rel": "evidence-for",
         "to": "intervention:ginger-extract",
-        "note": "Accelerated emptying in dyspepsia patients."
-      },
-      {
-        "rel": "evidence-against",
-        "to": "intervention:ginger-extract",
-        "note": "No change in symptoms or in motilin, ghrelin and GLP-1 despite the emptying effect; weakens a motilin-driven MMC explanation."
+        "note": "Accelerated emptying in dyspepsia patients; but no change in symptoms or in motilin, ghrelin and GLP-1, which weakens a motilin-driven MMC explanation."
       },
       {
         "rel": "evidence-for",
