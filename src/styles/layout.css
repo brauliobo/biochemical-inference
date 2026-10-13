@@ -64,7 +64,10 @@
 .grid--compact { --grid-min: calc(var(--target-min) * 3); }
 .grid--end { align-items: end; }
 /* Explicit column count for data that is a matrix (set --grid-columns). */
-.grid--fixed { grid-template-columns: repeat(var(--grid-columns, 1), minmax(0, 1fr)); }
+.grid--fixed {
+  --grid-columns: 1;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+}
 
 /* Fixed-width side column that drops below the content when narrow.
    Children: first is the sidebar, last is the main content. */

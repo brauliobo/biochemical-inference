@@ -3,22 +3,17 @@
   "files": [
     "src/components/APAPBenchmarkWorkbench.vue",
     "src/components/AtlasExplorer.vue",
-    "src/components/BuildProvenance.vue",
     "src/components/ChallengeWorkbench.vue",
     "src/components/DataPlaneWorkbench.vue",
     "src/components/EvidencePanel.vue",
     "src/components/ExperimentWorkspace.vue",
     "src/components/MeasuredCommonsWorkbench.vue",
     "src/components/MeasuredSpatialLiverAtlas.vue",
-    "src/components/NetworkView.vue",
     "src/components/ParameterStudyWorkbench.vue",
     "src/components/PhysiologyPluginWorkbench.vue",
     "src/components/PortfolioWorkbench.vue",
     "src/components/RevalidationCampaignWorkbench.vue",
     "src/components/ReviewWorkbench.vue",
-    "src/components/SpatialRegistrationWorkbench.vue",
-    "src/components/SpatialTissueWorkbench.vue",
-    "src/components/TimeSeriesChart.vue",
-    "src/components/TissueScene.vue"
+    "src/components/SpatialRegistrationWorkbench.vue"
   ]
 }

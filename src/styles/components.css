@@ -321,10 +321,11 @@ a.card:hover { border-color: var(--color-accent); }
 }
 /* Legend marker; set --swatch-color inline to pick a semantic colour. */
 .swatch {
+  --swatch-color: var(--color-accent);
   display: inline-block;
   inline-size: var(--icon-size);
   block-size: var(--border-width-accent);
-  background: var(--swatch-color, var(--color-accent));
+  background: var(--swatch-color);
 }
 .swatch--dot {
   inline-size: var(--space-inset-tight);
