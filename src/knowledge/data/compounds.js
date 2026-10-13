@@ -282,7 +282,8 @@ export default [
       "Choline kinase traps [[compound:choline]] inside the cell as phosphocholine using [[compound:atp]]. CTP:phosphocholine cytidylyltransferase then forms [[compound:cdp-choline]], so phosphocholine is the committed intermediate of the [[pathway:kennedy-pathway]]. Choline kinase activity is elevated in many tumours, which is the basis of choline PET imaging."
     ],
     evidence: "established",
-    facts: { formula: "C5H15NO4P+", molarMass: "184.15 g/mol", pubchem: "CID 1014" },
+    facts: { formula: "C5H15NO4P+", molarMass: "184.15 g/mol", pubchem: "CID 1014",
+    "chebi": "CHEBI:18132" },
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "precursor-of", to: "compound:cdp-choline" }
@@ -417,7 +418,8 @@ export default [
       "[[enzyme:cbs]] condenses [[compound:homocysteine]] with [[compound:serine]] to form cystathionine, which cystathionine gamma-lyase cleaves to [[compound:cysteine]], alpha-ketobutyrate and ammonia. Both enzymes need [[compound:plp]], and cystathionine (with Hcy after a methionine load) is therefore a functional marker of B6 insufficiency ([[state:b6-functional-deficiency]])."
     ],
     evidence: "established",
-    facts: { formula: "C7H14N2O4S", molarMass: "222.26 g/mol", pubchem: "CID 834" },
+    facts: { formula: "C7H14N2O4S", molarMass: "222.26 g/mol", pubchem: "CID 834",
+    "chebi": "CHEBI:17482" },
     relations: [
       { rel: "product-of", to: "enzyme:cbs" },
       { rel: "part-of", to: "pathway:transsulfuration" },
@@ -566,7 +568,8 @@ export default [
       "Methylene groups removed from [[compound:dimethylglycine]], [[compound:sarcosine]] or [[compound:glycine]] (via [[enzyme:glycine-cleavage-system|GCS]]) enter the mitochondrial folate pool as [[compound:5-10-methylene-thf]] and can be oxidised to formate, which leaves the organelle and is re-attached to [[compound:thf]] in the cytosol. This is how the choline-to-glycine route and glycine catabolism feed purine and thymidylate synthesis in the [[pathway:folate-cycle]]."
     ],
     evidence: "established",
-    facts: { formula: "CHO2-", molarMass: "45.02 g/mol", pubchem: "CID 283" },
+    facts: { formula: "CHO2-", molarMass: "45.02 g/mol", pubchem: "CID 283",
+    "chebi": "CHEBI:15740" },
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "associated-with", to: "compound:thf", note: "Re-enters the cytosolic pool as 10-formyl-THF" }
@@ -683,7 +686,8 @@ export default [
       "Folinic acid is converted by methenyl-THF synthetase to 5,10-methenyl-THF and then feeds the [[pathway:folate-cycle]] and [[compound:5-mthf]] without needing DHFR. Clinically it rescues normal cells from methotrexate and potentiates 5-fluorouracil (so oncology patients should not self-dose). Supplement versions are usually the racemic calcium salt, of which only the 6S form is active. An RCT in autism with cerebral folate receptor autoantibodies reported benefit for language (Frye 2018); generalisation beyond that subgroup is not supported. See [[intervention:folinic-acid-supplement]]."
     ],
     evidence: "established",
-    facts: { formula: "C20H23N7O7", molarMass: "473.44 g/mol", pubchem: "CID 6006" },
+    facts: { formula: "C20H23N7O7", molarMass: "473.44 g/mol", pubchem: "CID 6006",
+    "chebi": "CHEBI:15640" },
     relations: [
       { rel: "precursor-of", to: "compound:5-10-methylene-thf" },
       { rel: "part-of", to: "compound:folate" },
@@ -850,7 +854,8 @@ export default [
       "FAD is the cofactor of [[enzyme:mthfr]] (and a stabiliser of the C677T variant), the covalently flavinylated [[enzyme:dmgdh]] and [[enzyme:sardh]], and of glutathione reductase; FMN is needed by PNPO for converting dietary B6 to [[compound:plp]]. Riboflavin supplementation lowers homocysteine in MTHFR 677TT individuals, an established gene-nutrient interaction. RDA is 1.1-1.3 mg; no UL; urine turns bright yellow at supplement doses."
     ],
     evidence: "established",
-    facts: { formula: "C17H20N4O6", molarMass: "376.36 g/mol", pubchem: "CID 493570", "dosing-range": "RDA 1.1-1.3 mg; trials 1.6-10 mg for MTHFR 677TT", ul: "None established" },
+    facts: { formula: "C17H20N4O6", molarMass: "376.36 g/mol", pubchem: "CID 493570", "dosing-range": "RDA 1.1-1.3 mg; trials 1.6-10 mg for MTHFR 677TT", ul: "None established",
+    "chebi": "CHEBI:17015" },
     relations: [
       { rel: "cofactor-of", to: "enzyme:mthfr", note: "As FAD" },
       { rel: "cofactor-of", to: "enzyme:dmgdh", note: "As covalent FAD" },
@@ -908,7 +913,8 @@ export default [
       "NNMT transfers a methyl from [[compound:sam]] to [[compound:nicotinamide]], yielding MNA and [[compound:sah]]. MNA is excreted or further oxidised to pyridones. It is used as a readout of NNMT activity and NAD turnover; NNMT is abundant in liver and adipose tissue and elevated in obesity and some cancers. Modest anti-inflammatory activities have been described for MNA itself."
     ],
     evidence: "established",
-    facts: { formula: "C7H9N2O+", molarMass: "137.16 g/mol", pubchem: "CID 457" },
+    facts: { formula: "C7H9N2O+", molarMass: "137.16 g/mol", pubchem: "CID 457",
+    "chebi": "CHEBI:16797" },
     relations: [
       { rel: "associated-with", to: "compound:sam", note: "Consumes SAM" }
     ],
@@ -943,7 +949,8 @@ export default [
       "AGAT makes GAA from [[compound:glycine]] and arginine (releasing ornithine); GAMT converts it to [[compound:creatine]] and [[compound:sah]] at the expense of [[compound:sam]] ([[pathway:creatine-synthesis]]). GAA is sold as a supplement in sport and animal feed; it raises homocysteine because it consumes SAM, which is a reason for caution in under-methylation scenarios. GAMT deficiency is a rare inborn error causing creatine deficiency."
     ],
     evidence: "established",
-    facts: { formula: "C3H7N3O2", molarMass: "117.11 g/mol", pubchem: "CID 763" },
+    facts: { formula: "C3H7N3O2", molarMass: "117.11 g/mol", pubchem: "CID 763",
+    "chebi": "CHEBI:16344" },
     relations: [
       { rel: "precursor-of", to: "compound:creatine" },
       { rel: "increases", to: "compound:homocysteine", note: "Via SAM consumption" },
@@ -1149,7 +1156,8 @@ export default [
       "Urea circulates and enters saliva and gastric juice. [[enzyme:h-pylori-urease|H. pylori urease]] splits it to [[compound:ammonia]] and [[compound:carbon-dioxide]]. In the urea breath test the patient drinks 13C- or 14C-labelled urea; labelled CO2 in exhaled breath indicates urease activity and thus infection ([[intervention:h-pylori-testing]]). PPIs, bismuth and recent antibiotics can cause false negatives."
     ],
     evidence: "established",
-    facts: { formula: "CH4N2O", molarMass: "60.06 g/mol", pubchem: "CID 1176" },
+    facts: { formula: "CH4N2O", molarMass: "60.06 g/mol", pubchem: "CID 1176",
+    "chebi": "CHEBI:16199" },
     relations: [
       { rel: "substrate-of", to: "enzyme:h-pylori-urease" },
       { rel: "measured-by", to: "intervention:h-pylori-testing" },
@@ -1200,7 +1208,8 @@ export default [
       "Carnitine is synthesised from protein-bound trimethyllysine (methylated by [[compound:sam]], three methyl groups per molecule) and obtained from red meat and dairy. Gut microbes convert surplus carnitine to [[compound:trimethylamine]] and thus [[compound:tmao]] (Koeth 2013). Its biosynthesis is a minor but real SAM sink."
     ],
     evidence: "established",
-    facts: { formula: "C7H15NO3", molarMass: "161.20 g/mol", pubchem: "CID 10917" },
+    facts: { formula: "C7H15NO3", molarMass: "161.20 g/mol", pubchem: "CID 10917",
+    "chebi": "CHEBI:16347" },
     relations: [
       { rel: "precursor-of", to: "compound:trimethylamine", note: "Via gut microbial CntA/B" },
       { rel: "associated-with", to: "compound:methionine", note: "Biosynthesis uses lysine and methionine-derived SAM methyls" },
@@ -1369,7 +1378,8 @@ export default [
       "Enterochromaffin cells release 5-HT in response to luminal stimuli and the vagus; 5-HT4 receptors on enteric neurons facilitate acetylcholine release and propulsion ([[system:enteric-nervous-system]]), the target of prokinetics ([[intervention:prokinetic-drugs]]); 5-HT3 antagonists (ondansetron) suppress nausea. Brain synthesis needs [[compound:plp]] for aromatic amino acid decarboxylase. Gingerols have 5-HT3 antagonist activity in vitro ([[compound:gingerols]]); an effect on 5-HT4 or on the migrating motor complex, as asserted in the conversation, is not demonstrated."
     ],
     evidence: "established",
-    facts: { formula: "C10H12N2O", molarMass: "176.21 g/mol", pubchem: "CID 5202" },
+    facts: { formula: "C10H12N2O", molarMass: "176.21 g/mol", pubchem: "CID 5202",
+    "chebi": "CHEBI:28790" },
     relations: [
       { rel: "increases", to: "system:enteric-nervous-system", note: "5-HT4 facilitation of motility" },
       { rel: "associated-with", to: "system:gastric-physiology" },
@@ -1387,7 +1397,8 @@ export default [
       "Gastric mucosal PGE2 (largely via COX-1) acts on EP receptors to enhance the mucus-bicarbonate barrier ([[compound:gastric-mucus]], [[compound:bicarbonate]]), maintain blood flow and inhibit parietal-cell acid secretion. NSAIDs deplete it, which explains NSAID ulcers, and misoprostol (a PGE1 analogue) replaces it. Herbal mucosal protectants such as [[intervention:espinheira-santa]] and [[intervention:dgl-licorice]] are proposed to act partly through prostaglandin or mucus effects; the human data are limited."
     ],
     evidence: "established",
-    facts: { formula: "C20H32O5", molarMass: "352.5 g/mol", pubchem: "CID 5280360" },
+    facts: { formula: "C20H32O5", molarMass: "352.5 g/mol", pubchem: "CID 5280360",
+    "chebi": "CHEBI:15551" },
     relations: [
       { rel: "increases", to: "compound:gastric-mucus" },
       { rel: "decreases", to: "disease:peptic-ulcer" },
@@ -1479,7 +1490,8 @@ export default [
       "Benzoate (from diet, preservatives, toluene or gut metabolism of polyphenols) is conjugated to [[compound:glycine]] by glycine N-acyltransferase and excreted as hippurate. Sodium benzoate is used to lower glycine in non-ketotic hyperglycinaemia and ammonia in urea-cycle disorders. For ordinary diets the glycine drain is small (about 0.6 g glycine per gram benzoate), but it is one of several glycine sinks alongside [[compound:glutathione]], [[compound:creatine]] and [[pathway:bile-acid-conjugation]]."
     ],
     evidence: "established",
-    facts: { formula: "C9H9NO3", molarMass: "179.17 g/mol", pubchem: "CID 464" },
+    facts: { formula: "C9H9NO3", molarMass: "179.17 g/mol", pubchem: "CID 464",
+    "chebi": "CHEBI:18089" },
     relations: [
       { rel: "decreases", to: "compound:glycine", note: "Conjugation consumes glycine" },
       { rel: "associated-with", to: "system:gut-microbiota", note: "Microbial polyphenol metabolism supplies benzoate" }
@@ -1496,7 +1508,8 @@ export default [
       "Serum or urinary MMA rises in B12 deficiency before serum B12 becomes clearly low, and is also raised by renal impairment, bacterial overgrowth that produces propionate and genetic defects. Combining MMA with [[compound:homocysteine]] helps distinguish B12 from folate deficiency (both raise Hcy, only B12 raises MMA). See [[intervention:homocysteine-mma-testing]] and [[compound:adenosylcobalamin]]."
     ],
     evidence: "established",
-    facts: { formula: "C4H6O4", molarMass: "118.09 g/mol", pubchem: "CID 487", "reference-range": "serum about 0.07-0.27 micromol/L, lab dependent" },
+    facts: { formula: "C4H6O4", molarMass: "118.09 g/mol", pubchem: "CID 487", "reference-range": "serum about 0.07-0.27 micromol/L, lab dependent",
+    "chebi": "CHEBI:30860" },
     relations: [
       { rel: "measured-by", to: "intervention:homocysteine-mma-testing" },
       { rel: "associated-with", to: "compound:vitamin-b12" },
@@ -1514,7 +1527,8 @@ export default [
       "About half or more of urinary oxalate is endogenous, from glyoxylate derived from [[compound:glycine]] (via glycine oxidase and transamination), [[compound:hydroxyproline]] and ascorbate. Hydroxyproline-rich gelatin or [[compound:collagen]] loads raise urinary oxalate acutely in feeding studies (Knight 2006). People with a history of calcium-oxalate stones, primary hyperoxaluria or enteric hyperoxaluria should be cautious with large doses of collagen and glycine ([[intervention:glycine-powder]], [[intervention:collagen-peptides]])."
     ],
     evidence: "established",
-    facts: { formula: "C2H2O4", molarMass: "90.03 g/mol", pubchem: "CID 971" },
+    facts: { formula: "C2H2O4", molarMass: "90.03 g/mol", pubchem: "CID 971",
+    "chebi": "CHEBI:16995" },
     relations: [
       { rel: "associated-with", to: "intervention:collagen-peptides", note: "Caution in stone formers" }
     ],
@@ -1530,7 +1544,8 @@ export default [
       "Carvacrol (with its isomer thymol) disrupts bacterial membranes in vitro at sub-mg/mL concentrations and is the main active in [[intervention:oregano-oil]]. It activates TRPA1/TRPV3 sensory channels, so pungency and burning in the mouth, throat or oesophagus are expected, particularly in inflamed mucosa such as in [[disease:lpr]] or oesophagitis. Human trial data on gastrointestinal bacterial overgrowth are minimal."
     ],
     evidence: "plausible",
-    facts: { formula: "C10H14O", molarMass: "150.22 g/mol", pubchem: "CID 10364" },
+    facts: { formula: "C10H14O", molarMass: "150.22 g/mol", pubchem: "CID 10364",
+    "chebi": "CHEBI:3440" },
     relations: [
       { rel: "aggravates", to: "outcome:throat-burning", note: "Irritant on inflamed mucosa" },
       { rel: "decreases", to: "disease:sibo", note: "In vitro / limited clinical data" },
@@ -1547,7 +1562,8 @@ export default [
       "[6]-Gingerol converts to [6]-shogaol on drying or heating. Mechanisms proposed include 5-HT3 and muscarinic M3 antagonism, TRPV1 activation and anti-inflammatory COX effects. Human trials show faster gastric emptying with about 1.2 g ginger in functional dyspepsia (Wu 2008), antiemetic activity for nausea and pregnancy nausea. Evidence for 5-HT4 agonism or MMC stimulation is lacking. See [[intervention:ginger-extract]]."
     ],
     evidence: "plausible",
-    facts: { formula: "C17H26O4", molarMass: "294.39 g/mol", pubchem: "CID 442793", "dosing-range": "0.5-2 g ginger root/day in trials" },
+    facts: { formula: "C17H26O4", molarMass: "294.39 g/mol", pubchem: "CID 442793", "dosing-range": "0.5-2 g ginger root/day in trials",
+    "chebi": "CHEBI:10136" },
     relations: [
       { rel: "increases", to: "system:gastric-physiology", note: "Faster gastric emptying in small trials" },
       { rel: "mitigates", to: "state:gastric-dysmotility" },
@@ -1565,7 +1581,8 @@ export default [
       "Cynarin is present in artichoke at low concentrations (and partly formed during extraction), and the choleretic and lipid-lowering effects of [[intervention:artichoke-leaf-extract]] cannot be attributed to it alone. In humans, artichoke leaf extract (about 320-640 mg three times daily) improved functional dyspepsia symptom scores in a randomised trial (Holtmann 2003). Bile duct obstruction or gallstones with obstruction contraindicate it. Interaction with [[system:bile]] flow explains the proposed benefit for digestion."
     ],
     evidence: "plausible",
-    facts: { formula: "C25H24O12", molarMass: "516.4 g/mol", pubchem: "CID 5281769" },
+    facts: { formula: "C25H24O12", molarMass: "516.4 g/mol", pubchem: "CID 5281769",
+    "chebi": "CHEBI:520" },
     relations: [
       { rel: "increases", to: "system:bile", note: "Choleretic effect" },
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Dyspepsia symptom trial evidence" },
@@ -1583,7 +1600,8 @@ export default [
       "Glycyrrhetinic acid blocks 11-beta-hydroxysteroid dehydrogenase type 2, letting cortisol activate renal mineralocorticoid receptors (pseudo-aldosteronism). The WHO and EU scientific committees suggest not exceeding about 100 mg glycyrrhizin/day, roughly 50 g of licorice sweets. Deglycyrrhizinated licorice (DGL) products reduce glycyrrhizin to typically 1-3 % or less, so the pressor effect is largely absent, though labels vary ([[intervention:dgl-licorice]])."
     ],
     evidence: "established",
-    facts: { formula: "C42H62O16", molarMass: "822.9 g/mol", pubchem: "CID 14982", ul: "about 100 mg/day glycyrrhizin (WHO / EU SCF advice)" },
+    facts: { formula: "C42H62O16", molarMass: "822.9 g/mol", pubchem: "CID 14982", ul: "about 100 mg/day glycyrrhizin (WHO / EU SCF advice)",
+    "chebi": "CHEBI:15939" },
     relations: [
       { rel: "causes", to: "outcome:tachycardia", note: "Palpitations or arrhythmia via hypokalaemia with excess intake (rare)" },
       { rel: "part-of", to: "intervention:dgl-licorice", note: "Removed (mostly) in DGL; residual amount matters in hypertension or hypokalaemia" },
@@ -1601,7 +1619,8 @@ export default [
       "Berberine (from Berberis, goldenseal, Coptis) lowers glucose and LDL in meta-analyses of modest-quality trials, at typical doses of 500 mg two to three times daily. Oral bioavailability is below 1 %, so gut-lumen effects, including shifts in [[system:gut-microbiota]], may dominate. It was part of herbal regimens in a small SIBO study compared with rifaximin (Chedid 2014). It inhibits CYP2D6 and CYP3A4, interacts with cyclosporine and may potentiate hypoglycaemics. See [[intervention:berberine-supplement]]."
     ],
     evidence: "plausible",
-    facts: { formula: "C20H18NO4+", molarMass: "336.4 g/mol", pubchem: "CID 2353", "dosing-range": "500 mg 2-3 times/day in trials" },
+    facts: { formula: "C20H18NO4+", molarMass: "336.4 g/mol", pubchem: "CID 2353", "dosing-range": "500 mg 2-3 times/day in trials",
+    "chebi": "CHEBI:16118" },
     relations: [
       { rel: "decreases", to: "disease:sibo", note: "Small, low-quality trial evidence" },
       { rel: "interacts-with", to: "system:gut-microbiota" },

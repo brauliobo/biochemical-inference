@@ -634,7 +634,9 @@ export default [
       "In vitro, the enzyme cannot use [[compound:betaine]], and betaine does not inhibit it, so SMM and betaine use different enzymes."
     ],
     evidence: "plausible",
-    facts: { class: "methionine-derived sulfonium compound", chebi: "CHEBI:67050", pubchem: "CID 10197842" },
+    facts: { class: "methionine-derived sulfonium compound", chebi: "CHEBI:67050", pubchem: "CID 10197842",
+    "molarMass": "163.24 g/mol (zwitterion)",
+    "formula": "C6H13NO2S (zwitterion; cation C6H14NO2S+)" },
     relations: [
       { rel: "precursor-of", to: "compound:methionine", note: "Methyl donor in the BHMT2 reaction" },
       { rel: "decreases", to: "compound:homocysteine", note: "Via BHMT2 remethylation" }
