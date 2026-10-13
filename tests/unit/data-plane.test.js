@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, describe, expect, it } from 'vitest'
 import { DatabaseSync } from 'node:sqlite'
 import { mkdir, readFile, readdir, rename, rm, symlink, writeFile } from 'node:fs/promises'
