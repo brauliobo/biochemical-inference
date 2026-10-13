@@ -22,7 +22,8 @@ export default [
       { rel: "interacts-with", to: "enzyme:gnmt" },
       { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Adds to an already pathological glycine load." },
       { rel: "increases", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep quality in small trials from one research group." },
-      { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." }
+      { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." },
+      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia" }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-nmda"]
   },
@@ -43,7 +44,8 @@ export default [
       { rel: "increases", to: "compound:hydroxyproline" },
       { rel: "increases", to: "pathway:collagen-synthesis", note: "Substrate supply; clinical benefit modest" },
       { rel: "causes", to: "outcome:belching", note: "Reported by some users; mechanism unresolved" },
-      { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" }
+      { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" },
+      { rel: "mitigates", to: "disease:osteoarthritis", note: "Mixed small trials." }
     ],
     refs: ["article:iwai-2005-collagen-peptides-blood", "article:clark-2008-collagen-hydrolysate", "article:knight-2006-hydroxyproline-oxalate"]
   },
@@ -62,7 +64,8 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:collagen-type-ii" },
       { rel: "increases", to: "compound:glycine", note: "Negligible at 40 mg" },
-      { rel: "causes", to: "outcome:belching", note: "Reported by some users; likely not a glycine-load effect at 40 mg" }
+      { rel: "causes", to: "outcome:belching", note: "Reported by some users; likely not a glycine-load effect at 40 mg" },
+      { rel: "mitigates", to: "disease:osteoarthritis", note: "One RCT of UC-II in knee osteoarthritis; modest effect." }
     ],
     refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
@@ -70,7 +73,7 @@ export default [
     id: "intervention:dietary-glycine-sources",
     type: "intervention",
     name: "Dietary glycine sources (gelatin, bone broth, slow-cooked meats)",
-    aliases: ["gelatina", "caldo de ossos", "carnes de cozimento lento", "bone broth", "gelatin"],
+    aliases: ["gelatina", "caldo de ossos", "carnes de cozimento lento", "bone broth", "gelatin", "matriz proteica sólida"],
     summary: "Whole-food routes to glycine: gelatin, skin and connective tissue, long-simmered broths and slow-cooked tough cuts, which deliver collagen-derived glycine within a solid food matrix.",
     body: [
       "A typical mixed diet provides roughly 3-5 g glycine/day from protein (glycine is about 4 % of average protein but about 20-25 % of gelatin and connective tissue). Slow cooking converts collagen to gelatin, which is more digestible than native collagen, while giving amino acids gradually within a mixed meal ([[compound:collagen]], [[compound:glycine]]). This is the practical basis for the advice to obtain glycine from food rather than concentrated powders in people who are sensitive to the latter ([[intervention:amino-acids-with-meals]]).",
@@ -102,7 +105,9 @@ export default [
       { rel: "increases", to: "compound:betaine" },
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "interacts-with", to: "enzyme:bhmt" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" },
+      { rel: "mitigates", to: "disease:mthfr-deficiency", note: "Betaine is part of the treatment of the severe inherited form." },
+      { rel: "mitigates", to: "state:methyl-donor-depletion" }
     ],
     refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
@@ -110,7 +115,7 @@ export default [
     id: "intervention:betaine-hcl",
     type: "intervention",
     name: "Betaine hydrochloride (betaine HCl)",
-    aliases: ["betaína HCl", "betaine HCl", "cloridrato de betaína"],
+    aliases: ["betaína HCl", "betaine HCl", "cloridrato de betaína", "reacidificação", "reacidificar o estômago"],
     summary: "Acidifying supplement releasing about 6.5 mmol HCl per gram, marketed for hypochlorhydria; unvalidated and generally avoided with ulcers, gastritis, reflux or NSAID use.",
     body: [
       "Betaine HCl (molar mass 153.6 g/mol; 76 % betaine) dissociates in the stomach, delivering about 6.5 mmol H+ per gram, so a 650 mg capsule gives about 4.2 mmol acid, comparable to a few minutes of stimulated parietal output ([[compound:hydrochloric-acid]]). In volunteers with PPI-induced hypochlorhydria it transiently lowered gastric pH for under an hour (Yago 2013). The 'challenge' protocol of escalating capsules until warmth is felt is not validated ([[intervention:hcl-challenge-test]]), and no controlled trial shows clinical benefit in digestion, B12 or mineral absorption.",
@@ -124,7 +129,14 @@ export default [
       { rel: "contraindicated-in", to: "disease:gerd" },
       { rel: "contraindicated-in", to: "disease:lpr" },
       { rel: "aggravates", to: "outcome:throat-burning", note: "Via reflux of acidified contents; plausible" },
-      { rel: "mitigates", to: "state:hypochlorhydria", note: "Transient pH effect only; clinical value unproven" }
+      { rel: "mitigates", to: "state:hypochlorhydria", note: "Transient pH effect only; clinical value unproven" },
+      { rel: "contraindicated-in", to: "disease:gastritis", note: "Acid on inflamed lining; convention and mechanism, not trial evidence." },
+      { rel: "contraindicated-in", to: "disease:esophagitis" },
+      { rel: "aggravates", to: "disease:peptic-ulcer", note: "Acid on a broken lining; mechanistic and conventional caution, no trial." },
+      { rel: "aggravates", to: "disease:gerd", note: "Adds acid to the refluxate; no trial." },
+      { rel: "aggravates", to: "disease:lpr", note: "Adds acid to the refluxate; no trial." },
+      { rel: "aggravates", to: "disease:gastritis", note: "Acid on inflamed lining; burning after a dose is a reason to stop." },
+      { rel: "aggravates", to: "disease:esophagitis" }
     ],
     refs: ["article:yago-2013-betaine-hcl-reacidification"]
   },
@@ -132,11 +144,12 @@ export default [
     id: "intervention:choline-bitartrate",
     type: "intervention",
     name: "Choline bitartrate",
-    aliases: ["bitartarato de colina", "choline salts", "sais de colina"],
+    aliases: ["bitartarato de colina", "choline salts", "sais de colina", "BulkSupplements", "Extreme Suplementos", "colina bitartarato em pó"],
     summary: "Inexpensive choline salt (41 % choline by mass) used in doses of a few hundred mg; at high doses it causes diarrhoea, fishy odour and raises TMAO.",
     body: [
       "Choline bitartrate delivers 41 % choline ([[compound:choline]]), so 1 g supplies about 410 mg; choline chloride is 75 % choline and phosphatidylcholine about 13 %. The adequate intake is 400-550 mg/day and the US UL 3.5 g/day, with the main toxic signs hypotension, sweating, salivation, diarrhoea and fishy odour ([[disease:trimethylaminuria]]). Free choline salts are largely absorbed in the small intestine but surplus reaches the colon where microbes make [[compound:trimethylamine]] and, in liver, [[compound:tmao]] ([[system:gut-microbiota]]).",
-      "Clinical rationale in the source conversation: choline feeds [[compound:acetylcholine]] (vagal tone, [[system:vagal-tone]]) and, via [[compound:betaine]] and [[enzyme:bhmt]], supports remethylation. Reports of improvement with choline fit this, but are anecdotal and compatible with a placebo or unrelated effects. Cautions: low-blood-pressure, depression (cholinergic excess may worsen mood in susceptible people), kidney or liver disease, TMAU, and anticholinergic drug interactions."
+      "Clinical rationale in the source conversation: choline feeds [[compound:acetylcholine]] (vagal tone, [[system:vagal-tone]]) and, via [[compound:betaine]] and [[enzyme:bhmt]], supports remethylation. Reports of improvement with choline fit this, but are anecdotal and compatible with a placebo or unrelated effects. Cautions: low-blood-pressure, depression (cholinergic excess may worsen mood in susceptible people), kidney or liver disease, TMAU, and anticholinergic drug interactions.",
+      "The source conversation pointed to retail listings of this form (BulkSupplements choline bitartrate powder sold through Mercado Livre, and a pure choline bitartrate powder from Extreme Suplementos). They are recorded because they were mentioned, not as endorsements or quality assessments: supplement purity, dosing and labelling vary between products and sellers, and prices or availability change."
     ],
     evidence: "established",
     facts: { "choline content": "41 % by mass", "dosing-range": "250-1000 mg choline/day typical", ul: "3.5 g/day choline (IOM); EFSA none set" },
@@ -144,7 +157,10 @@ export default [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:trimethylamine", note: "Dose-dependent; more with free choline salts" },
       { rel: "increases", to: "compound:acetylcholine", note: "Plausible; evidence in adults with adequate intake weak" },
-      { rel: "contraindicated-in", to: "disease:trimethylaminuria" }
+      { rel: "contraindicated-in", to: "disease:trimethylaminuria" },
+      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Adds substrate for TMA formation." },
+      { rel: "causes", to: "state:choline-excess", note: "Only when the dose exceeds the 3.5 g/day upper level of choline." },
+      { rel: "causes", to: "outcome:cholinergic-excess-symptoms", note: "Only at doses far above the 3.5 g/day upper level." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"]
   },
@@ -152,7 +168,7 @@ export default [
     id: "intervention:alpha-gpc-supplement",
     type: "intervention",
     name: "Alpha-GPC supplement",
-    aliases: ["alfa-GPC", "L-alfa-glicerilfosforilcolina", "choline alfoscerate"],
+    aliases: ["alfa-GPC", "L-alfa-glicerilfosforilcolina", "choline alfoscerate", "suplemento de alfa-GPC"],
     summary: "Glycerophosphocholine (about 40 % choline) taken at 300-1200 mg/day for cognition or sport; absorbed without gastric acid but with limited quality evidence.",
     body: [
       "Alpha-GPC ([[compound:glycerophosphocholine]]) is hydrolysed to choline and glycerol phosphate and raises circulating choline efficiently. Italian trials used 1,200 mg/day in dementia; sports data show small effects on growth hormone and power output. Side effects include headache, heartburn, insomnia and irritability. A 2021 observational Korean claims analysis reported an association with stroke (confounded; mechanism uncertain). It does not require gastric acid for absorption.",
@@ -163,35 +179,41 @@ export default [
     relations: [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:acetylcholine", note: "Plausible" },
-      { rel: "increases", to: "compound:tmao", note: "Smaller effect than free choline in some data; not settled" }
+      { rel: "increases", to: "compound:tmao", note: "Smaller effect than free choline in some data; not settled" },
+      { rel: "mitigates", to: "disease:choline-deficiency", note: "Supplies choline; about 40 % choline by mass." },
+      { rel: "associated-with", to: "pathway:acetylcholine-synthesis" }
     ]
   },
   {
     id: "intervention:citicoline-supplement",
     type: "intervention",
     name: "Citicoline (CDP-choline) supplement",
-    aliases: ["citicolina", "Cognizin", "CDP-colina"],
+    aliases: ["citicolina", "Cognizin", "CDP-colina", "suplemento de citicolina", "Elysx", "citicolina lipossomal", "gotas de citicolina"],
     summary: "CDP-choline taken at 250-1000 mg/day; supplies choline and cytidine (uridine) for membrane synthesis, with mixed clinical evidence.",
     body: [
-      "Oral [[compound:cdp-choline]] is hydrolysed in the gut into cytidine and choline, absorbed and resynthesised in brain. Choline is only about 20 % of its mass, so it is a smaller choline source than alpha-GPC per mg. Trials in stroke recovery (ICTUS) were neutral; small trials in cognitive impairment are mixed. Liquid and liposomal forms are marketed for tolerability, but absorption by the intestinal route is already good. Adverse effects are generally mild (headache, insomnia, GI upset). Cautions: additive cholinergic effects; unknown in pregnancy."
+      "Oral [[compound:cdp-choline]] is hydrolysed in the gut into cytidine and choline, absorbed and resynthesised in brain. Choline is only about 20 % of its mass, so it is a smaller choline source than alpha-GPC per mg. Trials in stroke recovery (ICTUS) were neutral; small trials in cognitive impairment are mixed. Liquid and liposomal forms are marketed for tolerability, but absorption by the intestinal route is already good. Adverse effects are generally mild (headache, insomnia, GI upset). Cautions: additive cholinergic effects; unknown in pregnancy.",
+      "The source conversation pointed to retail listings of this form (Elysx 500 mg citicoline drops sold through Mercado Livre, and a liposomal liquid citicoline (Cognizin) from iHerb). They are recorded because they were mentioned, not as endorsements or quality assessments: supplement purity, dosing and labelling vary between products and sellers, and prices or availability change."
     ],
     evidence: "plausible",
     facts: { "dosing-range": "250-500 mg once or twice daily", "choline content": "about 20 %" },
     relations: [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:phosphatidylcholine", note: "Via Kennedy pathway in brain" },
-      { rel: "interacts-with", to: "pathway:kennedy-pathway" }
+      { rel: "interacts-with", to: "pathway:kennedy-pathway" },
+      { rel: "mitigates", to: "disease:choline-deficiency", note: "Supplies choline (about 20 % by mass) and cytidine." },
+      { rel: "associated-with", to: "pathway:acetylcholine-synthesis" }
     ]
   },
   {
     id: "intervention:phosphatidylcholine-supplement",
     type: "intervention",
     name: "Phosphatidylcholine / lecithin supplement",
-    aliases: ["lecitina", "fosfatidilcolina", "sunflower lecithin", "liquid phosphatidylcholine", "BodyBio PC"],
+    aliases: ["lecitina", "fosfatidilcolina", "sunflower lecithin", "liquid phosphatidylcholine", "BodyBio PC", "suplemento de fosfatidilcolina", "fosfatidilcolina líquida", "lecitina de girassol"],
     summary: "Phospholipid choline source (13 % choline in pure PC; lecithin granules contain 20-25 % PC), delivered in soft gels, granules or liquids and absorbed independently of stomach acid.",
     body: [
       "Dietary [[compound:phosphatidylcholine]] is hydrolysed in the small intestine by pancreatic phospholipase A2 to [[compound:glycerophosphocholine]] and lysophosphatidylcholine. It supplies choline for the [[pathway:kennedy-pathway]], biliary phospholipid ([[system:bile]]) and VLDL assembly, and was associated with TMAO increases in the study that popularised the gut-flora link (Wang 2011). Lecithin granules (1-2 tablespoons) also deliver significant calories and phytoestrogens in soy products.",
-      "Cautions: soy and egg allergy for relevant products; diarrhoea and nausea at high doses; unusual systemic effects of intravenous PC are not relevant to oral use. Claims that PC 'repairs mucosa' are plausible for biliary-gastric barrier lipids but not demonstrated."
+      "Cautions: soy and egg allergy for relevant products; diarrhoea and nausea at high doses; unusual systemic effects of intravenous PC are not relevant to oral use. Claims that PC 'repairs mucosa' are plausible for biliary-gastric barrier lipids but not demonstrated.",
+      "The source conversation pointed to retail listings of this form (an iHerb Brazil catalogue of liquid phosphatidylcholine and lecithin, including BodyBio PC and a purified liquid sunflower lecithin). They are recorded because they were mentioned, not as endorsements or quality assessments: supplement purity, dosing and labelling vary between products and sellers, and prices or availability change."
     ],
     evidence: "plausible",
     facts: { "dosing-range": "Lecithin 5-15 g/day; pure PC 1-3 g/day", "choline content": "13-14 % in pure PC" },
@@ -225,7 +247,7 @@ export default [
     id: "intervention:p5p-supplement",
     type: "intervention",
     name: "P5P (pyridoxal 5'-phosphate) supplement",
-    aliases: ["P5P", "P-5-P", "piridoxal-5-fosfato", "active B6", "vitamin B6 (P5P)"],
+    aliases: ["P5P", "P-5-P", "piridoxal-5-fosfato", "active B6", "vitamin B6 (P5P)", "suplemento de P5P", "vitamina B6 ativa"],
     summary: "Pre-phosphorylated B6 coenzyme taken at 5-50 mg; supports GAD, SHMT and transsulfuration enzymes, but chronic high doses risk sensory neuropathy.",
     body: [
       "[[compound:plp]] is dephosphorylated to pyridoxal in the gut and plasma and taken up before rephosphorylation by [[enzyme:pdxk]], so its advantage over [[compound:pyridoxine]] is mainly relevant in rare PNPO-related conversion defects or hepatic dysfunction. Biochemical rationale for effects on anxiety, irritability, mental fog and sleep: [[enzyme:gad]] and the [[pathway:gaba-shunt]], histamine and serotonin synthesis/metabolism, and [[enzyme:shmt]]/[[enzyme:glycine-cleavage-system|GCS]] glycine flux. Small trials of B6 (about 100 mg pyridoxine) reduced self-reported anxiety; whether P5P specifically is superior is untested.",
@@ -238,14 +260,15 @@ export default [
       { rel: "mitigates", to: "state:b6-functional-deficiency" },
       { rel: "increases", to: "compound:gaba", note: "Via GAD; effect size in humans uncertain" },
       { rel: "mitigates", to: "outcome:brain-fog", note: "Anecdotal; plausible" },
-      { rel: "mitigates", to: "disease:anxiety-disorder", note: "Weak trial evidence at about 100 mg B6" }
+      { rel: "mitigates", to: "disease:anxiety-disorder", note: "Weak trial evidence at about 100 mg B6" },
+      { rel: "mitigates", to: "disease:vitamin-b6-deficiency", note: "Repletes B6 status; nutritionally adequate forms work equally." }
     ]
   },
   {
     id: "intervention:methylfolate-supplement",
     type: "intervention",
     name: "L-methylfolate (5-MTHF) supplement",
-    aliases: ["metilfolato", "L-5-MTHF", "Metafolin", "Quatrefolic", "levomefolate"],
+    aliases: ["metilfolato", "L-5-MTHF", "Metafolin", "Quatrefolic", "levomefolate", "suplemento de metilfolato"],
     summary: "Active reduced folate (0.4-1 mg OTC; 7.5-15 mg prescription for depression adjunct) that bypasses DHFR and MTHFR; can mask B12 deficiency.",
     body: [
       "[[compound:5-mthf]] feeds [[enzyme:mtr]] directly for [[compound:homocysteine]] remethylation and independently of the MTHFR C677T variant. It is the preferred supplemental form when folic acid is poorly tolerated or when the genotype is of concern, although plain folic acid raises red-cell folate as well in most people. Evidence for high-dose L-methylfolate as an antidepressant adjunct is mixed (large trials of 15 mg were inconclusive). Established cautions: masking of B12 deficiency, interaction with methotrexate and antiepileptics, and unspecific reports of irritability, insomnia or anxiety at higher doses in sensitive individuals.",
@@ -276,7 +299,8 @@ export default [
     relations: [
       { rel: "increases", to: "compound:thf", note: "After DHFR reduction" },
       { rel: "decreases", to: "compound:homocysteine" },
-      { rel: "interacts-with", to: "compound:5-mthf", note: "Possible receptor competition at high doses (speculative)" }
+      { rel: "interacts-with", to: "compound:5-mthf", note: "Possible receptor competition at high doses (speculative)" },
+      { rel: "mitigates", to: "disease:neural-tube-defects", note: "Periconceptional folic acid lowered recurrence in a randomised trial." }
     ],
     refs: ["article:bailey-2009-dhfr-slow-human-liver"]
   },
@@ -302,7 +326,7 @@ export default [
     id: "intervention:methylcobalamin-supplement",
     type: "intervention",
     name: "Methylcobalamin supplement",
-    aliases: ["metilcobalamina", "methyl B12", "metilcobalamina sublingual"],
+    aliases: ["metilcobalamina", "methyl B12", "metilcobalamina sublingual", "suplemento de metilcobalamina"],
     summary: "Methyl B12 at 500-5000 micrograms oral/sublingual; as effective as other B12 forms for status, with no established UL.",
     body: [
       "[[compound:methylcobalamin]] is the coenzyme for [[enzyme:mtr]]. Crystalline B12 in supplements does not depend on gastric acid for release, so it is a reasonable choice in people on [[intervention:ppi-therapy]] or with [[state:hypochlorhydria]], where food-bound B12 absorption falls. Passive absorption of about 1 % allows 500-1000 microgram daily doses to correct deficiency even without intrinsic factor; injections are used for neurological involvement or pernicious anaemia. Established cautions are few (rare acne or itch); verify B12 status with [[compound:methylmalonic-acid]] and Hcy rather than serum B12 alone ([[intervention:homocysteine-mma-testing]]).",
@@ -323,7 +347,7 @@ export default [
     id: "intervention:cyanocobalamin-supplement",
     type: "intervention",
     name: "Cyanocobalamin supplement",
-    aliases: ["cianocobalamina", "synthetic B12"],
+    aliases: ["cianocobalamina", "synthetic B12", "suplemento de cianocobalamina"],
     summary: "Most studied and stable B12 form; fully effective for correcting deficiency despite the tiny cyanide moiety.",
     body: [
       "[[compound:cyanocobalamin]] is converted intracellularly after decyanation. It is cheap, stable and the form used in most trials and injections; its cyanide content (about 2 % of mass) is trivial at supplement doses. Rare concerns include slower conversion in cblC deficiency and reduced renal retention differences in advanced kidney disease, where hydroxocobalamin or methylcobalamin are sometimes preferred. Smokers have higher cyanide loads but B12 supplementation remains appropriate."
@@ -333,7 +357,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:cyanocobalamin" },
       { rel: "decreases", to: "compound:methylmalonic-acid" },
-      { rel: "decreases", to: "compound:homocysteine" }
+      { rel: "decreases", to: "compound:homocysteine" },
+      { rel: "mitigates", to: "disease:vitamin-b12-deficiency" },
+      { rel: "mitigates", to: "state:hyperhomocysteinemia", note: "When raised homocysteine is due to B12 shortage." }
     ],
     refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -370,7 +396,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:magnesium" },
       { rel: "interacts-with", to: "enzyme:mat" },
-      { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" }
+      { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" },
+      { rel: "interacts-with", to: "intervention:magnesium-glycinate", note: "Alternative magnesium salts." },
+      { rel: "interacts-with", to: "intervention:magnesium-l-threonate", note: "Alternative magnesium salts." }
     ]
   },
   {
@@ -388,14 +416,16 @@ export default [
     relations: [
       { rel: "increases", to: "compound:magnesium" },
       { rel: "increases", to: "compound:glycine", note: "About 2.4 g glycine per 400 mg Mg" },
-      { rel: "mitigates", to: "outcome:night-waking", note: "Plausible via magnesium or glycine; evidence modest" }
+      { rel: "mitigates", to: "outcome:night-waking", note: "Plausible via magnesium or glycine; evidence modest" },
+      { rel: "interacts-with", to: "intervention:magnesium-malate" },
+      { rel: "interacts-with", to: "intervention:magnesium-l-threonate" }
     ]
   },
   {
     id: "intervention:zinc-carnosine",
     type: "intervention",
     name: "Zinc carnosine (polaprezinc, PepZin GI)",
-    aliases: ["zinco carnosina", "polaprezinc", "PepZin GI", "Promac"],
+    aliases: ["zinco carnosina", "polaprezinc", "PepZin GI", "Promac", "padrão-ouro pós-úlcera", "quelato polimérico de zinco"],
     summary: "Chelate of zinc and L-carnosine approved in Japan for gastric ulcer at 150 mg/day (about 34 mg zinc); local mucosal protection and healing support, with trials as H. pylori adjunct.",
     body: [
       "Polaprezinc adheres to ulcerated mucosa, releasing zinc and carnosine locally; proposed actions include antioxidant effects, stabilisation of mucus, promotion of epithelial repair and anti-H. pylori activity. It has been prescribed in Japan since 1994 at 75 mg twice daily (150 mg/day contains about 34 mg zinc) and has supportive RCTs in gastric ulcer healing, as an adjunct to H. pylori eradication, and for small-bowel NSAID injury (Mahmood 2007). Outside Japan most evidence is smaller and manufacturer-linked, so 'gold standard' overstates it.",
@@ -416,7 +446,7 @@ export default [
     id: "intervention:zinc-supplement",
     type: "intervention",
     name: "Zinc supplementation (non-chelated forms)",
-    aliases: ["zinco", "zinc picolinate", "zinc gluconate", "zinc citrate"],
+    aliases: ["zinco", "zinc picolinate", "zinc gluconate", "zinc citrate", "suplemento de zinco"],
     summary: "Mineral supplement for deficiency (acid suppression and low acid reduce absorption); UL 40 mg/day (IOM) or 25 mg/day (EU).",
     body: [
       "Zinc supports [[enzyme:bhmt]], [[enzyme:mtr]] and [[enzyme:carbonic-anhydrase]] ([[compound:zinc]]). Deficiency is plausible with low acid intake, chronic [[intervention:ppi-therapy]], vegetarian diets and high phytate intake. Typical doses are 10-30 mg/day; chronic intake above the UL depletes copper and causes anaemia and neuropathy. Take with food to limit nausea. Interactions: quinolones, tetracyclines, penicillamine."
@@ -452,7 +482,7 @@ export default [
     id: "intervention:l-glutamine-supplement",
     type: "intervention",
     name: "L-Glutamine supplement",
-    aliases: ["L-glutamina", "glutamine powder"],
+    aliases: ["L-glutamina", "glutamine powder", "suplemento de L-glutamina"],
     summary: "Conditionally essential amino acid fuel for enterocytes, used at 5-15 g/day for gut barrier support; best evidence in short-bowel and post-infectious IBS-D.",
     body: [
       "[[compound:glutamine]] is the main fuel of rapidly dividing mucosal cells. A randomised trial in post-infectious IBS-D used 5 g three times daily for 8 weeks with benefit; intravenous/enteral use is established in critical illness and short-bowel syndrome. Evidence in peptic ulcer healing dates from the 1950s and is inadequate. Observed safe level in healthy adults is about 14 g/day (Shao and Hathcock 2008).",
@@ -471,7 +501,7 @@ export default [
     id: "intervention:sodium-alginate",
     type: "intervention",
     name: "Sodium alginate raft-forming reflux products",
-    aliases: ["alginato de sódio", "Gaviscon", "alginate raft", "alginato"],
+    aliases: ["alginato de sódio", "Gaviscon", "alginate raft", "alginato", "balsa de gel", "raft de alginato"],
     summary: "Liquid or chewable alginate/bicarbonate/carbonate products taken after meals and at bedtime; form a floating gel raft that reduces acid and pepsin reflux without lowering acid secretion.",
     body: [
       "On contact with gastric acid, sodium alginate gels and, with CO2 from the bicarbonate/carbonate in the formulation, floats as a raft that displaces the post-prandial acid pocket and impedes reflux ([[compound:alginate]]). A meta-analysis (Leiman 2017) found alginates superior to placebo and antacids for GERD symptoms; evidence against PPIs is mixed, and for [[disease:lpr]] there are only small trials. In vitro, rafts can entrap pepsin and bile acids ([[compound:pepsin]]); clinical benefit for 'neutralising throat pepsin' is plausible but unproven. They do not suppress acid ([[compound:hydrochloric-acid]]).",
@@ -491,7 +521,7 @@ export default [
     id: "intervention:ginger-extract",
     type: "intervention",
     name: "Ginger extract (standardised gingerols)",
-    aliases: ["gengibre", "ginger root", "Zingiber officinale extract"],
+    aliases: ["gengibre", "ginger root", "Zingiber officinale extract", "extrato de gengibre"],
     summary: "Ginger root powder or extract at 0.5-2 g/day with antiemetic and modest gastric-emptying effects; claims of 5-HT4 or MMC stimulation are unproven.",
     body: [
       "Gingerols and shogaols ([[compound:gingerols]]) antagonise 5-HT3 and M3 receptors in vitro ([[compound:serotonin]]). In a human study 1.2 g ginger accelerated gastric emptying in functional dyspepsia (Wu 2008), and it has repeatedly outperformed placebo for nausea. A prokinetic effect on the migrating motor complex ([[compound:motilin]], [[state:gastric-dysmotility]]) is not established.",
@@ -502,7 +532,8 @@ export default [
     relations: [
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Small trials of gastric emptying" },
       { rel: "increases", to: "system:gastric-physiology", note: "Faster emptying in some studies" },
-      { rel: "aggravates", to: "disease:gerd", note: "Pungent irritant in some people" }
+      { rel: "aggravates", to: "disease:gerd", note: "Pungent irritant in some people" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Faster emptying in small trials; symptom benefit uncertain." }
     ],
     refs: ["article:wu-2008-ginger-gastric-emptying"]
   },
@@ -521,7 +552,8 @@ export default [
     relations: [
       { rel: "increases", to: "system:bile", note: "Choleretic" },
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Functional dyspepsia RCT" },
-      { rel: "interacts-with", to: "compound:cynarin" }
+      { rel: "interacts-with", to: "compound:cynarin" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "One six-week RCT; mechanism untested." }
     ],
     refs: ["article:holtmann-2003-artichoke-leaf-functional-dyspepsia"]
   },
@@ -558,14 +590,16 @@ export default [
     relations: [
       { rel: "decreases", to: "disease:sibo", note: "In vitro and weak clinical data" },
       { rel: "aggravates", to: "outcome:throat-burning", note: "Mucosal irritant" },
-      { rel: "aggravates", to: "disease:lpr" }
+      { rel: "aggravates", to: "disease:lpr" },
+      { rel: "contraindicated-in", to: "disease:esophagitis", note: "Pungent phenols on inflamed oesophageal lining; general caution." },
+      { rel: "aggravates", to: "disease:esophagitis", note: "Pungent phenols on inflamed lining; general caution." }
     ]
   },
   {
     id: "intervention:berberine-supplement",
     type: "intervention",
     name: "Berberine supplement",
-    aliases: ["berberina", "berberine HCl"],
+    aliases: ["berberina", "berberine HCl", "suplemento de berberina", "fitoterápicos antimicrobianos"],
     summary: "Alkaloid used at 500 mg two to three times daily for glucose and lipids and in herbal SIBO protocols; interacts with CYP enzymes and is avoided in pregnancy.",
     body: [
       "[[compound:berberine]] activates AMPK and modulates the gut microbiota. It improves fasting glucose and LDL in meta-analyses of mostly low-quality trials. One small trial found herbal regimens containing berberine comparable to rifaximin for SIBO breath-test normalisation (Chedid 2014); this is preliminary ([[disease:sibo]]).",
@@ -584,7 +618,7 @@ export default [
     id: "intervention:ppi-therapy",
     type: "intervention",
     name: "Proton pump inhibitors (omeprazole, pantoprazole, esomeprazole, lansoprazole, rabeprazole)",
-    aliases: ["IBP", "inibidores da bomba de prótons", "omeprazol", "pantoprazol", "PPI", "proton pump inhibitor"],
+    aliases: ["IBP", "inibidores da bomba de prótons", "omeprazol", "pantoprazol", "PPI", "proton pump inhibitor", "inibidor da bomba de prótons"],
     summary: "Prodrugs that irreversibly block parietal-cell H+/K+-ATPase; first-line for ulcer, GERD and H. pylori regimens, with long-term effects on B12, magnesium and the upper-gut microbiome.",
     body: [
       "PPIs are acid-activated, form covalent sulfenamide bonds with the proton pump and suppress [[compound:hydrochloric-acid]] for 24 hours or more; acid recovers over 3-5 days as new pumps appear. Standard courses are 4 weeks for duodenal and 8 weeks for gastric ulcer, 14 days within [[intervention:h-pylori-eradication-therapy]], and 8 weeks for erosive oesophagitis; take 30-60 minutes before the first meal. Hypergastrinaemia is expected ([[compound:gastrin]]) and withdrawal produces rebound acid symptoms (Reimer 2009), so tapering is advisable.",
@@ -600,15 +634,18 @@ export default [
       { rel: "aggravates", to: "disease:sibo", note: "Associated in meta-analysis; mechanism and causality debated" },
       { rel: "decreases", to: "compound:vitamin-b12", note: "Food-bound B12 absorption falls with long-term use" },
       { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" },
-      { rel: "mitigates", to: "disease:lpr", note: "Trial evidence is mixed; benefit is likeliest when typical reflux symptoms coexist." }
+      { rel: "mitigates", to: "disease:lpr", note: "Trial evidence is mixed; benefit is likeliest when typical reflux symptoms coexist." },
+      { rel: "mitigates", to: "disease:esophagitis", note: "First-line healing therapy for erosive oesophagitis." },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "First-line for epigastric pain syndrome; small benefit." },
+      { rel: "causes", to: "state:acid-suppression" }
     ],
-    refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid"]
+    refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid", "article:katz-2022-acg-gerd-guideline"]
   },
   {
     id: "intervention:h2-receptor-antagonists",
     type: "intervention",
     name: "H2-receptor antagonists (famotidine, others)",
-    aliases: ["antagonistas H2", "famotidina", "H2 blockers", "bloqueadores H2"],
+    aliases: ["antagonistas H2", "famotidina", "H2 blockers", "bloqueadores H2", "ranitidina"],
     summary: "Competitive blockers of ECL-histamine signalling at parietal cells; quicker but weaker and tolerance-prone acid suppressants compared with PPIs.",
     body: [
       "Famotidine (20-40 mg once or twice daily; renal dosing needed) blocks H2 receptors, reducing acid especially at night ([[compound:histamine]], [[pathway:gastric-acid-secretion]]). Tachyphylaxis develops within days to weeks. Ranitidine was withdrawn in 2020 over NDMA impurity. Also associated with lower B12 absorption in long-term use (Lam 2013). Cimetidine inhibits CYP enzymes. Useful for short-term nocturnal symptoms and as an adjunct; head-to-head they heal ulcers less reliably than PPIs."
@@ -619,7 +656,9 @@ export default [
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "interacts-with", to: "compound:histamine" },
-      { rel: "mitigates", to: "disease:peptic-ulcer", note: "Healing agents in meta-analysis, less effective than PPIs." }
+      { rel: "mitigates", to: "disease:peptic-ulcer", note: "Healing agents in meta-analysis, less effective than PPIs." },
+      { rel: "decreases", to: "pathway:histamine-receptor-signalling", note: "Block H2 receptors only; H1 effects such as flushing are not blocked." },
+      { rel: "causes", to: "state:acid-suppression" }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -637,7 +676,9 @@ export default [
     relations: [
       { rel: "mitigates", to: "state:gastric-dysmotility" },
       { rel: "interacts-with", to: "compound:motilin" },
-      { rel: "mitigates", to: "disease:sibo", note: "Relapse prevention; off-label" }
+      { rel: "mitigates", to: "disease:sibo", note: "Relapse prevention; off-label" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Option for some patients in guidelines; modest benefit." },
+      { rel: "mitigates", to: "disease:gastroparesis", note: "Metoclopramide is the guideline-listed prokinetic." }
     ],
     refs: ["article:camilleri-2022-acg-gastroparesis"]
   },
@@ -657,7 +698,8 @@ export default [
       { rel: "mitigates", to: "disease:h-pylori-infection" },
       { rel: "mitigates", to: "disease:peptic-ulcer" },
       { rel: "interacts-with", to: "system:gut-microbiota", note: "Short-term dysbiosis" },
-      { rel: "interacts-with", to: "intervention:zinc-carnosine", note: "Chelation with tetracycline; adjunct trials" }
+      { rel: "interacts-with", to: "intervention:zinc-carnosine", note: "Chelation with tetracycline; adjunct trials" },
+      { rel: "mitigates", to: "disease:functional-dyspepsia", note: "Small benefit in H. pylori-positive patients." }
     ],
     refs: ["article:malfertheiner-2022-maastricht-vi"]
   },
@@ -721,7 +763,7 @@ export default [
     id: "intervention:bicarbonate-rinse",
     type: "intervention",
     name: "Bicarbonate (alkaline) rinse or gargle",
-    aliases: ["bochecho com bicarbonato", "alkaline water", "baking soda rinse", "gargle"],
+    aliases: ["bochecho com bicarbonato", "alkaline water", "baking soda rinse", "gargle", "água alcalina", "bochechos com água alcalina"],
     summary: "Swish-and-spit of dilute sodium bicarbonate or alkaline water to neutralise acid and denature pepsin in the pharynx; inexpensive and low-risk but with little clinical evidence.",
     body: [
       "Pepsin is irreversibly denatured above about pH 7-8 ([[compound:pepsin]]), and a lab study found pH 8.8 water denatured pepsin and lowered its activity (Koufman 2012), which is the basis of gargles with a pinch (about one-quarter teaspoon in 100-200 mL) of [[compound:bicarbonate]] or drinking alkaline water in LPR ([[disease:lpr]]). Clinical benefit has not been shown in controlled trials; it also cannot affect pepsin already taken up into tissue.",
@@ -740,7 +782,7 @@ export default [
     id: "intervention:beta-alanine-supplement",
     type: "intervention",
     name: "Beta-alanine supplement",
-    aliases: ["beta-alanina", "β-alanina"],
+    aliases: ["beta-alanina", "β-alanina", "suplemento de beta-alanina"],
     summary: "Carnosine precursor at 3.2-6.4 g/day (divided) improving 1-4 minute high-intensity exercise; paraesthesia is dose-dependent.",
     body: [
       "[[compound:beta-alanine]] is the rate-limiting precursor of muscle [[compound:carnosine]]; 4-10 weeks of supplementation raises carnosine by 40-80 % (Trexler 2015). Tingling is common above 800 mg per dose and can be reduced by sustained-release or split dosing. High doses may lower taurine in animals ([[compound:taurine]]). Evidence for exercise capacity is good; claims of mucosal or gut tissue benefit via carnosine are not supported by human studies.",
@@ -759,7 +801,7 @@ export default [
     id: "intervention:niacin-nicotinamide-supplement",
     type: "intervention",
     name: "Niacin / nicotinamide supplements",
-    aliases: ["niacina", "nicotinamida", "niacinamida", "vitamin B3 supplements"],
+    aliases: ["niacina", "nicotinamida", "niacinamida", "vitamin B3 supplements", "suplemento de niacina"],
     summary: "NAD precursors; gram-dose use methylates nicotinamide via NNMT and acts as a methyl sink; nicotinic acid causes flushing, nicotinamide does not.",
     body: [
       "Nicotinic acid ([[compound:niacin]]) at 1-3 g/day lowers LDL and raises HDL but causes flushing, hepatotoxicity risk (especially slow-release) and higher homocysteine and uric acid. Nicotinamide ([[compound:nicotinamide]]), 500 mg twice daily, reduced non-melanoma skin cancer recurrence (ONTRAC) and is used in dermatology. The methyl cost is NNMT methylation to [[compound:1-methylnicotinamide]] using [[compound:sam]]; this is a real but moderate burden at gram doses and is more relevant in people with low methyl or folate status.",
@@ -798,7 +840,7 @@ export default [
     id: "intervention:same-supplement",
     type: "intervention",
     name: "SAMe (S-adenosylmethionine) supplement",
-    aliases: ["SAMe", "S-adenosil-metionina", "AdoMet supplement"],
+    aliases: ["SAMe", "S-adenosil-metionina", "AdoMet supplement", "suplemento de SAMe"],
     summary: "Enteric-coated SAMe salts at 400-1600 mg/day with evidence in depression and osteoarthritis; avoided in bipolar disorder and with serotonergic drugs.",
     body: [
       "Oral [[compound:sam]] is absorbed poorly (bioavailability about 1 % without enteric coating), but meta-analyses support efficacy in major depression and osteoarthritis pain comparable to some NSAIDs, with heterogeneous trial quality. In people who feel 'over-methylated' (anxiety, insomnia) it can worsen symptoms, whereas for suspected 'under-methylation' evidence is lacking ([[state:undermethylation]], [[state:overmethylation]]). It increases flux through the methyltransferases and raises SAH and homocysteine unless B vitamins are adequate.",
@@ -810,14 +852,16 @@ export default [
       { rel: "increases", to: "compound:sam" },
       { rel: "increases", to: "compound:sah", note: "After methyl transfer" },
       { rel: "aggravates", to: "state:overmethylation" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible; unproven for the state as defined clinically" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible; unproven for the state as defined clinically" },
+      { rel: "aggravates", to: "outcome:anxiety", note: "Agitation, insomnia and anxiety are recognised adverse effects in susceptible people." },
+      { rel: "mitigates", to: "outcome:low-sam-sah-ratio", note: "Raises SAM; clinical benefit is a separate question." }
     ]
   },
   {
     id: "intervention:creatine-supplement",
     type: "intervention",
     name: "Creatine monohydrate supplement",
-    aliases: ["creatina", "creatine monohydrate"],
+    aliases: ["creatina", "creatine monohydrate", "suplemento de creatina"],
     summary: "3-5 g/day of creatine; reduces endogenous creatine synthesis, sparing SAM methyl groups and glycine, and is well tolerated in healthy adults.",
     body: [
       "Exogenous [[compound:creatine]] down-regulates kidney AGAT, so less [[compound:guanidinoacetate]] is made from [[compound:glycine]] and arginine and fewer [[compound:sam]] methyls are spent by GAMT ([[pathway:creatine-synthesis]]). Small human studies found lower plasma homocysteine; the size of methyl and glycine sparing at 3-5 g/day is uncertain but biochemically plausible. Well-established benefits: strength and high-intensity performance, some cognitive benefits under stress.",
@@ -828,7 +872,8 @@ export default [
     relations: [
       { rel: "increases", to: "compound:creatine" },
       { rel: "decreases", to: "compound:guanidinoacetate", note: "Feedback repression of AGAT" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Methyl-sparing; plausible, indirect" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Methyl-sparing; plausible, indirect" },
+      { rel: "mitigates", to: "state:methyl-donor-depletion", note: "Dietary creatine spares the SAM spent on endogenous creatine synthesis." }
     ],
     refs: ["article:stead-2006-methyl-balance-reevaluation"]
   },
@@ -876,7 +921,7 @@ export default [
     id: "intervention:phased-reintroduction-protocol",
     type: "intervention",
     name: "Phased reintroduction protocol (heal, de-colonise, then re-supplement)",
-    aliases: ["protocolo em fases", "fase 1 curar a mucosa", "orthomolecular phased protocol"],
+    aliases: ["protocolo em fases", "fase 1 curar a mucosa", "orthomolecular phased protocol", "medicina ortomolecular", "ortomolecular", "protocolo ortomolecular", "reintrodução em fases", "reintrodução da glicina", "curar a mucosa primeiro"],
     summary: "The conversation's three-phase sequence: protect mucosa and stop aggravators, investigate H. pylori/SIBO, then reintroduce methyl and amino-acid supplements; a heuristic with no trial support.",
     body: [
       "The conversation proposes: (1) suspend betaine HCl and free glycine/collagen while using mucosal protectants ([[intervention:zinc-carnosine]], [[intervention:dgl-licorice]], [[intervention:l-glutamine-supplement]]); (2) verify H. pylori eradication and evaluate SIBO ([[intervention:h-pylori-testing]], [[intervention:sibo-breath-test]]); (3) maintain choline, P5P and methylated B vitamins, then retry glycine within meals ([[intervention:p5p-supplement]], [[intervention:betaine-anhydrous]], [[intervention:amino-acids-with-meals]]). The ordering is a sensible clinical heuristic (confirm and treat structural disease before supplements), but it is not a validated protocol and several steps rest on weak evidence.",
@@ -905,7 +950,9 @@ export default [
     relations: [
       { rel: "contraindicated-in", to: "disease:peptic-ulcer" },
       { rel: "contraindicated-in", to: "disease:lpr" },
-      { rel: "associated-with", to: "state:hypochlorhydria", note: "Claims to detect it; not validated" }
+      { rel: "associated-with", to: "state:hypochlorhydria", note: "Claims to detect it; not validated" },
+      { rel: "associated-with", to: "outcome:heartburn", note: "Burning is the stop signal of the protocol." },
+      { rel: "contraindicated-in", to: "disease:esophagitis" }
     ]
   },
   {

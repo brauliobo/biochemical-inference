@@ -377,7 +377,7 @@ export default [
     id: "reaction:agat-guanidinoacetate-synthesis",
     type: "reaction",
     name: "AGAT: arginine + glycine <-> guanidinoacetate + ornithine",
-    aliases: ["arginina + glicina → guanidinoacetato + ornitina", "transamidinação", "primeiro passo da creatina"],
+    aliases: ["arginina + glicina → guanidinoacetato + ornitina", "transamidinação", "primeiro passo da creatina", "AGAT arginina glicina"],
     summary: "Mitochondrial transfer of the arginine amidino group to glycine, forming guanidinoacetate; the glycine-consuming first step of creatine synthesis.",
     body: [
       "[[compound:arginine]] + [[compound:glycine]] <-> [[compound:guanidinoacetate]] + [[compound:ornithine]] by [[enzyme:gatm]], mainly in kidney. About one glycine is used per creatine made, so creatine synthesis is a continuous modest sink of glycine as well as methyl groups ([[pathway:creatine-synthesis]])."
@@ -513,7 +513,7 @@ export default [
     id: "reaction:shmt-serine-glycine-interconversion",
     type: "reaction",
     name: "SHMT: serine + THF <-> glycine + 5,10-methylene-THF + H2O",
-    aliases: ["serina + THF ⇌ glicina + 5,10-metileno-THF", "serina hidroximetiltransferase"],
+    aliases: ["serina + THF ⇌ glicina + 5,10-metileno-THF", "serina hidroximetiltransferase", "serina + THF ⇌ glicina + metileno-THF", "interconversão serina-glicina"],
     summary: "Reversible PLP-dependent transfer of the serine side-chain carbon to THF, linking serine, glycine and the folate one-carbon pool.",
     body: [
       "[[compound:serine]] + [[compound:thf]] <-> [[compound:glycine]] + [[compound:5-10-methylene-thf]] + [[compound:water]], by cytosolic [[enzyme:shmt1]] and mitochondrial [[enzyme:shmt2]] ([[compound:plp]]). In mitochondria the net direction is usually serine breakdown (feeding one-carbon units to the cytosol as formate); in cytosol of liver and kidney it may run toward serine when glycine and methylene-THF are abundant. Rhea lists the serine-forming direction as the master record (RHEA:15481). Because the reverse reaction consumes glycine and 5,10-methylene-THF, a large glycine load could in principle compete with MTHFR for methylene-THF; the net effect in humans is not established."
@@ -579,7 +579,7 @@ export default [
     id: "reaction:mthfd1-methylene-thf-oxidation",
     type: "reaction",
     name: "MTHFD1 dehydrogenase: 5,10-methylene-THF + NADP+ <-> 5,10-methenyl-THF + NADPH",
-    aliases: ["metileno-THF desidrogenase", "5,10-CH2-THF → 5,10-CH=THF"],
+    aliases: ["metileno-THF desidrogenase", "5,10-CH2-THF → 5,10-CH=THF", "oxidação do 5,10-metileno-THF"],
     summary: "NADP+-dependent oxidation of 5,10-methylene-THF to 5,10-methenyl-THF by the dehydrogenase domain of MTHFD1.",
     body: [
       "[[compound:5-10-methylene-thf]] + [[compound:nadp]] <-> [[compound:5-10-methenyl-thf]] + [[compound:nadph]] by [[enzyme:mthfd1]]. First of the three activities that convert methylene-THF to formyl-THF; fully reversible, so cytosolic one-carbon flux can run toward 10-formyl-THF (purines) or back to methylene-THF."
@@ -588,7 +588,7 @@ export default [
     facts: {
       ec: "1.5.1.5",
       rhea: "RHEA:22812",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200718",
       compartment: "cytosol"
     },
     reaction: {
@@ -596,7 +596,7 @@ export default [
       products: [{ id: "compound:5-10-methenyl-thf", n: 1 }, { id: "compound:nadph", n: 1 }],
       ec: "1.5.1.5",
       rhea: "RHEA:22812",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200718",
       reversible: true,
       compartment: "cytosol",
       enzymes: ["enzyme:mthfd1"]
@@ -675,7 +675,7 @@ export default [
     id: "reaction:dmgdh-dimethylglycine-demethylation",
     type: "reaction",
     name: "DMGDH: dimethylglycine + THF + ETF(ox) -> sarcosine + 5,10-methylene-THF + ETF(red)",
-    aliases: ["DMG → sarcosina", "demetilação da dimetilglicina", "segundo metil da betaína"],
+    aliases: ["DMG → sarcosina", "demetilação da dimetilglicina", "segundo metil da betaína", "segundo grupo metil da betaína"],
     summary: "Oxidative demethylation of dimethylglycine to sarcosine; the removed carbon is trapped as 5,10-methylene-THF and electrons go to ETF.",
     body: [
       "[[compound:dimethylglycine]] + [[compound:thf]] + oxidised ETF -> [[compound:sarcosine]] + [[compound:5-10-methylene-thf]] + reduced ETF, by mitochondrial [[enzyme:dmgdh]]. The ETF pair is [[compound:etf-oxidized]] / [[compound:etf-reduced]] (reduced ETF = oxidised ETF + 2H, here written without a separate proton). Reactome R-HSA-6797653 depicts FAD/FADH2 in place of ETF."
@@ -708,7 +708,7 @@ export default [
     id: "reaction:sardh-sarcosine-demethylation",
     type: "reaction",
     name: "SARDH: sarcosine + THF + ETF(ox) -> glycine + 5,10-methylene-THF + ETF(red)",
-    aliases: ["sarcosina → glicina", "demetilação da sarcosina", "terceiro metil da betaína"],
+    aliases: ["sarcosina → glicina", "demetilação da sarcosina", "terceiro metil da betaína", "terceiro grupo metil da betaína"],
     summary: "Last demethylation of the betaine route: sarcosine becomes glycine and its methyl carbon becomes 5,10-methylene-THF.",
     body: [
       "[[compound:sarcosine]] + [[compound:thf]] + [[compound:etf-oxidized]] -> [[compound:glycine]] + [[compound:5-10-methylene-thf]] + [[compound:etf-reduced]], catalysed by [[enzyme:sardh]]. Handles sarcosine from both the betaine route and [[reaction:gnmt-glycine-methylation]], returning glycine intracellularly in the mitochondrion. This intracellular glycine is the origin of the conversation's 'clean' glycine from choline."
@@ -1003,7 +1003,7 @@ export default [
     id: "reaction:etnk1-ethanolamine-phosphorylation",
     type: "reaction",
     name: "ETNK1: ethanolamine + ATP -> phosphoethanolamine + ADP + H+",
-    aliases: ["etanolamina + ATP → fosfoetanolamina", "Kennedy ramo PE passo 1"],
+    aliases: ["etanolamina + ATP → fosfoetanolamina", "Kennedy ramo PE passo 1", "fosforilação da etanolamina"],
     summary: "ATP-dependent phosphorylation of ethanolamine, first step of the CDP-ethanolamine branch.",
     body: [
       "[[compound:ethanolamine]] + [[compound:atp]] -> [[compound:phosphoethanolamine]] + [[compound:adp]] + H+ by [[enzyme:etnk1]] (and the choline/ethanolamine kinases). Starts the branch that supplies PE, the PEMT substrate."
@@ -1034,7 +1034,7 @@ export default [
     id: "reaction:pcyt2-cdp-ethanolamine-synthesis",
     type: "reaction",
     name: "PCYT2: phosphoethanolamine + CTP + H+ -> CDP-ethanolamine + pyrophosphate",
-    aliases: ["fosfoetanolamina + CTP → CDP-etanolamina", "Kennedy ramo PE passo 2"],
+    aliases: ["fosfoetanolamina + CTP → CDP-etanolamina", "Kennedy ramo PE passo 2", "síntese de CDP-etanolamina"],
     summary: "Rate-limiting cytidylyl transfer of the CDP-ethanolamine branch.",
     body: [
       "[[compound:phosphoethanolamine]] + [[compound:ctp]] + H+ -> [[compound:cdp-ethanolamine]] + [[compound:pyrophosphate]] by [[enzyme:pcyt2]]."
@@ -1741,7 +1741,7 @@ export default [
     id: "reaction:p4h-prolyl-hydroxylation",
     type: "reaction",
     name: "P4H: peptidyl-proline + 2-oxoglutarate + O2 -> peptidyl-4-hydroxyproline + succinate + CO2",
-    aliases: ["prolina → 4-hidroxiprolina", "hidroxilação do colágeno", "P4HA1"],
+    aliases: ["prolina → 4-hidroxiprolina", "hidroxilação do colágeno", "P4HA1", "hidroxilação da prolina", "prolil hidroxilase"],
     summary: "Iron/ascorbate-dependent hydroxylation of procollagen proline residues; recorded at the free-amino-acid level for stoichiometry.",
     body: [
       "[[compound:proline]] + [[compound:2-oxoglutarate]] + [[compound:oxygen]] -> [[compound:hydroxyproline]] + [[compound:succinate]] + [[compound:carbon-dioxide]], catalysed by [[enzyme:p4ha1]] in the ER lumen. In reality the substrate and product are proline and 4-hydroxyproline residues within procollagen chains (Rhea RHEA:18945, Reactome R-HSA-1650808); the monomer-level form shown here balances atoms without a protein formula. Ascorbate (not a stoichiometric reactant) re-reduces the active-site iron."
@@ -1805,7 +1805,7 @@ export default [
     id: "reaction:bacterial-glycine-reductase",
     type: "reaction",
     name: "Bacterial glycine reductase: glycine + Pi + thioredoxin(red) -> acetyl phosphate + NH3 + H2O + thioredoxin(ox)",
-    aliases: ["redução de Stickland da glicina", "glicina → acetil-fosfato + NH3", "glycine reductase"],
+    aliases: ["redução de Stickland da glicina", "glicina → acetil-fosfato + NH3", "glycine reductase", "glicina redutase bacteriana"],
     summary: "Stickland-type reductive deamination of glycine by certain anaerobic Clostridia; yields ammonia and acetyl phosphate, not CO2.",
     body: [
       "[[compound:glycine]] + [[compound:phosphate]] + [[compound:thioredoxin-dithiol]] -> [[compound:acetyl-phosphate]] + [[compound:ammonia]] + [[compound:water]] + [[compound:thioredoxin-disulfide]], by [[enzyme:bacterial-glycine-reductase]]. Rhea RHEA:12232 lists the reverse (glycine-forming) direction, but the organisms run it reductively, driven by thioredoxin reduced in Stickland oxidations of other amino acids. Acetyl phosphate gives ATP by substrate-level phosphorylation. CO2 arises from the oxidative branch (other amino acids), not from glycine here.",
@@ -1837,7 +1837,7 @@ export default [
     id: "reaction:bacterial-glycine-cleavage",
     type: "reaction",
     name: "Bacterial glycine cleavage: glycine + THF + NAD+ -> 5,10-methylene-THF + CO2 + NH3 + NADH + H+",
-    aliases: ["glicina descarboxilase bacteriana", "GCV bacteriano", "glicina → CO2 + NH3 por bactérias"],
+    aliases: ["glicina descarboxilase bacteriana", "GCV bacteriano", "glicina → CO2 + NH3 por bactérias", "descarboxilação bacteriana da glicina"],
     summary: "Bacterial homologue of the mitochondrial glycine cleavage system; releases CO2 and NH3 from glycine, mainly as an anabolic one-carbon source.",
     body: [
       "[[compound:glycine]] + [[compound:thf]] + [[compound:nad]] -> [[compound:5-10-methylene-thf]] + [[compound:carbon-dioxide]] + [[compound:ammonia]] + [[compound:nadh]] + H+, by [[enzyme:bacterial-glycine-cleavage-system]] (GcvP, GcvT, GcvH, Lpd). Same stoichiometry as [[reaction:glycine-cleavage-system]]. The only known 'glycine decarboxylase' that liberates CO2 and NH3 from glycine is this system; no simple glycine decarboxylase to methylamine is established. The conversation's SIBO-driven rapid gas production from free glycine via this enzyme is plausible in principle but unquantified (speculative)."
@@ -1927,5 +1927,77 @@ export default [
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "deficiency causes the disorder" }
     ],
     refs: ["article:rhea-2022", "article:mackay-2011-trimethylaminuria"]
+  },
+  {
+    id: "reaction:carns1-carnosine-synthesis",
+    type: "reaction",
+    name: "CARNS1: beta-alanine + L-histidine + ATP -> carnosine + ADP + phosphate + H+",
+    aliases: ["beta-alanina + histidina → carnosina", "síntese de carnosina", "carnosina sintase"],
+    summary: "ATP-driven ligation of beta-alanine to L-histidine, forming the antioxidant dipeptide carnosine.",
+    body: [
+      "[[compound:beta-alanine]] + [[compound:histidine]] + [[compound:atp]] -> [[compound:carnosine]] + [[compound:adp]] + [[compound:phosphate]] + H+, catalysed by [[enzyme:carns1]]. The stoichiometric formation of ADP (not AMP) placed the enzyme in the ATP-grasp family ([[article:drozak-2010-carnosine-synthase-atpgd1]]).",
+      "In the source conversation this is the step that turns supplemental beta-alanine into carnosine ([[claim:beta-alanine-carnosine-tissue-protection]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "6.3.2.11",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      compartment: "cytosol",
+      direction: "ATP-driven; effectively irreversible"
+    },
+    reaction: {
+      reactants: [{ id: "compound:beta-alanine", n: 1 }, { id: "compound:histidine", n: 1 }, { id: "compound:atp", n: 1 }],
+      products: [
+        { id: "compound:carnosine", n: 1 },
+        { id: "compound:adp", n: 1 },
+        { id: "compound:phosphate", n: 1 },
+        { id: "compound:proton", n: 1 }
+      ],
+      ec: "6.3.2.11",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      reversible: false,
+      compartment: "cytosol",
+      enzymes: ["enzyme:carns1"]
+    },
+    relations: [
+      {
+        rel: "interacts-with",
+        to: "intervention:beta-alanine-supplement",
+        note: "Supplemental beta-alanine supplies the limiting substrate."
+      }
+    ],
+    refs: ["article:rhea-2022", "article:drozak-2010-carnosine-synthase-atpgd1"]
+  },
+  {
+    id: "reaction:tyms-thymidylate-synthesis",
+    type: "reaction",
+    name: "TYMS: dUMP + 5,10-methylene-THF -> dTMP + DHF",
+    aliases: ["dUMP + metileno-THF → dTMP + DHF", "síntese de timidilato", "metilação do dUMP"],
+    summary: "Reductive methylation of dUMP by 5,10-methylene-THF, giving dTMP and dihydrofolate; the single de novo route to thymine nucleotides.",
+    body: [
+      "[[compound:dump]] + [[compound:5-10-methylene-thf]] -> [[compound:dtmp]] + [[compound:dhf]], catalysed by [[enzyme:tyms]]. The folate supplies the carbon and the reducing power, so it leaves as dihydrofolate and must be regenerated before it can be reloaded with one-carbon units by [[enzyme:shmt]] ([[pathway:nucleotide-synthesis]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.45",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      compartment: "cytosol",
+      direction: "effectively irreversible"
+    },
+    reaction: {
+      reactants: [{ id: "compound:dump", n: 1 }, { id: "compound:5-10-methylene-thf", n: 1 }],
+      products: [{ id: "compound:dtmp", n: 1 }, { id: "compound:dhf", n: 1 }],
+      ec: "2.1.1.45",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      reversible: false,
+      compartment: "cytosol",
+      enzymes: ["enzyme:tyms"]
+    },
+    relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
+    refs: ["article:rhea-2022", "article:carreras-1995-thymidylate-synthase"]
   }
 ]

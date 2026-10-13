@@ -12,6 +12,7 @@ export default [
     aliases: ["GNMT", "glicina N-metiltransferase", "GNMT hepática", "dreno de metil", "methyl sink enzyme"],
     summary: "Cytosolic liver enzyme that transfers a methyl group from SAM to glycine, forming sarcosine and SAH; the main hepatic 'methyl sink' that buffers the SAM:SAH ratio.",
     body: [
+      "In plain words: GNMT is a liver enzyme that moves a methyl group from SAMe onto glycine, making sarcosine. It works like an overflow valve: when methyl supply is high, GNMT burns the surplus off. The source conversation proposes that glycine powder could force this valve open in someone already short of methyl groups and drain them further. In the body the valve is regulated by folate and the sarcosine is turned back into glycine, so whether a gram-scale glycine dose really drains methyl groups in people has not been shown.",
       "GNMT is a homotetrameric cytosolic enzyme that makes up on the order of 1-3% of soluble protein in liver (less in pancreas, kidney and prostate). It methylates [[compound:glycine]] using [[compound:sam]] to give [[compound:sarcosine]] and [[compound:sah]] ([[reaction:gnmt-glycine-methylation]]). Unlike most methyltransferases it is only weakly inhibited by SAH and has a glycine affinity in the range of hepatic glycine concentrations, so it can dispose of surplus methyl groups when SAM is high.",
       "Its activity is tuned by folate: 5-methyltetrahydrofolate polyglutamates bind GNMT and inhibit it. When SAM is high, [[enzyme:mthfr]] is inhibited by SAM so less [[compound:5-mthf|5-methyl-THF]] is made and GNMT is released; when SAM is low, 5-MTHF rises and GNMT is throttled, sparing methyl groups. Together this makes GNMT a flux-sensing 'methyl sink' ([[pathway:methyl-budget]]). The sarcosine it makes is demethylated back to glycine by [[enzyme:sardh]], so the methyl group is not lost but re-enters the folate one-carbon pool as 5,10-methylene-THF.",
       "Human GNMT deficiency gives a benign hypermethioninaemia with raised SAM, and Gnmt knockout mice develop fatty liver and hepatocellular carcinoma, confirming the role in SAM homeostasis. The source conversation proposed that a large oral glycine dose could over-recruit GNMT in an already under-methylated person and further drain SAM; this is mechanistically conceivable but is not demonstrated in humans (SARDH recapture and folate feedback should blunt it), so it is recorded as conversation-only."
@@ -48,6 +49,7 @@ export default [
     aliases: ["PEMT", "PEAMT", "fosfatidiletanolamina N-metiltransferase", "via PEMT", "síntese de novo de fosfatidilcolina"],
     summary: "ER/MAM enzyme of hepatocytes that methylates phosphatidylethanolamine three times with SAM to make phosphatidylcholine; a major hepatic SAM consumer.",
     body: [
+      "In plain words: PEMT is a liver enzyme that makes the membrane fat phosphatidylcholine by adding three methyl groups, one at a time, to a related fat. Every molecule costs three SAMe, so it is one of the largest consumers of methyl groups in the body. It appears in the conversation because choline, acetylcholine and gut movement are linked to it; that chain is plausible but weak.",
       "PEMT converts [[compound:phosphatidylethanolamine]] to [[compound:phosphatidylcholine]] by three successive SAM-dependent N-methylations, passing through phosphatidyl-N-methylethanolamine and phosphatidyl-N,N-dimethylethanolamine ([[reaction:pemt-pe-to-pc]]). Each cycle yields one [[compound:sah]], so every PC made de novo costs three [[compound:sam]]. It is a membrane protein of the endoplasmic reticulum and mitochondria-associated membranes and is quantitatively important mainly in liver, where it supplies roughly a third of hepatic PC in rodents (the rest comes from the CDP-choline route, [[pathway:kennedy-pathway]]). PEMT-derived PC is enriched in long-chain polyunsaturated acyl groups such as DHA.",
       "Because of the 3:1 SAM stoichiometry PEMT is one of the two or three largest sinks of methyl groups in the body, alongside creatine synthesis ([[enzyme:gamt]]) and the GNMT sink; the relative shares are debated (older estimates put creatine at over 70% of methyl-group flux, later revisions give PEMT a comparable or larger share). Expression is induced by oestrogen, and a common promoter variant (rs12325817) raises dietary choline requirement, which is why premenopausal women are less prone to choline-deficiency organ dysfunction.",
       "The conversation links PEMT to acetylcholine: low SAM, fewer PC molecules, less choline, less vagal acetylcholine. Choline for [[enzyme:chat]] mostly comes from the circulation and from recycling, with PC breakdown only a secondary reservoir, so the PEMT-to-acetylcholine chain is plausible but weak; it is recorded as a conversation-proposed link."
@@ -78,6 +80,7 @@ export default [
     aliases: ["BHMT", "BHMT1", "betaína-homocisteína metiltransferase", "remetilação por betaína", "via da betaína"],
     summary: "Zinc enzyme of liver and kidney that remethylates homocysteine to methionine using betaine (TMG), releasing dimethylglycine; folate- and B12-independent.",
     body: [
+      "In plain words: BHMT is a zinc-containing enzyme of liver and kidney that uses betaine to turn homocysteine back into methionine. It is a shortcut around the folate and B12 route. This is how choline and TMG help methylation, and the route the conversation uses to explain why choline might clear histamine at night.",
       "BHMT is a cytosolic zinc-dependent homotetramer that transfers one methyl group from [[compound:betaine]] to [[compound:homocysteine]], giving [[compound:methionine]] and [[compound:dimethylglycine]] ([[reaction:bhmt-betaine-homocysteine]]). It is expressed mainly in liver and kidney and provides a remethylation route that needs neither [[compound:5-mthf|5-methyl-THF]] nor [[compound:methylcobalamin]], in parallel with [[enzyme:mtr]]. In liver it accounts for a substantial but variable fraction of homocysteine remethylation; Bhmt knockout mice have raised homocysteine, fatty liver and liver tumours.",
       "Betaine comes from the oxidation of [[compound:choline]] ([[pathway:choline-oxidation]]) or from the diet (anhydrous betaine/TMG supplements, beet, wheat, shellfish). The dimethylglycine product is shuttled to mitochondria where [[enzyme:dmgdh]] and [[enzyme:sardh]] strip the remaining methyls to leave glycine, so one betaine can yield one SAM-regenerating methyl plus two folate-pool one-carbon units plus a glycine molecule.",
       "The conversation's argument that choline supports night-time histamine clearance via betaine, BHMT, SAM and [[enzyme:hnmt]] is mechanistically coherent for liver SAM, but brain and airway HNMT depend on local SAM (these tissues have little BHMT), so the effect on central histamine is plausible rather than demonstrated."
@@ -460,7 +463,7 @@ export default [
     id: "enzyme:mthfd1",
     type: "enzyme",
     name: "Trifunctional C1-tetrahydrofolate synthase (MTHFD1)",
-    aliases: ["MTHFD1", "C1-THF sintase", "metilenotetraidrofolato desidrogenase 1", "formil-THF sintetase"],
+    aliases: ["MTHFD1", "C1-THF sintase", "metilenotetraidrofolato desidrogenase 1", "formil-THF sintetase", "C1-tetraidrofolato sintase"],
     summary: "Cytosolic trifunctional enzyme (dehydrogenase, cyclohydrolase, synthetase) interconverting 5,10-methylene-THF, 10-formyl-THF and formate.",
     body: [
       "MTHFD1 combines three activities: NADP+-dependent oxidation of [[compound:5-10-methylene-thf]] to 5,10-methenyl-THF ([[reaction:mthfd1-methylene-thf-oxidation]]), hydrolysis of methenyl-THF to [[compound:10-formyl-thf]] ([[reaction:mthfd1-methenyl-thf-cyclohydrolase]]), and the ATP-driven formation of 10-formyl-THF from [[compound:formate]] and [[compound:thf]] ([[reaction:mthfd1-formate-thf-ligase]]). 10-formyl-THF is the one-carbon donor for two steps of purine synthesis.",
@@ -472,7 +475,7 @@ export default [
       ec: "1.5.1.5; 3.5.4.9; 6.3.4.3",
       uniprot: "P11586",
       rhea: "RHEA:22812; RHEA:23700; RHEA:20221",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200661; R-HSA-200718",
       kegg: "ec:6.3.4.3",
       compartment: "cytosol",
       tissue: "ubiquitous",
@@ -715,7 +718,7 @@ export default [
     id: "enzyme:gad1",
     type: "enzyme",
     name: "Glutamate decarboxylase 1 (GAD1; GAD67)",
-    aliases: ["GAD1", "GAD67", "glutamato descarboxilase 67", "GAD"],
+    aliases: ["GAD1", "GAD67", "glutamato descarboxilase 67", "GAD", "glutamato descarboxilase 1"],
     summary: "PLP-dependent cytosolic isoform that provides baseline GABA by decarboxylating glutamate; largely saturated with PLP.",
     body: [
       "GAD67 is the constitutively active, cytosolic isoform of glutamate decarboxylase ([[reaction:gad-glutamate-decarboxylation]]), producing [[compound:gaba]] and [[compound:carbon-dioxide]] from [[compound:glutamate]] with [[compound:plp]] as cofactor. It is mostly in the holoenzyme form and supplies the tonic, non-vesicular GABA pool and the GABA used in the GABA shunt ([[pathway:gaba-shunt]]).",
@@ -743,7 +746,7 @@ export default [
     id: "enzyme:gad2",
     type: "enzyme",
     name: "Glutamate decarboxylase 2 (GAD2; GAD65)",
-    aliases: ["GAD2", "GAD65", "glutamato descarboxilase 65", "anti-GAD"],
+    aliases: ["GAD2", "GAD65", "glutamato descarboxilase 65", "anti-GAD", "glutamato descarboxilase 2"],
     summary: "Vesicle-associated PLP-dependent isoform that makes GABA on demand; around half is apoenzyme, so its output tracks PLP availability.",
     body: [
       "GAD65 is anchored to synaptic vesicle membranes and synthesises [[compound:gaba]] for release ([[reaction:gad-glutamate-decarboxylation]]). A large part of the pool is present as inactive apoenzyme that is rapidly activated by binding [[compound:plp]], so it behaves as a reserve that responds to PLP supply and to neuronal activity. This is the biochemical basis for the 'glutamate to GABA' argument in the conversation: excitatory [[compound:glutamate]] is converted to the inhibitory transmitter via a B6-dependent step ([[pathway:gaba-shunt]]).",
@@ -975,7 +978,7 @@ export default [
     id: "enzyme:h-k-atpase",
     type: "enzyme",
     name: "Gastric H+/K+-ATPase (proton pump; ATP4A/ATP4B)",
-    aliases: ["ATP4A", "ATP4B", "bomba de prótons", "H+/K+ ATPase gástrica", "IBP", "omeprazol", "vonoprazana"],
+    aliases: ["ATP4A", "ATP4B", "bomba de prótons", "H+/K+ ATPase gástrica", "alvo dos IBPs", "alvo do omeprazol", "vonoprazana"],
     summary: "P-type ATPase of the parietal-cell canalicular membrane that exchanges cytosolic H+ for luminal K+ at the expense of ATP, acidifying gastric juice to pH ~1.",
     body: [
       "The gastric H+/K+-ATPase (alpha subunit ATP4A, beta subunit ATP4B) hydrolyses [[compound:atp]] to pump H+ into the secretory canaliculus in exchange for K+, producing a gradient of roughly a million-fold (cytosol pH ~7.2, lumen pH ~1; [[reaction:h-k-atpase-proton-pumping]]). Chloride follows through apical channels, completing [[compound:hydrochloric-acid]] secretion ([[reaction:gastric-hcl-secretion]], [[pathway:gastric-acid-secretion]]). The supply of protons comes from [[enzyme:carbonic-anhydrase]].",
@@ -996,7 +999,8 @@ export default [
       { rel: "part-of", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "PPI inhibition is the commonest cause of low acid" },
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "acid-peptic injury; PPIs promote healing" },
-      { rel: "associated-with", to: "system:gastric-physiology" }
+      { rel: "associated-with", to: "system:gastric-physiology" },
+      { rel: "part-of", to: "system:gastric-parietal-cells" }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -1632,7 +1636,7 @@ export default [
     id: "enzyme:psat1",
     type: "enzyme",
     name: "Phosphoserine aminotransferase 1 (PSAT1)",
-    aliases: ["PSAT1", "fosfoserina aminotransferase", "PSAT"],
+    aliases: ["PSAT1", "fosfoserina aminotransferase", "PSAT", "fosfosserina aminotransferase"],
     summary: "PLP-dependent transaminase of the serine pathway that converts 3-phosphohydroxypyruvate and glutamate into 3-phosphoserine.",
     body: [
       "PSAT1 transfers the amino group of [[compound:glutamate]] onto [[compound:3-phosphohydroxypyruvate]], yielding [[compound:3-phosphoserine]] and [[compound:2-oxoglutarate]] ([[reaction:psat1-phosphoserine-transamination]]). Written in the direction of serine synthesis the equilibrium is nearly neutral and pulled forward by [[enzyme:psph]].",
@@ -1660,7 +1664,7 @@ export default [
     id: "enzyme:psph",
     type: "enzyme",
     name: "Phosphoserine phosphatase (PSPH)",
-    aliases: ["PSPH", "fosfoserina fosfatase", "PSP"],
+    aliases: ["PSPH", "fosfoserina fosfatase", "PSP", "fosfosserina fosfatase"],
     summary: "Mg2+-dependent phosphatase that hydrolyses 3-phosphoserine to serine, the irreversible final step of serine synthesis.",
     body: [
       "PSPH removes the phosphate from [[compound:3-phosphoserine]] to give [[compound:serine]] and [[compound:phosphate]] ([[reaction:psph-phosphoserine-hydrolysis]]). This irreversible step drives the whole route from [[enzyme:phgdh]] onward and is inhibited by serine.",
@@ -1817,5 +1821,60 @@ export default [
       { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" }
     ],
     refs: ["article:pissios-2017-nnmt-methyl-sink"]
+  },
+  {
+    id: "enzyme:carns1",
+    type: "enzyme",
+    name: "Carnosine synthase 1 (CARNS1; ATPGD1)",
+    aliases: ["CARNS1", "ATPGD1", "carnosina sintase", "carnosina sintetase"],
+    summary: "ATP-grasp ligase that joins beta-alanine and L-histidine into carnosine (and GABA plus histidine into homocarnosine, less efficiently); beta-alanine supply limits it.",
+    body: [
+      "CARNS1 builds the dipeptide [[compound:carnosine]] from [[compound:beta-alanine]], [[compound:histidine]] and [[compound:atp]], releasing [[compound:adp]] and phosphate ([[reaction:carns1-carnosine-synthesis]]). It prefers beta-alanine over GABA by a factor of 15-25 in catalytic efficiency ([[article:drozak-2010-carnosine-synthase-atpgd1]]).",
+      "Because histidine is usually plentiful and beta-alanine is scarce, beta-alanine availability controls how much carnosine tissues can make; this is the reason beta-alanine rather than carnosine itself is the usual supplement ([[intervention:beta-alanine-supplement]], [[article:boldyrev-2013-carnosine-physiology]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "CARNS1",
+      ec: "6.3.2.11",
+      uniprot: "A5YM72",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      kegg: "ec:6.3.2.11",
+      compartment: "cytosol",
+      tissue: "skeletal muscle, brain"
+    },
+    relations: [
+      {
+        rel: "associated-with",
+        to: "intervention:beta-alanine-supplement",
+        note: "Supplemental beta-alanine raises the substrate for this enzyme."
+      }
+    ],
+    refs: ["article:drozak-2010-carnosine-synthase-atpgd1", "article:boldyrev-2013-carnosine-physiology"]
+  },
+  {
+    id: "enzyme:tyms",
+    type: "enzyme",
+    name: "Thymidylate synthase (TYMS)",
+    aliases: ["TYMS", "TS", "timidilato sintase", "timidilato sintetase"],
+    summary: "Cytosolic enzyme that methylates dUMP with 5,10-methylene-THF to make dTMP and dihydrofolate; the only de novo source of thymine nucleotides for DNA.",
+    body: [
+      "TYMS transfers a methylene group from [[compound:5-10-methylene-thf]] to [[compound:dump]] and reduces it to a methyl group, producing [[compound:dtmp]] and [[compound:dhf]] ([[reaction:tyms-thymidylate-synthesis]]). Because it is the sole de novo route to thymine nucleotides, cell division depends on it ([[pathway:nucleotide-synthesis]]).",
+      "It connects the dietary themes of this site to DNA: the folate pool that [[enzyme:shmt]], the glycine cleavage system and the choline-derived chain ([[enzyme:dmgdh]], [[enzyme:sardh]]) fill is drawn on here. Fluoropyrimidine and antifolate cancer drugs act on this step, which is why it is well characterised ([[article:carreras-1995-thymidylate-synthase]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "TYMS",
+      ec: "2.1.1.45",
+      uniprot: "P04818",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      kegg: "ec:2.1.1.45",
+      compartment: "cytosol (and nucleus in S phase)",
+      tissue: "proliferating tissues",
+      cofactors: "5,10-methylene-THF (co-substrate)"
+    },
+    relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
+    refs: ["article:carreras-1995-thymidylate-synthase", "article:ducker-2017-one-carbon-metabolism"]
   }
 ]

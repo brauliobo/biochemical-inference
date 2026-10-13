@@ -8,6 +8,7 @@ export default [
     aliases: ["Úlcera péptica", "Úlcera gástrica", "Úlcera duodenal", "Gastric ulcer", "Duodenal ulcer"],
     summary: "Breaks in the gastric or duodenal mucosa reaching the muscularis, caused mainly by H. pylori infection or NSAIDs and healed with acid suppression and removal of the cause.",
     body: [
+      "In plain words: a peptic ulcer is a sore in the lining of the stomach or the first part of the small intestine. Most come from infection with H. pylori or from anti-inflammatory painkillers; stomach acid and pepsin keep the sore open. Treatment removes the cause and lowers acid. In the source conversation, ulcers earlier in the year explain why an acid supplement (betaine HCl) burned and why gut-protective products are discussed. This page is educational only; ulcer symptoms need a doctor.",
       "Ulcers arise when aggressive factors (acid, [[compound:pepsin]], bile, [[disease:h-pylori-infection]], NSAIDs) overwhelm the [[system:mucosal-barrier]]. Standard care is to find and remove the cause (test and treat H. pylori, stop NSAIDs), use [[intervention:ppi-therapy|PPIs]] for healing, and confirm eradication afterwards ([[claim:confirm-h-pylori-eradication]]). Complications are bleeding, perforation and gastric-outlet obstruction.",
       "In the source conversation the user's early-year gastric and duodenal ulcers are the pivot for caution about acidifying supplements ([[claim:betaine-hcl-contraindicated-post-ulcer]]) and for suggestions such as [[intervention:zinc-carnosine]], [[intervention:dgl-licorice]] and [[intervention:espinheira-santa]]. Whether those add benefit beyond standard therapy is uncertain ([[claim:zinc-carnosine-ulcer-healing]]). Educational only; ulcer symptoms need clinical evaluation."
     ],
@@ -27,7 +28,7 @@ export default [
     id: "disease:h-pylori-infection",
     type: "disease",
     name: "Helicobacter pylori infection",
-    aliases: ["Infecção por H. pylori", "Helicobacter pylori", "H. pylori gastritis"],
+    aliases: ["Infecção por H. pylori", "Helicobacter pylori", "H. pylori gastritis", "H. pylori", "Helicobacter"],
     summary: "Chronic gastric infection by a urease-producing bacterium, causing gastritis, ulcers, atrophy and gastric cancer risk; treated with PPI-based antibiotic regimens and confirmed by test of cure.",
     body: [
       "The bacterium survives acid by producing urease, which hydrolyses urea into ammonia and [[compound:carbon-dioxide]] and buffers its microenvironment. The same reaction is the basis of the urea breath test. Roughly 40-45% of people worldwide are infected in systematic reviews, often without symptoms. Chronic infection can cause antral gastritis and duodenal ulcers (high acid) or corpus atrophy with [[state:hypochlorhydria]] ([[disease:atrophic-gastritis]]), and is the principal risk factor for gastric cancer.",
@@ -42,7 +43,8 @@ export default [
       { rel: "increases", to: "compound:ammonia", note: "Urease product; neutralises acid around the bacterium." },
       { rel: "associated-with", to: "disease:functional-dyspepsia", note: "Eradication helps a minority (NNT about 15)." },
       { rel: "measured-by", to: "outcome:h-pylori-test-result" },
-      { rel: "associated-with", to: "disease:sibo", note: "Meta-analysis of observational studies: infection was associated with SIBO (OR 1.82); direction and mechanism are unclear." }
+      { rel: "associated-with", to: "disease:sibo", note: "Meta-analysis of observational studies: infection was associated with SIBO (OR 1.82); direction and mechanism are unclear." },
+      { rel: "causes", to: "disease:gastritis", note: "The commonest cause of chronic gastritis." }
     ],
     refs: ["article:malfertheiner-2022-maastricht-vi", "article:chey-2024-acg-h-pylori-treatment", "article:kusters-2006-h-pylori-pathogenesis"]
   },
@@ -50,9 +52,10 @@ export default [
     id: "disease:sibo",
     type: "disease",
     name: "Small intestinal bacterial overgrowth (SIBO)",
-    aliases: ["SIBO", "Supercrescimento bacteriano do intestino delgado", "Proximal SIBO", "Small bowel bacterial overgrowth"],
+    aliases: ["SIBO", "Supercrescimento bacteriano do intestino delgado", "Proximal SIBO", "Small bowel bacterial overgrowth", "SIBO proximal", "sobrecrescimento bacteriano", "supercrescimento bacteriano"],
     summary: "Excess bacteria in the small bowel producing bloating, diarrhoea or malabsorption; breath testing is common but imprecise, and its role in belching or amino-acid fermentation is unproven.",
     body: [
+      "In plain words: SIBO means too many bacteria in the small intestine, where numbers are normally low. Typical complaints are bloating, gas and diarrhoea, and it is looked for with breath tests that are imperfect. The conversation suggests that bacteria high in the gut could ferment glycine powder and cause belching. That is chemically possible but unproven, and most SIBO gas is hydrogen and methane from carbohydrate.",
       "Defence against overgrowth comes from gastric acid, the migrating motor complex, bile, pancreatic enzymes, the ileocaecal valve and mucosal immunity. Risk rises with reduced motility, anatomy changes and probably prolonged acid suppression ([[state:acid-suppression]], [[claim:ppis-cause-sibo]]). Typical features are bloating, flatulence, diarrhoea and, in severe cases, steatorrhoea and B12 deficiency. The ACG 2020 guideline and the North American consensus use glucose or lactulose hydrogen/methane breath tests, but sensitivity and specificity versus aspirate culture are modest ([[intervention:sibo-breath-test]], [[outcome:breath-hydrogen-methane]]), and a 2024 expert update called for a more critical view of the SIBO hypothesis.",
       "The source conversation proposes that proximal SIBO rapidly ferments free glycine into CO2 and ammonia and so causes belching. Some gut anaerobes do metabolise glycine (glycine reductase, glycine cleavage), but clinical SIBO gas is mostly hydrogen and methane from carbohydrate fermentation, and belching mainly reflects swallowed air ([[claim:sibo-bacteria-metabolize-glycine-co2-nh3]], [[claim:sibo-gas-appears-in-15-45-min-as-belching]]). Educational only; antimicrobial therapy should be guided by a clinician."
     ],
@@ -63,7 +66,8 @@ export default [
       { rel: "manifests-as", to: "outcome:breath-hydrogen-methane" },
       { rel: "associated-with", to: "state:hypochlorhydria" },
       { rel: "associated-with", to: "state:gastric-dysmotility", note: "Impaired migrating motor complex is a recognised predisposition." },
-      { rel: "interacts-with", to: "system:gut-microbiota" }
+      { rel: "interacts-with", to: "system:gut-microbiota" },
+      { rel: "manifests-as", to: "outcome:flatulence", note: "Typical but non-specific; carbohydrate fermentation gas." }
     ],
     refs: ["article:pimentel-2020-acg-sibo-guideline", "article:rezaie-2017-breath-test-consensus", "article:kashyap-2024-sibo-critical-appraisal"]
   },
@@ -86,7 +90,8 @@ export default [
       { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
       { rel: "associated-with", to: "state:gastric-dysmotility" },
       { rel: "measured-by", to: "outcome:reflux-episodes" },
-      { rel: "manifests-as", to: "outcome:belching", note: "Belching, often supragastric, accompanies reflux in many patients." }
+      { rel: "manifests-as", to: "outcome:belching", note: "Belching, often supragastric, accompanies reflux in many patients." },
+      { rel: "manifests-as", to: "disease:esophagitis", note: "Erosive form; many patients have non-erosive reflux disease." }
     ],
     refs: ["article:katz-2022-acg-gerd-guideline", "article:leiman-2017-alginate-meta-analysis"]
   },
@@ -97,6 +102,7 @@ export default [
     aliases: ["RLF", "Refluxo laringofaríngeo", "Silent reflux", "Refluxo silencioso", "Extraesophageal reflux (throat)"],
     summary: "A label for throat symptoms (burning, throat clearing, globus, hoarseness) attributed to reflux; it lacks standard criteria and objective proof, and PPI response is often no better than placebo.",
     body: [
+      "In plain words: LPR (\"silent reflux\") is the idea that stomach contents reach the throat and cause burning, throat clearing or a lump sensation, sometimes without heartburn. It is a common but debated label: the tests are imperfect, and acid-blocking drugs often do no better than placebo. The conversation links belches that carry pepsin to the throat; that link has not been tested. Throat symptoms deserve medical assessment.",
       "Proposed mechanisms are direct injury of the [[system:larynx-pharynx]] by acid, [[compound:pepsin]] and bile, and indirect vagal reflexes. Johnston and colleagues showed that pepsin can be taken up by hypopharyngeal epithelial cells and may damage them even at weakly acidic or neutral pH, and that laryngeal tissue has lower protective carbonic anhydrase and mucins than the oesophagus. The AGA 2023 update, however, states that LPR has no standardised diagnostic criteria or objective evidence of reflux in many labelled patients, discourages empiric PPIs for isolated throat symptoms, and prefers reflux testing first ([[claim:throat-burning-means-lpr]]).",
       "Alginates have promising but still limited evidence for LPR, including a non-inferiority RCT against PPIs ([[claim:alginate-rafts-reduce-lpr]]); in-vitro work shows that alkaline water can denature pepsin ([[claim:alkaline-water-inactivates-pepsin]]). The conversation's suggestion that belches aerosolise pepsin onto the larynx is untested ([[claim:belch-aerosol-deposits-pepsin]]). Throat burning has many other causes (voice use, allergy, post-nasal drip, oesophageal motility, anxiety). Educational only."
     ],
@@ -263,7 +269,7 @@ export default [
     id: "disease:pyroluria-kpu",
     type: "disease",
     name: "Pyroluria / kryptopyrroluria (KPU)",
-    aliases: ["Piroluria", "Pyrrole disorder", "Mauve factor", "Kryptopyrrole", "HPL elevated urine"],
+    aliases: ["Piroluria", "Pyrrole disorder", "Mauve factor", "Kryptopyrrole", "HPL elevated urine", "KPU"],
     summary: "Alleged condition in which urinary pyrroles (HPL) bind B6 and zinc and cause psychiatric symptoms. Contested and not recognised: assay validity is disputed and no controlled trials exist.",
     body: [
       "The 'mauve factor' was first reported in the 1950s and attributed to kryptopyrrole; later analytical work found kryptopyrrole absent in urine and the compound was reassigned to hydroxyhemopyrrolin-2-one (HPL), a haem-derived product. Proponents say elevated HPL increases excretion of B6 and zinc and causes anxiety, mood swings, poor stress tolerance, pale skin, stretch marks and white nail spots, and recommend zinc and P5P. A systematic review (Pyroluria: Fact or Fiction?) found few studies showing higher HPL in psychiatric groups, no placebo-controlled treatment trials, and no demonstration that HPL increases B6 or zinc loss; urobilinogen interferes with the assay and the test is not endorsed by mainstream laboratories.",
@@ -355,7 +361,8 @@ export default [
       { rel: "causes", to: "state:hypochlorhydria" },
       { rel: "causes", to: "disease:vitamin-b12-deficiency" },
       { rel: "increases", to: "compound:gastrin" },
-      { rel: "associated-with", to: "disease:h-pylori-infection" }
+      { rel: "associated-with", to: "disease:h-pylori-infection" },
+      { rel: "part-of", to: "disease:gastritis" }
     ],
     refs: ["article:lenti-2020-autoimmune-gastritis"]
   },
@@ -442,7 +449,7 @@ export default [
     id: "disease:osteoarthritis",
     type: "disease",
     name: "Osteoarthritis",
-    aliases: ["Osteoartrite", "Joint cartilage degeneration"],
+    aliases: ["Osteoartrite", "Joint cartilage degeneration", "artrose"],
     summary: "Degeneration of joint cartilage and bone; type II collagen is its main cartilage protein. Undenatured type II collagen and glycine have been tried in small, mixed trials; no established benefit.",
     body: [
       "Articular cartilage is rich in type II [[compound:collagen]]. Undenatured type II collagen (UC-II) at about 40 mg/day, acting through oral tolerance rather than as an amino-acid source, improved knee symptoms in a trial (Lugo 2016), and collagen hydrolysates have shown mixed results. A hypothesis paper proposes that high glycine (about 10 g/day) boosts chondrocyte collagen synthesis in vitro and that glycine insufficiency may contribute to osteoarthritis ([[state:glycine-insufficiency]]).",
@@ -456,7 +463,7 @@ export default [
       { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" },
       { rel: "associated-with", to: "system:connective-tissue" }
     ],
-    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
+    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis", "article:bello-2006-collagen-hydrolysate-osteoarthritis"]
   },
   {
     id: "disease:choline-deficiency",
@@ -477,5 +484,65 @@ export default [
       { rel: "interacts-with", to: "enzyme:pemt" }
     ],
     refs: ["article:zeisel-1991-choline-essential-nutrient", "article:resseguie-2011-pemt-estrogen-choline", "article:efsa-2016-choline-dri"]
+  },
+  {
+    id: "disease:esophagitis",
+    type: "disease",
+    name: "Reflux oesophagitis (erosive oesophagitis)",
+    aliases: ["esofagite", "esofagite erosiva", "esofagite de refluxo", "reflux esophagitis", "erosive esophagitis"],
+    summary: "Visible inflammation or erosions of the oesophageal lining from acid reflux, the erosive form of GERD; it heals with acid suppression, and irritant supplements or oils are usually avoided.",
+    body: [
+      "Not everyone with reflux symptoms has visible damage: some have erosive disease (oesophagitis seen at endoscopy) and others have non-erosive reflux disease. Oesophagitis is graded by the extent of mucosal breaks, and acid suppression with a PPI heals most cases ([[disease:gerd]], [[article:katz-2022-acg-gerd-guideline]], [[intervention:ppi-therapy]]).",
+      "Practical relevance on this site: acid-releasing or pungent products are avoided on inflamed lining, which is why betaine HCl and concentrated oregano oil carry cautions ([[intervention:betaine-hcl]], [[intervention:oregano-oil]], [[claim:oregano-phenols-burn-inflamed-mucosa]]). Throat symptoms without oesophageal damage are classed separately ([[disease:lpr]]). Persistent burning, trouble swallowing or weight loss need medical assessment. Educational only."
+    ],
+    evidence: "established",
+    facts: { icd10: "K21.0 (GERD with oesophagitis); K20 (oesophagitis)" },
+    relations: [
+      { rel: "manifests-as", to: "outcome:heartburn" },
+      { rel: "measured-by", to: "outcome:reflux-episodes" },
+      {
+        rel: "associated-with",
+        to: "disease:lpr",
+        note: "Both are reflux-related; oesophagitis is oesophageal injury, LPR a throat label."
+      },
+      { rel: "associated-with", to: "system:lower-esophageal-sphincter" }
+    ],
+    refs: ["article:katz-2022-acg-gerd-guideline"]
+  },
+  {
+    id: "disease:gastritis",
+    type: "disease",
+    name: "Gastritis and duodenitis",
+    aliases: [
+      "gastrite",
+      "gastrite erosiva",
+      "duodenite",
+      "gastroduodenite",
+      "gastrite crônica",
+      "erosive gastritis",
+      "duodenitis"
+    ],
+    summary: "Inflammation of the stomach or duodenal lining, most often from H. pylori, also NSAIDs, alcohol, bile reflux or autoimmunity; erosive forms expose the mucosa and make acid painful.",
+    body: [
+      "Gastritis is inflammation of the stomach lining and duodenitis the same in the first part of the small intestine. Many cases cause no symptoms. The commonest cause is infection with Helicobacter pylori ([[disease:h-pylori-infection]]); others are anti-inflammatory painkillers (NSAIDs), heavy alcohol, bile reflux ([[state:duodenogastric-reflux]]) and autoimmune attack ([[disease:atrophic-gastritis]]). Erosive forms have surface defects short of a full ulcer ([[disease:peptic-ulcer]]). The Kyoto consensus classifies chronic gastritis and duodenitis by cause and pattern ([[article:sugano-2015-kyoto-gastritis-consensus]]).",
+      "The source conversation reasons that after ulcers the lining may still have \"microscopic erosive gastritis, residual duodenitis or a thinned mucus barrier\", which would make acid from betaine HCl burn ([[intervention:betaine-hcl]], [[claim:betaine-hcl-contraindicated-post-ulcer]]). Whether residual inflammation is present can only be shown by endoscopy and biopsy; burning on acid contact fits the picture but is non-specific ([[state:post-ulcer-mucosal-recovery]], [[system:mucosal-barrier]]). Educational only."
+    ],
+    evidence: "established",
+    facts: { icd10: "K29 (gastritis and duodenitis)" },
+    relations: [
+      {
+        rel: "associated-with",
+        to: "disease:peptic-ulcer",
+        note: "Same aggressive factors; ulcers are deeper breaks."
+      },
+      { rel: "associated-with", to: "state:duodenogastric-reflux" },
+      { rel: "measured-by", to: "outcome:h-pylori-test-result", note: "Testing for the commonest cause." },
+      { rel: "associated-with", to: "system:mucosal-barrier" }
+    ],
+    refs: [
+      "article:sugano-2015-kyoto-gastritis-consensus",
+      "article:malfertheiner-2022-maastricht-vi",
+      "article:lenti-2020-autoimmune-gastritis"
+    ]
   }
 ];

@@ -4,6 +4,7 @@ import { TYPES } from './types.js'
 import { allowedPair, describeAllowed } from './relations.js'
 import { checkEntity } from './schema.js'
 import { buildGraph, connectedComponents } from './graph.js'
+import { PATH_RULES, checkPaths } from './guided-paths.js'
 
 export const RULES = Object.freeze({
   schema: { severity: 'error', title: 'Schema violations' },
@@ -21,6 +22,7 @@ export const RULES = Object.freeze({
   'claim-no-evidence': { severity: 'error', title: 'Claims with no evidence-for/against' },
   'established-no-ref': { severity: 'error', title: "Entities graded 'established' without a reference" },
   'type-coverage': { severity: 'error', title: 'Entity types with no entities' },
+  ...PATH_RULES,
   'claim-flagged-no-evidence': { severity: 'warning', title: 'Flagged claims with no evidence yet' },
   'unverified-article': { severity: 'warning', title: 'Articles not yet verified' }
 })
@@ -32,7 +34,12 @@ const MEMBER_PREVIEW = 8
 
 const isEvidenceLink = (link) => link.rel === 'has-evidence' || link.rel === 'has-counterevidence'
 
-export function validateKnowledge(rawEntities) {
+/**
+ * validateKnowledge(rawEntities, { paths }) -> { ok, counts, errors, warnings }
+ * `paths` (optional) is the guided-path list from data/paths.js; when given, every path is checked
+ * against the graph (schema, duplicate ids, steps that do not resolve).
+ */
+export function validateKnowledge(rawEntities, { paths } = {}) {
   const issues = []
   const add = (rule, id, message, path = '') => issues.push({ rule, severity: RULES[rule].severity, id, path, message })
 
@@ -106,11 +113,15 @@ export function validateKnowledge(rawEntities) {
   // 6. coverage
   for (const type of TYPES) if (!graph.byType.get(type.id)?.length) add('type-coverage', '', `no entities of type '${type.id}'`)
 
+  // 7. guided paths
+  if (paths !== undefined) for (const item of checkPaths(paths, graph)) issues.push(item)
+
   return finish(issues, {
     entities: graph.stats.entities,
     byType: Object.fromEntries(TYPES.map((type) => [type.id, graph.byType.get(type.id).length])),
     edges: { total: graph.stats.edges, declared: graph.stats.declared, derived: graph.stats.derived },
-    mentions: graph.stats.mentions
+    mentions: graph.stats.mentions,
+    ...(Array.isArray(paths) ? { paths: paths.length } : {})
   })
 }
 
@@ -127,7 +138,7 @@ export function formatReport(report) {
   const lines = ['Knowledge base validation', '']
   const types = Object.entries(counts.byType).map(([type, count]) => `${type} ${count}`).join(', ')
   lines.push(`Entities: ${counts.entities}${types ? ` (${types})` : ''}`)
-  lines.push(`Relations: ${counts.edges.total} (${counts.edges.declared} declared, ${counts.edges.derived} derived); body mentions: ${counts.mentions}`, '')
+  lines.push(`Relations: ${counts.edges.total} (${counts.edges.declared} declared, ${counts.edges.derived} derived); body mentions: ${counts.mentions}${counts.paths === undefined ? '' : `; guided paths: ${counts.paths}`}`, '')
   const section = (label, items) => {
     if (!items.length) return
     lines.push(`${label} (${items.length})`)

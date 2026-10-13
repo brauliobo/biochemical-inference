@@ -116,9 +116,9 @@ export default [
   {
     id: "compound:pyrophosphate",
     type: "compound",
-    name: "Pyrophosphate (diphosphate, PPi)",
-    aliases: ["PPi", "diphosphate", "pirofosfato"],
-    summary: "Two linked phosphates released when ATP or CTP is cleaved to the monophosphate; its hydrolysis by pyrophosphatases drives nucleotidyl-transfer steps forward.",
+    name: "Pyrophosphate (diphosphate, inorganic)",
+    aliases: ["diphosphate", "pirofosfato", "inorganic pyrophosphate"],
+    summary: "Pyrophosphate (PPi, not the drug class PPI): two linked phosphates released when ATP or CTP is cleaved; its hydrolysis by pyrophosphatases drives nucleotidyl-transfer steps forward.",
     body: [
       "PPi is a by-product of [[reaction:mat-sam-synthesis]] (alongside phosphate), of CTP-dependent activation in [[reaction:pcyt1a-cdp-choline-synthesis]] and [[reaction:pcyt2-cdp-ethanolamine-synthesis]], and of bile-acid activation ([[reaction:bacs-cholate-coa-ligation]]). Rapid cleavage to two phosphates makes these steps effectively irreversible."
     ],
@@ -196,7 +196,9 @@ export default [
     evidence: "established",
     facts: { formula: "C9H14N3O8P", molarMass: "323.20 g/mol", chebi: "CHEBI:17361", pubchem: "CID 6131" },
     relations: [
-      { rel: "part-of", to: "pathway:kennedy-pathway", note: "By-product of the phosphotransferase steps" }
+      { rel: "part-of", to: "pathway:kennedy-pathway", note: "By-product of the phosphotransferase steps" },
+      { rel: "product-of", to: "enzyme:chpt1" },
+      { rel: "product-of", to: "enzyme:selenoi" }
     ],
     refs: ["article:kennedy-1956-cytidine-coenzymes"]
   },
@@ -339,7 +341,9 @@ export default [
     evidence: "established",
     facts: { class: "protein cofactor (redox)", uniprot: "P10599 (human TXN)" },
     relations: [
-      { rel: "associated-with", to: "compound:thioredoxin-dithiol", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:thioredoxin-dithiol", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:bacterial-glycine-reductase" },
+      { rel: "part-of", to: "pathway:gut-bacterial-glycine-fates" }
     ],
     refs: ["article:lu-2014-thioredoxin-system"]
   },
@@ -364,7 +368,7 @@ export default [
     id: "compound:etf-reduced",
     type: "compound",
     name: "Electron transfer flavoprotein (reduced)",
-    aliases: ["ETF red", "ETFH2", "ETF reduzida"],
+    aliases: ["ETF red", "ETFH2", "ETF reduzida", "flavoproteína transferidora de elétrons reduzida"],
     summary: "Reduced ETF produced when mitochondrial flavoprotein dehydrogenases such as DMGDH and SARDH oxidise their substrates; reoxidised by ETF-QO.",
     body: [
       "Reduced ETF hands its electrons to ETF:ubiquinone oxidoreductase, which feeds the ubiquinone pool of the respiratory chain. A defect in this shared route causes multiple acyl-CoA dehydrogenase deficiency.",
@@ -373,7 +377,10 @@ export default [
     evidence: "established",
     facts: { class: "flavoprotein (FAD + AMP)", uniprot: "P13804 (ETFA); P38117 (ETFB)", compartment: "mitochondrial matrix" },
     relations: [
-      { rel: "associated-with", to: "compound:etf-oxidized", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:etf-oxidized", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:dmgdh" },
+      { rel: "product-of", to: "enzyme:sardh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ],
     refs: ["article:watmough-2010-etf-qo"]
   },
@@ -390,14 +397,16 @@ export default [
     evidence: "plausible",
     facts: { class: "generic placeholder", "reduced-form": "compound:hydrogen-acceptor-reduced" },
     relations: [
-      { rel: "associated-with", to: "compound:hydrogen-acceptor-reduced", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:hydrogen-acceptor-reduced", note: "Redox partner" },
+      { rel: "substrate-of", to: "enzyme:chdh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ]
   },
   {
     id: "compound:hydrogen-acceptor-reduced",
     type: "compound",
     name: "Generic hydrogen acceptor, reduced (AH2)",
-    aliases: ["AH2", "reduced acceptor", "aceitador reduzido"],
+    aliases: ["AH2", "reduced acceptor", "aceitador reduzido", "aceitador de hidrogênio reduzido"],
     summary: "Reduced form of the generic acceptor in the choline dehydrogenase reaction; a placeholder for whatever the enzyme reduces.",
     body: [
       "Product of [[reaction:chdh-choline-oxidation]] alongside [[compound:betaine-aldehyde]]. The reduced acceptor equals [[compound:hydrogen-acceptor]] plus two hydrogens, so no separate proton is written.",
@@ -406,7 +415,9 @@ export default [
     evidence: "plausible",
     facts: { class: "generic placeholder" },
     relations: [
-      { rel: "associated-with", to: "compound:hydrogen-acceptor", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:hydrogen-acceptor", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:chdh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ]
   },
   // ------------------------------------------------------------------ carbon units and folates
@@ -414,7 +425,7 @@ export default [
     id: "compound:10-formyl-thf",
     type: "compound",
     name: "10-Formyltetrahydrofolate (10-formyl-THF)",
-    aliases: ["10-CHO-THF", "10-formil-THF", "formyl-THF"],
+    aliases: ["10-CHO-THF", "10-formil-THF", "formyl-THF", "10-formil-tetraidrofolato"],
     summary: "Folate form carrying a formyl group at the oxidation level of formate; supplies carbon for purine synthesis and is interconverted with formate by MTHFD1.",
     body: [
       "[[enzyme:mthfd1]] makes 10-formyl-THF from [[compound:thf]], [[compound:formate]] and ATP ([[reaction:mthfd1-formate-thf-ligase]]) and from [[compound:5-10-methenyl-thf]] by cyclohydrolysis ([[reaction:mthfd1-methenyl-thf-cyclohydrolase]]). In the opposite direction it releases formate, the mitochondrial output of one-carbon metabolism.",
@@ -424,7 +435,8 @@ export default [
     facts: { formula: "C20H23N7O7", molarMass: "473.4 g/mol", chebi: "CHEBI:15637", pubchem: "CID 135450591" },
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
-      { rel: "precursor-of", to: "compound:formate", note: "Reversible release of formate" }
+      { rel: "precursor-of", to: "compound:formate", note: "Reversible release of formate" },
+      { rel: "substrate-of", to: "pathway:nucleotide-synthesis", note: "Formyl donor for two steps of purine synthesis." }
     ],
     refs: ["article:reactome-folate-pterine-metabolism"]
   },
@@ -432,7 +444,7 @@ export default [
     id: "compound:5-10-methenyl-thf",
     type: "compound",
     name: "5,10-Methenyltetrahydrofolate",
-    aliases: ["5,10-CH=THF", "metenil-THF", "methenyl-THF"],
+    aliases: ["5,10-CH=THF", "metenil-THF", "methenyl-THF", "5,10-metenil-tetraidrofolato"],
     summary: "Folate form at the oxidation level of formate; an intermediate between 5,10-methylene-THF and 10-formyl-THF in the MTHFD1 reactions.",
     body: [
       "[[enzyme:mthfd1]] oxidises [[compound:5-10-methylene-thf]] to this cation using NADP+ ([[reaction:mthfd1-methylene-thf-oxidation]]), and then hydrates it to [[compound:10-formyl-thf]] ([[reaction:mthfd1-methenyl-thf-cyclohydrolase]]). The two activities are on the same polypeptide, so free methenyl-THF is a short-lived channelled intermediate.",
@@ -450,7 +462,7 @@ export default [
     id: "compound:2-oxoglutarate",
     type: "compound",
     name: "2-Oxoglutarate (alpha-ketoglutarate)",
-    aliases: ["alpha-ketoglutarate", "alfa-cetoglutarato", "2-OG", "AKG"],
+    aliases: ["alpha-ketoglutarate", "alfa-cetoglutarato", "2-OG", "AKG", "2-oxoglutarato"],
     summary: "Tricarboxylic acid cycle intermediate and the amino group acceptor in GABA transaminase and prolyl hydroxylase reactions.",
     body: [
       "[[enzyme:abat]] transfers the amino group of [[compound:gaba]] to 2-oxoglutarate, regenerating [[compound:glutamate]] and forming [[compound:succinate-semialdehyde]] ([[reaction:abat-gaba-transamination]]), which closes the GABA shunt around the TCA cycle ([[pathway:gaba-shunt]]). [[enzyme:p4ha1]] needs it, with oxygen and iron, to hydroxylate collagen proline ([[reaction:p4h-prolyl-hydroxylation]]).",
@@ -537,7 +549,7 @@ export default [
     id: "compound:3-phosphoserine",
     type: "compound",
     name: "3-Phosphoserine (O-phosphoserine)",
-    aliases: ["O-phospho-L-serine", "fosfoserina", "P-Ser"],
+    aliases: ["O-phospho-L-serine", "fosfoserina", "P-Ser", "3-fosfosserina"],
     summary: "Phosphorylated serine precursor released as free serine by PSPH in the last step of serine biosynthesis.",
     body: [
       "[[enzyme:psph]] hydrolyses the phosphate ester to give [[compound:serine]] and [[compound:phosphate]] ([[reaction:psph-phosphoserine-hydrolysis]]), an essentially irreversible step that commits the pathway.",
@@ -555,7 +567,7 @@ export default [
     id: "compound:arginine",
     type: "compound",
     name: "L-Arginine",
-    aliases: ["Arg", "arginina"],
+    aliases: ["Arg", "arginina", "L-arginina"],
     summary: "Amino acid that donates its amidino group to glycine in the first step of creatine synthesis (AGAT), leaving ornithine.",
     body: [
       "[[enzyme:gatm]] transfers the guanidino group of arginine to [[compound:glycine]] to form [[compound:guanidinoacetate]] and [[compound:ornithine]] ([[reaction:agat-guanidinoacetate-synthesis]]); [[enzyme:gamt]] then methylates guanidinoacetate with [[compound:sam]] to make [[compound:creatine]]. Creatine synthesis is therefore both a glycine sink and a major methyl sink ([[pathway:creatine-synthesis]]).",
@@ -608,7 +620,7 @@ export default [
     id: "compound:2-oxobutanoate",
     type: "compound",
     name: "2-Oxobutanoate (alpha-ketobutyrate)",
-    aliases: ["alpha-ketobutyrate", "2-ketobutyrate", "alfa-cetobutirato", "2-oxobutyric acid"],
+    aliases: ["alpha-ketobutyrate", "2-ketobutyrate", "alfa-cetobutirato", "2-oxobutyric acid", "2-oxobutanoato"],
     summary: "Keto acid formed when cystathionine is cleaved by CTH in transsulfuration; it is further oxidised to propionyl-CoA.",
     body: [
       "[[enzyme:cth]] splits [[compound:cystathionine]] into [[compound:cysteine]], [[compound:ammonia]] and 2-oxobutanoate ([[reaction:cth-cystathionine-cleavage]]), completing the conversion of homocysteine sulfur into cysteine ([[pathway:transsulfuration]]).",
@@ -633,7 +645,9 @@ export default [
       "In vitro, the enzyme cannot use [[compound:betaine]], and betaine does not inhibit it, so SMM and betaine use different enzymes."
     ],
     evidence: "plausible",
-    facts: { class: "methionine-derived sulfonium compound", chebi: "CHEBI:67050", pubchem: "CID 10197842" },
+    facts: { class: "methionine-derived sulfonium compound", chebi: "CHEBI:67050", pubchem: "CID 10197842",
+    "molarMass": "163.24 g/mol (zwitterion)",
+    "formula": "C6H13NO2S (zwitterion; cation C6H14NO2S+)" },
     relations: [
       { rel: "precursor-of", to: "compound:methionine", note: "Methyl donor in the BHMT2 reaction" },
       { rel: "decreases", to: "compound:homocysteine", note: "Via BHMT2 remethylation" }
@@ -754,7 +768,7 @@ export default [
     id: "compound:methylhistamine",
     type: "compound",
     name: "N-tau-methylhistamine",
-    aliases: ["1-methylhistamine", "tele-methylhistamine", "metilhistamina", "N(tele)-methylhistamine"],
+    aliases: ["1-methylhistamine", "tele-methylhistamine", "metilhistamina", "N(tele)-methylhistamine", "metil-histamina", "N-tau-metilhistamina"],
     summary: "The inactive methylated metabolite of histamine produced by HNMT with SAM; excreted in urine and further oxidised by MAO-B.",
     body: [
       "[[enzyme:hnmt]] methylates the imidazole ring of [[compound:histamine]] using [[compound:sam]] ([[reaction:hnmt-histamine-methylation]]), leaving [[compound:sah]]. This intracellular route handles histamine in brain and tissues, while [[enzyme:dao]] handles extracellular and dietary histamine ([[pathway:histamine-degradation]]).",
@@ -812,7 +826,8 @@ export default [
     summary: "O-methylated, largely inactive metabolite of dopamine formed by COMT; further oxidised by MAO to homovanillic acid.",
     body: [
       "Produced in [[reaction:comt-dopamine-methylation]], 3-MT leaves [[compound:sah]] as the co-product of the SAM-dependent methylation. Plasma or urinary 3-MT is a research marker of dopamine turnover and a useful tumour marker for dopamine-secreting paragangliomas.",
-      "It is not a measure of methylation capacity."
+      "It is not a measure of methylation capacity.",
+      "COMT is one of the many SAM-dependent sinks in the [[pathway:methyl-budget]], though a small one compared with [[enzyme:pemt]] and creatine synthesis ([[pathway:creatine-synthesis]])."
     ],
     evidence: "established",
     facts: { formula: "C9H13NO2", molarMass: "167.20 g/mol", chebi: "CHEBI:1582", pubchem: "CID 1669" },
@@ -945,5 +960,66 @@ export default [
       { rel: "precursor-of", to: "compound:carbon-dioxide", note: "Dehydration, catalysed by carbonic anhydrase" }
     ],
     refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase", "article:chebi-2016"]
+  },
+  {
+    id: "compound:dhf",
+    type: "compound",
+    name: "Dihydrofolate (DHF, 7,8-dihydrofolic acid)",
+    aliases: ["DHF", "H2folate", "diidrofolato", "di-hidrofolato", "ácido di-hidrofólico"],
+    summary: "Oxidised folate produced when thymidylate synthase uses methylene-THF; it is reduced back to tetrahydrofolate by DHFR, the step blocked by methotrexate.",
+    body: [
+      "Thymidylate synthase uses the folate cofactor twice: it donates a one-carbon unit and a pair of electrons, so 5,10-methylene-THF ends as dihydrofolate ([[reaction:tyms-thymidylate-synthesis]]). DHFR (not modelled on this site) must reduce it to [[compound:thf]] before the cycle can continue ([[article:carreras-1995-thymidylate-synthase]]).",
+      "Folic acid, the synthetic vitamin, also needs DHFR for its first reduction, and human liver DHFR is slow at this ([[compound:folic-acid]], [[article:bailey-2009-dhfr-slow-human-liver]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C19H21N7O6", molarMass: "443.41 g/mol", chebi: "CHEBI:15633", pubchem: "CID 135398604" },
+    relations: [{ rel: "precursor-of", to: "compound:thf", note: "Reduced by DHFR (not modelled)." }],
+    refs: ["article:carreras-1995-thymidylate-synthase", "article:bailey-2009-dhfr-slow-human-liver"]
+  },
+  {
+    id: "compound:dtmp",
+    type: "compound",
+    name: "Thymidine monophosphate (dTMP)",
+    aliases: ["dTMP", "timidilato", "timidina monofosfato", "ácido timidílico"],
+    summary: "The thymine nucleotide of DNA, made only by methylating dUMP; it is phosphorylated to dTTP for DNA synthesis and depends on the folate one-carbon pool.",
+    body: [
+      "dTMP is the product of [[reaction:tyms-thymidylate-synthesis]]. Cells that divide quickly need a steady supply of it, which is why folate and B12 shortage first shows in tissues such as bone marrow ([[pathway:nucleotide-synthesis]], [[state:folate-trap]]).",
+      "RNA uses uracil rather than thymine, so this nucleotide is specific to DNA."
+    ],
+    evidence: "established",
+    facts: { formula: "C10H15N2O8P", molarMass: "322.21 g/mol", chebi: "CHEBI:17013", pubchem: "CID 9700" },
+    relations: [{ rel: "product-of", to: "pathway:nucleotide-synthesis" }],
+    refs: ["article:carreras-1995-thymidylate-synthase"]
+  },
+  {
+    id: "compound:dump",
+    type: "compound",
+    name: "Deoxyuridine monophosphate (dUMP)",
+    aliases: ["dUMP", "desoxiuridina monofosfato", "ácido desoxiuridílico"],
+    summary: "Pyrimidine nucleotide that thymidylate synthase methylates, using 5,10-methylene-THF, to make dTMP; the substrate side of the folate-dependent thymine step.",
+    body: [
+      "dUMP is the uracil-containing precursor of the thymine nucleotide. [[enzyme:tyms]] adds a methyl group to it, taking the one-carbon unit from [[compound:5-10-methylene-thf]] ([[reaction:tyms-thymidylate-synthesis]]).",
+      "It is included so that the link between dietary methyl and folate supply and DNA synthesis can be followed on the site ([[pathway:nucleotide-synthesis]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C9H13N2O8P", molarMass: "308.18 g/mol", chebi: "CHEBI:17622", pubchem: "CID 65063" },
+    relations: [{ rel: "precursor-of", to: "compound:dtmp" }],
+    refs: ["article:carreras-1995-thymidylate-synthase"]
+  },
+  {
+    id: "compound:imp",
+    type: "compound",
+    name: "Inosine monophosphate (IMP)",
+    aliases: ["IMP", "ácido inosínico", "inosina monofosfato", "inosinic acid"],
+    summary: "First complete purine nucleotide of de novo synthesis and the precursor of AMP and GMP; two of its ten synthetic steps take a formyl group from 10-formyl-THF.",
+    body: [
+      "IMP is assembled step by step on a ribose phosphate scaffold. Two of the steps (the GART and ATIC transformylase activities) take a formyl unit from [[compound:10-formyl-thf]], so each IMP consumes two folate-carried one-carbon units ([[pathway:nucleotide-synthesis]]). It is then converted to [[compound:amp]] and to GMP, the purines of DNA and RNA.",
+      "It appears here as a bookkeeping node: the source conversation mentions purine synthesis only as one destination of the mitochondrial one-carbon pool.",
+      "Folate or B12 shortage ([[state:folate-trap]]) slows this branch together with thymidylate synthesis ([[reaction:tyms-thymidylate-synthesis]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C10H13N4O8P", molarMass: "348.21 g/mol", chebi: "CHEBI:17202", pubchem: "CID 135398640" },
+    relations: [{ rel: "product-of", to: "pathway:nucleotide-synthesis" }, { rel: "precursor-of", to: "compound:amp" }],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism"]
   }
 ]

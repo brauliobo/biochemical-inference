@@ -5,9 +5,10 @@ export default [
     id: "outcome:belching",
     type: "outcome",
     name: "Belching (eructation)",
-    aliases: ["Arrotos", "Eructação", "Burping", "Gas expelled orally"],
+    aliases: ["Arrotos", "Eructação", "Burping", "Gas expelled orally", "eructações", "arrotar", "gases em forma de arroto", "arrotos frequentes"],
     summary: "Expulsion of gas through the mouth, mostly swallowed air vented by gastric or supragastric mechanisms; chemical CO2 and bacterial gas add little, so it is not specific to any one cause.",
     body: [
+      "In plain words: belching is the release of gas from the stomach or oesophagus through the mouth. Most of it is swallowed air, and some belching after meals is normal. The source conversation starts from belching without flatulence after glycine powder. This page collects each explanation that was offered (swallowed air, CO2 from acid and bicarbonate, slow stomach emptying, extra acid, gas-making bacteria) and what is known about each one.",
       "Belching is normal after meals: swallowed air and CO2 distend the stomach, triggering a vagally mediated transient LES relaxation ([[system:lower-esophageal-sphincter]]). Excessive belching is typically a swallowed-air problem, often with a behavioural supragastric component ([[disease:aerophagia-belching-disorders]]), and may be aggravated by carbonated drinks, fast eating, chewing gum, reflux ([[disease:gerd]]) or anxiety. Impedance monitoring ([[outcome:reflux-episodes]]) distinguishes the types.",
       "In the conversation, belching rather than flatulence is read as proof that gas originates in the upper gut. That is a reasonable pointer to the stomach or oesophagus, but it does not say whether the gas is air, CO2 or fermentation products, and the specific glycine mechanism is unproven ([[outcome:glycine-intolerance]], [[claim:belching-mostly-swallowed-air]]). Educational only."
     ],
@@ -24,7 +25,7 @@ export default [
     id: "outcome:night-waking",
     type: "outcome",
     name: "Night waking at 2-3 am",
-    aliases: ["Despertar às 2-3h", "Nocturnal awakening", "Early-morning waking", "Insônia de manutenção"],
+    aliases: ["Despertar às 2-3h", "Nocturnal awakening", "Early-morning waking", "Insônia de manutenção", "acordar de madrugada"],
     summary: "Awakening in the small hours, sometimes with palpitations and heat. Has many causes (sleep apnoea, anxiety, reflux, alcohol, glucose dips); a histamine or vagal-brake explanation is a hypothesis only.",
     body: [
       "The source conversation attributes the user's waking with tachycardia and heat to a nocturnal histamine peak insufficiently cleared by [[enzyme:hnmt]], relieved by choline via [[enzyme:bhmt]], SAM and a vagal acetylcholine 'brake'. Plasma histamine does show circadian variation with a night/early-morning peak in some human data, partly from mast-cell clocks, but brain histaminergic neurons are least active in sleep, and the specific chain has not been tested ([[claim:histamine-peaks-2-4am]], [[claim:choline-fixed-night-waking-via-bhmt-hnmt]], [[claim:choline-supplies-nocturnal-vagal-brake]]).",
@@ -43,7 +44,7 @@ export default [
     id: "outcome:throat-burning",
     type: "outcome",
     name: "Throat burning",
-    aliases: ["Queimação na garganta", "Pharyngeal burning", "Laryngeal irritation", "Globus / throat clearing"],
+    aliases: ["Queimação na garganta", "Pharyngeal burning", "Laryngeal irritation", "Globus / throat clearing", "pigarro", "bolo na garganta", "globus", "ardência na garganta"],
     summary: "A burning sensation in the throat. A symptom attributed to laryngopharyngeal reflux but with many other causes; reflux needs objective confirmation rather than assumption.",
     body: [
       "The [[system:larynx-pharynx]] has less mucus, bicarbonate and carbonic-anhydrase protection than the oesophagus, so small amounts of acid, [[compound:pepsin]] or bile may irritate it ([[disease:lpr]]). But throat burning also arises from voice overuse, post-nasal drip, allergy, infections, oesophageal motility problems, irritant foods, oregano oil and similar phenols, and anxiety. The AGA 2023 update recommends reflux testing before empiric PPIs when typical heartburn is absent ([[claim:throat-burning-means-lpr]]).",
@@ -134,7 +135,7 @@ export default [
     id: "outcome:delayed-gastric-emptying",
     type: "outcome",
     name: "Delayed gastric emptying",
-    aliases: ["Esvaziamento gástrico lentificado", "Slow gastric emptying", "Gastric stasis"],
+    aliases: ["Esvaziamento gástrico lentificado", "Slow gastric emptying", "Gastric stasis", "peso gástrico", "plenitude pós-prandial"],
     summary: "Retention of food in the stomach beyond reference times on scintigraphy or breath tests. Causes include diabetes, drugs, surgery and vagal injury; symptoms correlate poorly with measured delay.",
     body: [
       "Standard testing is a four-hour scintigraphic solid meal study. Delay slows nutrient delivery and may promote bloating, nausea and bacterial stasis. [[intervention:ppi-therapy|PPIs]] therapy delays solid-meal emptying modestly in some studies ([[claim:ppis-slow-gastric-emptying]]), and ginger may accelerate emptying in small trials ([[claim:ginger-prokinetic-5ht4-mmc]]). The conversation proposes undermethylation-linked cholinergic failure as a cause, which is unproven ([[claim:undermethylation-causes-subclinical-vagal-dysfunction]]). Educational only."
@@ -181,7 +182,8 @@ export default [
       { rel: "associated-with", to: "compound:carbon-dioxide" },
       { rel: "associated-with", to: "compound:bicarbonate" },
       { rel: "associated-with", to: "compound:hydrochloric-acid" },
-      { rel: "associated-with", to: "system:pancreas-bicarbonate" }
+      { rel: "associated-with", to: "system:pancreas-bicarbonate" },
+      { rel: "causes", to: "outcome:transient-les-relaxations", note: "Gastric distension is the classical trigger; CO2 from drinks is shown, CO2 from acid-bicarbonate chemistry is not." }
     ]
   },
   {
@@ -241,7 +243,7 @@ export default [
     id: "outcome:ulcer-healing",
     type: "outcome",
     name: "Ulcer healing",
-    aliases: ["Cicatrização da úlcera", "Mucosal healing", "Endoscopic ulcer healing"],
+    aliases: ["Cicatrização da úlcera", "Mucosal healing", "Endoscopic ulcer healing", "reepitelização", "regeneração da mucosa"],
     summary: "Complete re-epithelialisation of an ulcer crater on endoscopy, typically in 4-8 weeks with PPI therapy and removal of the cause; symptom relief can precede true healing.",
     body: [
       "Healing rates with PPIs are high (commonly above 90% for duodenal ulcers in 4 weeks) when H. pylori and NSAIDs are addressed ([[disease:peptic-ulcer]], [[disease:h-pylori-infection]]). Adjuncts such as [[intervention:zinc-carnosine]] (polaprezinc, widely used in Japan) are supported by trials mainly as add-ons to PPIs; [[intervention:dgl-licorice]] has weak evidence ([[claim:zinc-carnosine-ulcer-healing]], [[claim:dgl-ulcer-healing]]). Educational only."
@@ -276,7 +278,7 @@ export default [
     id: "outcome:glycine-intolerance",
     type: "outcome",
     name: "Glycine intolerance (GI side effects)",
-    aliases: ["Intolerância à glicina", "Gas and belching on glycine powder", "Glycine powder GI upset"],
+    aliases: ["Intolerância à glicina", "Gas and belching on glycine powder", "Glycine powder GI upset", "gases com glicina", "glicina causa arrotos"],
     summary: "Upper-GI symptoms such as belching, nausea or soft stool after taking glycine powder, reported at high doses and anecdotally at 2-3 g; mechanisms and prevalence are unmeasured.",
     body: [
       "Trials of glycine at 3 g before bed for sleep reported no major problems ([[outcome:improved-sleep-quality]]), and schizophrenia trials used 15-60 g/day with mild upper-GI discomfort in some. No study has characterised belching on 2-3 g, so possible causes (swallowed air while dissolving a sweet powder, hyperosmolar drinking, taste, nausea, sensitivity) cannot be ranked, and the conversation's specific chain through gastrin, bicarbonate and SIBO is not supported ([[claim:free-glycine-stimulates-gastrin]], [[claim:sibo-bacteria-metabolize-glycine-co2-nh3]]). Taking glycine with food is a common suggestion without controlled data ([[intervention:amino-acids-with-meals|glycine with meals]]). Educational only."
@@ -303,7 +305,10 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:undermethylation" },
       { rel: "associated-with", to: "state:overmethylation" },
-      { rel: "associated-with", to: "compound:sam" }
+      { rel: "associated-with", to: "compound:sam" },
+      { rel: "associated-with", to: "compound:sah", note: "SAH inhibits DNA methyltransferases." },
+      { rel: "associated-with", to: "pathway:methionine-cycle" },
+      { rel: "associated-with", to: "pathway:folate-cycle" }
     ]
   },
   {
@@ -345,7 +350,7 @@ export default [
     id: "outcome:low-plp-status",
     type: "outcome",
     name: "Low plasma PLP",
-    aliases: ["PLP baixo", "Low vitamin B6 status", "Low pyridoxal phosphate"],
+    aliases: ["PLP baixo", "Low vitamin B6 status", "Low pyridoxal phosphate", "P5P baixo"],
     summary: "A low plasma pyridoxal 5'-phosphate concentration, the main marker of vitamin B6 status, lowered by inflammation, alcohol, renal disease and some drugs as well as by poor intake.",
     body: [
       "Plasma [[compound:plp]] below about 20 nmol/L is commonly used for deficiency, although inflammation lowers it independently of stores. It is the sensible test before supplementing B6 ([[state:b6-functional-deficiency]], [[disease:vitamin-b6-deficiency]]). Educational only."
@@ -414,7 +419,7 @@ export default [
     id: "outcome:heartburn",
     type: "outcome",
     name: "Heartburn",
-    aliases: ["Pirose", "Azia", "Retrosternal burning"],
+    aliases: ["Pirose", "Azia", "Retrosternal burning", "queimação no estômago", "queimação gástrica", "queimação estomacal"],
     summary: "Retrosternal burning from reflux of gastric contents into the oesophagus; the cardinal symptom of GERD, distinct from epigastric burning of ulcers or dyspepsia.",
     body: [
       "Heartburn after meals or when lying down suggests [[disease:gerd]]; persistent burning after ulcer therapy may reflect residual gastritis or acid exposure on healing mucosa ([[state:post-ulcer-mucosal-recovery]]). The conversation's burning on betaine HCl is likely a direct effect of acid on sensitive mucosa ([[claim:betaine-hcl-contraindicated-post-ulcer]]). Alarm symptoms (dysphagia, weight loss, bleeding) require evaluation. Educational only."
@@ -431,7 +436,7 @@ export default [
     id: "outcome:cholinergic-excess-symptoms",
     type: "outcome",
     name: "Cholinergic excess symptoms",
-    aliases: ["Sintomas colinérgicos", "Cholinergic crisis (loosely)", "Sweating, cramps, diarrhoea"],
+    aliases: ["Sintomas colinérgicos", "Cholinergic crisis (loosely)", "Sweating, cramps, diarrhoea", "hiperestimulação parassimpática", "sudorese, cólicas, diarreia"],
     summary: "Sweating, salivation, cramps, diarrhoea, nausea and hypotension from parasympathetic stimulation; reported at choline intakes of about 7.5-16 g/day. Not a true cholinergic crisis.",
     body: [
       "Very high choline doses can raise acetylcholine signalling and cause the muscarinic effects above ([[state:choline-excess]]). A true cholinergic crisis follows acetylcholinesterase inhibitors or organophosphates and is far more severe; the conversation's wording overstates the choline picture ([[claim:above-ul-fishy-odor-and-cholinergic-effects]]). Educational only."
@@ -440,7 +445,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:acetylcholine" },
       { rel: "associated-with", to: "compound:choline" },
-      { rel: "associated-with", to: "state:choline-excess" }
+      { rel: "associated-with", to: "state:choline-excess" },
+      { rel: "associated-with", to: "system:vagal-tone" },
+      { rel: "associated-with", to: "system:enteric-nervous-system" }
     ],
     refs: ["article:iom-1998-choline-dri"]
   },
@@ -517,7 +524,7 @@ export default [
     id: "outcome:salivary-pepsin",
     type: "outcome",
     name: "Pepsin in saliva or laryngeal tissue",
-    aliases: ["Pepsina salivar", "Peptest", "Laryngeal pepsin"],
+    aliases: ["Pepsina salivar", "Peptest", "Laryngeal pepsin", "pepsina na laringe"],
     summary: "Detection of pepsin outside the stomach as a sign of reflux. It is a research and commercial adjunct for LPR whose diagnostic accuracy is debated and not guideline-endorsed.",
     body: [
       "Pepsin is made only in the stomach, so its presence in saliva or laryngeal tissue implies gastric reflux; cells can take it up ([[compound:pepsin]], [[claim:belch-aerosol-deposits-pepsin]]). Salivary test performance is variable, results are affected by meals, and the AGA update does not endorse it for diagnosis ([[disease:lpr]]). Educational only."
@@ -543,7 +550,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:trimethylamine" },
       { rel: "associated-with", to: "compound:tmao" },
-      { rel: "associated-with", to: "disease:trimethylaminuria" }
+      { rel: "associated-with", to: "disease:trimethylaminuria" },
+      { rel: "associated-with", to: "pathway:tma-tmao-axis" },
+      { rel: "associated-with", to: "system:liver" }
     ],
     refs: ["article:mackay-2011-trimethylaminuria"]
   },
@@ -559,7 +568,9 @@ export default [
     evidence: "speculative",
     relations: [
       { rel: "associated-with", to: "disease:pyroluria-kpu" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency" },
+      { rel: "associated-with", to: "compound:zinc" },
+      { rel: "associated-with", to: "compound:kryptopyrrole" }
     ]
   },
   {
@@ -587,7 +598,7 @@ export default [
     aliases: ["Gastrina elevada", "Hypergastrinaemia"],
     summary: "Raised serum gastrin, most commonly from low acid (PPIs, atrophic gastritis), less often from gastrinoma; amino acids such as phenylalanine and tryptophan stimulate it, glycine did not in human tests.",
     body: [
-      "Antral G cells release [[compound:gastrin]] in response to peptides, amino acids, distension and alkaline pH, and are inhibited by acid via somatostatin. In humans, intragastric phenylalanine and tryptophan strongly raised gastrin and acid; glycine did not, even at 200 mM ([[claim:free-glycine-stimulates-gastrin]]). Chronic hypergastrinaemia commonly signals hypochlorhydria ([[disease:atrophic-gastritis]]). Educational only."
+      "Antral G cells release [[compound:gastrin]] in response to peptides, amino acids, distension and alkaline pH, and are inhibited by acid via somatostatin. In humans, intragastric phenylalanine and tryptophan strongly raised gastrin and acid; glycine did not (Taylor 1982; Wald 1982, 100 mM glycine, [[claim:free-glycine-stimulates-gastrin]]). Chronic hypergastrinaemia commonly signals hypochlorhydria ([[disease:atrophic-gastritis]]). Educational only."
     ],
     evidence: "established",
     relations: [
@@ -613,5 +624,66 @@ export default [
       { rel: "associated-with", to: "compound:gastrin" }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:taylor-1982-amino-acids-gastric-acid", "article:wald-1982-glycine-gastric-acid"]
+  },
+  {
+    id: "outcome:transient-les-relaxations",
+    type: "outcome",
+    name: "Transient lower oesophageal sphincter relaxations (TLESR)",
+    aliases: [
+      "relaxamentos transitórios do EEI",
+      "TLESR",
+      "relaxamento transitório do esfíncter esofágico inferior",
+      "relaxamentos transitórios do esfíncter",
+      "transient LES relaxation"
+    ],
+    summary: "Brief reflex relaxations of the lower oesophageal sphincter not triggered by swallowing, set off by gastric distension; they let swallowed gas escape as a belch and are a main route of reflux.",
+    body: [
+      "The valve between oesophagus and stomach normally stays shut. When the stomach fills with food and air, a vagal reflex briefly opens it without a swallow. That relaxation is how swallowed air is vented as a belch, and it is also one of the ways stomach contents can rise into the oesophagus ([[system:lower-esophageal-sphincter]], [[article:mittal-1997-esophagogastric-junction]], [[article:boeckxstaens-2014-symptomatic-reflux-disease]]).",
+      "Carbonated drinks raise the frequency: in 18 healthy volunteers 200 ml of cola produced a median 10.5 relaxations per 30 minutes against fewer with water, and lowered sphincter pressure ([[article:shukla-2012-carbonated-beverage-tlesr]]). In the conversation, \"transient relaxations of the LES\" are presented as a consequence of low vagal tone; the classical trigger is simply gastric distension, and a link to under-methylation has not been tested ([[claim:undermethylation-causes-subclinical-vagal-dysfunction]], [[outcome:co2-gastric-distension]])."
+    ],
+    evidence: "established",
+    relations: [
+      { rel: "causes", to: "outcome:belching", note: "Vents swallowed or generated gas." },
+      { rel: "causes", to: "outcome:reflux-episodes", note: "A main mechanism of reflux events." },
+      { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
+      { rel: "associated-with", to: "disease:gerd" },
+      {
+        rel: "associated-with",
+        to: "system:vagal-tone",
+        note: "Vagovagal reflex; relation to tone itself not established."
+      }
+    ],
+    refs: [
+      "article:mittal-1997-esophagogastric-junction",
+      "article:boeckxstaens-2014-symptomatic-reflux-disease",
+      "article:shukla-2012-carbonated-beverage-tlesr"
+    ]
+  },
+  {
+    id: "outcome:flatulence",
+    type: "outcome",
+    name: "Flatulence (flatus)",
+    aliases: ["flatulência", "gases intestinais", "flatos", "gás retal", "passing gas"],
+    summary: "Passage of gas through the rectum, mostly hydrogen and CO2 from colonic fermentation; different from belching, which vents swallowed air or gastric gas through the mouth.",
+    body: [
+      "Everyone passes gas. In ten healthy volunteers on a normal diet the daily volume ranged from about 0.5 to 1.5 litres (median 705 ml), made up mainly of fermentation gases, hydrogen above all, with carbon dioxide, some methane in a few people and a residue of nitrogen. A fibre-free diet for two days cut the volume and nearly abolished hydrogen ([[article:tomlin-1991-normal-flatus]]).",
+      "The conversation stresses that the gas appears as belching and not as flatulence, and uses this to place the problem in the upper gut. That is a reasonable reading of where the gas leaves the body, because gas made in the [[system:colon]] is vented below, but the absence of flatulence says nothing about what produced the belched gas ([[outcome:belching]], [[claim:sibo-gas-appears-in-15-45-min-as-belching]]). Flatulence is a typical complaint in carbohydrate-fermenting overgrowth ([[disease:sibo]]). Educational only."
+    ],
+    evidence: "established",
+    facts: { "normal-daily-volume": "median 705 ml (range 476-1491 ml) in ten healthy volunteers" },
+    relations: [
+      {
+        rel: "associated-with",
+        to: "outcome:belching",
+        note: "Two exits for gas; route does not identify the source."
+      },
+      { rel: "associated-with", to: "system:colon" },
+      {
+        rel: "associated-with",
+        to: "outcome:breath-hydrogen-methane",
+        note: "Breath H2 and CH4 reflect fermentation but are not flatus volumes."
+      }
+    ],
+    refs: ["article:tomlin-1991-normal-flatus"]
   }
 ];

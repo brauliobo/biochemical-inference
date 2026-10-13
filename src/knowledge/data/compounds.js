@@ -5,9 +5,10 @@ export default [
     id: "compound:glycine",
     type: "compound",
     name: "Glycine",
-    aliases: ["Gly", "G", "glicina", "aminoacetic acid"],
+    aliases: ["Gly", "G", "glicina", "aminoacetic acid", "glicocola", "zwitterion", "anfótero", "glicina livre"],
     summary: "Smallest proteinogenic amino acid; a collagen building block, inhibitory neurotransmitter, GNMT methyl acceptor and precursor of glutathione, creatine, heme, purines and bile-acid conjugates.",
     body: [
+      "In plain words: glycine is the smallest amino acid. The body makes it, eats it and uses it for collagen, the antioxidant glutathione, bile salts, creatine and as a calming messenger in the nervous system. Glycine powder (3 g at bedtime up to 10 g or more a day) is taken for sleep or \"collagen support\". In the source conversation it produced belching. This page separates what is known about glycine (how it is made and used) from the proposed reasons for the gas: a drain on methyl groups, extra stomach acid, CO2, and gas-forming bacteria. Most of those are unproven. It also shows the route that makes glycine inside liver cells from choline and betaine without passing through the gut.",
       "Glycine (H2N-CH2-COOH) is made in the body mainly from [[compound:serine]] by [[enzyme:shmt]] (a PLP-dependent reaction that also transfers a one-carbon unit onto [[compound:thf]]), and is broken down chiefly by the mitochondrial [[enzyme:glycine-cleavage-system|glycine cleavage system]], which yields CO2, ammonia and [[compound:5-10-methylene-thf]]. It can also be formed from [[compound:betaine]] through [[compound:dimethylglycine]] and [[compound:sarcosine]] (the [[pathway:choline-oxidation]] route), and from [[compound:hydroxyproline]] catabolism via glyoxylate.",
       "Glycine is consumed in many places: [[compound:collagen]] (about one residue in three), [[compound:glutathione]] synthesis, [[compound:guanidinoacetate]] and hence [[compound:creatine]], heme and purine synthesis, [[compound:bile-acids|bile acid]] conjugation ([[compound:glycocholic-acid]]), and xenobiotic conjugation such as [[compound:hippuric-acid]]. In the central nervous system it is an inhibitory neurotransmitter at strychnine-sensitive glycine receptors and a co-agonist at NMDA receptors. Glycine is the methyl acceptor of [[enzyme:gnmt]], which converts [[compound:sam]] to [[compound:sah]] and [[compound:sarcosine]].",
       "Evidence note: Melendez-Hevia and colleagues argued that endogenous synthesis (about 3 g/day) falls short of the glycine needed for collagen turnover, leaving a deficit near 10 g/day; this is a modelling argument and is contested, not a settled requirement. The idea that extra glycine strongly depletes methyl groups through GNMT is plausible but unproven in humans: GNMT is already near-saturated by hepatic glycine and is chiefly regulated by SAM and 5-methyl-THF. Gram-scale glycine has no formal UL; trials used about 3 g at bedtime for sleep and far larger daily doses in psychiatric research, with GI complaints reported at high doses."
@@ -35,7 +36,10 @@ export default [
       { rel: "precursor-of", to: "compound:oxalate", note: "Minor flux via glyoxylate" },
       { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the glycine cleavage system is defective; supplements are avoided." },
       { rel: "mitigates", to: "state:glycine-insufficiency", note: "Direct repletion; whether a shortfall exists in healthy adults is contested." },
-      { rel: "increases", to: "compound:glutathione", note: "Glycine is a substrate of glutathione synthetase; with cysteine it restored glutathione synthesis in older adults in one small study." }
+      { rel: "increases", to: "compound:glutathione", note: "Glycine is a substrate of glutathione synthetase; with cysteine it restored glutathione synthesis in older adults in one small study." },
+      { rel: "part-of", to: "compound:elastin" },
+      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the cleavage system is defective." },
+      { rel: "causes", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep in small trials." }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:mudd-2007-methyl-balance", "article:bannai-2012-glycine-sleep"]
   },
@@ -43,7 +47,7 @@ export default [
     id: "compound:serine",
     type: "compound",
     name: "L-Serine",
-    aliases: ["Ser", "serina"],
+    aliases: ["Ser", "serina", "L-serina"],
     summary: "Non-essential amino acid and the main source of one-carbon units for folate metabolism; interconverts with glycine through SHMT.",
     body: [
       "[[enzyme:shmt]] converts serine plus [[compound:thf]] into [[compound:glycine]] plus [[compound:5-10-methylene-thf]] (and back). The mitochondrial isoform makes serine the principal supplier of one-carbon units for purines, thymidylate and, through [[pathway:folate-cycle]] flux, for [[compound:5-mthf]] and [[compound:sam]]. Serine also condenses with [[compound:homocysteine]] in the [[enzyme:cbs]] reaction to start [[pathway:transsulfuration]], and is a precursor of phosphatidylserine, sphingolipids and D-serine.",
@@ -63,7 +67,7 @@ export default [
     id: "compound:sarcosine",
     type: "compound",
     name: "Sarcosine (N-methylglycine)",
-    aliases: ["N-methylglycine", "monometilglicina", "sarcosina"],
+    aliases: ["N-methylglycine", "monometilglicina", "sarcosina", "N-metilglicina"],
     summary: "Mono-methylated glycine; the product of GNMT and an intermediate on the betaine-to-glycine route, oxidised back to glycine by SARDH.",
     body: [
       "Sarcosine arises in two ways: [[enzyme:gnmt]] transfers a methyl group from [[compound:sam]] onto [[compound:glycine]], and the mitochondrial [[enzyme:dmgdh]] removes one methyl from [[compound:dimethylglycine]]. [[enzyme:sardh]] then oxidises sarcosine to glycine, releasing the methyl carbon as [[compound:5-10-methylene-thf]] (via formaldehyde captured by THF). Net, GNMT plus SARDH form a futile-looking cycle that burns SAM into SAH and one-carbon units without net glycine loss.",
@@ -103,9 +107,10 @@ export default [
     id: "compound:betaine",
     type: "compound",
     name: "Betaine (trimethylglycine, TMG)",
-    aliases: ["TMG", "trimethylglycine", "glycine betaine", "betaína", "betaína anidra"],
+    aliases: ["TMG", "trimethylglycine", "glycine betaine", "betaína", "betaína anidra", "trimetilglicina"],
     summary: "Fully methylated glycine; an osmolyte and the methyl donor for BHMT, formed from choline in liver and kidney mitochondria.",
     body: [
+      "In plain words: betaine, also called TMG or trimethylglycine, is glycine carrying three methyl groups. Liver and kidney make it from choline, and it gives one methyl to homocysteine to rebuild methionine, then loses its other two methyls and ends as plain glycine. \"Betaine anhydrous\" (TMG) is a neutral supplement. \"Betaine HCl\" is a different product that releases hydrochloric acid in the stomach. Confusing the two matters: the burning after betaine HCl described in the conversation is an acid effect, not a property of TMG.",
       "Betaine is N,N,N-trimethylglycine. It is made from [[compound:choline]] by [[enzyme:chdh]] (to [[compound:betaine-aldehyde]]) and [[enzyme:aldh7a1|BADH]], or taken in from foods such as wheat bran, spinach, beets and shellfish. In liver and kidney [[enzyme:bhmt]] transfers one methyl to [[compound:homocysteine]] giving [[compound:methionine]] and [[compound:dimethylglycine]]; the two remaining methyls are shed as one-carbon units by [[enzyme:dmgdh]] and [[enzyme:sardh]], ending at [[compound:glycine]]. So one mole of choline can in principle yield one mole of glycine plus one remethylation event and two folate-bound one-carbon units.",
       "Betaine is also an organic osmolyte protecting renal medullary and hepatic cells. Pharmacologically, anhydrous betaine (about 6 g/day in divided doses) is an approved treatment for homocystinuria. Do not confuse it with betaine hydrochloride, a different salt that releases HCl ([[intervention:betaine-hcl]]); anhydrous betaine is a neutral zwitterion ([[intervention:betaine-anhydrous]])."
     ],
@@ -157,6 +162,7 @@ export default [
     aliases: ["colina", "trimethylethanolamine"],
     summary: "Essential nutrient and quaternary amine feeding phosphatidylcholine, acetylcholine, sphingomyelin and (via betaine) the methyl and glycine pool.",
     body: [
+      "In plain words: choline is an essential nutrient found in eggs, liver, fish and soy. The body uses it to build cell membranes, to make acetylcholine (the messenger of the vagus nerve, which also steers digestion and the heartbeat) and, through betaine, to supply methyl groups and finally glycine. In the source conversation choline is the nutrient that seemed to help (night-time waking, racing heart) and the proposed \"clean\" source of glycine. This page covers the four routes of choline, safe intake levels (a US upper limit of 3.5 g a day; none set by EFSA), why 10 g of glycine from choline is not realistic, and what too much choline does.",
       "Choline has four main metabolic fates. (1) Phosphorylation by choline kinase starts the [[pathway:kennedy-pathway]] to [[compound:phosphatidylcholine]]; this is the dominant route in most tissues and makes membranes, bile phospholipid and VLDL. (2) Acetylation by choline acetyltransferase gives [[compound:acetylcholine]], the vagal and enteric neurotransmitter. (3) Irreversible oxidation by [[enzyme:chdh]] and [[enzyme:aldh7a1|BADH]] to [[compound:betaine]] ([[pathway:choline-oxidation]]), which connects to [[enzyme:bhmt]] and the [[pathway:methionine-cycle]]. (4) Gut bacterial cleavage to [[compound:trimethylamine]], which the liver oxidises to [[compound:tmao]]. The body can also make choline de novo through [[enzyme:pemt]], but this uses three [[compound:sam]] methyls per molecule and does not cover needs, so choline is a dietary requirement.",
       "Intake: adequate intake is 550 mg/day (men) and 425 mg/day (women) in the US (IOM 1998) and 400 mg/day for adults in the EU (EFSA 2016). The IOM UL is 3.5 g/day for adults, based on hypotension, fishy odour, sweating, salivation and GI effects. EFSA did not set an upper level, contrary to some secondary summaries. Good sources are eggs, liver, meat, fish and soy ([[intervention:dietary-choline-sources]]); typical intakes in many populations fall below the AI. Isolated salts such as [[intervention:choline-bitartrate]] are the usual supplement form.",
       "Evidence note: one mole of choline can yield at most one mole of glycine, so reaching 10 g glycine (about 0.133 mol) from choline would need about 14 g of choline cation (roughly 34 g choline bitartrate) at 100 % conversion, far above the UL and above realistic hepatic partitioning, because most choline goes to the Kennedy pathway. The arithmetic in the source conversation is therefore right in direction, and the conclusion (not a practical glycine source) is sound; glycine formed in liver mitochondria is also largely consumed locally by the glycine cleavage system rather than exported."
@@ -185,7 +191,9 @@ export default [
       { rel: "increases", to: "compound:tmao", note: "Via gut bacterial trimethylamine (CutC) and hepatic FMO3." },
       { rel: "decreases", to: "compound:homocysteine", note: "Through betaine and BHMT; phosphatidylcholine lowered fasting homocysteine in a randomised study." },
       { rel: "mitigates", to: "disease:choline-deficiency", note: "Repletion corrects the deficiency syndrome." },
-      { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." }
+      { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." },
+      { rel: "mitigates", to: "state:methyl-donor-depletion", note: "Supplies betaine for BHMT and, indirectly, SAM." },
+      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Choline is the substrate for gut TMA; dietary restriction is part of management." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri", "article:zeisel-2009-choline-essential-nutrient"]
   },
@@ -232,7 +240,7 @@ export default [
     id: "compound:cdp-choline",
     type: "compound",
     name: "CDP-choline (citicoline)",
-    aliases: ["citicolina", "citicoline", "cytidine diphosphocholine"],
+    aliases: ["citicolina", "citicoline", "cytidine diphosphocholine", "CDP-colina"],
     summary: "Rate-limited intermediate of the Kennedy pathway and the basis of the citicoline supplement; hydrolysed in the gut to cytidine and choline.",
     body: [
       "In the [[pathway:kennedy-pathway]], phosphocholine plus CTP gives CDP-choline (CCT is the regulated step) and CDP-choline plus diacylglycerol gives [[compound:phosphatidylcholine]]. As a supplement ([[intervention:citicoline-supplement]]) it is hydrolysed in the intestine and liver; circulating cytidine and choline are taken up and resynthesised into CDP-choline in brain. Choline is only about one fifth of its mass.",
@@ -251,10 +259,10 @@ export default [
     id: "compound:glycerophosphocholine",
     type: "compound",
     name: "Glycerophosphocholine (alpha-GPC)",
-    aliases: ["alpha-GPC", "alfa-GPC", "GPC", "choline alfoscerate", "L-alfa-glicerilfosforilcolina"],
+    aliases: ["alpha-GPC", "alfa-GPC", "GPC", "choline alfoscerate", "L-alfa-glicerilfosforilcolina", "glicerofosfocolina"],
     summary: "Water-soluble phosphatidylcholine breakdown product and choline supplement, about 40 % choline by mass.",
     body: [
-      "GPC is produced when phospholipases strip both fatty acids from [[compound:phosphatidylcholine]] and is normally further cleaved to [[compound:choline]] and glycerol-3-phosphate. In milk and many tissues it is a natural choline reservoir. As a supplement ([[intervention:alpha-gpc-supplement]]) it is absorbed without needing gastric acid and delivers choline efficiently. An observational Korean claims-data study reported higher stroke incidence in users; it is confounded by indication and not proof of harm."
+      "GPC is produced when phospholipases strip both fatty acids from [[compound:phosphatidylcholine]] and is normally further cleaved to [[compound:choline]] and glycerol-3-phosphate. In milk and many tissues it is a natural choline reservoir. As a supplement ([[intervention:alpha-gpc-supplement]]) it is water-soluble and is generally described as absorbed without needing gastric acid and as delivering choline efficiently; that description rests on manufacturer and review statements, not on the sources used here ([[claim:alpha-gpc-pc-absorbed-without-acid]]). An observational Korean claims-data study reported higher stroke incidence in users; it is confounded by indication and not proof of harm."
     ],
     evidence: "established",
     facts: { formula: "C8H20NO6P", molarMass: "257.22 g/mol", chebi: "CHEBI:16870", pubchem: "CID 657272", "choline-content": "about 40 % choline by mass" },
@@ -274,7 +282,8 @@ export default [
       "Choline kinase traps [[compound:choline]] inside the cell as phosphocholine using [[compound:atp]]. CTP:phosphocholine cytidylyltransferase then forms [[compound:cdp-choline]], so phosphocholine is the committed intermediate of the [[pathway:kennedy-pathway]]. Choline kinase activity is elevated in many tumours, which is the basis of choline PET imaging."
     ],
     evidence: "established",
-    facts: { formula: "C5H15NO4P+", molarMass: "184.15 g/mol", pubchem: "CID 1014" },
+    facts: { formula: "C5H15NO4P+", molarMass: "184.15 g/mol", pubchem: "CID 1014",
+    "chebi": "CHEBI:18132" },
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "precursor-of", to: "compound:cdp-choline" }
@@ -304,7 +313,7 @@ export default [
     id: "compound:sam",
     type: "compound",
     name: "S-adenosylmethionine (SAMe)",
-    aliases: ["SAMe", "SAM", "AdoMet", "S-adenosil-metionina"],
+    aliases: ["SAMe", "SAM", "AdoMet", "S-adenosil-metionina", "doador de metil", "S-adenosilmetionina"],
     summary: "Universal methyl donor made by MAT from methionine and ATP; allosterically regulates MTHFR, CBS and BHMT.",
     body: [
       "[[enzyme:mat]] (MAT1A in liver, MAT2A elsewhere) makes SAM from [[compound:methionine]] and [[compound:atp]], consuming the whole triphosphate chain; Mg2+ is required ([[compound:magnesium]]). More than 50 methyltransferases use SAM: [[enzyme:gnmt]] ([[compound:sarcosine]]), [[enzyme:pemt]] ([[compound:phosphatidylcholine]]), GAMT ([[compound:creatine]]), NNMT ([[compound:1-methylnicotinamide]]), [[enzyme:hnmt]] ([[compound:histamine]]), COMT, DNA and histone methyltransferases, and others. Each reaction yields [[compound:sah]].",
@@ -312,7 +321,7 @@ export default [
       "'Under-methylation' as a clinical state is discussed at [[state:undermethylation]]; its biochemical definitions are inconsistent and measurement is rarely standardised."
     ],
     evidence: "established",
-    facts: { formula: "C15H22N6O5S (cation)", molarMass: "398.44 g/mol", chebi: "CHEBI:15414", pubchem: "CID 34755", hmdb: "HMDB0001185" },
+    facts: { formula: "C15H23N6O5S+ (cation; neutral zwitterion C15H22N6O5S)", molarMass: "399.45 g/mol (cation); 398.44 g/mol (zwitterion)", chebi: "CHEBI:15414", pubchem: "CID 34755", hmdb: "HMDB0001185" },
     relations: [
       { rel: "product-of", to: "enzyme:mat" },
       { rel: "substrate-of", to: "enzyme:gnmt" },
@@ -365,7 +374,7 @@ export default [
     id: "compound:methionine",
     type: "compound",
     name: "L-Methionine",
-    aliases: ["Met", "metionina"],
+    aliases: ["Met", "metionina", "L-metionina"],
     summary: "Essential sulfur amino acid, precursor of SAM and, through the methionine cycle, of homocysteine and cysteine.",
     body: [
       "Methionine comes from protein (meat, fish, eggs, dairy, Brazil nuts) at roughly 1-2 g/day in typical diets and from remethylation of [[compound:homocysteine]]. [[enzyme:mat]] activates it to [[compound:sam]]. Excess methionine is catabolised via [[pathway:transsulfuration]] to [[compound:cysteine]] and [[compound:taurine]]. A methionine loading test (post-load Hcy and [[compound:cystathionine]]) is a research tool for transsulfuration and B6 function ([[state:b6-functional-deficiency]]).",
@@ -409,7 +418,8 @@ export default [
       "[[enzyme:cbs]] condenses [[compound:homocysteine]] with [[compound:serine]] to form cystathionine, which cystathionine gamma-lyase cleaves to [[compound:cysteine]], alpha-ketobutyrate and ammonia. Both enzymes need [[compound:plp]], and cystathionine (with Hcy after a methionine load) is therefore a functional marker of B6 insufficiency ([[state:b6-functional-deficiency]])."
     ],
     evidence: "established",
-    facts: { formula: "C7H14N2O4S", molarMass: "222.26 g/mol", pubchem: "CID 834" },
+    facts: { formula: "C7H14N2O4S", molarMass: "222.26 g/mol", pubchem: "CID 834",
+    "chebi": "CHEBI:17482" },
     relations: [
       { rel: "product-of", to: "enzyme:cbs" },
       { rel: "part-of", to: "pathway:transsulfuration" },
@@ -458,7 +468,7 @@ export default [
     id: "compound:glutamate",
     type: "compound",
     name: "Glutamate",
-    aliases: ["glutamic acid", "glutamato", "Glu"],
+    aliases: ["glutamic acid", "glutamato", "Glu", "ácido glutâmico"],
     summary: "Main excitatory neurotransmitter and metabolic hub; decarboxylated by PLP-dependent GAD to GABA and amidated to glutamine.",
     body: [
       "Glutamate is the precursor of [[compound:gaba]] via [[enzyme:gad]] (GAD65/67 require [[compound:plp]]; see [[pathway:gaba-shunt]]) and of [[compound:glutamine]] via glutamine synthetase; it is also a constituent of [[compound:glutathione]] and an amino-group sink for transaminases. Histidine catabolism ends in glutamate via formimino-glutamate (FIGLU) and consumes [[compound:thf]].",
@@ -479,7 +489,7 @@ export default [
     id: "compound:glutamine",
     type: "compound",
     name: "L-Glutamine",
-    aliases: ["Gln", "glutamina"],
+    aliases: ["Gln", "glutamina", "L-glutamina"],
     summary: "Most abundant free amino acid in blood; fuel for enterocytes and immune cells and the brain's glutamate-GABA reservoir.",
     body: [
       "Glutamine is made from [[compound:glutamate]] and ammonia by glutamine synthetase and hydrolysed by glutaminase back to glutamate plus [[compound:ammonia]]. Enterocytes and lymphocytes oxidise it as a primary fuel; in neurons the glutamate-glutamine cycle replenishes [[compound:gaba]] and glutamate. Oral use as a gut-healing agent is discussed at [[intervention:l-glutamine-supplement]]; evidence in peptic ulcer healing is old and thin."
@@ -534,7 +544,7 @@ export default [
     id: "compound:histidine",
     type: "compound",
     name: "L-Histidine",
-    aliases: ["His", "histidina"],
+    aliases: ["His", "histidina", "L-histidina", "histidina tecidual"],
     summary: "Essential amino acid; precursor of histamine and carnosine, metal chelator, and the substrate of the histidine load (FIGLU) test of folate status.",
     body: [
       "Decarboxylation of histidine gives [[compound:histamine]]; ligation with [[compound:beta-alanine]] gives [[compound:carnosine]]. Histidine catabolism via urocanate to formiminoglutamate (FIGLU) hands a one-carbon unit to [[compound:thf]], so urinary FIGLU after a histidine load was historically used to detect folate deficiency. Free histidine supplementation raises histamine only modestly in most data but is generally avoided in suspected histamine intolerance ([[disease:histamine-intolerance]])."
@@ -552,13 +562,14 @@ export default [
     id: "compound:formate",
     type: "compound",
     name: "Formate",
-    aliases: ["formato", "formic acid"],
+    aliases: ["formato", "formic acid", "ácido fórmico"],
     summary: "One-carbon unit exported from mitochondria to supply cytosolic 10-formyl-THF; the carbon liberated from serine, glycine, sarcosine and DMG.",
     body: [
       "Methylene groups removed from [[compound:dimethylglycine]], [[compound:sarcosine]] or [[compound:glycine]] (via [[enzyme:glycine-cleavage-system|GCS]]) enter the mitochondrial folate pool as [[compound:5-10-methylene-thf]] and can be oxidised to formate, which leaves the organelle and is re-attached to [[compound:thf]] in the cytosol. This is how the choline-to-glycine route and glycine catabolism feed purine and thymidylate synthesis in the [[pathway:folate-cycle]]."
     ],
     evidence: "established",
-    facts: { formula: "CHO2-", molarMass: "45.02 g/mol", pubchem: "CID 283" },
+    facts: { formula: "CHO2-", molarMass: "45.02 g/mol", pubchem: "CID 283",
+    "chebi": "CHEBI:15740" },
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "associated-with", to: "compound:thf", note: "Re-enters the cytosolic pool as 10-formyl-THF" }
@@ -569,7 +580,7 @@ export default [
     id: "compound:folate",
     type: "compound",
     name: "Folate (vitamin B9) - overview",
-    aliases: ["vitamin B9", "folato", "B9", "folates"],
+    aliases: ["vitamin B9", "folato", "B9", "folates", "vitamina B9"],
     summary: "Family of pteridine-glutamate cofactors that carry one-carbon units; natural folates in food differ from the synthetic folic acid in supplements and fortified flour.",
     body: [
       "Natural folates are reduced, polyglutamated molecules ([[compound:thf]], [[compound:5-10-methylene-thf]], [[compound:5-mthf]], 10-formyl-THF, 5-formyl-THF) found in leafy greens, legumes, liver and eggs. They are deconjugated in the gut and absorbed mainly in the proximal jejunum by the acid-optimum proton-coupled folate transporter. Synthetic [[compound:folic-acid]] is fully oxidised and must be reduced by DHFR, and [[compound:folinic-acid]] is the stable 5-formyl form. The reduced folate pool runs the [[pathway:folate-cycle]], which supplies one-carbon units for purines, thymidylate, [[compound:serine]]/[[compound:glycine]] interconversion and, via [[enzyme:mthfr]], methyl groups for the [[pathway:methionine-cycle]].",
@@ -608,7 +619,7 @@ export default [
     id: "compound:5-10-methylene-thf",
     type: "compound",
     name: "5,10-Methylenetetrahydrofolate",
-    aliases: ["5,10-CH2-THF", "metilenotetraidrofolato", "methylene-THF"],
+    aliases: ["5,10-CH2-THF", "metilenotetraidrofolato", "methylene-THF", "5,10-metilenotetraidrofolato", "metileno-THF"],
     summary: "Central one-carbon folate: fed by SHMT, GCS, DMGDH and SARDH; consumed by thymidylate synthase, MTHFD and MTHFR.",
     body: [
       "Methylene-THF is a crossroads of the [[pathway:folate-cycle]]. It is produced by [[enzyme:shmt]], [[enzyme:glycine-cleavage-system|GCS]], [[enzyme:dmgdh]] and [[enzyme:sardh]] and is consumed by thymidylate synthase (dUMP to dTMP, for DNA), by MTHFD1 toward 10-formyl-THF and purines (with exported [[compound:formate]]), or by [[enzyme:mthfr]] (FAD, NADPH) which irreversibly reduces it to [[compound:5-mthf]] for [[compound:homocysteine]] remethylation. SAM inhibits MTHFR, steering carbon toward nucleotides when methylation capacity is replete.",
@@ -621,7 +632,8 @@ export default [
       { rel: "product-of", to: "enzyme:dmgdh" },
       { rel: "substrate-of", to: "enzyme:mthfr" },
       { rel: "part-of", to: "pathway:folate-cycle" },
-      { rel: "precursor-of", to: "compound:formate", note: "After oxidation in mitochondria" }
+      { rel: "precursor-of", to: "compound:formate", note: "After oxidation in mitochondria" },
+      { rel: "substrate-of", to: "pathway:nucleotide-synthesis", note: "Methylene donor for thymidylate synthase." }
     ],
     refs: ["article:reactome-folate-pterine-metabolism"]
   },
@@ -629,7 +641,7 @@ export default [
     id: "compound:5-mthf",
     type: "compound",
     name: "5-Methyltetrahydrofolate (5-MTHF, methylfolate)",
-    aliases: ["5-MTHF", "L-methylfolate", "metilfolato", "L-5-MTHF", "levomefolate"],
+    aliases: ["5-MTHF", "L-methylfolate", "metilfolato", "L-5-MTHF", "levomefolate", "5-metiltetraidrofolato", "L-metilfolato"],
     summary: "Predominant circulating folate and the methyl donor to homocysteine via methionine synthase; made irreversibly by MTHFR.",
     body: [
       "[[enzyme:mthfr]] reduces [[compound:5-10-methylene-thf]] to 5-MTHF, which [[enzyme:mtr]] uses together with [[compound:methylcobalamin]] to convert [[compound:homocysteine]] to [[compound:methionine]]. 5-MTHF polyglutamates also inhibit [[enzyme:gnmt]], so folate status modulates how readily glycine can drain [[compound:sam]], a regulatory link relevant to glycine-supplement discussions. The common MTHFR C677T variant lowers enzyme activity (about 30 % residual in TT homozygotes) mainly when folate and riboflavin status are low.",
@@ -674,7 +686,8 @@ export default [
       "Folinic acid is converted by methenyl-THF synthetase to 5,10-methenyl-THF and then feeds the [[pathway:folate-cycle]] and [[compound:5-mthf]] without needing DHFR. Clinically it rescues normal cells from methotrexate and potentiates 5-fluorouracil (so oncology patients should not self-dose). Supplement versions are usually the racemic calcium salt, of which only the 6S form is active. An RCT in autism with cerebral folate receptor autoantibodies reported benefit for language (Frye 2018); generalisation beyond that subgroup is not supported. See [[intervention:folinic-acid-supplement]]."
     ],
     evidence: "established",
-    facts: { formula: "C20H23N7O7", molarMass: "473.44 g/mol", pubchem: "CID 6006" },
+    facts: { formula: "C20H23N7O7", molarMass: "473.44 g/mol", pubchem: "CID 6006",
+    "chebi": "CHEBI:15640" },
     relations: [
       { rel: "precursor-of", to: "compound:5-10-methylene-thf" },
       { rel: "part-of", to: "compound:folate" },
@@ -686,7 +699,7 @@ export default [
     id: "compound:vitamin-b12",
     type: "compound",
     name: "Vitamin B12 (cobalamin) - overview",
-    aliases: ["cobalamina", "B12", "cobalamin"],
+    aliases: ["cobalamina", "B12", "cobalamin", "vitamina B12"],
     summary: "Cobalt-containing cofactor for methionine synthase (methylcobalamin) and methylmalonyl-CoA mutase (adenosylcobalamin); absorption depends on gastric acid, intrinsic factor and the ileum.",
     body: [
       "Food B12 is bound to protein and released by [[compound:hydrochloric-acid]] and [[compound:pepsin]] in the stomach, binds haptocorrin, is handed to intrinsic factor (secreted by parietal cells) in the duodenum and is absorbed in the terminal ileum. About 1 % of an oral dose is absorbed passively without intrinsic factor, so 250-1000 micrograms/day oral works even in malabsorption. Crystalline B12 in supplements does not need acid, so [[intervention:ppi-therapy]], atrophic gastritis ([[disease:h-pylori-infection]]) and [[state:hypochlorhydria]] mainly impair absorption of food-bound B12.",
@@ -752,7 +765,9 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:methylcobalamin" },
       { rel: "precursor-of", to: "compound:adenosylcobalamin" },
-      { rel: "part-of", to: "compound:vitamin-b12" }
+      { rel: "part-of", to: "compound:vitamin-b12" },
+      { rel: "mitigates", to: "disease:vitamin-b12-deficiency", note: "Standard, inexpensive supplement form; converted to active forms in cells." },
+      { rel: "decreases", to: "compound:methylmalonic-acid", note: "Falls with effective B12 repletion." }
     ],
     refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -797,7 +812,7 @@ export default [
     id: "compound:plp",
     type: "compound",
     name: "Pyridoxal 5'-phosphate (PLP, P5P)",
-    aliases: ["P5P", "P-5-P", "piridoxal-5-fosfato", "pyridoxal phosphate", "active B6"],
+    aliases: ["P5P", "P-5-P", "piridoxal-5-fosfato", "pyridoxal phosphate", "active B6", "B6 ativa"],
     summary: "Active B6 coenzyme for transaminases, decarboxylases (GAD, HDC), SHMT, CBS/CTH and the glycine cleavage system.",
     body: [
       "PLP forms a Schiff base with substrate amino acids and enables transamination, decarboxylation, racemisation and beta/gamma-elimination. In this ontology it matters for [[enzyme:gad]] ([[compound:glutamate]] to [[compound:gaba]]), histidine decarboxylase ([[compound:histamine]]), [[enzyme:shmt]] ([[compound:glycine]] and [[compound:serine]]), the glycine cleavage system P-protein ([[enzyme:glycine-cleavage-system|GCS]]), [[enzyme:cbs]] and cystathionine lyase ([[pathway:transsulfuration]]), heme synthesis and serotonin/dopamine synthesis (aromatic amino acid decarboxylase). Oral PLP is dephosphorylated to pyridoxal in the gut and plasma before cellular uptake, then rephosphorylated by [[enzyme:pdxk]], so the supposed 'bypass' is partial.",
@@ -828,20 +843,23 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "Hypothesised link only" },
       { rel: "interacts-with", to: "compound:plp", note: "Proposed binding of pyridoxal" },
-      { rel: "interacts-with", to: "compound:zinc", note: "Proposed co-depletion" }
+      { rel: "interacts-with", to: "compound:zinc", note: "Proposed co-depletion" },
+      { rel: "measured-by", to: "outcome:urinary-hpl", note: "The assay is non-specific and its link to symptoms is disputed." },
+      { rel: "associated-with", to: "disease:pyroluria-kpu" }
     ]
   },
   {
     id: "compound:riboflavin",
     type: "compound",
     name: "Riboflavin (vitamin B2)",
-    aliases: ["vitamin B2", "riboflavina", "FAD", "FMN"],
+    aliases: ["vitamin B2", "riboflavina", "FAD", "FMN", "vitamina B2"],
     summary: "Precursor of FAD and FMN, flavin cofactors of MTHFR, DMGDH, SARDH, CHDH and PNPO, linking it to methylation, choline oxidation and B6 activation.",
     body: [
       "FAD is the cofactor of [[enzyme:mthfr]] (and a stabiliser of the C677T variant), the covalently flavinylated [[enzyme:dmgdh]] and [[enzyme:sardh]], and of glutathione reductase; FMN is needed by PNPO for converting dietary B6 to [[compound:plp]]. Riboflavin supplementation lowers homocysteine in MTHFR 677TT individuals, an established gene-nutrient interaction. RDA is 1.1-1.3 mg; no UL; urine turns bright yellow at supplement doses."
     ],
     evidence: "established",
-    facts: { formula: "C17H20N4O6", molarMass: "376.36 g/mol", pubchem: "CID 493570", "dosing-range": "RDA 1.1-1.3 mg; trials 1.6-10 mg for MTHFR 677TT", ul: "None established" },
+    facts: { formula: "C17H20N4O6", molarMass: "376.36 g/mol", pubchem: "CID 493570", "dosing-range": "RDA 1.1-1.3 mg; trials 1.6-10 mg for MTHFR 677TT", ul: "None established",
+    "chebi": "CHEBI:17015" },
     relations: [
       { rel: "cofactor-of", to: "enzyme:mthfr", note: "As FAD" },
       { rel: "cofactor-of", to: "enzyme:dmgdh", note: "As covalent FAD" },
@@ -855,7 +873,7 @@ export default [
     id: "compound:niacin",
     type: "compound",
     name: "Niacin (nicotinic acid, vitamin B3)",
-    aliases: ["nicotinic acid", "niacina", "vitamin B3"],
+    aliases: ["nicotinic acid", "niacina", "vitamin B3", "vitamina B3", "ácido nicotínico"],
     summary: "NAD precursor; high-dose nicotinic acid lowers LDL but causes flushing and raises methyl-group demand through nicotinamide methylation.",
     body: [
       "Niacin is converted to NAD+ and NADP+. Surplus nicotinamide is methylated by NNMT using [[compound:sam]] to [[compound:1-methylnicotinamide]], excreted in urine, so gram-scale niacin acts as a methyl sink (classic estimates; the quantitative impact on SAM:SAH in people with adequate folate is modest and variable). Nicotinic-acid flushing (prostaglandin D2) limits dosing: UL 10 mg/day in the EU and 35 mg/day (total niacin) in the US. Large slow-release doses cause hepatotoxicity. See [[intervention:niacin-nicotinamide-supplement]]."
@@ -867,14 +885,15 @@ export default [
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses; methyl sink effect" },
       { rel: "interacts-with", to: "compound:sam", note: "Via NNMT consumption of nicotinamide" },
       { rel: "aggravates", to: "state:undermethylation", note: "NNMT uses SAM to methylate nicotinamide, so gram doses add a dose-dependent methyl load; relevance at ordinary doses is not established." },
-      { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." }
+      { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." },
+      { rel: "aggravates", to: "state:methyl-donor-depletion", note: "Nicotinamide is cleared by NNMT using SAM." }
     ]
   },
   {
     id: "compound:nicotinamide",
     type: "compound",
     name: "Nicotinamide (niacinamide)",
-    aliases: ["niacinamide", "nicotinamida", "NAM"],
+    aliases: ["niacinamide", "nicotinamida", "NAM", "niacinamida"],
     summary: "Amide form of niacin; NAD precursor without flushing, cleared partly by NNMT methylation, hence a methyl sink at large doses.",
     body: [
       "[[enzyme:gnmt]] is not the only major hepatic methyl sink; NNMT methylates nicotinamide using [[compound:sam]] giving [[compound:1-methylnicotinamide]]. At the 100s of mg to g/day used for skin cancer chemoprevention (500 mg twice daily in the ONTRAC trial) or other indications, this can add a measurable load, and high nicotinamide inhibits sirtuins and PARPs. The EU SCF UL is 900 mg/day for nicotinamide; the US UL (35 mg/day) is expressed as total niacin and based on flushing from nicotinic acid. See [[intervention:niacin-nicotinamide-supplement]]."
@@ -898,7 +917,8 @@ export default [
       "NNMT transfers a methyl from [[compound:sam]] to [[compound:nicotinamide]], yielding MNA and [[compound:sah]]. MNA is excreted or further oxidised to pyridones. It is used as a readout of NNMT activity and NAD turnover; NNMT is abundant in liver and adipose tissue and elevated in obesity and some cancers. Modest anti-inflammatory activities have been described for MNA itself."
     ],
     evidence: "established",
-    facts: { formula: "C7H9N2O+", molarMass: "137.16 g/mol", pubchem: "CID 457" },
+    facts: { formula: "C7H9N2O+", molarMass: "137.16 g/mol", pubchem: "CID 457",
+    "chebi": "CHEBI:16797" },
     relations: [
       { rel: "associated-with", to: "compound:sam", note: "Consumes SAM" }
     ],
@@ -927,13 +947,14 @@ export default [
     id: "compound:guanidinoacetate",
     type: "compound",
     name: "Guanidinoacetate (GAA)",
-    aliases: ["glycocyamine", "guanidinoacetic acid", "GAA"],
+    aliases: ["glycocyamine", "guanidinoacetic acid", "GAA", "guanidinoacetato", "ácido guanidinoacético"],
     summary: "Intermediate of creatine synthesis formed from glycine and arginine; methylated by GAMT using SAM.",
     body: [
       "AGAT makes GAA from [[compound:glycine]] and arginine (releasing ornithine); GAMT converts it to [[compound:creatine]] and [[compound:sah]] at the expense of [[compound:sam]] ([[pathway:creatine-synthesis]]). GAA is sold as a supplement in sport and animal feed; it raises homocysteine because it consumes SAM, which is a reason for caution in under-methylation scenarios. GAMT deficiency is a rare inborn error causing creatine deficiency."
     ],
     evidence: "established",
-    facts: { formula: "C3H7N3O2", molarMass: "117.11 g/mol", pubchem: "CID 763" },
+    facts: { formula: "C3H7N3O2", molarMass: "117.11 g/mol", pubchem: "CID 763",
+    "chebi": "CHEBI:16344" },
     relations: [
       { rel: "precursor-of", to: "compound:creatine" },
       { rel: "increases", to: "compound:homocysteine", note: "Via SAM consumption" },
@@ -1001,7 +1022,7 @@ export default [
     id: "compound:glycocholic-acid",
     type: "compound",
     name: "Glycocholic acid (glycocholate)",
-    aliases: ["glico-colato", "glycocholate", "glyco-conjugated bile acid"],
+    aliases: ["glico-colato", "glycocholate", "glyco-conjugated bile acid", "ácido glicocólico", "glicocolato"],
     summary: "Cholic acid conjugated to glycine; the major human bile acid conjugate, more lipophilic and mucosa-irritating than taurine conjugates at low pH.",
     body: [
       "BAAT conjugates cholic acid with [[compound:glycine]] in hepatocyte peroxisomes ([[pathway:bile-acid-conjugation]]). Its pKa is about 4, so at the acidic pH of a stomach affected by duodenogastric reflux it is partly protonated and can enter epithelial cells, which is why acid plus glycine-conjugated bile salts is a damaging combination in oesophageal research. Gut bacterial hydrolases release glycine from it, which re-enters the portal circulation."
@@ -1019,7 +1040,7 @@ export default [
     id: "compound:taurocholic-acid",
     type: "compound",
     name: "Taurocholic acid (taurocholate)",
-    aliases: ["tauro-colato", "taurocholate"],
+    aliases: ["tauro-colato", "taurocholate", "ácido taurocólico", "taurocolato"],
     summary: "Cholic acid conjugated to taurine; fully ionised at gastric pH and a substrate for bacterial deconjugation that releases taurine.",
     body: [
       "BAAT forms taurocholate from cholic acid and [[compound:taurine]] ([[pathway:bile-acid-conjugation]]). Its sulfonate group keeps it ionised even at pH 1-2, making it less able to penetrate acid-exposed mucosa than [[compound:glycocholic-acid]]. Taurine supply shifts the glycine:taurine conjugation ratio; some mouse data link taurine-conjugated bile acids to expansion of sulfite-reducing bacteria, a hypothesis not established in people."
@@ -1076,7 +1097,7 @@ export default [
     id: "compound:bicarbonate",
     type: "compound",
     name: "Bicarbonate",
-    aliases: ["HCO3-", "bicarbonato", "hydrogen carbonate"],
+    aliases: ["HCO3-", "bicarbonato", "hydrogen carbonate", "bicarbonato de sódio", "sodium bicarbonate", "baking soda", "hidrogenocarbonato"],
     summary: "Buffer base secreted by gastric surface cells, duodenal mucosa (Brunner glands) and pancreas; neutralises acid and, with H+, forms CO2.",
     body: [
       "Bicarbonate is secreted in a mucus gel layer over the gastric epithelium (maintaining near-neutral pH at the cell surface), by duodenal enterocytes (stimulated by prostaglandin E2, [[compound:prostaglandin-e2]]) and by pancreatic ducts in response to [[compound:secretin]]. In the duodenum H+ + HCO3- becomes H2CO3, which carbonic anhydrase ([[enzyme:carbonic-anhydrase]]) converts to water and [[compound:carbon-dioxide]]; most of that CO2 is absorbed locally across the highly permeable mucosa. Most gas generated by this neutralisation therefore enters blood, not the belch.",
@@ -1139,7 +1160,8 @@ export default [
       "Urea circulates and enters saliva and gastric juice. [[enzyme:h-pylori-urease|H. pylori urease]] splits it to [[compound:ammonia]] and [[compound:carbon-dioxide]]. In the urea breath test the patient drinks 13C- or 14C-labelled urea; labelled CO2 in exhaled breath indicates urease activity and thus infection ([[intervention:h-pylori-testing]]). PPIs, bismuth and recent antibiotics can cause false negatives."
     ],
     evidence: "established",
-    facts: { formula: "CH4N2O", molarMass: "60.06 g/mol", pubchem: "CID 1176" },
+    facts: { formula: "CH4N2O", molarMass: "60.06 g/mol", pubchem: "CID 1176",
+    "chebi": "CHEBI:16199" },
     relations: [
       { rel: "substrate-of", to: "enzyme:h-pylori-urease" },
       { rel: "measured-by", to: "intervention:h-pylori-testing" },
@@ -1184,17 +1206,21 @@ export default [
     id: "compound:l-carnitine",
     type: "compound",
     name: "L-Carnitine",
-    aliases: ["carnitina", "levocarnitine"],
+    aliases: ["carnitina", "levocarnitine", "L-carnitina"],
     summary: "Carrier of long-chain fatty acids into mitochondria, made from lysine and methionine (three SAM methyls) and a gut-microbial TMA precursor.",
     body: [
       "Carnitine is synthesised from protein-bound trimethyllysine (methylated by [[compound:sam]], three methyl groups per molecule) and obtained from red meat and dairy. Gut microbes convert surplus carnitine to [[compound:trimethylamine]] and thus [[compound:tmao]] (Koeth 2013). Its biosynthesis is a minor but real SAM sink."
     ],
     evidence: "established",
-    facts: { formula: "C7H15NO3", molarMass: "161.20 g/mol", pubchem: "CID 10917" },
+    facts: { formula: "C7H15NO3", molarMass: "161.20 g/mol", pubchem: "CID 10917",
+    "chebi": "CHEBI:16347" },
     relations: [
       { rel: "precursor-of", to: "compound:trimethylamine", note: "Via gut microbial CntA/B" },
       { rel: "associated-with", to: "compound:methionine", note: "Biosynthesis uses lysine and methionine-derived SAM methyls" },
-      { rel: "interacts-with", to: "compound:sam", note: "Biosynthesis consumes three methyls" }
+      { rel: "interacts-with", to: "compound:sam", note: "Biosynthesis consumes three methyls" },
+      { rel: "part-of", to: "pathway:tma-tmao-axis", note: "Gut bacteria can cleave carnitine to TMA." },
+      { rel: "interacts-with", to: "system:gut-microbiota" },
+      { rel: "associated-with", to: "disease:cardiovascular-disease", note: "Carnitine-TMAO link reported in cohorts and mice; causality debated." }
     ],
     refs: ["article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },
@@ -1277,7 +1303,7 @@ export default [
     id: "compound:collagen-type-ii",
     type: "compound",
     name: "Type II collagen (undenatured and hydrolysed)",
-    aliases: ["colágeno tipo 2", "UC-II", "undenatured type II collagen", "chicken sternum collagen"],
+    aliases: ["colágeno tipo 2", "UC-II", "undenatured type II collagen", "chicken sternum collagen", "colágeno tipo 2 em pó"],
     summary: "Cartilage collagen sold either as milligram-dose undenatured form (oral tolerance claim) or gram-dose hydrolysate; the two behave differently.",
     body: [
       "Undenatured type II collagen (UC-II) is dosed at about 40 mg/day, a trivially small glycine load (roughly 10 mg); its proposed mechanism is oral tolerance via gut-associated lymphoid tissue, with small trials in knee osteoarthritis symptoms (Lugo 2016). Hydrolysed type II collagen is taken at about 1-10 g/day and behaves like other [[compound:collagen]] hydrolysates. Because glycine delivery from UC-II is minimal, a glycine-load explanation of any belching with a 40 mg product is unlikely; the product's other ingredients (excipients, sweeteners, capsule fill) are likelier culprits.",
@@ -1288,7 +1314,9 @@ export default [
     relations: [
       { rel: "part-of", to: "compound:collagen" },
       { rel: "precursor-of", to: "compound:glycine", note: "Negligible at 40 mg doses" },
-      { rel: "associated-with", to: "intervention:type-ii-collagen" }
+      { rel: "associated-with", to: "intervention:type-ii-collagen" },
+      { rel: "associated-with", to: "disease:osteoarthritis" },
+      { rel: "associated-with", to: "pathway:collagen-synthesis" }
     ],
     refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
@@ -1359,7 +1387,8 @@ export default [
       "Enterochromaffin cells release 5-HT in response to luminal stimuli and the vagus; 5-HT4 receptors on enteric neurons facilitate acetylcholine release and propulsion ([[system:enteric-nervous-system]]), the target of prokinetics ([[intervention:prokinetic-drugs]]); 5-HT3 antagonists (ondansetron) suppress nausea. Brain synthesis needs [[compound:plp]] for aromatic amino acid decarboxylase. Gingerols have 5-HT3 antagonist activity in vitro ([[compound:gingerols]]); an effect on 5-HT4 or on the migrating motor complex, as asserted in the conversation, is not demonstrated."
     ],
     evidence: "established",
-    facts: { formula: "C10H12N2O", molarMass: "176.21 g/mol", pubchem: "CID 5202" },
+    facts: { formula: "C10H12N2O", molarMass: "176.21 g/mol", pubchem: "CID 5202",
+    "chebi": "CHEBI:28790" },
     relations: [
       { rel: "increases", to: "system:enteric-nervous-system", note: "5-HT4 facilitation of motility" },
       { rel: "associated-with", to: "system:gastric-physiology" },
@@ -1371,13 +1400,14 @@ export default [
     id: "compound:prostaglandin-e2",
     type: "compound",
     name: "Prostaglandin E2 (PGE2)",
-    aliases: ["PGE2", "prostaglandina E2"],
+    aliases: ["PGE2", "prostaglandina E2", "prostaglandinas"],
     summary: "COX-derived mediator that stimulates mucus and bicarbonate secretion, increases mucosal blood flow and reduces acid; depleted by NSAIDs.",
     body: [
       "Gastric mucosal PGE2 (largely via COX-1) acts on EP receptors to enhance the mucus-bicarbonate barrier ([[compound:gastric-mucus]], [[compound:bicarbonate]]), maintain blood flow and inhibit parietal-cell acid secretion. NSAIDs deplete it, which explains NSAID ulcers, and misoprostol (a PGE1 analogue) replaces it. Herbal mucosal protectants such as [[intervention:espinheira-santa]] and [[intervention:dgl-licorice]] are proposed to act partly through prostaglandin or mucus effects; the human data are limited."
     ],
     evidence: "established",
-    facts: { formula: "C20H32O5", molarMass: "352.5 g/mol", pubchem: "CID 5280360" },
+    facts: { formula: "C20H32O5", molarMass: "352.5 g/mol", pubchem: "CID 5280360",
+    "chebi": "CHEBI:15551" },
     relations: [
       { rel: "increases", to: "compound:gastric-mucus" },
       { rel: "decreases", to: "disease:peptic-ulcer" },
@@ -1417,7 +1447,8 @@ export default [
     relations: [
       { rel: "decreases", to: "compound:gastrin" },
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
-      { rel: "associated-with", to: "disease:h-pylori-infection" }
+      { rel: "associated-with", to: "disease:h-pylori-infection" },
+      { rel: "decreases", to: "system:gastric-g-cells", note: "Paracrine brake on gastrin release as the stomach acidifies." }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -1453,7 +1484,8 @@ export default [
     relations: [
       { rel: "increases", to: "system:enteric-nervous-system", note: "Initiates MMC phase III" },
       { rel: "decreases", to: "disease:sibo", note: "Via MMC clearing, evidence moderate" },
-      { rel: "associated-with", to: "state:gastric-dysmotility" }
+      { rel: "associated-with", to: "state:gastric-dysmotility" },
+      { rel: "increases", to: "pathway:migrating-motor-complex", note: "Triggers antral phase III of the fasting cycle." }
     ],
     refs: ["article:mondal-2017-duodenal-ph-mmc-motilin"]
   },
@@ -1467,7 +1499,8 @@ export default [
       "Benzoate (from diet, preservatives, toluene or gut metabolism of polyphenols) is conjugated to [[compound:glycine]] by glycine N-acyltransferase and excreted as hippurate. Sodium benzoate is used to lower glycine in non-ketotic hyperglycinaemia and ammonia in urea-cycle disorders. For ordinary diets the glycine drain is small (about 0.6 g glycine per gram benzoate), but it is one of several glycine sinks alongside [[compound:glutathione]], [[compound:creatine]] and [[pathway:bile-acid-conjugation]]."
     ],
     evidence: "established",
-    facts: { formula: "C9H9NO3", molarMass: "179.17 g/mol", pubchem: "CID 464" },
+    facts: { formula: "C9H9NO3", molarMass: "179.17 g/mol", pubchem: "CID 464",
+    "chebi": "CHEBI:18089" },
     relations: [
       { rel: "decreases", to: "compound:glycine", note: "Conjugation consumes glycine" },
       { rel: "associated-with", to: "system:gut-microbiota", note: "Microbial polyphenol metabolism supplies benzoate" }
@@ -1484,7 +1517,8 @@ export default [
       "Serum or urinary MMA rises in B12 deficiency before serum B12 becomes clearly low, and is also raised by renal impairment, bacterial overgrowth that produces propionate and genetic defects. Combining MMA with [[compound:homocysteine]] helps distinguish B12 from folate deficiency (both raise Hcy, only B12 raises MMA). See [[intervention:homocysteine-mma-testing]] and [[compound:adenosylcobalamin]]."
     ],
     evidence: "established",
-    facts: { formula: "C4H6O4", molarMass: "118.09 g/mol", pubchem: "CID 487", "reference-range": "serum about 0.07-0.27 micromol/L, lab dependent" },
+    facts: { formula: "C4H6O4", molarMass: "118.09 g/mol", pubchem: "CID 487", "reference-range": "serum about 0.07-0.27 micromol/L, lab dependent",
+    "chebi": "CHEBI:30860" },
     relations: [
       { rel: "measured-by", to: "intervention:homocysteine-mma-testing" },
       { rel: "associated-with", to: "compound:vitamin-b12" },
@@ -1496,13 +1530,14 @@ export default [
     id: "compound:oxalate",
     type: "compound",
     name: "Oxalate",
-    aliases: ["oxalic acid", "oxalato"],
+    aliases: ["oxalic acid", "oxalato", "ácido oxálico"],
     summary: "End product from glyoxylate, ascorbate and hydroxyproline; elevated urinary oxalate drives calcium-oxalate stones.",
     body: [
       "About half or more of urinary oxalate is endogenous, from glyoxylate derived from [[compound:glycine]] (via glycine oxidase and transamination), [[compound:hydroxyproline]] and ascorbate. Hydroxyproline-rich gelatin or [[compound:collagen]] loads raise urinary oxalate acutely in feeding studies (Knight 2006). People with a history of calcium-oxalate stones, primary hyperoxaluria or enteric hyperoxaluria should be cautious with large doses of collagen and glycine ([[intervention:glycine-powder]], [[intervention:collagen-peptides]])."
     ],
     evidence: "established",
-    facts: { formula: "C2H2O4", molarMass: "90.03 g/mol", pubchem: "CID 971" },
+    facts: { formula: "C2H2O4", molarMass: "90.03 g/mol", pubchem: "CID 971",
+    "chebi": "CHEBI:16995" },
     relations: [
       { rel: "associated-with", to: "intervention:collagen-peptides", note: "Caution in stone formers" }
     ],
@@ -1512,13 +1547,14 @@ export default [
     id: "compound:carvacrol",
     type: "compound",
     name: "Carvacrol",
-    aliases: ["carvacrol", "oregano phenol"],
+    aliases: ["carvacrol", "oregano phenol", "timol e carvacrol"],
     summary: "Phenolic monoterpene of oregano oil with in vitro antimicrobial action and TRPA1/TRPV3 irritant activity.",
     body: [
       "Carvacrol (with its isomer thymol) disrupts bacterial membranes in vitro at sub-mg/mL concentrations and is the main active in [[intervention:oregano-oil]]. It activates TRPA1/TRPV3 sensory channels, so pungency and burning in the mouth, throat or oesophagus are expected, particularly in inflamed mucosa such as in [[disease:lpr]] or oesophagitis. Human trial data on gastrointestinal bacterial overgrowth are minimal."
     ],
     evidence: "plausible",
-    facts: { formula: "C10H14O", molarMass: "150.22 g/mol", pubchem: "CID 10364" },
+    facts: { formula: "C10H14O", molarMass: "150.22 g/mol", pubchem: "CID 10364",
+    "chebi": "CHEBI:3440" },
     relations: [
       { rel: "aggravates", to: "outcome:throat-burning", note: "Irritant on inflamed mucosa" },
       { rel: "decreases", to: "disease:sibo", note: "In vitro / limited clinical data" },
@@ -1535,7 +1571,8 @@ export default [
       "[6]-Gingerol converts to [6]-shogaol on drying or heating. Mechanisms proposed include 5-HT3 and muscarinic M3 antagonism, TRPV1 activation and anti-inflammatory COX effects. Human trials show faster gastric emptying with about 1.2 g ginger in functional dyspepsia (Wu 2008), antiemetic activity for nausea and pregnancy nausea. Evidence for 5-HT4 agonism or MMC stimulation is lacking. See [[intervention:ginger-extract]]."
     ],
     evidence: "plausible",
-    facts: { formula: "C17H26O4", molarMass: "294.39 g/mol", pubchem: "CID 442793", "dosing-range": "0.5-2 g ginger root/day in trials" },
+    facts: { formula: "C17H26O4", molarMass: "294.39 g/mol", pubchem: "CID 442793", "dosing-range": "0.5-2 g ginger root/day in trials",
+    "chebi": "CHEBI:10136" },
     relations: [
       { rel: "increases", to: "system:gastric-physiology", note: "Faster gastric emptying in small trials" },
       { rel: "mitigates", to: "state:gastric-dysmotility" },
@@ -1553,11 +1590,13 @@ export default [
       "Cynarin is present in artichoke at low concentrations (and partly formed during extraction), and the choleretic and lipid-lowering effects of [[intervention:artichoke-leaf-extract]] cannot be attributed to it alone. In humans, artichoke leaf extract (about 320-640 mg three times daily) improved functional dyspepsia symptom scores in a randomised trial (Holtmann 2003). Bile duct obstruction or gallstones with obstruction contraindicate it. Interaction with [[system:bile]] flow explains the proposed benefit for digestion."
     ],
     evidence: "plausible",
-    facts: { formula: "C25H24O12", molarMass: "516.4 g/mol", pubchem: "CID 5281769" },
+    facts: { formula: "C25H24O12", molarMass: "516.4 g/mol", pubchem: "CID 5281769",
+    "chebi": "CHEBI:520" },
     relations: [
       { rel: "increases", to: "system:bile", note: "Choleretic effect" },
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Dyspepsia symptom trial evidence" },
-      { rel: "part-of", to: "intervention:artichoke-leaf-extract" }
+      { rel: "part-of", to: "intervention:artichoke-leaf-extract" },
+      { rel: "associated-with", to: "disease:functional-dyspepsia", note: "Extract trial in dyspepsia; the role of cynarin itself is untested." }
     ],
     refs: ["article:holtmann-2003-artichoke-leaf-functional-dyspepsia"]
   },
@@ -1565,17 +1604,20 @@ export default [
     id: "compound:glycyrrhizin",
     type: "compound",
     name: "Glycyrrhizin (and glycyrrhetinic acid)",
-    aliases: ["glicirrizina", "glycyrrhizic acid", "licorice saponin"],
+    aliases: ["glicirrizina", "glycyrrhizic acid", "licorice saponin", "ácido glicirrízico"],
     summary: "Sweet saponin of licorice root; its aglycone inhibits 11-beta-HSD2, causing sodium retention, hypokalaemia and hypertension, and is removed in DGL.",
     body: [
       "Glycyrrhetinic acid blocks 11-beta-hydroxysteroid dehydrogenase type 2, letting cortisol activate renal mineralocorticoid receptors (pseudo-aldosteronism). The WHO and EU scientific committees suggest not exceeding about 100 mg glycyrrhizin/day, roughly 50 g of licorice sweets. Deglycyrrhizinated licorice (DGL) products reduce glycyrrhizin to typically 1-3 % or less, so the pressor effect is largely absent, though labels vary ([[intervention:dgl-licorice]])."
     ],
     evidence: "established",
-    facts: { formula: "C42H62O16", molarMass: "822.9 g/mol", pubchem: "CID 14982", ul: "about 100 mg/day glycyrrhizin (WHO / EU SCF advice)" },
+    facts: { formula: "C42H62O16", molarMass: "822.9 g/mol", pubchem: "CID 14982", ul: "about 100 mg/day glycyrrhizin (WHO / EU SCF advice)",
+    "chebi": "CHEBI:15939" },
     relations: [
       { rel: "causes", to: "outcome:tachycardia", note: "Palpitations or arrhythmia via hypokalaemia with excess intake (rare)" },
       { rel: "part-of", to: "intervention:dgl-licorice", note: "Removed (mostly) in DGL; residual amount matters in hypertension or hypokalaemia" },
-      { rel: "associated-with", to: "disease:peptic-ulcer", note: "Licorice derivative carbenoxolone was an ulcer drug but caused mineralocorticoid effects" }
+      { rel: "associated-with", to: "disease:peptic-ulcer", note: "Licorice derivative carbenoxolone was an ulcer drug but caused mineralocorticoid effects" },
+      { rel: "associated-with", to: "outcome:ulcer-healing", note: "Licorice derivatives were used for ulcers; DGL removes most glycyrrhizin." },
+      { rel: "interacts-with", to: "compound:prostaglandin-e2" }
     ],
     refs: ["article:isbrucker-2006-licorice-glycyrrhizin-safety"]
   },
@@ -1589,11 +1631,14 @@ export default [
       "Berberine (from Berberis, goldenseal, Coptis) lowers glucose and LDL in meta-analyses of modest-quality trials, at typical doses of 500 mg two to three times daily. Oral bioavailability is below 1 %, so gut-lumen effects, including shifts in [[system:gut-microbiota]], may dominate. It was part of herbal regimens in a small SIBO study compared with rifaximin (Chedid 2014). It inhibits CYP2D6 and CYP3A4, interacts with cyclosporine and may potentiate hypoglycaemics. See [[intervention:berberine-supplement]]."
     ],
     evidence: "plausible",
-    facts: { formula: "C20H18NO4+", molarMass: "336.4 g/mol", pubchem: "CID 2353", "dosing-range": "500 mg 2-3 times/day in trials" },
+    facts: { formula: "C20H18NO4+", molarMass: "336.4 g/mol", pubchem: "CID 2353", "dosing-range": "500 mg 2-3 times/day in trials",
+    "chebi": "CHEBI:16118" },
     relations: [
       { rel: "decreases", to: "disease:sibo", note: "Small, low-quality trial evidence" },
       { rel: "interacts-with", to: "system:gut-microbiota" },
-      { rel: "part-of", to: "intervention:berberine-supplement" }
+      { rel: "part-of", to: "intervention:berberine-supplement" },
+      { rel: "interacts-with", to: "intervention:oregano-oil", note: "Combined in herbal antimicrobial regimens for suspected SIBO." },
+      { rel: "associated-with", to: "outcome:breath-hydrogen-methane", note: "Herbal-versus-rifaximin study used breath-test normalisation." }
     ],
     refs: ["article:chedid-2014-herbal-vs-rifaximin"]
   },
@@ -1611,8 +1656,97 @@ export default [
     relations: [
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "mitigates", to: "disease:lpr", note: "Plausible; modest evidence" },
-      { rel: "interacts-with", to: "compound:pepsin", note: "In vitro binding" }
+      { rel: "interacts-with", to: "compound:pepsin", note: "In vitro binding" },
+      { rel: "part-of", to: "intervention:sodium-alginate" },
+      { rel: "decreases", to: "outcome:reflux-episodes", note: "Raft impedes reflux without lowering acid; clinical effect sizes vary." },
+      { rel: "interacts-with", to: "compound:hydrochloric-acid", note: "Gels on contact with acid." }
     ],
     refs: ["article:leiman-2017-alginate-meta-analysis"]
+  },
+  {
+    id: "compound:elastin",
+    type: "compound",
+    name: "Elastin",
+    aliases: ["elastina", "tropoelastina", "fibras elásticas", "tropoelastin"],
+    summary: "Cross-linked extracellular protein that gives skin, arteries and lungs their recoil; like collagen it is glycine-rich (about 29 % glycine in the human precursor sequence).",
+    body: [
+      "Elastin is what lets skin, blood vessels and lungs stretch and spring back. Cells secrete a soluble precursor, tropoelastin, which is cross-linked outside the cell into a durable polymer in the [[system:connective-tissue]] ([[article:debelle-1999-elastin-molecular-description]]). Unlike [[compound:collagen]], elastin is built mainly during development and turns over very slowly in adults.",
+      "Composition, counted from the human ELN precursor sequence (UniProt P15502, 786 residues): about 29 % glycine, 21 % alanine, 13 % proline and 13 % valine. The conversation lists elastin together with collagen and glutathione as places where [[compound:glycine]] is consumed. That is correct in kind, but glycine-budget arguments such as [[outcome:glycine-deficit-estimate]] are dominated by collagen, the largest sink ([[pathway:collagen-synthesis]])."
+    ],
+    evidence: "established",
+    facts: {
+      class: "extracellular matrix protein",
+      uniprot: "P15502 (human ELN precursor)",
+      composition: "Gly 28.6 %, Ala 21.2 %, Pro 12.7 %, Val 12.5 % of residues (counted from UniProt P15502)"
+    },
+    relations: [
+      { rel: "part-of", to: "system:connective-tissue" },
+      {
+        rel: "interacts-with",
+        to: "compound:collagen",
+        note: "Both are glycine-rich extracellular matrix proteins."
+      }
+    ],
+    refs: ["article:debelle-1999-elastin-molecular-description"]
+  },
+  {
+    id: "compound:thymol",
+    type: "compound",
+    name: "Thymol",
+    aliases: ["timol", "2-isopropil-5-metilfenol", "thyme phenol", "fenol do tomilho"],
+    summary: "Volatile phenol, isomer of carvacrol, found in thyme and oregano oils; antimicrobial in vitro and a pungent TRP-channel activator that can burn inflamed mucosa.",
+    body: [
+      "Thymol (5-methyl-2-isopropylphenol) is a structural isomer of [[compound:carvacrol]]: the same atoms with the hydroxyl and isopropyl groups swapped. Both are major phenols of oregano and thyme essential oils and together make up much of [[intervention:oregano-oil]]. In test tubes both damage bacterial membranes at low concentrations, which is the basis for their use in herbal gut-antimicrobial regimens ([[disease:sibo]]).",
+      "The same chemistry explains the burning sensation. Thymol and carvacrol switch on warmth- and pungency-sensing TRP channels (TRPV3, and TRPA1 for carvacrol) ([[article:xu-2006-carvacrol-thymol-trp-channels]]). On inflamed or damaged lining, such as in oesophagitis or laryngopharyngeal reflux, that pungency is felt as burning. The source conversation reported that oregano oil \"burned\" and gave this reason; the explanation is plausible but is inferred from receptor experiments, not tested in reflux patients ([[claim:oregano-phenols-burn-inflamed-mucosa]])."
+    ],
+    evidence: "plausible",
+    facts: { formula: "C10H14O", molarMass: "150.22 g/mol", chebi: "CHEBI:27607", pubchem: "CID 6989" },
+    relations: [
+      {
+        rel: "interacts-with",
+        to: "compound:carvacrol",
+        note: "Structural isomers that co-occur in oregano and thyme oils."
+      },
+      { rel: "part-of", to: "intervention:oregano-oil" },
+      {
+        rel: "aggravates",
+        to: "outcome:throat-burning",
+        note: "Pungent TRP-channel activator; effect on inflamed throat mucosa is inferred, not trialled."
+      },
+      {
+        rel: "aggravates",
+        to: "disease:esophagitis",
+        note: "General caution for pungent oils on inflamed oesophageal lining; no trial."
+      }
+    ],
+    refs: ["article:xu-2006-carvacrol-thymol-trp-channels"]
+  },
+  {
+    id: "compound:tannins-flavonoids",
+    type: "compound",
+    name: "Tannins and flavonoids (plant polyphenols)",
+    aliases: ["taninos", "flavonoides", "polifenóis", "taninos e flavonoides", "polyphenols"],
+    summary: "Plant polyphenols: tannins bind proteins and metals (astringent, can lower iron absorption); flavonoids are antioxidant pigments. The fractions credited for espinheira-santa.",
+    body: [
+      "Polyphenols are plant compounds built from phenol rings. Tannins are the larger ones that bind proteins and metal ions, which gives tea and unripe fruit their astringency and explains why tannin-rich herbs can reduce absorption of iron and some medicines. Flavonoids are a large family of polyphenol pigments (catechins and others) that act as antioxidants in test systems.",
+      "The conversation credits the tannins and flavonoids of espinheira-santa with a \"pro-prostaglandin\" action that thickens mucus and bicarbonate. In the rat study usually cited, a flavonoid-rich fraction protected the stomach by inhibiting the proton pump and nitric oxide formation, not by raising mucus ([[article:baggio-2007-maytenus-ilicifolia-gastroprotection]], [[claim:espinheira-santa-prostaglandin-mucus]]). Human evidence for these fractions in ulcer healing is thin ([[intervention:espinheira-santa]])."
+    ],
+    evidence: "plausible",
+    facts: { class: "plant polyphenols (tannins, flavonoids incl. catechins)" },
+    relations: [
+      {
+        rel: "part-of",
+        to: "intervention:espinheira-santa",
+        note: "Named constituents of Maytenus ilicifolia leaves."
+      },
+      {
+        rel: "decreases",
+        to: "enzyme:h-k-atpase",
+        note: "A flavonoid-rich fraction inhibited H+/K+-ATPase activity in rats; not shown in people."
+      },
+      { rel: "associated-with", to: "outcome:ulcer-healing" },
+      { rel: "associated-with", to: "pathway:gastric-acid-secretion" }
+    ],
+    refs: ["article:baggio-2007-maytenus-ilicifolia-gastroprotection"]
   },
 ];
