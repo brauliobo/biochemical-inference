@@ -1,7 +1,7 @@
 <script setup vapor>
 import { computed } from 'vue'
 import { REACTION_IDS } from '../../shared/identifiers.js'
-import ChartFrame from './ui/ChartFrame.vue'
+import ChartFrame from '../ui/ChartFrame.vue'
 
 const props = defineProps({
   result: { type: Object, required: true },

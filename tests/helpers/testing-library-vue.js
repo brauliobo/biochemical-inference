@@ -1,77 +1,34 @@
-// ESM drop-in for '@testing-library/vue' (aliased in vite.config.js), so every
-// existing `import { render, screen, fireEvent } from '@testing-library/vue'`
-// keeps working unchanged.
-//
-// Why it exists: the real package is CommonJS and `require`s a second, CJS copy
-// of Vue (with no Vapor and a different reactivity instance) next to the ESM
-// copy our components use. This file is the same small API on top of the ESM
-// @vue/test-utils, plus one extra: `render` mounts Vapor components through
-// mountVapor().
-import { mount } from '@vue/test-utils'
-import { vaporInteropPlugin } from 'vue'
+// ESM drop-in for '@testing-library/vue' (aliased in vite.config.js), so tests
+// import `render`, `screen`, `fireEvent` ... as usual. It is the same small API
+// on top of @testing-library/dom, and `render` mounts Vapor components through
+// mountVapor(). (The real package is CommonJS and needs @vue/test-utils, which
+// cannot mount Vapor components; see docs/VAPOR.md.)
 import { fireEvent as domFireEvent, getQueriesForElement, prettyDOM, waitFor } from '@testing-library/dom'
-import { cleanupVapor, isVaporComponent, mountVapor } from './mount-vapor.js'
+import { cleanupVapor, mountVapor } from './mount-vapor.js'
 
 export * from '@testing-library/dom'
 
-const mountedWrappers = new Set()
-
-export function render(Component, { container: customContainer, baseElement: customBaseElement, ...mountOptions } = {}) {
+export function render(Component, { container: customContainer, baseElement: customBaseElement, props, global } = {}) {
   const baseElement = customBaseElement || customContainer || document.body
   const container = customContainer || baseElement.appendChild(document.createElement('div'))
-
-  let unmount
-  let html
-  let emitted
-  let rerender
-
-  if (isVaporComponent(Component)) {
-    const handle = mountVapor(Component, { props: mountOptions.props, plugins: mountOptions.global?.plugins, attachTo: container })
-    unmount = () => handle.unmount()
-    html = () => handle.html()
-    emitted = () => { throw new Error('emitted() is not available for Vapor components; assert on the DOM or a callback prop.') }
-    rerender = () => { throw new Error('rerender() is not available for Vapor components; remount instead.') }
-  } else {
-    // A virtual-DOM component may host Vapor children (migrated components), which
-    // needs the same interop plugin as the application.
-    const plugins = [...(mountOptions.global?.plugins ?? []), vaporInteropPlugin]
-    const wrapper = mount(Component, { ...mountOptions, global: { ...mountOptions.global, plugins }, attachTo: container })
-    // Remove the extra wrapping div VTU adds.
-    wrapper.element.parentElement.replaceWith(...wrapper.element.parentElement.childNodes)
-    mountedWrappers.add(wrapper)
-    unmount = () => wrapper.unmount()
-    html = () => wrapper.html()
-    emitted = (name) => wrapper.emitted(name)
-    rerender = (props) => wrapper.setProps(props)
-  }
+  const handle = mountVapor(Component, { props, plugins: global?.plugins, attachTo: container })
 
   return {
     container,
     baseElement,
     debug: (el = baseElement, maxLength, options) =>
       (Array.isArray(el) ? el : [el]).forEach((item) => console.log(prettyDOM(item, maxLength, options))),
-    unmount,
-    html,
-    emitted,
-    rerender,
+    unmount: () => handle.unmount(),
+    html: () => handle.html(),
     ...getQueriesForElement(baseElement)
   }
 }
 
-export function cleanup() {
-  cleanupVapor()
-  for (const wrapper of mountedWrappers) {
-    const host = wrapper.element?.parentNode
-    if (host?.parentNode === document.body) document.body.removeChild(host)
-    wrapper.unmount()
-  }
-  mountedWrappers.clear()
-}
+export const cleanup = cleanupVapor
 
 // Vue flushes asynchronously, so every dispatch is followed by a tick. Keep the
 // promise chain exactly this long: some component tests are sensitive to the
-// number of microtasks between a dispatch and the next query, and this matches
-// the original package.
+// number of microtasks between a dispatch and the next query.
 const settle = () => waitFor(() => {}).then(() => {})
 
 export function fireEvent(...args) {

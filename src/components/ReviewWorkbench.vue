@@ -10,9 +10,9 @@ import {
   reproduceDerivedAssertion,
   submitApapDerivedBundle
 } from '../api.js'
-import Section from './ui/Section.vue'
-import Toolbar from './ui/Toolbar.vue'
-import { statusTone } from './ui/tone.js'
+import Section from '../ui/Section.vue'
+import Toolbar from '../ui/Toolbar.vue'
+import { statusTone } from '../ui/tone.js'
 
 const props = defineProps({ apapRun: { type: Object, default: undefined } })
 

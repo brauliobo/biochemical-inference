@@ -2,10 +2,10 @@
 import { computed, defineVaporAsyncComponent, onBeforeUnmount, ref, watch } from 'vue'
 import { loadSpatialWorkspace } from '../api.js'
 import { parsePointInstances, scaleValue } from '../spatial.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import Toolbar from './ui/Toolbar.vue'
-import { statusTone } from './ui/tone.js'
+import Metric from '../ui/Metric.vue'
+import Section from '../ui/Section.vue'
+import Toolbar from '../ui/Toolbar.vue'
+import { statusTone } from '../ui/tone.js'
 
 const props = defineProps({
   taxonId: { type: String, required: true },

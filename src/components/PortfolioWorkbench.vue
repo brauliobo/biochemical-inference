@@ -1,9 +1,9 @@
 <script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { loadPortfolioModels, runPortfolioExperiment } from '../api.js'
-import ChartFrame from './ui/ChartFrame.vue'
-import Section from './ui/Section.vue'
-import { badgeClass, statusTone } from './ui/tone.js'
+import ChartFrame from '../ui/ChartFrame.vue'
+import Section from '../ui/Section.vue'
+import { badgeClass, statusTone } from '../ui/tone.js'
 
 const models = ref([])
 const modelId = ref('')

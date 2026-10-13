@@ -3,9 +3,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { APAP_RELEASE_ID, APAP_WARNING } from '../../shared/apap-contracts.js'
 import { loadApapWorkspace, runApapBenchmark } from '../api.js'
 import SpatialTissueWorkbench from './SpatialTissueWorkbench.vue'
-import DataTable from './ui/DataTable.vue'
-import Field from './ui/Field.vue'
-import Panel from './ui/Panel.vue'
+import DataTable from '../ui/DataTable.vue'
+import Field from '../ui/Field.vue'
+import Panel from '../ui/Panel.vue'
 
 const emit = defineEmits(['completed'])
 

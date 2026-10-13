@@ -1,4 +1,0 @@
-{
-  "comment": "Legacy components not yet migrated to <script setup vapor> + <template lang=\"pug\">. This list may only shrink; when it is empty, delete src/vapor-interop.js. See docs/CONVENTIONS.md.",
-  "files": []
-}

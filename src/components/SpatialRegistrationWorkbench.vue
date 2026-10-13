@@ -12,9 +12,9 @@ import {
   transformSpatialRegistrationPoint,
   verifySpatialRegistrationIntegrity
 } from '../api.js'
-import DataTable from './ui/DataTable.vue'
-import Field from './ui/Field.vue'
-import Panel from './ui/Panel.vue'
+import DataTable from '../ui/DataTable.vue'
+import Field from '../ui/Field.vue'
+import Panel from '../ui/Panel.vue'
 
 const TONES = { ready: 'success', failed: 'danger' }
 const statusTone = (value) => TONES[value] ?? ''

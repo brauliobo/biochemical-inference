@@ -10,10 +10,10 @@ import {
   runMeasuredCalibration,
   syncMeasured
 } from '../api.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import Toolbar from './ui/Toolbar.vue'
-import { statusTone } from './ui/tone.js'
+import Metric from '../ui/Metric.vue'
+import Section from '../ui/Section.vue'
+import Toolbar from '../ui/Toolbar.vue'
+import { statusTone } from '../ui/tone.js'
 
 const CALIBRATION_GROUPS = Object.freeze([
   'group:cebs0004:dose-0',

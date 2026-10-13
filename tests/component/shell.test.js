@@ -86,14 +86,13 @@ describe('workbench routes', () => {
     expect(links).toHaveLength(workbenches.length)
   })
 
-  it('lazy-loads a migrated workbench inside the Vapor shell without the legacy wrapper', async () => {
+  it('lazy-loads a workbench inside the Vapor shell', async () => {
     api.loadPortfolioModels.mockResolvedValue([])
     navigate('/workbench/portfolio')
     mountVapor(App)
 
     expect(await screen.findByRole('heading', { level: 2, name: 'ODE · SSA · FBA workbench' })).toBeTruthy()
     expect(screen.getByRole('region', { name: 'ODE · SSA · FBA workbench' })).toBeTruthy()
-    expect(document.querySelector('.legacy-workbench')).toBeNull()
     expect(api.loadPortfolioModels).toHaveBeenCalled()
   })
 
@@ -104,7 +103,6 @@ describe('workbench routes', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'MTHFR evidence atlas' })).toBeTruthy()
     expect(screen.getByText(/requires the API server/).closest('[role="status"]')).toBeTruthy()
-    expect(document.querySelector('.legacy-workbench')).toBeNull()
   })
 
   it('reports an unknown workbench as not found', async () => {

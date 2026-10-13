@@ -13,7 +13,7 @@ import {
   syncChallenge,
   verifyChallengeIntegrity
 } from '../api.js'
-import Panel from './ui/Panel.vue'
+import Panel from '../ui/Panel.vue'
 
 const resultTone = Object.freeze({ failed: 'notice--danger', 'not-evaluable': 'notice--warning', 'supported-within-boundary': 'notice--success' })
 const supportTone = Object.freeze({ unsupported: 'badge--danger', 'not-evaluable': 'badge--warning', 'supported-within-boundary': 'badge--success' })

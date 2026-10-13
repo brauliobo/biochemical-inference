@@ -8,8 +8,8 @@ import {
   loadEvidenceHealth,
   searchEvidence
 } from '../api.js'
-import Field from './ui/Field.vue'
-import Panel from './ui/Panel.vue'
+import Field from '../ui/Field.vue'
+import Panel from '../ui/Panel.vue'
 
 const props = defineProps({ suggestedQuery: { type: String, default: 'MTHFR' } })
 

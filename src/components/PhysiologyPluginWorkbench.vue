@@ -1,10 +1,10 @@
 <script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { createPhysiologyCoupling, loadPhysiologyWorkbench, runPhysiologyConformance, runPhysiologyCoupling } from '../api.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import Toolbar from './ui/Toolbar.vue'
-import { badgeClass } from './ui/tone.js'
+import Metric from '../ui/Metric.vue'
+import Section from '../ui/Section.vue'
+import Toolbar from '../ui/Toolbar.vue'
+import { badgeClass } from '../ui/tone.js'
 
 const workspace = ref()
 const state = ref('loading')

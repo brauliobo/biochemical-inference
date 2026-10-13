@@ -1,9 +1,9 @@
 <script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { loadParameterOptions, runParameterStudy } from '../api.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import { badgeClass, statusTone } from './ui/tone.js'
+import Metric from '../ui/Metric.vue'
+import Section from '../ui/Section.vue'
+import { badgeClass, statusTone } from '../ui/tone.js'
 
 const options = ref()
 const record = ref()

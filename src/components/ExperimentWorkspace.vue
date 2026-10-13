@@ -21,9 +21,9 @@ import {
   queueWorkspaceRun,
   restartWorkspaceCheckpoint
 } from '../api.js'
-import DataTable from './ui/DataTable.vue'
-import Field from './ui/Field.vue'
-import Panel from './ui/Panel.vue'
+import DataTable from '../ui/DataTable.vue'
+import Field from '../ui/Field.vue'
+import Panel from '../ui/Panel.vue'
 
 const TONES = { ready: 'success', successful: 'success', failed: 'danger', 'resource-exhausted': 'danger', cancelled: 'warning' }
 const statusTone = (value) => TONES[value] ?? ''

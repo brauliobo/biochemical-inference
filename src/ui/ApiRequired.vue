@@ -1,11 +1,13 @@
 <script setup vapor>
+import Notice from './Notice.vue'
+
 // Shown instead of a workbench that needs the Fastify API when the app is
 // built in static mode (GitHub Pages). The only place that explains this.
 defineProps({ title: { type: String, default: 'This workbench' } })
 </script>
 
 <template lang="pug">
-.notice.notice--warning.stack.stack--tight(role="status")
+Notice(tone="warning" role="status")
   p
     strong {{ title }} requires the API server.
   p.

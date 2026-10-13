@@ -12,10 +12,10 @@ import {
   reconcileRevalidationCampaign,
   verifyRevalidationIntegrity
 } from '../api.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import Toolbar from './ui/Toolbar.vue'
-import { badgeClass, statusTone } from './ui/tone.js'
+import Metric from '../ui/Metric.vue'
+import Section from '../ui/Section.vue'
+import Toolbar from '../ui/Toolbar.vue'
+import { badgeClass, statusTone } from '../ui/tone.js'
 
 const status = ref()
 const campaigns = ref([])

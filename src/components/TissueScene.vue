@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { resolveExistingBin, scaleValue } from '../spatial.js'
-import { minimumHeight, onSchemeChange, readSceneColors } from './ui/scene-colors.js'
+import { minimumHeight, onSchemeChange, readSceneColors } from '../ui/scene-colors.js'
 
 const props = defineProps({
   cells: { type: Array, required: true },

@@ -24,12 +24,11 @@ export default defineConfig({
     // The Node entry of `vue` is a CJS build without Vapor. Resolve the same
     // ESM bundler builds the browser uses (not the "node" export condition) and
     // inline every package that imports Vue, so the whole test graph shares one
-    // Vue instance. @testing-library/vue is CJS (it would require a second Vue),
-    // so it is replaced by an ESM drop-in; see tests/helpers/testing-library-vue.js.
+    // Vue instance. Tests import '@testing-library/vue', which is an ESM helper
+    // that mounts Vapor components; see tests/helpers/testing-library-vue.js.
     alias: [
       { find: /^@testing-library\/vue$/, replacement: fileURLToPath(new URL('./tests/helpers/testing-library-vue.js', import.meta.url)) },
       { find: /^vue$/, replacement: 'vue/dist/vue.runtime.esm-bundler.js' },
-      { find: /^@vue\/test-utils$/, replacement: fileURLToPath(new URL('./node_modules/@vue/test-utils/dist/vue-test-utils.esm-bundler.mjs', import.meta.url)) },
       { find: /^@vue\/(runtime-dom|runtime-core|reactivity|shared)$/, replacement: '@vue/$1/dist/$1.esm-bundler.js' }
     ],
     server: { deps: { inline: [/node_modules\/@vue\//, /node_modules\/vue\//] } }

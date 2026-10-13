@@ -1,4 +1,6 @@
 <script setup vapor>
+import Disclosure from './Disclosure.vue'
+
 // A figure around one chart: a caption (title and optional current value), the
 // chart itself (default slot, an <svg role="img" aria-label>), a visible text
 // summary, an optional legend, and an optional data table behind a disclosure.
@@ -21,8 +23,7 @@ figure.stack.stack--tight(:aria-labelledby="`${id}-caption`")
   p.muted(v-if="summary") {{ summary }}
   .cluster(v-if="$slots.legend")
     slot(name="legend")
-  details(v-if="$slots.table")
-    summary {{ tableLabel }}
+  Disclosure(v-if="$slots.table" :summary="tableLabel")
     .scroll-x(role="region" tabindex="0" :aria-label="`${title}: data table`")
       slot(name="table")
 </template>
