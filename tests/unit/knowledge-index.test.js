@@ -33,7 +33,7 @@ describe('knowledge singleton', () => {
 describe('data/index.js', () => {
   it('statically imports every content file and concatenates them', () => {
     const source = readFileSync(resolve(import.meta.dirname, '../../src/knowledge/data/index.js'), 'utf8')
-    const files = ['compounds', 'interventions', 'enzymes', 'reactions', 'pathways', 'states', 'diseases', 'outcomes', 'systems', 'claims', 'articles']
+    const files = ['compounds', 'metabolites', 'interventions', 'enzymes', 'reactions', 'pathways', 'states', 'diseases', 'outcomes', 'systems', 'claims', 'articles']
     for (const file of files) expect(source).toContain(`from './${file}.js'`)
     expect(source).not.toMatch(/import\.meta\.glob\(/)
   })

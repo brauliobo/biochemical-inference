@@ -110,6 +110,41 @@ Warnings: `unverified-article` (`verified: false`) and `claim-flagged-no-evidenc
 
 The graph builder itself never throws on bad data; it records problems (`graph.dangling`, `graph.duplicates`, `graph.malformedMentions`, `graph.unknownRelations`) and skips them, so the site keeps rendering while validation tells you what to fix.
 
+`tests/unit/knowledge-data.test.js` runs the same validation over the real dataset and fails on any error, so a data change that breaks a reference, drops a type below its floor or leaves an established entity without a source cannot merge.
+
+## Data files and conventions
+
+| file | holds |
+| --- | --- |
+| `compounds.js` | nutrients, drugs-as-molecules, hormones, amino acids, bile acids, neurotransmitters |
+| `metabolites.js` | water, protons, nucleotides, NAD(P)(H), CoA, ETF, thioredoxin, pathway intermediates: the small molecules that appear only as reaction participants |
+| `enzymes.js`, `reactions.js`, `pathways.js`, `states.js`, `diseases.js`, `outcomes.js`, `systems.js`, `interventions.js` | one type each |
+| `claims.js` | atomic statements from the source conversation, graded against the literature |
+| `articles.js` | verified papers, guidelines and database papers; bibliographic fields come from PubMed or Crossref |
+
+Conventions settled when the files were merged:
+
+- One canonical id per concept: `compound:5-mthf` (not `5-methyl-thf`), `intervention:ppi-therapy`, `intervention:p5p-supplement`, `enzyme:glycine-cleavage-system`. Retired aliases are asserted absent in the data test.
+- Gene-family enzymes have a family entity plus isoform entities (`enzyme:shmt` with `shmt1`/`shmt2`, `enzyme:gad` with `gad1`/`gad2`, `enzyme:mat` with `mat1a`/`mat2a`, `enzyme:glycine-cleavage-system` with its four proteins). Reactions list the isoforms in `reaction.enzymes`; cofactor and substrate relations may point at the family.
+- A compound made from another compound is written `precursor-of` on the parent. `product-of`/`substrate-of` link a compound to a reaction, enzyme or pathway only, and a microbial source is written `increases` from the system.
+- Generic placeholders used by databases (`compound:hydrogen-acceptor`, the ETF and thioredoxin redox pairs) are real entities graded `plausible` or tied to a review, and the body says they are bookkeeping.
+- Evidence edges carry the caveat: a weak, animal-only or second-hand source is attached with a note saying so, and counter-evidence is an `evidence-against` edge written on the article.
+
+## Current coverage
+
+Output of `npm run kb:validate` (0 errors, 4 warnings):
+
+| type | entities | | type | entities |
+| --- | ---: | --- | --- | ---: |
+| compound | 137 | | intervention | 48 |
+| enzyme | 63 | | claim | 54 |
+| reaction | 59 | | system | 16 |
+| pathway | 22 | | outcome | 35 |
+| state | 13 | | disease | 23 |
+| article | 239 | | **total** | **709** |
+
+2,997 relations (2,039 declared, 958 derived from `refs` and reaction blocks) and 3,333 body mentions. Evidence grades: 499 established, 176 plausible, 33 speculative, 1 conversation-only. The four warnings are conversation claims flagged `unsupported` for which no literature was found for or against (`claim:higher-ph-delays-les-closure-and-pylorus`, `claim:undermethylated-have-functional-b6-deficiency`, `claim:undermethylated-hypochlorhydria`, `claim:undermethylation-causes-subclinical-vagal-dysfunction`).
+
 ## Using the engine
 
 ```js
