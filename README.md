@@ -1,8 +1,53 @@
 # Biochemical Inference
 
-A controlled, inspectable demonstration of one-carbon metabolism, standards-based ODE/SSA/FBA, a durable local experiment workspace, parameter inference, a bounded human/mouse APAP liver benchmark, a contextual MTHFR atlas, and license-aware literature evidence intelligence. The active application uses Vue 3, JavaScript (ES6), Vite, Pug, Fastify, Three.js, Node 22 `node:sqlite`, and the sibling JavaScript/PGlite biochemical-db service. It does not use or build the legacy Jekyll/Riot prototype.
+An educational knowledge site on methylation biochemistry, with a set of interactive modelling workbenches next to it.
+
+- **Knowledge site** (works with no server). About 760 cross-linked entries (compounds, enzymes, reactions, pathways, states, diseases, outcomes, systems, interventions, claims and cited articles), each on its own page with an evidence grade, its relationships in both directions and its sources. Search that ignores case and accents (Portuguese aliases included), a neighbourhood map, a "how is A connected to B?" finder, a claims audit, and nine **guided paths**: short reading routes through the graph, one step per page, each with the reason it comes next.
+- **Workbenches** (need the local API). One-carbon metabolism simulation, parameter studies, a human/mouse APAP liver benchmark, spatial tissue views, a contextual MTHFR atlas, literature evidence, a durable experiment workspace and more. They are illustrative models.
+
+The client is Vue 3.6 Vapor components with Pug templates on a token-based CSS design system, with hash routing so it works from any sub-path. The API is Fastify with Node 22 `node:sqlite`, Three.js for the 3D views, and a sibling `biochemical-db` service for pinned data releases. It does not use or build the legacy Jekyll/Riot prototype.
 
 This software is an educational systems model. Its initial conditions and kinetics are illustrative, not measured physiology, and its output is not clinical, diagnostic, or treatment guidance.
+
+## Live site
+
+The static edition (the knowledge site; workbenches show an "API required" notice) is deployed to GitHub Pages by `.github/workflows/pages.yml` on every push to `master`:
+
+`https://brauliobo.github.io/biochemical-inference/`
+
+Routes are hash routes, so any page can be bookmarked or shared and survives a reload under the sub-path:
+
+| Page | URL |
+|---|---|
+| Home | `/#/` |
+| Knowledge base | `/#/kb` |
+| One kind / one entry | `/#/kb/enzyme`, `/#/kb/enzyme/gnmt` |
+| Guided paths, and one step of one path | `/#/kb/paths`, `/#/kb/paths/glycine-belching-question?step=3` |
+| Map | `/#/kb/map?id=compound%3Aglycine` |
+| Workbenches | `/#/workbench` |
+
+## Quick start: the knowledge site
+
+```sh
+npm ci
+npm run dev:web          # http://127.0.0.1:5173, no API needed for the knowledge site
+```
+
+| Command | Does |
+|---|---|
+| `npm run build:static` | API-less build into `dist-static/` (what Pages publishes); `VITE_BASE=/sub/path/` sets the public path |
+| `npx vite preview --outDir dist-static` | serve that build locally |
+| `npm run build` | full client build plus the server bundle (`dist/`, `server-dist/`) |
+| `npm test` | routine unit, component and API tests |
+| `npm run check` | syntax check, test selection, tests and build |
+| `npm run test:e2e:static` | browser tests (axe, keyboard, task success) against `dist-static` |
+| `npm run kb:validate` | validate the knowledge data and the guided paths |
+
+## Documentation index
+
+- Using and extending the site: [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) (components, routes, tests), [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) (tokens, layout primitives, `src/ui`), [`docs/VAPOR.md`](docs/VAPOR.md), [`docs/USABILITY.md`](docs/USABILITY.md) (ISO 9241-11 targets and measured results), [`docs/KNOWLEDGE_MODEL.md`](docs/KNOWLEDGE_MODEL.md) (entity contract, relations, evidence grades, validation, guided paths).
+- Architecture and operations: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/OPERATIONS.md`](docs/OPERATIONS.md), [`docs/GOALS.md`](docs/GOALS.md), [`docs/RELEASE_BLOCKERS.md`](docs/RELEASE_BLOCKERS.md).
+- Workbench and data-plane contracts are listed at the end of this file (`docs/ATLAS_EXPLORER.md`, `docs/EVIDENCE_PANEL.md`, `docs/APAP_BENCHMARK.md`, `docs/DATA_PLANE.md` and the rest).
 
 ## Requirements
 
@@ -12,7 +57,7 @@ This software is an educational systems model. Its initial conditions and kineti
 
 For a fresh-machine production workflow, explicit key/token generation, supervised startup, deterministic backup/restore, upgrade/rollback rehearsal, metrics, and SBOM/provenance commands, use [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
-## Start
+## Full stack: workbenches and API
 
 ```sh
 DB_RUNTIME="${XDG_DATA_HOME:-$HOME/.local/share}/biochemical-db/service-js"
@@ -65,7 +110,7 @@ npm start
 
 ## Knowledge site and GitHub Pages
 
-The client is an educational knowledge site (hash routes: `/#/`, `/#/kb`, `/#/kb/:type/:slug`) plus the workbenches. It is written as Vue 3.6 Vapor components with Pug templates on a token-based CSS design system; see [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md), [`docs/VAPOR.md`](docs/VAPOR.md), [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) and the usability targets in [`docs/USABILITY.md`](docs/USABILITY.md).
+The client is an educational knowledge site (hash routes: `/#/`, `/#/kb`, `/#/kb/paths`, `/#/kb/:type/:slug`) plus the workbenches. It is written as Vue 3.6 Vapor components with Pug templates on a token-based CSS design system; see [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md), [`docs/VAPOR.md`](docs/VAPOR.md), [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) and the usability targets in [`docs/USABILITY.md`](docs/USABILITY.md).
 
 `.github/workflows/pages.yml` builds the static, API-less edition (`npm run build:static`, output `dist-static/`, never committed) and deploys it with GitHub Actions on every push to `master` or on demand. In the repository settings, set **Pages > Build and deployment > Source** to **GitHub Actions** once. The site is then at `https://<owner>.github.io/<repository>/`; hash routing means deep links work without a `404.html`. Workbenches that need the API show a notice there.
 
