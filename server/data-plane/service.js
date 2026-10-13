@@ -1,7 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdtemp, realpath, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import {
   AuthorityClosureAuditReportSchema,
@@ -21,10 +18,15 @@ import {
   FactorySemanticDiffSchema,
   FactoryTrustStoreSchema
 } from '../../shared/data-plane-contracts.js'
+import { decodeCursor, decodeSecret, encodeCursor } from '../commons/cursor.js'
+import { canonicalSha256Hex } from '../commons/digest.js'
+import { isoNow as now } from '../commons/clock.js'
+import { defineRequestError } from '../commons/errors.js'
+import { transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { createFactoryClient } from './client.js'
 import { openDataPlaneDatabase } from './database.js'
 import { createDataPlaneObjectStore } from './object-store.js'
-import { assertNoSymlinkAncestors, ensurePrivateDirectory } from './safe-path.js'
 import {
   DataPlaneVerificationError,
   RECORD_TYPES,
@@ -44,47 +46,23 @@ const FILTER_COLUMNS = Object.freeze({
   limitations: new Set(['id'])
 })
 const TEST_CURSOR_SECRET = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-const now = () => new Date().toISOString()
 
-export class DataPlaneRequestError extends Error {
-  constructor(code, message, statusCode = 422) {
-    super(message)
-    this.name = 'DataPlaneRequestError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const DataPlaneRequestError = defineRequestError('DataPlaneRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
-
-async function selectRoot(options, env) {
-  const configured = options.root ?? env.BIOCHEMICAL_DATA_PLANE_ROOT
-  if (!configured && env.NODE_ENV === 'test') {
-    const testRoot = resolve(env.BIOCHEMICAL_TEST_DATA_PLANE_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await assertNoSymlinkAncestors(testRoot)
-    await ensurePrivateDirectory(testRoot)
-    const root = await mkdtemp(resolve(testRoot, 'data-plane-'))
-    await ensurePrivateDirectory(root)
-    return { root, ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'data-plane-v2'))
-  if (inside(resolve(process.cwd()), root)) throw new DataPlaneRequestError('data_plane_root_in_source', 'Data-plane storage root must be outside the source tree.', 500)
-  await assertNoSymlinkAncestors(root)
-  await ensurePrivateDirectory(root)
-  const [sourceRealPath, rootRealPath] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceRealPath, rootRealPath)) throw new DataPlaneRequestError('data_plane_root_in_source', 'Data-plane storage root must be outside the source tree.', 500)
-  await assertNoSymlinkAncestors(rootRealPath)
-  return { root: rootRealPath, ephemeral: false }
+function selectRoot(options, env) {
+  return selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_DATA_PLANE_ROOT,
+    test: env.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_DATA_PLANE_ROOT), prefix: 'data-plane-' } : null,
+    defaultName: 'data-plane-v2',
+    secure: true,
+    inSourceError: () => new DataPlaneRequestError('data_plane_root_in_source', 'Data-plane storage root must be outside the source tree.', 500)
+  })
 }
 
 export function decodeCursorSecret(value) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value)) throw new DataPlaneRequestError('data_plane_cursor_secret_invalid', 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET must be unpadded base64url for exactly 32 bytes.', 500)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== 32 || decoded.toString('base64url') !== value) throw new DataPlaneRequestError('data_plane_cursor_secret_invalid', 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET is not canonical base64url.', 500)
-  return decoded
+  return decodeSecret(value, (reason) => {
+    throw new DataPlaneRequestError('data_plane_cursor_secret_invalid', reason === 'shape' ? 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET must be unpadded base64url for exactly 32 bytes.' : 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET is not canonical base64url.', 500)
+  })
 }
 
 function cursorSecret(env) {
@@ -93,44 +71,15 @@ function cursorSecret(env) {
   return decodeCursorSecret(value)
 }
 
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const value = action()
-    database.exec('COMMIT')
-    return value
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
-}
-
 function generationRelease(row) {
   return { id: row.release_id, schema_version: row.schema_version, digest: row.release_digest }
 }
 
-function strictCursorDecode(value, secret) {
-  try {
-    if (typeof value !== 'string' || value.length > 8192 || value.length % 4 === 1 || !/^[A-Za-z0-9_-]+$/.test(value)) throw new Error('shape')
-    const raw = Buffer.from(value, 'base64url')
-    if (raw.toString('base64url') !== value || raw.length <= 32) throw new Error('encoding')
-    const encoded = raw.subarray(0, -32)
-    const signature = raw.subarray(-32)
-    const expected = createHmac('sha256', secret).update(encoded).digest()
-    if (!timingSafeEqual(signature, expected)) throw new Error('signature')
-    const payload = JSON.parse(encoded.toString('utf8'))
-    if (canonicalJson(payload) !== encoded.toString('utf8')) throw new Error('canonical')
-    return payload
-  } catch {
-    throw new DataPlaneRequestError('data_plane_cursor_invalid', 'Local data-plane cursor is invalid or tampered.')
-  }
-}
+const strictCursorDecode = (value, secret) => decodeCursor(value, secret, () => {
+  throw new DataPlaneRequestError('data_plane_cursor_invalid', 'Local data-plane cursor is invalid or tampered.')
+}, { strictLength: true })
 
-function cursorEncode(payload, secret) {
-  const encoded = Buffer.from(canonicalJson(payload))
-  const signature = createHmac('sha256', secret).update(encoded).digest()
-  return Buffer.concat([encoded, signature]).toString('base64url')
-}
+const cursorEncode = encodeCursor
 
 function rowObject(database, objects, row, field, expectedBytes) {
   const digest = row[field]
@@ -361,7 +310,7 @@ export async function createDataPlaneService(options = {}) {
         const report = parseCanonicalBytes(encoded, AuthorityClosureAuditReportSchema, `Authority closure audit ${auditRow.report_digest}`)
         const digestValue = { ...report }
         delete digestValue.reportDigest
-        const computed = sha256(Buffer.from(canonicalJson(digestValue)))
+        const computed = canonicalSha256Hex(digestValue)
         if (computed !== report.reportDigest || report.reportDigest !== auditRow.report_digest || !sameValue(digestValue, expectedAuditValue) || report.algorithmVersion !== auditRow.algorithm_version || auditRow.candidate_generation_id !== candidate.generation_id || auditRow.baseline_generation_id !== baseline.generation_id) throw new DataPlaneVerificationError(`Authority closure audit ${auditRow.report_digest} has invalid immutable identity or release pins.`)
       }
 
@@ -593,7 +542,7 @@ export async function createDataPlaneService(options = {}) {
       const diffBytes = await rowObject(database, objects, diffRow, 'object_digest')
       const semanticDiff = verifyStoredBundle(new Map([[baseline.release.id, baseline], [candidate.release.id, candidate]]), diffBytes)
       const digestValue = authorityAuditValue(candidateRow, baselineRow, candidate, baseline, diffRow, semanticDiff)
-      const reportDigest = sha256(Buffer.from(canonicalJson(digestValue)))
+      const reportDigest = canonicalSha256Hex(digestValue)
       const report = AuthorityClosureAuditReportSchema.parse({ ...digestValue, reportDigest })
       const encoded = Buffer.from(canonicalJson(report))
       transaction(database, () => {

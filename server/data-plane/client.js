@@ -1,4 +1,5 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { readBoundedBody, timeoutSignal, validateLoopbackOrigin } from '../commons/upstream.js'
 import {
   DATA_PLANE_BASELINE_RELEASE_ID,
   DATA_PLANE_CANDIDATE_RELEASE_ID,
@@ -37,46 +38,10 @@ export class DataPlaneUpstreamError extends DataPlaneVerificationError {
 }
 
 export function validateLoopbackFactoryUrl(value) {
-  let url
-  try {
-    url = new URL(value)
-  } catch {
-    throw new DataPlaneUpstreamError('Factory upstream URL must be an absolute loopback HTTP URL.', { statusCode: 500, code: 'DATA_PLANE_UPSTREAM_URL_INVALID' })
-  }
-  const loopback = url.hostname === '127.0.0.1' || url.hostname === '[::1]'
-  if (url.protocol !== 'http:' || !loopback || url.username || url.password || url.search || url.hash || (url.pathname !== '/' && url.pathname !== '')) {
-    throw new DataPlaneUpstreamError('Factory upstream is restricted to an origin-only 127.0.0.1 or [::1] HTTP URL.', { statusCode: 500, code: 'DATA_PLANE_UPSTREAM_URL_REJECTED' })
-  }
-  return url.origin
+  return validateLoopbackOrigin(value, { ErrorClass: DataPlaneUpstreamError, subject: 'Factory upstream', codePrefix: 'DATA_PLANE_UPSTREAM', noun: 'URL' })
 }
 
-function combinedSignal(timeoutMs, signal) {
-  const timeout = AbortSignal.timeout(timeoutMs)
-  return signal ? AbortSignal.any([timeout, signal]) : timeout
-}
-
-async function boundedBody(response, maxBytes, label, assertOwnership) {
-  const contentLength = response.headers.get('content-length')
-  if (contentLength === null || !/^(?:0|[1-9][0-9]*)$/.test(contentLength) || Number(contentLength) > maxBytes) throw new DataPlaneUpstreamError(`${label} has a missing, invalid, or excessive Content-Length.`)
-  if (!response.body) throw new DataPlaneUpstreamError(`${label} has no response body.`)
-  const chunks = []
-  let total = 0
-  const reader = response.body.getReader()
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      assertOwnership()
-      if (done) break
-      total += value.byteLength
-      if (total > maxBytes || total > Number(contentLength)) throw new DataPlaneUpstreamError(`${label} exceeded its declared byte boundary.`)
-      chunks.push(Buffer.from(value))
-    }
-  } finally {
-    reader.releaseLock()
-  }
-  if (total !== Number(contentLength)) throw new DataPlaneUpstreamError(`${label} body length does not match Content-Length.`)
-  return Buffer.concat(chunks, total)
-}
+const boundedBody = (response, maxBytes, label, assertOwnership) => readBoundedBody(response, { maximum: maxBytes, label, ErrorClass: DataPlaneUpstreamError, onRead: assertOwnership })
 
 function exactHeaders(response, mediaType, digest, label, extra = {}) {
   if (response.headers.get('content-type') !== mediaType) throw new DataPlaneUpstreamError(`${label} returned incompatible media type ${response.headers.get('content-type') ?? '(missing)'}; expected ${mediaType}.`)
@@ -97,7 +62,7 @@ export function createFactoryClient(env = process.env, options = {}) {
         method: 'GET',
         headers: { accept: mediaType },
         redirect: 'manual',
-        signal: combinedSignal(timeoutMs, signal)
+        signal: timeoutSignal(timeoutMs, signal)
       })
       assertOwnership()
     } catch (error) {
