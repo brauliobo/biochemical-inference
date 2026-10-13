@@ -52,7 +52,7 @@ npm ci
 npm run dev
 ```
 
-The workbench is served at the configured exact origin, `http://127.0.0.1:5173`; Vite proxies `/api` to the inference API at `http://127.0.0.1:3000`.
+The site is served at the configured exact origin, `http://127.0.0.1:5173`; Vite proxies `/api` to the inference API at `http://127.0.0.1:3000`. The workbenches are under `/#/workbench` (the original single page is `/#/workbench/full`).
 
 For production-like local operation:
 
@@ -62,6 +62,12 @@ npm start
 ```
 
 `npm start` serves the API and built client on `http://localhost:3000`.
+
+## Knowledge site and GitHub Pages
+
+The client is an educational knowledge site (hash routes: `/#/`, `/#/kb`, `/#/kb/:type/:slug`) plus the workbenches. It is written as Vue 3.6 Vapor components with Pug templates on a token-based CSS design system; see [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md), [`docs/VAPOR.md`](docs/VAPOR.md), [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) and the usability targets in [`docs/USABILITY.md`](docs/USABILITY.md).
+
+`.github/workflows/pages.yml` builds the static, API-less edition (`npm run build:static`, output `dist-static/`, never committed) and deploys it with GitHub Actions on every push to `master` or on demand. In the repository settings, set **Pages > Build and deployment > Source** to **GitHub Actions** once. The site is then at `https://<owner>.github.io/<repository>/`; hash routing means deep links work without a `404.html`. Workbenches that need the API show a notice there.
 
 ## Knowledge source
 
