@@ -1,8 +1,7 @@
-import { createHash } from 'node:crypto'
 import { lstat, readFile, readdir, readlink } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
-import { compareUtf8 } from '../../server/commons/digest.js'
+import { canonicalSha256Hex, compareUtf8, sha256Hex } from '../../server/commons/digest.js'
 import { inside } from '../../server/commons/paths.js'
 
 export function deploymentClosure(root, repository) {
@@ -47,11 +46,11 @@ export async function deploymentTreeDigest(root, repository) {
     const bytes = await readFile(path)
     const after = await lstat(path, { bigint: true })
     if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size || before.mtimeNs !== after.mtimeNs || before.ctimeNs !== after.ctimeNs) throw new Error(`deployment file changed while it was verified: ${name}`)
-    entries.push({ path: name, type: 'file', mode, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') })
+    entries.push({ path: name, type: 'file', mode, bytes: bytes.length, sha256: sha256Hex(bytes) })
   }
   for (const item of selectedClosure) await visit(item.path, item.name)
   entries.sort((left, right) => compareUtf8(left.path, right.path))
-  return createHash('sha256').update(canonicalJson({ artifact_tree_schema_version: 'biochemical-runnable-tree-v2', entries })).digest('hex')
+  return canonicalSha256Hex({ artifact_tree_schema_version: 'biochemical-runnable-tree-v2', entries })
 }
 
 export async function verifyDeploymentTree(root, repository, marker) {

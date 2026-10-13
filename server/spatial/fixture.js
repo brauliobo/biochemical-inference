@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { sha256Hex } from '../commons/digest.js'
 import {
   SPATIAL_CONTRACT_VERSION,
   SPATIAL_RELEASE_DIGEST,
@@ -181,7 +181,7 @@ const content = new Map(Object.entries({
 
 for (const item of inventory) {
   const body = content.get(item.id)
-  if (!body || body.length !== item.bytes || createHash('sha256').update(body).digest('hex') !== item.sha256) throw new Error(`Invalid spatial fixture content ${item.id}`)
+  if (!body || body.length !== item.bytes || sha256Hex(body) !== item.sha256) throw new Error(`Invalid spatial fixture content ${item.id}`)
 }
 
 const envelope = (items) => ({ release: FIXTURE_SPATIAL_RELEASE, items })

@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { sha256Hex } from '../commons/digest.js'
 import {
   SPATIAL_MAX_CONTENT_BYTES,
   SPATIAL_RELEASE_DIGEST,
@@ -34,7 +34,7 @@ function canonicalDigest(value) {
     : item && typeof item === 'object'
       ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, sort(item[key])]))
       : item
-  return createHash('sha256').update(JSON.stringify(sort(value))).digest('hex')
+  return sha256Hex(JSON.stringify(sort(value)))
 }
 
 export function createSpatialClient(env = process.env) {
@@ -136,7 +136,7 @@ export function createSpatialClient(env = process.env) {
       const expectedBytes = range ? range.end - range.start + 1 : item.bytes
       if (body.length !== expectedBytes || body.length > SPATIAL_MAX_CONTENT_BYTES) throw new SpatialCompatibilityError('Spatial content byte count does not match the verified inventory')
       if (range && response.headers.get('content-range') !== `bytes ${range.start}-${range.end}/${item.bytes}`) throw new SpatialCompatibilityError('Spatial upstream returned an incompatible content range')
-      if (!range && createHash('sha256').update(body).digest('hex') !== item.sha256) throw new SpatialCompatibilityError('Spatial content SHA-256 does not match the verified inventory')
+      if (!range && sha256Hex(body) !== item.sha256) throw new SpatialCompatibilityError('Spatial content SHA-256 does not match the verified inventory')
       return { body, statusCode: response.status, item, range }
     }
   }

@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
 import { KnowledgeSnapshotSchema } from '../../shared/snapshot-contracts.js'
 import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from './fixture.js'
 
@@ -38,7 +38,7 @@ function releasePayloadBytes(payload) {
 
 export function snapshotDigest(snapshot) {
   const { snapshot_digest: _digest, ...content } = snapshot
-  return createHash('sha256').update(canonicalJson(content), 'utf8').digest('hex')
+  return canonicalSha256Hex(content)
 }
 
 export function verifyKnowledgeSnapshot(rawSnapshot, options = {}) {
@@ -50,7 +50,7 @@ export function verifyKnowledgeSnapshot(rawSnapshot, options = {}) {
   if (options.expectedTaxonId && snapshot.selected_taxon.id !== options.expectedTaxonId) throw new Error('Knowledge snapshot taxon does not match the requested taxon.')
   if (snapshot.release.id !== snapshot.manifest.release_id || snapshot.release.id !== snapshot.provenance.release_id || snapshot.release.digest !== snapshot.manifest.release_digest || snapshot.release.digest !== snapshot.provenance.release_digest) throw new Error('Knowledge snapshot release closure is inconsistent.')
   const { release_digest: _releaseDigest, ...manifestContent } = snapshot.manifest
-  const manifestDigest = createHash('sha256').update(canonicalJson(manifestContent), 'utf8').digest('hex')
+  const manifestDigest = canonicalSha256Hex(manifestContent)
   if (manifestDigest !== snapshot.manifest.release_digest) throw new Error('Knowledge snapshot manifest release digest does not recompute.')
   if (!snapshot.manifest.supported_taxa.includes(snapshot.selected_taxon.id)) throw new Error('Knowledge snapshot taxon is outside the release scope.')
   if (!snapshot.self_contained || snapshot.restricted_dependencies.length > 0) throw new Error('Knowledge snapshot is not self-contained for offline execution.')
@@ -61,7 +61,7 @@ export function verifyKnowledgeSnapshot(rawSnapshot, options = {}) {
   for (const [recordType, payload] of Object.entries(snapshot.release_payloads)) {
     const entry = manifestFiles.get(recordType)
     const bytes = releasePayloadBytes(payload)
-    if (!entry || entry.path !== `${recordType}.json` || entry.bytes !== bytes.length || entry.sha256 !== createHash('sha256').update(bytes).digest('hex') || entry.record_count !== payload.records.length) throw new Error(`Knowledge snapshot ${recordType} payload does not match its manifest file bytes and hash.`)
+    if (!entry || entry.path !== `${recordType}.json` || entry.bytes !== bytes.length || entry.sha256 !== sha256Hex(bytes) || entry.record_count !== payload.records.length) throw new Error(`Knowledge snapshot ${recordType} payload does not match its manifest file bytes and hash.`)
     const identifiers = payload.records.map((item) => item.id)
     if (new Set(identifiers).size !== identifiers.length) throw new Error(`Knowledge snapshot release payload repeats a ${recordType} identifier.`)
   }
@@ -272,7 +272,7 @@ export function bundledKnowledgeSnapshot(taxonId) {
   }))
   const manifestFiles = types.map((type) => {
     const bytes = releasePayloadBytes(releasePayloads[type])
-    return { path: `${type}.json`, sha256: createHash('sha256').update(bytes).digest('hex'), bytes: bytes.length, record_type: type, record_count: payloadRecords[type].length }
+    return { path: `${type}.json`, sha256: sha256Hex(bytes), bytes: bytes.length, record_type: type, record_count: payloadRecords[type].length }
   })
   const content = {
     snapshot_schema_version: '1.0.0',
@@ -311,10 +311,10 @@ export function bundledKnowledgeSnapshot(taxonId) {
     restricted_dependencies: []
   }
   const { release_digest: _releaseDigest, ...manifestContent } = content.manifest
-  const actualReleaseDigest = createHash('sha256').update(canonicalJson(manifestContent), 'utf8').digest('hex')
+  const actualReleaseDigest = canonicalSha256Hex(manifestContent)
   content.release.digest = actualReleaseDigest
   content.manifest.release_digest = actualReleaseDigest
   content.provenance.release_digest = actualReleaseDigest
-  const snapshot = { ...content, snapshot_digest: createHash('sha256').update(canonicalJson(content), 'utf8').digest('hex') }
+  const snapshot = { ...content, snapshot_digest: canonicalSha256Hex(content) }
   return verifyKnowledgeSnapshot(snapshot, { expectedReleaseId: snapshotReleaseId, expectedReleaseDigest: actualReleaseDigest, expectedTaxonId: selectedTaxon.id })
 }

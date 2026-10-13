@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createHash, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { cp, lstat, mkdir, mkdtemp, open, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -8,6 +8,7 @@ import { canonicalJson } from '../shared/canonical-json.js'
 import { inspectNoSymlinkPath } from '../server/operations/path-safety.js'
 import { deploymentTreeDigest } from './operations/deployment-identity.js'
 import { flags, git } from './operations/cli.js'
+import { canonicalSha256Hex, sha256Hex } from '../server/commons/digest.js'
 
 function run(command, arguments_, options = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -29,12 +30,12 @@ async function artifactDigest(roots) {
         const bytes = await readFile(path)
         const after = await lstat(path, { bigint: true })
         if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size || before.mtimeNs !== after.mtimeNs || before.ctimeNs !== after.ctimeNs) throw new Error('built artifact changed while it was hashed')
-        files.push({ path: `${prefix}/${relative(base, path).split(sep).join('/')}`, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') })
+        files.push({ path: `${prefix}/${relative(base, path).split(sep).join('/')}`, bytes: bytes.length, sha256: sha256Hex(bytes) })
       } else throw new Error('built artifact contains a special file')
     }
   }
   for (const item of roots) await visit(item.root, item.root, item.name)
-  return createHash('sha256').update(canonicalJson({ artifact_tree_schema_version: '1.0.0', files })).digest('hex')
+  return canonicalSha256Hex({ artifact_tree_schema_version: '1.0.0', files })
 }
 
 const selected = flags(process.argv.slice(2))
@@ -104,7 +105,7 @@ try {
   const published = await lstat(output, { bigint: true })
   if (published.dev !== outputIdentity.dev || published.ino !== outputIdentity.ino) throw new Error('deployment archive output ownership changed during publication')
   const bytes = await readFile(output)
-  process.stdout.write(`${JSON.stringify({ artifact_sha256: artifactSha256, bytes: bytes.length, commit, repository: repositoryName, sha256: createHash('sha256').update(bytes).digest('hex') })}\n`)
+  process.stdout.write(`${JSON.stringify({ artifact_sha256: artifactSha256, bytes: bytes.length, commit, repository: repositoryName, sha256: sha256Hex(bytes) })}\n`)
 } catch (error) {
   await outputHandle.close().catch(() => undefined)
   const current = await lstat(output, { bigint: true }).catch(() => null)

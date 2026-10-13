@@ -1,4 +1,4 @@
-import { createHash, createPublicKey, verify as verifySignature } from 'node:crypto'
+import { createPublicKey, verify as verifySignature } from 'node:crypto'
 import { constants } from 'node:fs'
 import { TextDecoder } from 'node:util'
 import { gunzipSync } from 'node:zlib'
@@ -11,6 +11,7 @@ import {
   ProducerPagesSignatureEnvelopeSchema,
   StaticFileDescriptorSchema
 } from '../../shared/entity-mention-handoff-contracts.js'
+import { sha256Hex } from '../commons/digest.js'
 import { openPinnedDirectory, openRegularNoFollow } from '../data-plane/safe-path.js'
 import { parseBoundedJson } from './bounded-json.js'
 import { ENTITY_MENTION_HANDOFF_PINS } from './pins.js'
@@ -121,7 +122,7 @@ export class EntityMentionHandoffVerificationError extends Error {
 }
 
 const fail = (message) => { throw new EntityMentionHandoffVerificationError(message) }
-export const entityMentionSha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
+export const entityMentionSha256 = sha256Hex
 
 function safePath(path) {
   if (typeof path !== 'string' || !SAFE_PATH.test(path) || path.includes('..')) fail(`Unsafe bundle path: ${path}.`)
