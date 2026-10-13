@@ -31,6 +31,7 @@ sensitivity, and cognitive or reading difficulties.
 - T6 Return to, bookmark or share a specific page.
 - T7 Run a workbench model (needs the API; local installation only).
 - T8 Understand what the site is not (educational, not medical advice).
+- T9 Follow a guided path from Home to its last step, and return to a step from a shared link or from an entity page.
 
 **Equipment**: phone (320 CSS px wide and up), tablet, laptop and desktop; touch,
 mouse and keyboard-only input; the current and previous major versions of
@@ -137,7 +138,7 @@ SEQ per task, SUS at the end; fix every task that misses E1 before release.
 ## Results
 
 Automated task measures, static build, Chromium desktop (1280 x 720) and the mobile
-project (360 x 740), 2026-10-13, 54 browser tests passing. An interaction is one
+project (360 x 740), 2026-10-13, 58 browser tests passing. An interaction is one
 click, tap or Enter. Source: `tests/e2e/usability-tasks.spec.js` (prints a `MEASURE` line
 per measure) and `tests/e2e/shell.spec.js`.
 
@@ -155,21 +156,25 @@ per measure) and `tests/e2e/shell.spec.js`.
 | E3 every kind from Home | 1 interaction | 11 of 11 kinds, each first entry 2 interactions |
 | E4 link integrity, all entity pages rendered | 0 broken links | 0 broken, 0 unnamed links on 411 pages; every page links onward |
 | T6 deep link (`?to=`) reopened in a fresh browser | same page and result | passes |
+| T9 follow the glycine-belching guided path from Home to its last step, keyboard only (no pointer) | operable | passes: 10 Tab presses from page load to the path link on Home, Enter, then 3 Tab presses and Enter per step (Read the page, Previous, Next) for 10 steps; 42 Tab presses in all for the 11 steps. Focus lands on the step heading after each step, the URL carries `?step=N`, the progress bar reads "Step N of 11", and the last step has no Next link |
+| T9 a step link (`?step=5`) reopened in a fresh browser; the entity page's "Part of guided paths" link back to its step | same step | passes (a link from the GNMT page opens step 5 of the glycine-belching path) |
 | T8 "not medical advice" notice fully inside the first screen | visible without scrolling | passes at 1280 x 720 (bottom edge 352 px) and 360 x 740 (591 px of 740) |
 | Keyboard only: Tab presses to the search box on Home | n/a | 8 |
 | Keyboard only: search, Down/Up/Escape through results, Enter | operable | passes |
 | Keyboard only: Tab to a reaction link on an entity page, then the "connected to" control | operable | 20 Tab presses to the first reaction or enzyme link; control opens and chooses with Enter |
 | F5 Tab presses to the primary navigation (Home, entity page) | 5 or fewer | 3 and 3 |
 | Focus indicator on every Tab stop (Home, claims, reaction) | always visible | 0 stops without an outline |
-| A1 axe WCAG 2.2 AA, 33 routes (knowledge site, workbench index, all 15 workbenches, unknown routes), light and dark, desktop and mobile | 0 violations | 0 (also with search results, every disclosure open and a filtered listing) |
-| A1 axe WCAG 2.2 AA + best practices in jsdom, 25 routes as pages and 16 workbench states with mocked API data | 0 violations | 0 (the audit is checked to find unlabelled controls, unnamed buttons, bad lists and missing alternatives, `tests/component/axe-helper.test.js`) |
+| A1 axe WCAG 2.2 AA, 39 routes (knowledge site including the guided-path list, first, middle and last step and an unknown path; workbench index, all 15 workbenches, unknown routes), light and dark, desktop and mobile | 0 violations | 0 (also with search results, every disclosure open and a filtered listing) |
+| A1 axe WCAG 2.2 AA + best practices in jsdom, 28 routes as pages (guided-path list, a step and an unknown path included; steps 1, 5 and 11 of a path audited again in `tests/component/kb-paths.test.js`) and 16 workbench states with mocked API data | 0 violations | 0 (the audit is checked to find unlabelled controls, unnamed buttons, bad lists and missing alternatives, `tests/component/axe-helper.test.js`) |
 | A1 the same 16 populated workbench states in Chromium with the built CSS (contrast, target size, reflow), light and dark, desktop and 360 px | 0 violations, no horizontal overflow | 0 violations. It found one defect, fixed: a long digest in the single-page workbench's "Controlled run" grid widened the page by 303 px at 360 px (`.grid > *` now has `min-inline-size: 0` and wraps long identifiers) |
-| A4 buttons, fields, disclosure summaries in `main` on 4 key pages | 44 px or more | 0 under 44 px |
-| A5 horizontal overflow at 320 px, 8 key routes | none | 0 routes overflow |
-| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 41.7 kB (index 34.9 kB; was 71.9 kB before the virtual-DOM interop runtime was removed); the knowledge data chunk (about 328 kB gzip as built today) follows lazily |
+| A4 buttons, fields, disclosure summaries in `main` on 5 key pages (a guided-path step included: Previous / Next and Read the page are buttons-as-links at 44 px) | 44 px or more | 0 under 44 px |
+| A5 horizontal overflow at 320 px, 10 key routes (the guided-path list and a step included) | none | 0 routes overflow |
+| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 47.4 kB (index 33.0 kB; the guided-path cards add the 7.9 kB gzip paths data, 41.7 kB before them); the knowledge data chunk (353 kB gzip as built today) follows lazily |
 
 Not measured here (needs people or devices): E1, E2, F2, F3, S1 to S4, screen readers,
 zoom to 400 percent, forced colours. They stay on the manual list above.
+
+Findings from running the guided-path measures: a path step changes only `?step=`, so the shell does not move focus (it reacts to path changes) and a keyboard user would stay on a link that has just changed meaning; the step view therefore focuses its own step heading after each move, and the page title (announced by the shell) names the step. From `<main>` the first Next link is 5 Tab presses away (three breadcrumb links, Read the page, Next); from the heading it is 3. The cards load the small paths data, not the entity data, so the cards render at first paint.
 
 Findings from running these measures that changed the design: the first build put the
 knowledge data in the home route's initial JavaScript (255 kB, over F4), so the home page

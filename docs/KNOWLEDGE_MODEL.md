@@ -175,11 +175,20 @@ getPath('choline-to-glycine') // { id, title, summary, length, types, steps: [{ 
 pathsFor('enzyme:gnmt')       // paths that visit the entity: [{ id, title, summary, length, position, why }]
 ```
 
-There is no UI for paths yet; the models are shaped for one (an entity page can say "appears in 2 guided paths" from `pathsFor`).
+### Where paths appear in the site
+
+| Place | Route / component | Uses |
+|---|---|---|
+| List | `/#/kb/paths` (`views/kb/KbPathsView.vue`, `components/kb/PathCards.vue`) | `pathList()` |
+| One step of one path | `/#/kb/paths/<id>?step=<n>` (`views/kb/KbPathView.vue`) | `getPath(id)`; `kb/path-steps.js` clamps `?step=` to 1..length and builds the Previous / Next links |
+| Home, `/kb` hub | a "Guided paths" section above "Start here" / the kinds | Home reads `kb/path-cards.js` (paths data only) so the cards render before the entity data loads |
+| Entity page | "Part of guided paths" (`components/kb/EntityPaths.vue`) | `pathsFor(id)`; each link goes to `?step=<position>` with the path's reason |
+
+Both routes are registered before `/kb/:type` in `src/routes.js`. The step view shows the entry with type and evidence badges, the reason, a native `<progress>` ("Step 3 of 12"), Previous / Next links and the full list of steps; moving between steps keeps the route path, so the view moves focus to the step heading itself and the page title (announced by the shell) names the step.
 
 ## Coverage of the source conversation
 
-`tmp/coverage.md` is the line-by-line checklist of `tmp/base-talk.txt`: 315 items (substances, enzymes, reactions, pathways, states and diseases, symptoms and outcomes, interventions and products, systems, mechanisms and numeric claims, studies), each with the phrase used in the conversation, a short search term and the entity that holds it. 280 items mapped to entities that already existed, 35 needed new entities (32 distinct ids, listed in the file), and about 20 existing entities received extra aliases so that the conversation's own phrasing resolves. All 315 search terms find their entity in the top three results. The test table `CONVERSATION_TERMS` in `tests/unit/knowledge-data.test.js` keeps 173 of them under test.
+`tmp/coverage.md` (local scratch, `tmp/` is git-ignored) is the line-by-line checklist of `tmp/base-talk.txt`: 315 items (substances, enzymes, reactions, pathways, states and diseases, symptoms and outcomes, interventions and products, systems, mechanisms and numeric claims, studies), each with the phrase used in the conversation, a short search term and the entity that holds it. 280 items mapped to entities that already existed, 35 needed new entities (32 distinct ids, listed in the file), and about 20 existing entities received extra aliases so that the conversation's own phrasing resolves. All 315 search terms find their entity in the top three results. The test table `CONVERSATION_TERMS` in `tests/unit/knowledge-data.test.js` keeps 173 of them under test.
 
 ## Current coverage
 

@@ -94,10 +94,10 @@ one line in `src/routes.js` plus the view file:
 Views in `src/views/kb/` only lay out what the engine's models return
 (`docs/KNOWLEDGE_MODEL.md`); presentational pieces are small components in
 `src/components/kb/` and pure logic is in `src/kb/` (URL scheme `paths.js`, list
-filtering `listing.js`, map `neighbourhood.js`, the home "start here" path).
+filtering `listing.js`, map `neighbourhood.js`, the home "start here" path, guided-path steps `path-steps.js`).
 
-- Build every URL with `entityPath(id)`, `typePath(type)`, `mapPath(id)` or
-  `connectionPath(from, to)`; never concatenate. Types are singular ids
+- Build every URL with `entityPath(id)`, `typePath(type)`, `mapPath(id)`,
+  `connectionPath(from, to)` or `guidedPathPath(id, step)`; never concatenate. Types are singular ids
   (`/kb/enzyme/gnmt`); the plural spelling is accepted when reading.
 - Link to entities with `EntityLink`. A target missing from the data renders as plain
   text, never a dead link; body text is rendered as text nodes, never `v-html`.
