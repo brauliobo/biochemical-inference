@@ -71,18 +71,31 @@ describe('APAPBenchmarkWorkbench', () => {
     expect(screen.getByText('Pass · uniform-zonation')).toBeTruthy()
   })
 
+  it('emits the completed record so the review workbench can submit it', async () => {
+    const onCompleted = vi.fn()
+    render(APAPBenchmarkWorkbench, { props: { onCompleted: () => onCompleted } })
+    await fireEvent.click(await screen.findByRole('button', { name: 'Run APAP benchmark' }))
+
+    await waitFor(() => expect(onCompleted).toHaveBeenCalledWith(record))
+  })
+
   it('locks all request-defining controls and ignores a response after its generation ends', async () => {
     const pending = deferred()
     api.runApapBenchmark.mockReturnValue(pending.promise)
-    const view = render(APAPBenchmarkWorkbench)
+    const onCompleted = vi.fn()
+    // Vapor reads root props as getters, so a listener is passed as () => listener.
+    const view = render(APAPBenchmarkWorkbench, { props: { onCompleted: () => onCompleted } })
     await fireEvent.click(await screen.findByRole('button', { name: 'Run APAP benchmark' }))
 
-    for (const control of screen.getAllByRole('button').filter((button) => button.classList.contains('apap-context') || button.classList.contains('protocol-card'))) expect(control.disabled).toBe(true)
+    const cards = screen.getAllByRole('button').filter((button) => button.hasAttribute('aria-pressed'))
+    expect(cards).toHaveLength(workspace.contexts.length + workspace.protocols.length)
+    for (const control of cards) expect(control.disabled).toBe(true)
+    expect(screen.getByRole('status').textContent).toMatch(/controls are locked/)
     for (const name of ['CYP activity', 'NAPQI adduct binding', 'Zonation amplitude', 'NAC-to-GSH term']) expect(screen.getByLabelText(name).disabled).toBe(true)
 
     view.unmount()
     pending.resolve(record)
     await Promise.resolve()
-    expect(view.emitted().completed).toBeUndefined()
+    expect(onCompleted).not.toHaveBeenCalled()
   })
 })
