@@ -222,7 +222,7 @@ describe('ChallengeWorkbench', () => {
     render(ChallengeWorkbench)
     await screen.findByText(CHALLENGE_PINS.releaseId)
 
-    for (const group of document.querySelectorAll('.challenge-pin-grid > div')) {
+    for (const group of screen.getByLabelText('Challenge identity pins').children) {
       expect([...group.children].map((item) => item.tagName)).toEqual(['DT', 'DD'])
       expect(group.querySelector('dd code')).toBeTruthy()
     }
