@@ -1,17 +1,15 @@
 #!/usr/bin/env node
-import { createHash } from 'node:crypto'
 import { lstat, mkdir, readFile, readdir, rename, rmdir, unlink, writeFile } from 'node:fs/promises'
 import { dirname, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { canonicalJson } from '../shared/canonical-json.js'
+import { compareUtf8, sha256Hex as digest } from '../server/commons/digest.js'
 import { inspectNoSymlinkPath, syncPath } from '../server/operations/path-safety.js'
 
 const root = resolve(import.meta.dirname, '..')
 const EXCLUDED = new Set(['.git', '.supply-chain', 'coverage', 'dist', 'node_modules', 'playwright-report', 'server-dist', 'test-results'])
 const OUTPUT_FILES = Object.freeze(['.biochemical-supply-chain-output.json', 'SHA256SUMS', 'checksums.json', 'provenance.json', 'sbom.cdx.json'])
 const OUTPUT_MARKER = Object.freeze({ output_schema_version: 'biochemical-supply-chain-output-v1', owner: 'biochemical-inference' })
-const compareUtf8 = (left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right))
-const digest = (value) => createHash('sha256').update(value).digest('hex')
 
 async function sourceFiles() {
   const output = []

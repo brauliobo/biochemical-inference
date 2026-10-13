@@ -12,7 +12,7 @@ export const GOAL15_SCALE_COUNTS = Object.freeze({
   work_items: 1024
 })
 
-export const GOAL15_SCALE_RESOURCE_PROFILE = Object.freeze({
+const GOAL15_SCALE_RESOURCE_PROFILE = Object.freeze({
   profile_id: 'goal15-scale-bounded',
   cpu_cores: 2,
   memory_mib: 1024,

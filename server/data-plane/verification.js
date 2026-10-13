@@ -1,6 +1,7 @@
-import { createHash, createPublicKey, verify as verifyCrypto } from 'node:crypto'
-import { TextDecoder } from 'node:util'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { sha256Hex } from '../commons/digest.js'
+import { defineProblemError } from '../commons/errors.js'
+import { parseCanonicalBytes as parseCanonical, verifyEd25519Signature } from '../commons/verification.js'
 import {
   DATA_PLANE_ACTIVE_KEY_ID,
   DATA_PLANE_ACTIVE_PUBLIC_KEY,
@@ -26,10 +27,9 @@ import {
 
 export const MAX_METADATA_BYTES = 8 * 1024 * 1024
 export const MAX_PARTITION_BYTES = 8 * 1024 * 1024
-export const MAX_RECORD_BYTES = 1024 * 1024
+const MAX_RECORD_BYTES = 1024 * 1024
 export const PRODUCER_PAGE_LIMIT = 2
 
-const utf8 = new TextDecoder('utf-8', { fatal: true })
 const RECORD_TYPES = Object.freeze(Object.keys(FACTORY_RECORD_SCHEMAS))
 const EXPECTED_SOURCE_ACCESSIONS = Object.freeze({
   'ncbi-taxonomy-human-mouse-esummary': ['NCBITaxon:9606', 'NCBITaxon:10090'],
@@ -53,47 +53,18 @@ const SOURCE_POLICY = Object.freeze({
   REPOSITORY: { recordTypes: ['catalysis', 'limitations'], adapter: 'repository-curation-json', origin: 'curation' }
 })
 
-export class DataPlaneVerificationError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'DataPlaneVerificationError'
-    this.code = options.code ?? 'DATA_PLANE_VERIFICATION_FAILED'
-    this.statusCode = options.statusCode ?? 409
-  }
-}
+export const DataPlaneVerificationError = defineProblemError('DataPlaneVerificationError', { statusCode: 409, code: 'DATA_PLANE_VERIFICATION_FAILED' })
 
-export function sha256(value) {
-  return createHash('sha256').update(value).digest('hex')
-}
-
-function strictBase64Url(value, bytes, label) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=')) throw new DataPlaneVerificationError(`${label} is not strict unpadded base64url.`)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== bytes || decoded.toString('base64url') !== value) throw new DataPlaneVerificationError(`${label} has an invalid encoded length.`)
-  return decoded
-}
+export const sha256 = sha256Hex
 
 export function parseCanonicalBytes(bytes, schema, label, expectedDigest) {
-  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_METADATA_BYTES) throw new DataPlaneVerificationError(`${label} exceeds its canonical metadata boundary.`)
-  if (expectedDigest && sha256(bytes) !== expectedDigest) throw new DataPlaneVerificationError(`${label} SHA-256 does not match its independent pin.`)
-  let text
-  let value
-  try {
-    text = utf8.decode(bytes)
-    value = JSON.parse(text)
-  } catch {
-    throw new DataPlaneVerificationError(`${label} is not strict UTF-8 JSON.`)
-  }
-  let canonical
-  try {
-    canonical = canonicalJson(value)
-  } catch {
-    throw new DataPlaneVerificationError(`${label} cannot be RFC 8785 canonical JSON.`)
-  }
-  if (text !== canonical) throw new DataPlaneVerificationError(`${label} is not RFC 8785 canonical JSON.`)
-  const parsed = schema.safeParse(value)
-  if (!parsed.success) throw new DataPlaneVerificationError(`${label} does not match the strict producer contract.`)
-  return parsed.data
+  return parseCanonical(bytes, schema, label, {
+    ErrorClass: DataPlaneVerificationError,
+    maxBytes: MAX_METADATA_BYTES,
+    expectedDigest,
+    contract: 'producer',
+    messages: { bounds: 'exceeds its canonical metadata boundary.', pin: 'SHA-256 does not match its independent pin.' }
+  })
 }
 
 function keyAtSigningTime(signature, trust) {
@@ -108,22 +79,15 @@ function keyAtSigningTime(signature, trust) {
 
 export function verifySignedObject(payload, signature, trust) {
   const key = keyAtSigningTime(signature, trust)
-  const publicRaw = strictBase64Url(key.public_key, 32, `Public key ${key.key_id}`)
-  const signatureRaw = strictBase64Url(signature.value, 64, `Signature ${key.key_id}`)
-  const spki = Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), publicRaw])
-  const signed = Buffer.from(canonicalJson({
+  verifyEd25519Signature({
     payload,
-    algorithm: signature.algorithm,
-    key_id: signature.key_id,
-    signed_at: signature.signed_at
-  }))
-  let valid = false
-  try {
-    valid = verifyCrypto(null, signed, createPublicKey({ key: spki, format: 'der', type: 'spki' }), signatureRaw)
-  } catch {
-    valid = false
-  }
-  if (!valid) throw new DataPlaneVerificationError(`Invalid Ed25519 signature for key: ${key.key_id}.`)
+    signature,
+    publicKey: key.public_key,
+    ErrorClass: DataPlaneVerificationError,
+    labels: { publicKey: `Public key ${key.key_id}`, signature: `Signature ${key.key_id}` },
+    invalidMessage: `Invalid Ed25519 signature for key: ${key.key_id}.`,
+    lengthMessage: 'has an invalid encoded length.'
+  })
   return key
 }
 
@@ -291,7 +255,7 @@ export function verifyRecordClosure(manifest, partitions) {
   return records
 }
 
-export function scientificClosureResults(manifest, records) {
+function scientificClosureResults(manifest, records) {
   const citedAssertions = records.catalysis.filter((assertion) => assertion.reference_ids.length > 0).length
   return {
     recordCounts: manifest.record_counts,

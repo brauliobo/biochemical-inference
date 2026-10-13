@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256HexSchema, Sha256DigestSchema, IsoDateSchema, UtcDatetimeSchema, HumanMouseTaxonSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, pinnedReleaseRefSchema, pinnedCatalogEntrySchema, releaseItemsEnvelopeSchema } from './commons/schemas.js'
 
 export const PHYSIOLOGY_RELEASE_ID = 'physiology-plugin-evidence-v1.0.0'
 export const PHYSIOLOGY_RELEASE_DIGEST = '8f7a14db2cebe4603772146b3d1f9f2a8ccafbf2452ef5c9ff856326584fadb8'
@@ -15,11 +16,10 @@ export const BPP_MAX_TOTAL_BYTES = 750_000
 export const BPP_MAX_ENTRIES = 8
 export const BPP_MAX_COMPRESSION_RATIO = 50
 
-const FiniteSchema = z.number().finite()
-const PositiveFiniteSchema = FiniteSchema.positive()
-export const PhysiologySha256Schema = z.string().regex(/^[a-f0-9]{64}$/)
-export const PhysiologyDigestSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
-export const PhysiologyTaxonSchema = z.enum(['NCBITaxon:9606', 'NCBITaxon:10090'])
+const PositiveFiniteSchema = FiniteNumberSchema.positive()
+export const PhysiologySha256Schema = Sha256HexSchema
+export const PhysiologyDigestSchema = Sha256DigestSchema
+export const PhysiologyTaxonSchema = HumanMouseTaxonSchema
 export const PhysiologyDomainSchema = z.enum(['circulation', 'liver', 'kidney', 'respiratory', 'endocrine', 'immune', 'neural', 'tumor'])
 export const PhysiologyPluginIdSchema = z.string().regex(/^PLUGIN:[A-Z0-9][A-Z0-9-]{2,79}$/)
 export const ReferencePluginIdSchema = z.enum(['PLUGIN:CIRCULATION-REFERENCE', 'PLUGIN:LIVER-REFERENCE', 'PLUGIN:KIDNEY-REFERENCE'])
@@ -27,21 +27,10 @@ export const PhysiologyContextIdSchema = z.string().regex(/^CONTEXT:PHYS-HUMAN-(
 export const PhysiologyPortIdSchema = z.string().regex(/^PORT:[A-Z0-9][A-Z0-9-]{2,95}$/)
 export const PhysiologyQuantityIdSchema = z.string().regex(/^QUANTITY:[A-Z0-9][A-Z0-9-]{2,127}$/)
 const AnatomySchema = z.enum(['UBERON:0004537', 'UBERON:0002107', 'UBERON:0002113', 'UBERON:0001004', 'UBERON:0000949', 'UBERON:0002405', 'UBERON:0001016'])
-const DateSchema = z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)
 
-export const PhysiologyReleaseRefSchema = z.object({
-  id: z.literal(PHYSIOLOGY_RELEASE_ID),
-  schema_version: z.literal(PHYSIOLOGY_CONTRACT_VERSION),
-  digest: z.literal(PHYSIOLOGY_RELEASE_DIGEST)
-}).strict()
+export const PhysiologyReleaseRefSchema = pinnedReleaseRefSchema(PHYSIOLOGY_RELEASE_ID, PHYSIOLOGY_CONTRACT_VERSION, PHYSIOLOGY_RELEASE_DIGEST)
 
-const CatalogEntrySchema = z.object({
-  release_id: z.literal(PHYSIOLOGY_RELEASE_ID),
-  title: z.literal('Synthetic human physiology plugin coupling evidence'),
-  schema_version: z.literal(PHYSIOLOGY_CONTRACT_VERSION),
-  release_digest: z.literal(PHYSIOLOGY_RELEASE_DIGEST),
-  manifest_path: z.literal(`${PHYSIOLOGY_RELEASE_ID}/manifest.json`)
-}).strict()
+const CatalogEntrySchema = pinnedCatalogEntrySchema({ releaseId: PHYSIOLOGY_RELEASE_ID, schemaVersion: PHYSIOLOGY_CONTRACT_VERSION, releaseDigest: PHYSIOLOGY_RELEASE_DIGEST, title: z.literal('Synthetic human physiology plugin coupling evidence') })
 
 export const PhysiologyCatalogSchema = z.object({
   catalog_schema_version: z.literal(PHYSIOLOGY_CONTRACT_VERSION),
@@ -52,21 +41,21 @@ const ManifestFileSchema = z.object({
   path: z.string().regex(/^[a-z][a-z0-9_]*\.json$/),
   record_type: z.enum(['contexts', 'applicability', 'quantities', 'model_evidence', 'benchmarks', 'observations', 'validation', 'coverage', 'limitations']),
   sha256: PhysiologySha256Schema,
-  bytes: z.number().int().positive(),
-  record_count: z.number().int().nonnegative()
+  bytes: PositiveIntSchema,
+  record_count: NonNegativeIntSchema
 }).strict()
 
 const PhysiologySourceSchema = z.object({
   id: z.enum(['NCBI_TAXONOMY', 'UBERON', 'SYNTHETIC_PHYSIOLOGY', 'CURATOR_ASSUMPTION']),
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   source_class: z.enum(['identifier-authority', 'synthetic', 'curator-assumption']),
   trust_label: z.enum(['authority-anchor-only', 'synthetic-not-measured', 'assumption-not-measured']),
-  version: z.string().min(1),
+  version: NonEmptyStringSchema,
   url: z.string().url(),
-  accessed_at: DateSchema,
-  license: z.string().min(1),
+  accessed_at: IsoDateSchema,
+  license: NonEmptyStringSchema,
   license_url: z.string().url(),
-  usage: z.string().min(1)
+  usage: NonEmptyStringSchema
 }).strict()
 
 export const PhysiologyManifestSchema = z.object({
@@ -75,9 +64,9 @@ export const PhysiologyManifestSchema = z.object({
   schema_version: z.literal(PHYSIOLOGY_CONTRACT_VERSION),
   release_digest: z.literal(PHYSIOLOGY_RELEASE_DIGEST),
   digest_algorithm: z.literal('sha256-canonical-manifest-v1'),
-  published_at: DateSchema,
+  published_at: IsoDateSchema,
   immutable: z.literal(true),
-  scientific_scope: z.string().min(1),
+  scientific_scope: NonEmptyStringSchema,
   files: z.array(ManifestFileSchema).length(9),
   record_counts: z.object({ applicability: z.literal(3), benchmarks: z.literal(1), contexts: z.literal(3), coverage: z.literal(16), limitations: z.literal(6), model_evidence: z.literal(3), observations: z.literal(4), quantities: z.literal(4), validation: z.literal(4) }).strict(),
   sources: z.array(PhysiologySourceSchema).length(4),
@@ -97,7 +86,7 @@ export const PhysiologyManifestSchema = z.object({
 
 export const PhysiologyContextSchema = z.object({
   id: PhysiologyContextIdSchema,
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   taxon_id: z.literal('NCBITaxon:9606'),
   taxon_label: z.literal('Homo sapiens'),
   domain: z.enum(['circulation', 'liver', 'kidney']),
@@ -121,7 +110,7 @@ export const PhysiologyApplicabilitySchema = z.object({
   applicability_status: z.literal('applicable-for-synthetic-contract'),
   included_use: z.literal('bounded three-plugin coupling conformance benchmark'),
   excluded_taxon_ids: z.tuple([z.literal('NCBITaxon:10090')]),
-  exclusions: z.array(z.string().min(1)).min(1),
+  exclusions: z.array(NonEmptyStringSchema).min(1),
   scientific_validation_status: z.literal('unsupported')
 }).strict()
 
@@ -141,7 +130,7 @@ const EndpointSchema = PhysiologyPortSchema.omit({ id: true, quantity_id: true }
 
 export const PhysiologyQuantitySchema = z.object({
   id: PhysiologyQuantityIdSchema,
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   semantic: z.literal('drug-mass-flow'),
   dimension: z.literal('mass_rate'),
   canonical_unit: z.literal('mg/min'),
@@ -159,7 +148,7 @@ export const PhysiologyQuantitySchema = z.object({
 
 const NumericAssumptionSchema = z.object({
   id: z.string().regex(/^ASSUMPTION:PHYS-(?:CIRCULATION|LIVER|KIDNEY)-STEP$/),
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   value: PositiveFiniteSchema,
   unit: z.literal('min'),
   dimension: z.literal('time'),
@@ -171,7 +160,7 @@ const NumericAssumptionSchema = z.object({
 export const PhysiologyModelEvidenceSchema = z.object({
   id: z.string().regex(/^MODEL-EVIDENCE:(?:CIRCULATION|LIVER|KIDNEY)-REFERENCE$/),
   plugin_id: ReferencePluginIdSchema,
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   context_id: PhysiologyContextIdSchema,
   domain: z.enum(['circulation', 'liver', 'kidney']),
   model_class: z.literal('repository-authored declarative synthetic reference'),
@@ -184,13 +173,13 @@ export const PhysiologyModelEvidenceSchema = z.object({
   protocol_conformance_status: z.literal('passed'),
   certification_status: z.literal('not-certified'),
   scientific_validation_status: z.literal('unsupported'),
-  limitation: z.string().min(1)
+  limitation: NonEmptyStringSchema
 }).strict()
 
 const ObservationIdSchema = z.string().regex(/^OBSERVATION:PHYS-MASS-BALANCE-T[0-9]+$/)
 export const PhysiologyBenchmarkSchema = z.object({
   id: z.literal('DATASET:PHYS-HUMAN-THREE-PLUGIN-MASS-BALANCE'),
-  title: z.string().min(1),
+  title: NonEmptyStringSchema,
   context_ids: z.tuple([PhysiologyContextIdSchema, PhysiologyContextIdSchema, PhysiologyContextIdSchema]),
   model_evidence_ids: z.tuple([z.string(), z.string(), z.string()]),
   quantity_ids: z.tuple([PhysiologyQuantityIdSchema, PhysiologyQuantityIdSchema, PhysiologyQuantityIdSchema, PhysiologyQuantityIdSchema]),
@@ -206,7 +195,7 @@ export const PhysiologyBenchmarkSchema = z.object({
 
 const SyntheticValueSchema = z.object({
   metric: z.enum(['time', 'circulation-drug-mass', 'liver-drug-mass', 'kidney-drug-mass', 'mass-balance-residual']),
-  value: FiniteSchema,
+  value: FiniteNumberSchema,
   unit: z.enum(['min', 'mg']),
   dimension: z.enum(['time', 'mass']),
   value_origin: z.literal('synthetic'),
@@ -225,13 +214,13 @@ export const PhysiologyValidationSchema = z.object({
   id: z.string().regex(/^VALIDATION:PHYS-[A-Z-]+$/),
   domain: z.enum(['circulation', 'liver', 'kidney', 'integrated']),
   plugin_id: ReferencePluginIdSchema.nullable(),
-  claim: z.string().min(1),
+  claim: NonEmptyStringSchema,
   validation_kind: z.literal('scientific'),
   evidence_class: z.literal('synthetic-contract-only'),
   validation_status: z.literal('unsupported'),
   supported: z.literal(false),
   protocol_conformance_used_as_scientific_evidence: z.literal(false),
-  rationale: z.string().min(1)
+  rationale: NonEmptyStringSchema
 }).strict()
 
 export const PhysiologyCoverageSchema = z.object({
@@ -246,11 +235,11 @@ export const PhysiologyCoverageSchema = z.object({
   context_id: PhysiologyContextIdSchema.nullable(),
   scientific_validation_status: z.literal('unsupported'),
   reason_code: z.enum(['synthetic-reference-published', 'not-published-in-release', 'not-assessed']),
-  rationale: z.string().min(1)
+  rationale: NonEmptyStringSchema
 }).strict()
 
-const PhysiologyLimitationSchema = z.object({ id: z.string().regex(/^LIMITATION:PHYS-[A-Z0-9-]+$/), category: z.enum(['scope', 'evidence', 'applicability', 'validation', 'clinical']), statement: z.string().min(1) }).strict()
-const upstreamEnvelope = (schema) => z.object({ release: PhysiologyReleaseRefSchema, items: z.array(schema) }).strict()
+const PhysiologyLimitationSchema = z.object({ id: z.string().regex(/^LIMITATION:PHYS-[A-Z0-9-]+$/), category: z.enum(['scope', 'evidence', 'applicability', 'validation', 'clinical']), statement: NonEmptyStringSchema }).strict()
+const upstreamEnvelope = (schema) => releaseItemsEnvelopeSchema(PhysiologyReleaseRefSchema, schema)
 export const PhysiologyContextsResponseSchema = upstreamEnvelope(PhysiologyContextSchema)
 export const PhysiologyApplicabilityResponseSchema = upstreamEnvelope(PhysiologyApplicabilitySchema)
 export const PhysiologyQuantitiesResponseSchema = upstreamEnvelope(PhysiologyQuantitySchema)
@@ -260,12 +249,12 @@ export const PhysiologyCoverageResponseSchema = upstreamEnvelope(PhysiologyCover
 export const PhysiologyBenchmarksResponseSchema = z.object({ release: PhysiologyReleaseRefSchema, items: z.array(PhysiologyBenchmarkSchema), observations: z.array(PhysiologyObservationSchema) }).strict()
 export const PhysiologyDetailSchema = z.object({ release: PhysiologyReleaseRefSchema, manifest: PhysiologyManifestSchema, limitations: z.array(PhysiologyLimitationSchema).length(6) }).strict()
 
-const ShapeSchema = z.array(z.number().int().positive().max(1_000_000)).min(1).max(4)
+const ShapeSchema = z.array(PositiveIntSchema.max(1_000_000)).min(1).max(4)
 const PackagePathSchema = z.union([z.enum(['model.json', 'coupling.json']), z.string().regex(/^process\/[a-z0-9][a-z0-9._-]{0,63}$/)])
 const PackageContentSchema = z.object({
   path: PackagePathSchema,
   sha256: PhysiologySha256Schema,
-  bytes: z.number().int().positive().max(BPP_MAX_ENTRY_BYTES),
+  bytes: PositiveIntSchema.max(BPP_MAX_ENTRY_BYTES),
   mediaType: z.enum(['application/json', 'application/javascript'])
 }).strict()
 
@@ -278,8 +267,8 @@ export const BppManifestSchema = z.object({
   pluginKind: z.enum(['declarative', 'process']),
   publisher: z.object({ keyId: z.string().regex(/^ed25519:[a-f0-9]{16}$/), algorithm: z.literal('Ed25519') }).strict(),
   evidence: z.object({ releaseId: z.literal(PHYSIOLOGY_RELEASE_ID), releaseDigest: z.literal(PHYSIOLOGY_RELEASE_DIGEST), modelEvidenceId: z.string().regex(/^MODEL-EVIDENCE:(?:CIRCULATION|LIVER|KIDNEY)-REFERENCE$/), modelEvidenceDigest: PhysiologySha256Schema, protocolEvidenceDigest: PhysiologySha256Schema }).strict(),
-  license: z.object({ spdx: z.literal('CC0-1.0'), redistributable: z.literal(true), notice: z.string().min(1).max(500) }).strict(),
-  applicability: z.object({ taxonIds: z.tuple([z.literal('NCBITaxon:9606')]), contextIds: z.tuple([PhysiologyContextIdSchema]), domains: z.tuple([z.enum(['circulation', 'liver', 'kidney'])]), useScopes: z.tuple([z.literal('bounded-three-plugin-coupling-conformance')]), exclusions: z.array(z.string().min(1).max(500)).min(1).max(8) }).strict(),
+  license: z.object({ spdx: z.literal('CC0-1.0'), redistributable: z.literal(true), notice: NonEmptyStringSchema.max(500) }).strict(),
+  applicability: z.object({ taxonIds: z.tuple([z.literal('NCBITaxon:9606')]), contextIds: z.tuple([PhysiologyContextIdSchema]), domains: z.tuple([z.enum(['circulation', 'liver', 'kidney'])]), useScopes: z.tuple([z.literal('bounded-three-plugin-coupling-conformance')]), exclusions: z.array(NonEmptyStringSchema.max(500)).min(1).max(8) }).strict(),
   resources: z.object({ cpuCores: z.number().int().min(1).max(2), memoryMb: z.number().int().min(16).max(128), wallTimeMs: z.number().int().min(100).max(10_000), maxOutputBytes: z.number().int().min(1024).max(1_000_000) }).strict(),
   permissions: z.object({ network: z.literal(false), filesystem: z.literal('none'), subprocess: z.literal(false) }).strict(),
   entrypoints: z.object({ model: z.literal('model.json'), coupling: z.literal('coupling.json'), process: z.string().regex(/^process\/[a-z0-9._-]+$/).nullable() }).strict(),
@@ -300,9 +289,9 @@ export const BppModelDescriptorSchema = z.object({
   modelType: z.literal('declarative-piecewise-flow-v1'),
   contextId: PhysiologyContextIdSchema,
   evidenceModelDigest: PhysiologySha256Schema,
-  state: z.object({ id: z.literal('STATE:DRUG-MASS'), semantic: z.literal('drug-mass'), dimension: z.literal('mass'), unit: z.literal('mg'), shape: ShapeSchema, initial: FiniteSchema.nonnegative() }).strict(),
+  state: z.object({ id: z.literal('STATE:DRUG-MASS'), semantic: z.literal('drug-mass'), dimension: z.literal('mass'), unit: z.literal('mg'), shape: ShapeSchema, initial: FiniteNumberSchema.nonnegative() }).strict(),
   cadenceMinutes: PositiveFiniteSchema,
-  outputSchedules: z.array(z.object({ portId: PhysiologyPortIdSchema, intervals: z.array(z.object({ startMinute: FiniteSchema.nonnegative(), endMinute: PositiveFiniteSchema, value: FiniteSchema.nonnegative(), unit: z.literal('mg/min') }).strict().refine((item) => item.endMinute > item.startMinute, 'Flow interval must be ordered.')).min(1).max(16) }).strict()).max(4)
+  outputSchedules: z.array(z.object({ portId: PhysiologyPortIdSchema, intervals: z.array(z.object({ startMinute: FiniteNumberSchema.nonnegative(), endMinute: PositiveFiniteSchema, value: FiniteNumberSchema.nonnegative(), unit: z.literal('mg/min') }).strict().refine((item) => item.endMinute > item.startMinute, 'Flow interval must be ordered.')).min(1).max(16) }).strict()).max(4)
 }).strict()
 
 export const BppCouplingDescriptorSchema = z.object({
@@ -324,7 +313,7 @@ export const BppSignatureSchema = z.object({
 }).strict()
 
 export const PackageValidationRequestSchema = z.object({ packageBase64: z.string().min(4).max(BPP_BASE64_MAX_LENGTH).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/) }).strict()
-export const PackageFindingSchema = z.object({ code: z.string().regex(/^[a-z0-9_]+$/), path: z.string().min(1), message: z.string().min(1) }).strict()
+export const PackageFindingSchema = z.object({ code: z.string().regex(/^[a-z0-9_]+$/), path: NonEmptyStringSchema, message: NonEmptyStringSchema }).strict()
 
 export const CertificationSchema = z.object({
   status: z.enum(['certified-conformant', 'not-certified']),
@@ -338,12 +327,12 @@ export const PhysiologyPackageSchema = z.object({
   packageDigest: PhysiologyDigestSchema,
   modelDescriptorDigest: PhysiologyDigestSchema,
   couplingDescriptorDigest: PhysiologyDigestSchema,
-  bytes: z.number().int().positive().max(BPP_MAX_ARCHIVE_BYTES),
-  installedAt: z.string().datetime(),
+  bytes: PositiveIntSchema.max(BPP_MAX_ARCHIVE_BYTES),
+  installedAt: UtcDatetimeSchema,
   builtIn: z.boolean(),
   manifest: BppManifestSchema,
   signature: BppSignatureSchema,
-  trust: z.object({ keyId: z.string(), status: z.enum(['trusted', 'revoked', 'unknown']), publisher: z.string().min(1) }).strict(),
+  trust: z.object({ keyId: z.string(), status: z.enum(['trusted', 'revoked', 'unknown']), publisher: NonEmptyStringSchema }).strict(),
   certification: CertificationSchema
 }).strict()
 
@@ -355,7 +344,7 @@ export const PackageValidationResponseSchema = z.object({
   findings: z.array(PackageFindingSchema)
 }).strict()
 
-export const TrustKeySchema = z.object({ keyId: z.string(), algorithm: z.literal('Ed25519'), publisher: z.string().min(1), publicKeySpkiBase64: z.string().min(32), status: z.enum(['trusted', 'revoked']), createdAt: z.string().datetime(), revokedAt: z.string().datetime().nullable() }).strict()
+export const TrustKeySchema = z.object({ keyId: z.string(), algorithm: z.literal('Ed25519'), publisher: NonEmptyStringSchema, publicKeySpkiBase64: z.string().min(32), status: z.enum(['trusted', 'revoked']), createdAt: UtcDatetimeSchema, revokedAt: UtcDatetimeSchema.nullable() }).strict()
 export const TrustKeyAddRequestSchema = z.object({ keyId: z.string().regex(/^ed25519:[a-f0-9]{16}$/), algorithm: z.literal('Ed25519'), publisher: z.string().trim().min(1).max(160), publicKeySpkiBase64: z.string().regex(/^[A-Za-z0-9+/]+={0,2}$/).max(256) }).strict()
 
 export const CouplingCreateRequestSchema = z.object({
@@ -397,12 +386,12 @@ export const PhysiologyCouplingSchema = z.object({
   applicabilityIntersection: z.object({ taxonIds: z.tuple([z.literal('NCBITaxon:9606')]), useScopes: z.tuple([z.literal('bounded-three-plugin-coupling-conformance')]), contextBindings: z.array(PhysiologyContextIdSchema).length(3), exclusions: z.array(z.string()).min(3) }).strict(),
   scientificValidation: z.literal('unsupported'),
   warning: z.literal(PHYSIOLOGY_WARNING),
-  createdAt: z.string().datetime()
+  createdAt: UtcDatetimeSchema
 }).strict()
 
 export const PhysiologyRunRequestSchema = z.object({ couplingDigest: PhysiologyDigestSchema }).strict()
-const StateSnapshotSchema = z.object({ timeMinutes: FiniteSchema.nonnegative(), massesMg: z.record(ReferencePluginIdSchema, FiniteSchema.nonnegative()), totalMassMg: FiniteSchema.nonnegative(), massConservationResidualMg: FiniteSchema }).strict()
-const ExchangeAmountSchema = z.object({ intervalStartMinutes: FiniteSchema.nonnegative(), intervalEndMinutes: PositiveFiniteSchema, quantityId: PhysiologyQuantityIdSchema, rateMgPerMinute: FiniteSchema.nonnegative(), integratedAmountMg: FiniteSchema.nonnegative(), sourceLossMg: FiniteSchema.nonnegative(), targetGainMg: FiniteSchema.nonnegative(), residualMg: FiniteSchema }).strict()
+const StateSnapshotSchema = z.object({ timeMinutes: FiniteNumberSchema.nonnegative(), massesMg: z.record(ReferencePluginIdSchema, FiniteNumberSchema.nonnegative()), totalMassMg: FiniteNumberSchema.nonnegative(), massConservationResidualMg: FiniteNumberSchema }).strict()
+const ExchangeAmountSchema = z.object({ intervalStartMinutes: FiniteNumberSchema.nonnegative(), intervalEndMinutes: PositiveFiniteSchema, quantityId: PhysiologyQuantityIdSchema, rateMgPerMinute: FiniteNumberSchema.nonnegative(), integratedAmountMg: FiniteNumberSchema.nonnegative(), sourceLossMg: FiniteNumberSchema.nonnegative(), targetGainMg: FiniteNumberSchema.nonnegative(), residualMg: FiniteNumberSchema }).strict()
 
 export const PhysiologyRunSchema = z.object({
   runDigest: PhysiologyDigestSchema,
@@ -410,19 +399,19 @@ export const PhysiologyRunSchema = z.object({
   packageDigests: z.array(PhysiologyDigestSchema).length(3),
   pluginDigests: z.record(PhysiologyPluginIdSchema, PhysiologyDigestSchema),
   status: z.literal('completed'),
-  protocolEvents: z.array(z.object({ sequence: z.number().int().positive(), timeMinutes: FiniteSchema.nonnegative(), pluginId: ReferencePluginIdSchema, event: z.enum(['initialize', 'read-inputs', 'advance', 'publish-outputs']), cadenceDue: z.boolean() }).strict()).min(1),
-  schedule: z.array(z.object({ timeMinutes: FiniteSchema.nonnegative(), duePluginIds: z.array(ReferencePluginIdSchema) }).strict()).min(2),
+  protocolEvents: z.array(z.object({ sequence: PositiveIntSchema, timeMinutes: FiniteNumberSchema.nonnegative(), pluginId: ReferencePluginIdSchema, event: z.enum(['initialize', 'read-inputs', 'advance', 'publish-outputs']), cadenceDue: z.boolean() }).strict()).min(1),
+  schedule: z.array(z.object({ timeMinutes: FiniteNumberSchema.nonnegative(), duePluginIds: z.array(ReferencePluginIdSchema) }).strict()).min(2),
   states: z.array(StateSnapshotSchema).min(2),
   exchanges: z.array(ExchangeAmountSchema).min(4),
-  diagnostics: z.object({ initialMassMg: FiniteSchema.nonnegative(), finalMassMg: FiniteSchema.nonnegative(), maximumAbsoluteResidualMg: FiniteSchema.nonnegative(), massConserved: z.boolean(), deterministic: z.literal(true), cadenceMinutes: PositiveFiniteSchema, interpolation: z.literal('zero-order-hold'), refinement: z.array(z.object({ factor: z.union([z.literal(1), z.literal(2), z.literal(4)]), stepMinutes: PositiveFiniteSchema, finalMassesMg: z.record(ReferencePluginIdSchema, FiniteSchema.nonnegative()), maximumAbsoluteResidualMg: FiniteSchema.nonnegative() }).strict()).length(3), convergenceMaximumDifferenceMg: FiniteSchema.nonnegative(), converged: z.boolean() }).strict(),
+  diagnostics: z.object({ initialMassMg: FiniteNumberSchema.nonnegative(), finalMassMg: FiniteNumberSchema.nonnegative(), maximumAbsoluteResidualMg: FiniteNumberSchema.nonnegative(), massConserved: z.boolean(), deterministic: z.literal(true), cadenceMinutes: PositiveFiniteSchema, interpolation: z.literal('zero-order-hold'), refinement: z.array(z.object({ factor: z.union([z.literal(1), z.literal(2), z.literal(4)]), stepMinutes: PositiveFiniteSchema, finalMassesMg: z.record(ReferencePluginIdSchema, FiniteNumberSchema.nonnegative()), maximumAbsoluteResidualMg: FiniteNumberSchema.nonnegative() }).strict()).length(3), convergenceMaximumDifferenceMg: FiniteNumberSchema.nonnegative(), converged: z.boolean() }).strict(),
   applicability: z.object({ supported: z.literal(true), intersection: PhysiologyCouplingSchema.shape.applicabilityIntersection }).strict(),
   protocolConformance: z.literal('passed'),
   scientificValidation: z.literal('unsupported'),
   warning: z.literal(PHYSIOLOGY_WARNING),
-  completedAt: z.string().datetime()
+  completedAt: UtcDatetimeSchema
 }).strict()
 
-export const ConformanceResultSchema = z.object({ packageDigest: PhysiologyDigestSchema, certification: CertificationSchema, benchmark: z.object({ id: z.literal('DATASET:PHYS-HUMAN-THREE-PLUGIN-MASS-BALANCE'), passed: z.boolean(), maximumAbsoluteDifferenceMg: FiniteSchema.nonnegative(), partition: z.literal('fixed-calibration-validation') }).strict(), protocolSequence: z.array(z.string()).min(4), scientificValidation: z.literal('unsupported'), warning: z.literal(PHYSIOLOGY_WARNING) }).strict()
+export const ConformanceResultSchema = z.object({ packageDigest: PhysiologyDigestSchema, certification: CertificationSchema, benchmark: z.object({ id: z.literal('DATASET:PHYS-HUMAN-THREE-PLUGIN-MASS-BALANCE'), passed: z.boolean(), maximumAbsoluteDifferenceMg: FiniteNumberSchema.nonnegative(), partition: z.literal('fixed-calibration-validation') }).strict(), protocolSequence: z.array(z.string()).min(4), scientificValidation: z.literal('unsupported'), warning: z.literal(PHYSIOLOGY_WARNING) }).strict()
 
 export const PhysiologyEvidenceSchema = z.object({
   release: PhysiologyReleaseRefSchema,

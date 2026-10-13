@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256HexSchema, UtcInstantSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, StrictEmptyObjectSchema, PageLimitSchema, CoercedNonNegativeIntSchema, pageLimitQuerySchema } from './commons/schemas.js'
 
 export const MEASURED_SPATIAL_CONTRACT = 'measured-spatial/1.0.0'
 export const MEASURED_SPATIAL_RELEASE_ID = 'digimouse-measured-liver-atlas-v1.0.0'
@@ -49,14 +50,12 @@ export const MEASURED_SPATIAL_PINS = Object.freeze({
   decodedChunkBytes: 524_288
 })
 
-export const MeasuredSpatialSha256Schema = z.string().regex(/^[0-9a-f]{64}$/)
+export const MeasuredSpatialSha256Schema = Sha256HexSchema
 export const MeasuredSpatialRecordTypeSchema = z.enum(MEASURED_SPATIAL_RECORD_TYPES)
 export const MeasuredSpatialArrayIdSchema = z.enum(['anatomy-labels', 'liver-mask'])
 export const MeasuredSpatialLevelSchema = z.union([z.literal(0), z.literal(1)])
-const DateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
-const InstantSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
-const PositiveTripleSchema = z.tuple([z.number().int().positive().max(10_000), z.number().int().positive().max(10_000), z.number().int().positive().max(10_000)])
-const NonnegativeTripleSchema = z.tuple([z.number().int().nonnegative().max(10_000), z.number().int().nonnegative().max(10_000), z.number().int().nonnegative().max(10_000)])
+const PositiveTripleSchema = z.tuple([PositiveIntSchema.max(10_000), PositiveIntSchema.max(10_000), PositiveIntSchema.max(10_000)])
+const NonnegativeTripleSchema = z.tuple([NonNegativeIntSchema.max(10_000), NonNegativeIntSchema.max(10_000), NonNegativeIntSchema.max(10_000)])
 const BoundsSchema = z.tuple([NonnegativeTripleSchema, NonnegativeTripleSchema]).nullable()
 const ChunkShapeSchema = z.tuple([z.literal(32), z.literal(128), z.literal(128)])
 const sortedUnique = (items, select) => items.every((item, index) => index === 0 || select(items[index - 1]) < select(item))
@@ -83,8 +82,8 @@ export const MeasuredSpatialAttributionSchema = z.object({
     url: z.literal('https://creativecommons.org/licenses/by-sa/4.0/'),
     redistribution: z.literal('permitted'),
     share_alike: z.literal(true),
-    warranty_disclaimer: z.string().min(1).max(2048),
-    no_endorsement: z.string().min(1).max(2048)
+    warranty_disclaimer: NonEmptyStringSchema.max(2048),
+    no_endorsement: NonEmptyStringSchema.max(2048)
   }).strict(),
   modifications: z.tuple([
     z.literal('Analyze extraction'),
@@ -96,7 +95,7 @@ export const MeasuredSpatialAttributionSchema = z.object({
     z.literal('deterministic compression')
   ]),
   adapted_material_license: z.literal('CC-BY-SA-4.0'),
-  software_license_boundary: z.string().min(1).max(2048)
+  software_license_boundary: NonEmptyStringSchema.max(2048)
 }).strict()
 
 export const MeasuredSpatialAcquisitionSchema = z.object({
@@ -139,9 +138,9 @@ export const MeasuredSpatialArraySchema = z.object({
   dimension_separator: z.literal('.'),
   zarr_format: z.literal(2),
   compressor: MeasuredSpatialCodecSchema,
-  uncompressed_bytes: z.number().int().positive().max(100_000_000),
+  uncompressed_bytes: PositiveIntSchema.max(100_000_000),
   uncompressed_sha256: MeasuredSpatialSha256Schema,
-  liver_voxels: z.number().int().nonnegative().max(100_000_000),
+  liver_voxels: NonNegativeIntSchema.max(100_000_000),
   liver_bounds_xyz: BoundsSchema
 }).strict().superRefine((value, context) => {
   const pin = MEASURED_SPATIAL_ARRAY_PINS[value.id]
@@ -197,7 +196,7 @@ export const MeasuredSpatialChunkSchema = z.object({
   path: z.string().regex(/^arrays\/(anatomy-labels|liver-mask)\/[01]\/[0-9]+\.[0-9]+\.[0-9]+$/),
   codec: z.literal('gzip-level-9-mtime-0'),
   media_type: z.literal('application/vnd.zarr.chunk'),
-  encoded_bytes: z.number().int().positive().max(1024 * 1024),
+  encoded_bytes: PositiveIntSchema.max(1024 * 1024),
   encoded_sha256: MeasuredSpatialSha256Schema,
   decoded_bytes: z.literal(MEASURED_SPATIAL_PINS.decodedChunkBytes),
   decoded_sha256: MeasuredSpatialSha256Schema
@@ -211,16 +210,16 @@ export const MeasuredSpatialInventorySchema = z.object({
 }).strict().refine((value) => sortedUnique(value.chunks, (item) => item.path), 'Measured-spatial chunk inventory must be uniquely sorted.')
 
 const ManifestFileSchema = z.object({
-  path: z.string().min(1).max(512).regex(/^(?!\/)(?!.*(?:^|\/)\.\.?(?:\/|$))[A-Za-z0-9._/-]+$/),
+  path: NonEmptyStringSchema.max(512).regex(/^(?!\/)(?!.*(?:^|\/)\.\.?(?:\/|$))[A-Za-z0-9._/-]+$/),
   role: z.enum(['metadata', 'zarr-metadata', 'chunk-inventory', 'chunk']),
-  bytes: z.number().int().positive().max(16 * 1024 * 1024),
+  bytes: PositiveIntSchema.max(16 * 1024 * 1024),
   sha256: MeasuredSpatialSha256Schema
 }).strict()
 
 export const MeasuredSpatialManifestSchema = z.object({
   manifest_schema_version: z.literal('1.0.0'),
   release_id: z.literal(MEASURED_SPATIAL_RELEASE_ID),
-  title: z.string().min(1).max(256),
+  title: NonEmptyStringSchema.max(256),
   contract_family: z.literal(MEASURED_SPATIAL_CONTRACT),
   release_digest: z.literal(MEASURED_SPATIAL_PINS.releaseDigest),
   digest_algorithm: z.literal('sha256-rfc8785-manifest-v1'),
@@ -256,7 +255,7 @@ export const MeasuredSpatialTrustSchema = z.object({
     status: z.literal('retired'),
     valid_from: z.literal('2026-07-17'),
     valid_until: z.literal('2026-07-17'),
-    reason: z.string().min(1).max(1024)
+    reason: NonEmptyStringSchema.max(1024)
   }).strict()])
 }).strict()
 
@@ -304,7 +303,7 @@ export const MeasuredSpatialProducerRecordPageSchema = z.object({
 }).strict()
 
 export const MeasuredSpatialProducerChunkPageSchema = z.object({
-  offset: z.number().int().nonnegative().max(300),
+  offset: NonNegativeIntSchema.max(300),
   limit: z.literal(100),
   total: z.literal(MEASURED_SPATIAL_PINS.chunkCount),
   items: z.array(MeasuredSpatialChunkSchema).length(100)
@@ -359,10 +358,10 @@ export const MeasuredSpatialDiscoverySchema = z.object({
   arrays: z.record(z.string(), z.object({
     shapeZyx: PositiveTripleSchema,
     spacingUm: PositiveTripleSchema,
-    uncompressedBytes: z.number().int().positive(),
+    uncompressedBytes: PositiveIntSchema,
     uncompressedSha256: MeasuredSpatialSha256Schema,
-    liverVoxels: z.number().int().nonnegative(),
-    chunkCount: z.number().int().positive()
+    liverVoxels: NonNegativeIntSchema,
+    chunkCount: PositiveIntSchema
   }).strict()),
   status: MeasuredSpatialStatusSchema,
   registration: z.literal('unavailable'),
@@ -391,9 +390,9 @@ export const MeasuredSpatialLocalChunkPageSchema = z.object({
   releaseDigest: z.literal(MEASURED_SPATIAL_PINS.releaseDigest),
   arrayId: MeasuredSpatialArrayIdSchema.nullable(),
   level: MeasuredSpatialLevelSchema.nullable(),
-  offset: z.number().int().nonnegative(),
-  limit: z.number().int().min(1).max(100),
-  total: z.number().int().nonnegative().max(MEASURED_SPATIAL_PINS.chunkCount),
+  offset: NonNegativeIntSchema,
+  limit: PageLimitSchema,
+  total: NonNegativeIntSchema.max(MEASURED_SPATIAL_PINS.chunkCount),
   items: z.array(MeasuredSpatialChunkSchema).max(100)
 }).strict()
 
@@ -404,7 +403,7 @@ export const MeasuredSpatialOfflineCompletionSchema = z.object({
   encodedBytes: z.literal(MEASURED_SPATIAL_PINS.encodedChunkBytes),
   encodedAndDecodedVerified: z.literal(true),
   networkAccessRequiredForReplay: z.literal(false),
-  completedAt: InstantSchema
+  completedAt: UtcInstantSchema
 }).strict()
 
 export const MeasuredSpatialIntegritySchema = z.object({
@@ -422,19 +421,19 @@ export const MeasuredSpatialIntegritySchema = z.object({
 export const MeasuredSpatialChunkParamSchema = z.object({
   arrayId: MeasuredSpatialArrayIdSchema,
   level: z.coerce.number().pipe(MeasuredSpatialLevelSchema),
-  z: z.coerce.number().int().nonnegative().max(10_000),
-  y: z.coerce.number().int().nonnegative().max(10_000),
-  x: z.coerce.number().int().nonnegative().max(10_000)
+  z: CoercedNonNegativeIntSchema.max(10_000),
+  y: CoercedNonNegativeIntSchema.max(10_000),
+  x: CoercedNonNegativeIntSchema.max(10_000)
 }).strict()
 
 export const MeasuredSpatialChunkQuerySchema = z.object({
   array_id: MeasuredSpatialArrayIdSchema.optional(),
   level: z.coerce.number().pipe(MeasuredSpatialLevelSchema).optional(),
-  offset: z.coerce.number().int().nonnegative().max(MEASURED_SPATIAL_PINS.chunkCount).default(0),
-  limit: z.coerce.number().int().min(1).max(100).default(100)
+  offset: CoercedNonNegativeIntSchema.max(MEASURED_SPATIAL_PINS.chunkCount).default(0),
+  limit: pageLimitQuerySchema(100)
 }).strict()
 
-export const MeasuredSpatialEmptySchema = z.object({}).strict()
+export const MeasuredSpatialEmptySchema = StrictEmptyObjectSchema
 
 export const MEASURED_SPATIAL_RECORD_SCHEMAS = Object.freeze({
   acquisitions: MeasuredSpatialAcquisitionSchema,
@@ -442,8 +441,7 @@ export const MEASURED_SPATIAL_RECORD_SCHEMAS = Object.freeze({
   arrays: MeasuredSpatialArraySchema,
   labels: MeasuredSpatialLabelSchema.extend({ id: z.literal('label:18') }).strict(),
   registrations: MeasuredSpatialRegistrationSchema,
-  limitations: z.object({ id: z.string().regex(/^limitation:[0-2]$/), statement: z.string().min(1) }).strict(),
+  limitations: z.object({ id: z.string().regex(/^limitation:[0-2]$/), statement: NonEmptyStringSchema }).strict(),
   attribution: MeasuredSpatialAttributionSchema.extend({ id: z.literal('attribution:digimouse') }).strict()
 })
 
-export { DateSchema, InstantSchema }

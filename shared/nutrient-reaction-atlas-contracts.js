@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256HexSchema, FiniteNumberSchema, NonEmptyStringSchema } from './commons/schemas.js'
 
 export const NUTRIENT_REACTION_ATLAS_FOUNDATION = Object.freeze({
   releaseId: 'nutrient-reaction-atlas-foundation-v0.1.0',
@@ -45,8 +46,6 @@ export const NUTRIENT_REACTION_I2_RECONCILIATION = Object.freeze({
   manifestDigest: '1ed8768d47500800dacee93f88ce8fdad387d843150e64e05dc94721578f4014'
 })
 
-const DigestSchema = z.string().regex(/^[a-f0-9]{64}$/)
-const RecordIdSchema = z.string().regex(/^(?:SOURCE|NUTRIENT|FORM_CLASS|EVENT_KIND|POLICY|REACTION_CANDIDATE|HYPOTHESIS):[A-Z0-9][A-Z0-9_.-]*$/)
 const OriginSchema = z.enum(['measured', 'curated', 'submitted', 'model-derived', 'text-mined', 'computed', 'assumption', 'hypothetical'])
 const ContextStatusSchema = z.enum(['known', 'unknown', 'not-reported', 'not-assessed', 'not-applicable'])
 
@@ -243,11 +242,11 @@ export const NutrientReactionI2ReconciliationSummarySchema = z.object({
 
 const ParticipantSchema = z.object({
   identity_status: z.enum(['exact', 'class-level', 'unresolved']),
-  chemical_id: z.string().min(1).nullable(),
-  unresolved_constraints: z.array(z.string().min(1)),
+  chemical_id: NonEmptyStringSchema.nullable(),
+  unresolved_constraints: z.array(NonEmptyStringSchema),
   role: z.enum(['reactant', 'product', 'transported-cargo', 'catalyst-bound-cofactor', 'regulator']),
   coefficient: z.string().regex(/^[1-9][0-9]*(?:\/[1-9][0-9]*)?$/),
-  compartment_id: z.string().min(1).nullable()
+  compartment_id: NonEmptyStringSchema.nullable()
 }).strict().superRefine((value, context) => {
   if (value.identity_status === 'exact' && (value.chemical_id === null || value.unresolved_constraints.length !== 0)) {
     context.addIssue({ code: z.ZodIssueCode.custom, message: 'exact participants require one chemical id and no unresolved constraints' })
@@ -259,13 +258,13 @@ const ParticipantSchema = z.object({
 
 const UncertaintySchema = z.object({
   representation: z.enum(['distribution', 'interval', 'qualitative', 'unknown']),
-  description: z.string().min(1),
-  parameters: z.record(z.number().finite())
+  description: NonEmptyStringSchema,
+  parameters: z.record(FiniteNumberSchema)
 }).strict()
 
 export const NutrientReactionSimulationCandidateSchema = z.object({
   id: z.string().regex(/^REACTION_CANDIDATE:[A-Z0-9][A-Z0-9_.-]*$/),
-  content_digest: DigestSchema,
+  content_digest: Sha256HexSchema,
   origin: OriginSchema,
   event_kind_id: z.string().regex(/^EVENT_KIND:[A-Z0-9][A-Z0-9_.-]*$/),
   nutrient_concept_ids: z.array(z.string().regex(/^NUTRIENT:[A-Z0-9][A-Z0-9_.-]*$/)).min(1),
@@ -273,11 +272,11 @@ export const NutrientReactionSimulationCandidateSchema = z.object({
   direction_status: ContextStatusSchema,
   compartment_status: ContextStatusSchema,
   source_ids: z.array(z.string().regex(/^SOURCE:[A-Z0-9][A-Z0-9_.-]*$/)),
-  generation_lineage: z.array(DigestSchema),
-  assumptions: z.array(z.string().min(1)),
+  generation_lineage: z.array(Sha256HexSchema),
+  assumptions: z.array(NonEmptyStringSchema),
   uncertainty: UncertaintySchema,
   simulation_eligible: z.boolean(),
-  simulation_eligibility_rationale: z.string().min(1),
+  simulation_eligibility_rationale: NonEmptyStringSchema,
   trusted_knowledge_eligible: z.literal(false),
   can_support_biological_conclusion: z.literal(false),
   automatic_promotion: z.literal(false),
@@ -302,14 +301,14 @@ export const NutrientReactionSimulationCandidateSchema = z.object({
 
 export const NutrientReactionHypothesisSchema = z.object({
   id: z.string().regex(/^HYPOTHESIS:[A-Z0-9][A-Z0-9_.-]*$/),
-  content_digest: DigestSchema,
+  content_digest: Sha256HexSchema,
   candidate_ids: z.array(z.string().regex(/^REACTION_CANDIDATE:[A-Z0-9][A-Z0-9_.-]*$/)).min(1),
-  input_digests: z.array(DigestSchema).min(1),
-  generation_method: z.string().min(1),
-  assumptions: z.array(z.string().min(1)).min(1),
+  input_digests: z.array(Sha256HexSchema).min(1),
+  generation_method: NonEmptyStringSchema,
+  assumptions: z.array(NonEmptyStringSchema).min(1),
   uncertainty: UncertaintySchema,
-  falsifiable_statement: z.string().min(1),
-  proposed_test: z.string().min(1),
+  falsifiable_statement: NonEmptyStringSchema,
+  proposed_test: NonEmptyStringSchema,
   status: z.enum(['unreviewed', 'accepted-for-testing', 'rejected', 'tested-supported-within-boundary', 'tested-failed', 'not-evaluable']),
   trusted_knowledge_eligible: z.literal(false),
   can_support_biological_conclusion: z.literal(false),
@@ -348,7 +347,3 @@ export function verifyNutrientReactionHypothesis(value) {
   return NutrientReactionHypothesisSchema.parse(value)
 }
 
-export function collectNutrientReactionRecordIds(value) {
-  const records = [value, ...(value.participants ?? [])]
-  return records.flatMap((record) => Object.values(record).filter((item) => typeof item === 'string' && RecordIdSchema.safeParse(item).success))
-}

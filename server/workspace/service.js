@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdir, mkdtemp, realpath, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { canonicalDigest, canonicalJson } from '../../shared/canonical-json.js'
 import {
   ArtifactRecordSchema,
@@ -27,6 +25,10 @@ import {
   WorkspaceSpecificationSchema
 } from '../../shared/workspace-contracts.js'
 import { PortfolioResultSchema } from '../../shared/portfolio-contracts.js'
+import { isoNow as now } from '../commons/clock.js'
+import { defineRequestError } from '../commons/errors.js'
+import { parseJsonColumn as parseJson, transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { verifyKnowledgeSnapshot } from '../knowledge/snapshot.js'
 import { executeInWorker, validateExperimentForModel } from '../portfolio/execution.js'
 import { modelDigest } from '../portfolio/identity.js'
@@ -58,48 +60,18 @@ const DEFAULT_PROFILE = Object.freeze({
   isDefault: true
 })
 
-const now = () => new Date().toISOString()
-const parseJson = (value) => value === null ? null : JSON.parse(value)
 
-export class WorkspaceRequestError extends Error {
-  constructor(code, message, statusCode = 422) {
-    super(message)
-    this.name = 'WorkspaceRequestError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const WorkspaceRequestError = defineRequestError('WorkspaceRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
-
-async function selectRoot(options) {
-  const configured = options.root ?? options.env?.BIOCHEMICAL_WORKSPACE_ROOT
-  if (!configured && options.env?.NODE_ENV === 'test') {
-    const testRoot = resolve(options.env.BIOCHEMICAL_TEST_WORKSPACE_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await mkdir(testRoot, { recursive: true, mode: 0o700 })
-    return { root: await mkdtemp(resolve(testRoot, 'workspace-')), ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'workspace-v1'))
-  if (inside(resolve(process.cwd()), root)) throw new WorkspaceRequestError('workspace_root_in_source', 'BIOCHEMICAL_WORKSPACE_ROOT must be outside the source tree.', 500)
-  await mkdir(root, { recursive: true, mode: 0o700 })
-  const [sourceRealPath, rootRealPath] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceRealPath, rootRealPath)) throw new WorkspaceRequestError('workspace_root_in_source', 'BIOCHEMICAL_WORKSPACE_ROOT must be outside the source tree.', 500)
-  return { root: rootRealPath, ephemeral: false }
-}
-
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const result = action()
-    database.exec('COMMIT')
-    return result
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
+function selectRoot(options) {
+  const env = options.env
+  return selectStorageRoot({
+    configured: options.root ?? env?.BIOCHEMICAL_WORKSPACE_ROOT,
+    test: env?.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_WORKSPACE_ROOT), prefix: 'workspace-' } : null,
+    defaultName: 'workspace-v1',
+    secure: false,
+    inSourceError: () => new WorkspaceRequestError('workspace_root_in_source', 'BIOCHEMICAL_WORKSPACE_ROOT must be outside the source tree.', 500)
+  })
 }
 
 function experimentRecord(row) {

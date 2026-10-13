@@ -1,16 +1,10 @@
-import { createHash } from 'node:crypto'
 import { lstat, readFile, readdir, readlink } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, compareUtf8, sha256Hex } from '../../server/commons/digest.js'
+import { inside } from '../../server/commons/paths.js'
 
-const compareUtf8 = (left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right))
-
-function inside(parent, child) {
-  const selected = relative(parent, child)
-  return selected === '' || (selected !== '..' && !selected.startsWith(`..${sep}`) && !isAbsolute(selected))
-}
-
-export function deploymentClosure(root, repository) {
+function deploymentClosure(root, repository) {
   if (repository === 'biochemical-db') return [
     { name: 'service-js/package.json', path: resolve(root, 'service-js', 'package.json') },
     { name: 'service-js/src', path: resolve(root, 'service-js', 'src') },
@@ -52,11 +46,11 @@ export async function deploymentTreeDigest(root, repository) {
     const bytes = await readFile(path)
     const after = await lstat(path, { bigint: true })
     if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size || before.mtimeNs !== after.mtimeNs || before.ctimeNs !== after.ctimeNs) throw new Error(`deployment file changed while it was verified: ${name}`)
-    entries.push({ path: name, type: 'file', mode, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') })
+    entries.push({ path: name, type: 'file', mode, bytes: bytes.length, sha256: sha256Hex(bytes) })
   }
   for (const item of selectedClosure) await visit(item.path, item.name)
   entries.sort((left, right) => compareUtf8(left.path, right.path))
-  return createHash('sha256').update(canonicalJson({ artifact_tree_schema_version: 'biochemical-runnable-tree-v2', entries })).digest('hex')
+  return canonicalSha256Hex({ artifact_tree_schema_version: 'biochemical-runnable-tree-v2', entries })
 }
 
 export async function verifyDeploymentTree(root, repository, marker) {

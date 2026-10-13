@@ -1,7 +1,7 @@
-import { createHash } from 'node:crypto'
 import yauzl from 'yauzl'
 import yazl from 'yazl'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { sha256Prefixed as bufferDigest } from '../commons/digest.js'
 import { KnowledgeSnapshotSchema } from '../../shared/snapshot-contracts.js'
 import { PORTABLE_BUNDLE_PROFILE, PortableBundleManifestSchema, WORKSPACE_MAX_BUNDLE_BYTES, WorkspaceRunResultSchema, WorkspaceSpecificationSchema } from '../../shared/workspace-contracts.js'
 import { verifyKnowledgeSnapshot } from '../knowledge/snapshot.js'
@@ -14,7 +14,6 @@ const MAX_ENTRIES = 260
 const MAX_COMPRESSION_RATIO = 100
 const ZIP_MTIME = new Date('1980-01-01T00:00:00.000Z')
 
-const bufferDigest = (buffer) => `sha256:${createHash('sha256').update(buffer).digest('hex')}`
 const objectPath = (digest) => `objects/sha256/${digest.slice('sha256:'.length)}`
 
 function zipBuffer(files) {

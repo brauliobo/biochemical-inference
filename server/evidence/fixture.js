@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { sha256Hex } from '../commons/digest.js'
 import {
   EVIDENCE_RANKING_EXPLANATIONS,
   EvidenceCandidateExtractionRequestSchema,
@@ -52,9 +52,7 @@ const details = new Map(documents.map((document) => [document.id, EvidenceDocume
   relations: []
 })]))
 
-function digest(value) {
-  return createHash('sha256').update(value).digest('hex')
-}
+const digest = sha256Hex
 
 export function createEvidenceFixtureClient() {
   const candidates = new Map()

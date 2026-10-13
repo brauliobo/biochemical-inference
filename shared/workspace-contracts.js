@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { OffsetDatetimeSchema, ShortIdentifierSchema, NcbiTaxonIdSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, pageLimitQuerySchema } from './commons/schemas.js'
 import { ExperimentSchema, PortfolioModelSchema, PortfolioResultSchema, RunOutcomeSchema, Sha256Schema } from './portfolio-contracts.js'
 
 export const WORKSPACE_CONTRACT_VERSION = '1.0.0'
@@ -7,28 +8,25 @@ export const WORKSPACE_MAX_BUNDLE_BYTES = 25_000_000
 export const WORKSPACE_BUNDLE_BASE64_MAX_LENGTH = Math.ceil(WORKSPACE_MAX_BUNDLE_BYTES / 3) * 4
 export const WORKSPACE_BUNDLE_REQUEST_BODY_LIMIT = WORKSPACE_BUNDLE_BASE64_MAX_LENGTH + 64
 
-const IdentifierSchema = z.string().regex(/^[A-Za-z][A-Za-z0-9_.-]{0,63}$/)
-const TimestampSchema = z.string().datetime({ offset: true })
-const TaxonSchema = z.string().regex(/^NCBITaxon:[1-9][0-9]*$/)
 const TissueSchema = z.string().regex(/^[A-Z][A-Za-z0-9_]*:[A-Za-z0-9_.-]+$/)
-const FailureSchema = z.object({ code: IdentifierSchema, message: z.string().min(1).max(2000) }).strict()
+const FailureSchema = z.object({ code: ShortIdentifierSchema, message: NonEmptyStringSchema.max(2000) }).strict()
 
 export const NumericalContractSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('exact') }).strict(),
-  z.object({ kind: z.literal('tolerance'), absolute: z.number().finite().nonnegative(), relative: z.number().finite().nonnegative() }).strict()
+  z.object({ kind: z.literal('tolerance'), absolute: FiniteNumberSchema.nonnegative(), relative: FiniteNumberSchema.nonnegative() }).strict()
 ])
 
 export const WorkspaceDesignSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('single') }).strict(),
-  z.object({ type: z.literal('parameter-sweep'), parameterId: IdentifierSchema, values: z.array(z.number().finite()).min(2).max(128) }).strict(),
+  z.object({ type: z.literal('parameter-sweep'), parameterId: ShortIdentifierSchema, values: z.array(FiniteNumberSchema).min(2).max(128) }).strict(),
   z.object({ type: z.literal('ensemble'), members: z.number().int().min(2).max(128) }).strict(),
-  z.object({ type: z.literal('sensitivity'), parameterIds: z.array(IdentifierSchema).min(1).max(32) }).strict(),
+  z.object({ type: z.literal('sensitivity'), parameterIds: z.array(ShortIdentifierSchema).min(1).max(32) }).strict(),
   z.object({ type: z.literal('intervention-schedule') }).strict()
 ])
 
 export const WorkspaceEntrySchema = z.object({
-  id: IdentifierSchema,
-  label: z.string().min(1).max(160),
+  id: ShortIdentifierSchema,
+  label: NonEmptyStringSchema.max(160),
   model: PortfolioModelSchema,
   experiment: ExperimentSchema
 }).strict().superRefine((entry, context) => {
@@ -39,10 +37,10 @@ export const WorkspaceEntrySchema = z.object({
 export const WorkspaceSpecificationSchema = z.object({
   contractVersion: z.literal(WORKSPACE_CONTRACT_VERSION),
   design: WorkspaceDesignSchema,
-  context: z.object({ taxonId: TaxonSchema, tissueId: TissueSchema.nullable() }).strict(),
+  context: z.object({ taxonId: NcbiTaxonIdSchema, tissueId: TissueSchema.nullable() }).strict(),
   entries: z.array(WorkspaceEntrySchema).min(1).max(128),
   numericalContract: NumericalContractSchema,
-  tags: z.array(IdentifierSchema).max(32)
+  tags: z.array(ShortIdentifierSchema).max(32)
 }).strict().superRefine((specification, context) => {
   const identifiers = specification.entries.map((entry) => entry.id)
   if (new Set(identifiers).size !== identifiers.length) context.addIssue({ code: z.ZodIssueCode.custom, path: ['entries'], message: 'entry identifiers must be unique' })
@@ -53,8 +51,8 @@ export const WorkspaceSpecificationSchema = z.object({
 })
 
 export const ResourceProfileSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(100),
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(100),
   cpuCores: z.number().int().min(1).max(64),
   concurrency: z.number().int().min(1).max(16),
   gpu: z.enum(['disabled', 'optional', 'required']),
@@ -69,24 +67,24 @@ export const ExperimentCreateRequestSchema = z.object({
   name: z.string().trim().min(1).max(160),
   description: z.string().trim().max(2000),
   specification: WorkspaceSpecificationSchema,
-  resourceProfileId: IdentifierSchema.default('local-default')
+  resourceProfileId: ShortIdentifierSchema.default('local-default')
 }).strict()
 
 export const ExperimentRecordSchema = z.object({
   experimentId: z.string().uuid(),
-  name: z.string().min(1).max(160),
+  name: NonEmptyStringSchema.max(160),
   description: z.string().max(2000),
-  createdAt: TimestampSchema,
-  updatedAt: TimestampSchema,
+  createdAt: OffsetDatetimeSchema,
+  updatedAt: OffsetDatetimeSchema,
   latestRevisionId: Sha256Schema.nullable()
 }).strict()
 
-export const RevisionCreateRequestSchema = z.object({ specification: WorkspaceSpecificationSchema, resourceProfileId: IdentifierSchema.default('local-default') }).strict()
+export const RevisionCreateRequestSchema = z.object({ specification: WorkspaceSpecificationSchema, resourceProfileId: ShortIdentifierSchema.default('local-default') }).strict()
 
 export const RevisionRecordSchema = z.object({
   revisionId: Sha256Schema,
   experimentId: z.string().uuid(),
-  ordinal: z.number().int().positive(),
+  ordinal: PositiveIntSchema,
   parentRevisionId: Sha256Schema.nullable(),
   specificationDigest: Sha256Schema,
   specificationObjectDigest: Sha256Schema,
@@ -94,9 +92,9 @@ export const RevisionRecordSchema = z.object({
   snapshotObjectDigest: Sha256Schema,
   modelDigests: z.array(Sha256Schema).min(1),
   engineDigests: z.array(Sha256Schema).min(1),
-  resourceProfileId: IdentifierSchema,
+  resourceProfileId: ShortIdentifierSchema,
   source: z.enum(['local', 'clone', 'import']),
-  createdAt: TimestampSchema,
+  createdAt: OffsetDatetimeSchema,
   specification: WorkspaceSpecificationSchema
 }).strict()
 
@@ -108,16 +106,16 @@ export const AttemptRecordSchema = z.object({
   attemptId: Sha256Schema,
   runId: Sha256Schema,
   revisionId: Sha256Schema,
-  attemptNumber: z.number().int().positive(),
+  attemptNumber: PositiveIntSchema,
   kind: AttemptKindSchema,
   restartMode: z.literal('from-specification').nullable(),
   checkpointId: Sha256Schema.nullable(),
   state: QueueStateSchema,
   outcome: RunOutcomeSchema.nullable(),
-  resourceProfileId: IdentifierSchema,
-  createdAt: TimestampSchema,
-  startedAt: TimestampSchema.nullable(),
-  completedAt: TimestampSchema.nullable(),
+  resourceProfileId: ShortIdentifierSchema,
+  createdAt: OffsetDatetimeSchema,
+  startedAt: OffsetDatetimeSchema.nullable(),
+  completedAt: OffsetDatetimeSchema.nullable(),
   cancellationRequested: z.boolean(),
   failure: FailureSchema.nullable(),
   resultArtifactId: Sha256Schema.nullable(),
@@ -128,17 +126,17 @@ export const RunRecordSchema = z.object({
   runId: Sha256Schema,
   revisionIds: z.array(Sha256Schema).min(1),
   scientificIdentityVersion: z.literal('workspace-scientific-run-v1'),
-  createdAt: TimestampSchema,
+  createdAt: OffsetDatetimeSchema,
   attempts: z.array(AttemptRecordSchema)
 }).strict()
 
 export const WorkspaceEventSchema = z.object({
   eventId: Sha256Schema,
   attemptId: Sha256Schema,
-  sequence: z.number().int().positive(),
+  sequence: PositiveIntSchema,
   type: z.enum(['queued', 'started', 'progress', 'cancellation-requested', 'cancelled', 'completed', 'failed', 'interrupted', 'recovered', 'resource-exhausted', 'rerun-verified']),
-  at: TimestampSchema,
-  data: z.record(z.union([z.string(), z.number().finite(), z.boolean(), z.null()]))
+  at: OffsetDatetimeSchema,
+  data: z.record(z.union([z.string(), FiniteNumberSchema, z.boolean(), z.null()]))
 }).strict()
 
 export const SpecificationCheckpointSchema = z.object({
@@ -153,7 +151,7 @@ export const SpecificationCheckpointSchema = z.object({
   snapshotDigest: Sha256Schema,
   modelDigests: z.array(Sha256Schema).min(1),
   engineDigests: z.array(Sha256Schema).min(1),
-  createdAt: TimestampSchema
+  createdAt: OffsetDatetimeSchema
 }).strict()
 
 export const ArtifactRecordSchema = z.object({
@@ -161,10 +159,10 @@ export const ArtifactRecordSchema = z.object({
   attemptId: Sha256Schema,
   name: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,159}$/),
   kind: z.enum(['result', 'log', 'report-html', 'report-json', 'report-csv', 'report-svg', 'bundle']),
-  mediaType: z.string().min(1).max(100),
+  mediaType: NonEmptyStringSchema.max(100),
   digest: Sha256Schema,
-  bytes: z.number().int().nonnegative(),
-  createdAt: TimestampSchema
+  bytes: NonNegativeIntSchema,
+  createdAt: OffsetDatetimeSchema
 }).strict()
 
 export const WorkspaceRunResultSchema = z.object({
@@ -172,30 +170,30 @@ export const WorkspaceRunResultSchema = z.object({
   runId: Sha256Schema,
   attemptId: Sha256Schema,
   revisionId: Sha256Schema,
-  entries: z.array(z.object({ entryId: IdentifierSchema, result: PortfolioResultSchema }).strict()).min(1),
+  entries: z.array(z.object({ entryId: ShortIdentifierSchema, result: PortfolioResultSchema }).strict()).min(1),
   numericalContract: NumericalContractSchema
 }).strict()
 
 export const HistoryFilterSchema = z.object({
   release: z.string().max(160).optional(),
-  model: IdentifierSchema.optional(),
-  taxon: TaxonSchema.optional(),
+  model: ShortIdentifierSchema.optional(),
+  taxon: NcbiTaxonIdSchema.optional(),
   tissue: TissueSchema.optional(),
   status: z.union([QueueStateSchema, RunOutcomeSchema]).optional(),
-  limit: z.coerce.number().int().min(1).max(200).default(50),
+  limit: pageLimitQuerySchema(50, 200),
   offset: z.coerce.number().int().min(0).default(0)
 }).strict()
 
 export const HistoryItemSchema = z.object({
   attempt: AttemptRecordSchema,
   experimentId: z.string().uuid(),
-  experimentName: z.string().min(1),
-  taxonId: TaxonSchema,
+  experimentName: NonEmptyStringSchema,
+  taxonId: NcbiTaxonIdSchema,
   tissueId: TissueSchema.nullable(),
-  modelIds: z.array(IdentifierSchema).min(1),
-  releaseIds: z.array(z.string().min(1)).min(1)
+  modelIds: z.array(ShortIdentifierSchema).min(1),
+  releaseIds: z.array(NonEmptyStringSchema).min(1)
 }).strict()
-export const HistoryResponseSchema = z.object({ items: z.array(HistoryItemSchema), total: z.number().int().nonnegative(), limit: z.number().int().positive(), offset: z.number().int().nonnegative() }).strict()
+export const HistoryResponseSchema = z.object({ items: z.array(HistoryItemSchema), total: NonNegativeIntSchema, limit: PositiveIntSchema, offset: NonNegativeIntSchema }).strict()
 
 export const AttemptDetailSchema = z.object({
   attempt: AttemptRecordSchema,
@@ -203,8 +201,8 @@ export const AttemptDetailSchema = z.object({
   experiment: ExperimentRecordSchema
 }).strict()
 
-export const RunCreateRequestSchema = z.object({ revisionId: Sha256Schema, resourceProfileId: IdentifierSchema.optional() }).strict()
-export const RestartRequestSchema = z.object({ resourceProfileId: IdentifierSchema.optional() }).strict()
+export const RunCreateRequestSchema = z.object({ revisionId: Sha256Schema, resourceProfileId: ShortIdentifierSchema.optional() }).strict()
+export const RestartRequestSchema = z.object({ resourceProfileId: ShortIdentifierSchema.optional() }).strict()
 
 export const ComparisonRequestSchema = z.object({ leftAttemptId: Sha256Schema, rightAttemptId: Sha256Schema, contract: NumericalContractSchema }).strict()
 export const ComparisonRecordSchema = z.object({
@@ -214,15 +212,15 @@ export const ComparisonRecordSchema = z.object({
   contract: NumericalContractSchema,
   status: z.enum(['pass', 'fail', 'incompatible']),
   specificationChanged: z.boolean(),
-  differences: z.array(z.object({ path: z.string().min(1), left: z.number().finite(), right: z.number().finite(), absoluteDifference: z.number().finite().nonnegative(), withinContract: z.boolean() }).strict()).max(10_000),
-  createdAt: TimestampSchema
+  differences: z.array(z.object({ path: NonEmptyStringSchema, left: FiniteNumberSchema, right: FiniteNumberSchema, absoluteDifference: FiniteNumberSchema.nonnegative(), withinContract: z.boolean() }).strict()).max(10_000),
+  createdAt: OffsetDatetimeSchema
 }).strict()
 
 export const ReportRequestSchema = z.object({ attemptId: Sha256Schema }).strict()
 export const ReportDocumentSchema = z.object({
   reportVersion: z.literal(WORKSPACE_CONTRACT_VERSION),
   reportId: Sha256Schema,
-  experiment: z.object({ experimentId: z.string().uuid(), name: z.string().min(1), description: z.string() }).strict(),
+  experiment: z.object({ experimentId: z.string().uuid(), name: NonEmptyStringSchema, description: z.string() }).strict(),
   revision: z.object({ revisionId: Sha256Schema, specificationDigest: Sha256Schema, snapshotDigest: Sha256Schema }).strict(),
   attempt: AttemptRecordSchema,
   result: WorkspaceRunResultSchema,
@@ -232,12 +230,12 @@ export const ReportDocumentSchema = z.object({
 export const ReportRecordSchema = z.object({
   reportId: Sha256Schema,
   attemptId: Sha256Schema,
-  createdAt: TimestampSchema,
+  createdAt: OffsetDatetimeSchema,
   artifacts: z.array(ArtifactRecordSchema).length(4),
   csp: z.literal("default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
 }).strict()
 
-export const BundleObjectSchema = z.object({ path: z.string().regex(/^objects\/sha256\/[a-f0-9]{64}$/), digest: Sha256Schema, bytes: z.number().int().nonnegative(), mediaType: z.string().min(1) }).strict()
+export const BundleObjectSchema = z.object({ path: z.string().regex(/^objects\/sha256\/[a-f0-9]{64}$/), digest: Sha256Schema, bytes: NonNegativeIntSchema, mediaType: NonEmptyStringSchema }).strict()
 export const PortableBundleManifestSchema = z.object({
   profile: z.literal(PORTABLE_BUNDLE_PROFILE),
   experiment: ExperimentRecordSchema,
@@ -247,5 +245,5 @@ export const PortableBundleManifestSchema = z.object({
   rerun: z.object({ contract: NumericalContractSchema, expectedResultDigest: Sha256Schema.nullable() }).strict()
 }).strict()
 
-export const BundleImportRequestSchema = z.object({ bundleBase64: z.string().min(1).max(WORKSPACE_BUNDLE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
-export const BundleExportResponseSchema = z.object({ profile: z.literal(PORTABLE_BUNDLE_PROFILE), fileName: z.string().regex(/^[A-Za-z0-9_.-]+\.zip$/), bundleBase64: z.string().min(1) }).strict()
+export const BundleImportRequestSchema = z.object({ bundleBase64: NonEmptyStringSchema.max(WORKSPACE_BUNDLE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
+export const BundleExportResponseSchema = z.object({ profile: z.literal(PORTABLE_BUNDLE_PROFILE), fileName: z.string().regex(/^[A-Za-z0-9_.-]+\.zip$/), bundleBase64: NonEmptyStringSchema }).strict()

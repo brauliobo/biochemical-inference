@@ -37,7 +37,7 @@ import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from './fixture.j
 import { bundledKnowledgeSnapshot, verifyKnowledgeSnapshot } from './snapshot.js'
 import { canonicalJson } from '../../shared/canonical-json.js'
 
-export const DEFAULT_BIOCHEMICAL_DB_URL = 'http://127.0.0.1:8000'
+const DEFAULT_BIOCHEMICAL_DB_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_RELEASE_ID = 'one-carbon-human-mouse-v1.0.0'
 export const DEFAULT_RELEASE_DIGEST = 'b72d00c072551a6babd348cf88302788e9a7b547cca17f9fb834e7e0cddbeef1'
 export const DEFAULT_ATLAS_RELEASE_ID = 'contextual-mthfr-human-mouse-v2.0.0'

@@ -1,7 +1,6 @@
-import { createHash, createPublicKey } from 'node:crypto'
-import { homedir } from 'node:os'
-import { isAbsolute, join, relative, resolve, sep } from 'node:path'
-import { mkdir, mkdtemp, realpath, rm } from 'node:fs/promises'
+import { createPublicKey } from 'node:crypto'
+import { join } from 'node:path'
+import { rm } from 'node:fs/promises'
 import { z } from 'zod'
 import { canonicalDigest, canonicalJson } from '../../shared/canonical-json.js'
 import {
@@ -15,60 +14,36 @@ import {
   TrustKeyAddRequestSchema,
   TrustKeySchema
 } from '../../shared/physiology-contracts.js'
+import { isoNow as now } from '../commons/clock.js'
+import { sha256Hex, sha256Prefixed } from '../commons/digest.js'
+import { defineRequestError } from '../commons/errors.js'
+import { transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { createObjectStore } from '../workspace/object-store.js'
 import { openPhysiologyDatabase } from './database.js'
 import { createReferencePackages, REFERENCE_KEY_ID, REFERENCE_PUBLIC_KEY_SPKI_BASE64, REFERENCE_PUBLISHER } from './reference.js'
 import { checkBubblewrapSandbox, runBubblewrapPlugin } from './sandbox.js'
-import { digestBuffer, validateBppPackage } from './package.js'
+import { validateBppPackage } from './package.js'
 
 const BUILT_IN_AT = '2026-07-13T00:00:00.000Z'
 const ENGINE_VERSION = 'physiology-coupler-v1.1.0'
 const REQUIRED_PLUGINS = ['PLUGIN:CIRCULATION-REFERENCE', 'PLUGIN:LIVER-REFERENCE', 'PLUGIN:KIDNEY-REFERENCE']
-const now = () => new Date().toISOString()
 const ProcessOutputSchema = z.object({
   schemaVersion: z.literal('1.0.0'),
   outputs: z.array(z.object({ portId: z.string().regex(/^PORT:[A-Z0-9][A-Z0-9-]{2,95}$/), value: z.number().finite().nonnegative(), unit: z.literal('mg/min') }).strict()).max(4)
 }).strict()
 
-export class PhysiologyRequestError extends Error {
-  constructor(code, message, statusCode = 422) {
-    super(message)
-    this.name = 'PhysiologyRequestError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const PhysiologyRequestError = defineRequestError('PhysiologyRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
-
-async function selectRoot(options) {
-  const configured = options.root ?? options.env.BIOCHEMICAL_PHYSIOLOGY_ROOT ?? (options.env.BIOCHEMICAL_WORKSPACE_ROOT ? join(options.env.BIOCHEMICAL_WORKSPACE_ROOT, 'physiology-v1') : undefined)
-  if (!configured && options.env.NODE_ENV === 'test') {
-    const testRoot = resolve(options.env.BIOCHEMICAL_TEST_PHYSIOLOGY_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await mkdir(testRoot, { recursive: true, mode: 0o700 })
-    return { root: await mkdtemp(resolve(testRoot, 'physiology-')), ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'physiology-v1'))
-  if (inside(resolve(process.cwd()), root)) throw new PhysiologyRequestError('physiology_root_in_source', 'Physiology storage root must be outside the source tree.', 500)
-  await mkdir(root, { recursive: true, mode: 0o700 })
-  const [sourceRealPath, rootRealPath] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceRealPath, rootRealPath)) throw new PhysiologyRequestError('physiology_root_in_source', 'Physiology storage root must be outside the source tree.', 500)
-  return { root: rootRealPath, ephemeral: false }
-}
-
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const result = action()
-    database.exec('COMMIT')
-    return result
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
+function selectRoot(options) {
+  const env = options.env
+  return selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_PHYSIOLOGY_ROOT ?? (env.BIOCHEMICAL_WORKSPACE_ROOT ? join(env.BIOCHEMICAL_WORKSPACE_ROOT, 'physiology-v1') : undefined),
+    test: env.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_PHYSIOLOGY_ROOT), prefix: 'physiology-' } : null,
+    defaultName: 'physiology-v1',
+    secure: false,
+    inSourceError: () => new PhysiologyRequestError('physiology_root_in_source', 'Physiology storage root must be outside the source tree.', 500)
+  })
 }
 
 function revokedCertification(certification) {
@@ -255,7 +230,7 @@ export async function createPhysiologyService(options = {}) {
   }
 
   for (const reference of await createReferencePackages(evidence)) {
-    const digest = digestBuffer(reference.bytes)
+    const digest = sha256Prefixed(reference.bytes)
     const alreadyInstalled = database.prepare('SELECT package_digest FROM packages WHERE package_digest = ?').get(digest)
     if (alreadyInstalled) continue
     const validated = await validateBppPackage(reference.bytes, { evidence, trustKey, processSandboxAvailable: sandbox.available, installedAt: BUILT_IN_AT, builtIn: true })
@@ -292,7 +267,7 @@ export async function createPhysiologyService(options = {}) {
     }
     if (key.asymmetricKeyType !== 'ed25519') throw new PhysiologyRequestError('invalid_trust_key', 'Publisher public key must be Ed25519.')
     const canonicalSpki = key.export({ format: 'der', type: 'spki' })
-    const expectedKeyId = `ed25519:${createHash('sha256').update(canonicalSpki).digest('hex').slice(0, 16)}`
+    const expectedKeyId = `ed25519:${sha256Hex(canonicalSpki).slice(0, 16)}`
     if (request.keyId !== expectedKeyId || canonicalSpki.toString('base64') !== request.publicKeySpkiBase64) throw new PhysiologyRequestError('trust_key_id_mismatch', 'Publisher key identifier or encoding does not match canonical SPKI bytes.')
     const existing = trustKey(request.keyId)
     if (existing) {

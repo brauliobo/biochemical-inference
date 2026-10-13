@@ -2,12 +2,14 @@ import { createHash } from 'node:crypto'
 import { createReadStream } from 'node:fs'
 import { DatabaseSync } from 'node:sqlite'
 import { chmod, copyFile, lstat, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
+import { dirname, relative, resolve, sep } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { compareUtf8, sha256Hex as digest } from '../../server/commons/digest.js'
+import { inside } from '../../server/commons/paths.js'
 import { acquireInferenceBackupLock, assertInferenceOperationLock } from '../../server/operations/runtime-lock.js'
 import { assertSafeLocalFilesystem, inspectNoSymlinkPath, publishDirectoryAnchored, removeAnchored, syncPath, syncTree, withDirectoryAnchor } from '../../server/operations/path-safety.js'
 
-export const INFERENCE_BACKUP_VERSION = 'biochemical-inference-state-backup-v1'
+const INFERENCE_BACKUP_VERSION = 'biochemical-inference-state-backup-v1'
 export const INFERENCE_STATE_ROOTS = Object.freeze([
   ['challenge', 'sqlite-cas', 'goal13.sqlite3'],
   ['data-plane', 'sqlite-cas', 'data-plane.sqlite3'],
@@ -21,13 +23,6 @@ export const INFERENCE_STATE_ROOTS = Object.freeze([
 
 const PRIVATE_NAME = /(?:^|\/)(?:[^/]*(?:private[-_.]?key|secret|token)[^/]*|[^/]+\.pem)$/i
 const PRIVATE_BYTES = [Buffer.from('-----BEGIN PRIVATE KEY-----'), Buffer.from('-----BEGIN ENCRYPTED PRIVATE KEY-----')]
-const compareUtf8 = (left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right))
-const digest = (value) => createHash('sha256').update(value).digest('hex')
-
-function inside(parent, child) {
-  const selected = relative(parent, child)
-  return selected === '' || (selected !== '..' && !selected.startsWith(`..${sep}`) && !isAbsolute(selected))
-}
 
 async function exactDirectory(path, label) {
   return (await inspectNoSymlinkPath(path, label)).path

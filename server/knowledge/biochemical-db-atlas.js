@@ -230,7 +230,7 @@ export function adaptAtlasCatalogEntry(entry, source = 'biochemical-db') {
   })
 }
 
-export function adaptAtlasEntity(entity) {
+function adaptAtlasEntity(entity) {
   const adapted = {
     id: entity.id,
     name: entity.name,
@@ -254,7 +254,7 @@ export function adaptAtlasEntity(entity) {
   return AtlasEntitySchema.parse(adapted)
 }
 
-export function adaptAtlasEvidence(evidence) {
+function adaptAtlasEvidence(evidence) {
   return AtlasEvidenceSchema.parse({
     id: evidence.id,
     kind: evidence.kind,
@@ -265,7 +265,7 @@ export function adaptAtlasEvidence(evidence) {
   })
 }
 
-export function adaptAtlasClaim(claim) {
+function adaptAtlasClaim(claim) {
   return AtlasClaimSchema.parse({
     id: claim.id,
     subjectId: claim.subject_id,
@@ -284,7 +284,7 @@ export function adaptAtlasClaim(claim) {
   })
 }
 
-export function adaptAtlasMapping(mapping) {
+function adaptAtlasMapping(mapping) {
   return AtlasMappingSchema.parse({
     id: mapping.id,
     sourceId: mapping.source_id,
@@ -297,7 +297,7 @@ export function adaptAtlasMapping(mapping) {
   })
 }
 
-export function adaptAtlasTransformation(transformation) {
+function adaptAtlasTransformation(transformation) {
   return AtlasTransformationSchema.parse({
     id: transformation.id,
     kind: transformation.kind,
@@ -311,7 +311,7 @@ export function adaptAtlasTransformation(transformation) {
   })
 }
 
-export function adaptAtlasCoverage(coverage) {
+function adaptAtlasCoverage(coverage) {
   return AtlasCoverageSchema.parse({
     id: coverage.id,
     taxonId: internalTaxonId(coverage.taxon_id),
@@ -327,7 +327,7 @@ export function adaptAtlasCoverage(coverage) {
   })
 }
 
-export function adaptAtlasLimitation(limitation) {
+function adaptAtlasLimitation(limitation) {
   return AtlasLimitationSchema.parse({
     id: limitation.id,
     category: limitation.category,

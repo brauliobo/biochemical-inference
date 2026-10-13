@@ -1,7 +1,8 @@
-import { createHash, createPublicKey, verify as verifyCrypto } from 'node:crypto'
 import { gunzipSync } from 'node:zlib'
-import { TextDecoder } from 'node:util'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
+import { defineProblemError } from '../commons/errors.js'
+import { parseCanonicalBytes, verifyEd25519Signature } from '../commons/verification.js'
 import {
   MEASURED_SPATIAL_ARRAY_PINS,
   MEASURED_SPATIAL_PINS,
@@ -22,54 +23,15 @@ import {
 export const MAX_MEASURED_SPATIAL_METADATA_BYTES = 16 * 1024 * 1024
 export const MAX_MEASURED_SPATIAL_PAGE_BYTES = 2 * 1024 * 1024
 export const MAX_MEASURED_SPATIAL_CHUNK_BYTES = 1024 * 1024
-const utf8 = new TextDecoder('utf-8', { fatal: true })
 const RECORD_COUNTS = Object.freeze({ acquisitions: 1, spaces: 1, arrays: 4, labels: 1, registrations: 1, limitations: 3, attribution: 1 })
 
-export class MeasuredSpatialVerificationError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'MeasuredSpatialVerificationError'
-    this.code = options.code ?? 'MEASURED_SPATIAL_VERIFICATION_FAILED'
-    this.statusCode = options.statusCode ?? 409
-  }
-}
+export const MeasuredSpatialVerificationError = defineProblemError('MeasuredSpatialVerificationError', { statusCode: 409, code: 'MEASURED_SPATIAL_VERIFICATION_FAILED' })
 
-export function measuredSpatialSha256(value) {
-  return createHash('sha256').update(value).digest('hex')
-}
+export const measuredSpatialSha256 = sha256Hex
+export const measuredSpatialDigest = canonicalSha256Hex
 
-export function measuredSpatialDigest(value) {
-  return measuredSpatialSha256(Buffer.from(canonicalJson(value)))
-}
-
-export function parseMeasuredSpatialCanonical(bytes, schema, label, expectedDigest) {
-  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_MEASURED_SPATIAL_METADATA_BYTES) throw new MeasuredSpatialVerificationError(`${label} exceeds its bounded canonical JSON contract.`)
-  if (expectedDigest && measuredSpatialSha256(bytes) !== expectedDigest) throw new MeasuredSpatialVerificationError(`${label} does not match its independent SHA-256 pin.`)
-  let text
-  let value
-  try {
-    text = utf8.decode(bytes)
-    value = JSON.parse(text)
-  } catch {
-    throw new MeasuredSpatialVerificationError(`${label} is not strict UTF-8 JSON.`)
-  }
-  let canonical
-  try {
-    canonical = canonicalJson(value)
-  } catch {
-    throw new MeasuredSpatialVerificationError(`${label} cannot be RFC 8785 canonical JSON.`)
-  }
-  if (canonical !== text) throw new MeasuredSpatialVerificationError(`${label} is not RFC 8785 canonical JSON.`)
-  const parsed = schema.safeParse(value)
-  if (!parsed.success) throw new MeasuredSpatialVerificationError(`${label} does not match the strict measured-spatial contract: ${parsed.error.issues[0].message}`)
-  return parsed.data
-}
-
-function strictBase64Url(value, bytes, label) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=')) throw new MeasuredSpatialVerificationError(`${label} is not strict unpadded base64url.`)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== bytes || decoded.toString('base64url') !== value) throw new MeasuredSpatialVerificationError(`${label} has an invalid canonical encoding.`)
-  return decoded
+function parseMeasuredSpatialCanonical(bytes, schema, label, expectedDigest) {
+  return parseCanonicalBytes(bytes, schema, label, { ErrorClass: MeasuredSpatialVerificationError, maxBytes: MAX_MEASURED_SPATIAL_METADATA_BYTES, expectedDigest, contract: 'measured-spatial', issue: true })
 }
 
 export function verifyMeasuredSpatialSignature(payload, signature, trust) {
@@ -77,17 +39,14 @@ export function verifyMeasuredSpatialSignature(payload, signature, trust) {
   if (!key || key.public_key !== MEASURED_SPATIAL_PINS.signerPublicKey || key.status !== 'retired') throw new MeasuredSpatialVerificationError('Measured-spatial signature does not use the independently pinned retired publication key.')
   const signedDate = signature.signed_at.slice(0, 10)
   if (signedDate < key.valid_from || signedDate > key.valid_until) throw new MeasuredSpatialVerificationError('Measured-spatial signature falls outside the publication key interval.')
-  const publicKey      = strictBase64Url(key.public_key, 32, 'Measured-spatial public key')
-  const signatureBytes = strictBase64Url(signature.value, 64, 'Measured-spatial signature')
-  const spki           = Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), publicKey])
-  const message        = Buffer.from(canonicalJson({ payload, algorithm: signature.algorithm, key_id: signature.key_id, signed_at: signature.signed_at }))
-  let valid = false
-  try {
-    valid = verifyCrypto(null, message, createPublicKey({ key: spki, format: 'der', type: 'spki' }), signatureBytes)
-  } catch {
-    valid = false
-  }
-  if (!valid) throw new MeasuredSpatialVerificationError('Measured-spatial Ed25519 signature is invalid.')
+  verifyEd25519Signature({
+    payload,
+    signature,
+    publicKey: key.public_key,
+    ErrorClass: MeasuredSpatialVerificationError,
+    labels: { publicKey: 'Measured-spatial public key', signature: 'Measured-spatial signature' },
+    invalidMessage: 'Measured-spatial Ed25519 signature is invalid.'
+  })
   return key
 }
 

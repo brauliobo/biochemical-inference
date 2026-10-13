@@ -21,17 +21,11 @@ import {
 } from '../../shared/derived-contracts.js'
 import { verifyDerivedBundle } from './bundle.js'
 import { createDerivedFixtureClient } from './fixture.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8000'
+const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8000'
 
-export class DerivedCompatibilityError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'DerivedCompatibilityError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'DERIVED_INCOMPATIBLE'
-  }
-}
+export const DerivedCompatibilityError = defineProblemError('DerivedCompatibilityError', { statusCode: 409, code: 'DERIVED_INCOMPATIBLE' })
 
 export function createDerivedClient(env = process.env) {
   if (env.BIOCHEMICAL_DERIVED_USE_FIXTURE === 'true' || env.BIOCHEMICAL_INFERENCE_USE_FIXTURE === 'true') return createDerivedFixtureClient()

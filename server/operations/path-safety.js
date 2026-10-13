@@ -67,7 +67,7 @@ export async function withDirectoryAnchor(path, label, operation) {
   try { return await operation(`/proc/self/fd/${handle.fd}`) } finally { await handle.close() }
 }
 
-export async function renameAnchored(source, target, rename) {
+async function renameAnchored(source, target, rename) {
   if (dirname(resolve(source)) !== dirname(resolve(target))) throw new Error('anchored rename requires one parent directory')
   return withDirectoryAnchor(dirname(resolve(source)), 'rename parent', (anchor) => rename(resolve(anchor, basename(source)), resolve(anchor, basename(target))))
 }

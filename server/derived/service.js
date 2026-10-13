@@ -1,15 +1,9 @@
 import { canonicalDigest } from '../../shared/canonical-json.js'
 import { ReproduceRequestSchema } from '../../shared/derived-contracts.js'
 import { apapResultArtifactContent, buildApapDerivedBundle, canonicalResultArtifactsEqual } from './bundle.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export class DerivedRequestError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'DerivedRequestError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'DERIVED_REQUEST_REJECTED'
-  }
-}
+export const DerivedRequestError = defineProblemError('DerivedRequestError', { statusCode: 409, code: 'DERIVED_REQUEST_REJECTED' })
 
 export function createDerivedRunService(derivedClient, apapRunService) {
   return {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256DigestSchema, OffsetDatetimeSchema, SemverSchema, KebabIdSchema, SourceIdSchema, ChebiIdSchema, RheaIdSchema, UniProtIdSchema, FactoryRecordTypeSchema, PositiveIntSchema, NonEmptyStringSchema } from './commons/schemas.js'
 
 export const TAXA = [
   { id: 9606, name: 'Human', scientificName: 'Homo sapiens' },
@@ -7,12 +8,11 @@ export const TAXA = [
 
 export const TaxonIdSchema = z.union([z.literal(9606), z.literal(10090)])
 
-const Sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
 
 export const ReleaseSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  digest: Sha256Schema,
+  id: NonEmptyStringSchema,
+  title: NonEmptyStringSchema,
+  digest: Sha256DigestSchema,
   schemaVersion: z.literal('1.0.0'),
   supportedTaxa: z.array(TaxonIdSchema),
   verified: z.literal(true),
@@ -21,34 +21,34 @@ export const ReleaseSchema = z.object({
 
 const ProvenanceArtifactSchema = z.object({
   path: z.string().regex(/^(recipes|sources\/locks)\/[a-z0-9.-]+\.json$/),
-  digest: Sha256Schema
+  digest: Sha256DigestSchema
 }).strict()
 
 const ProvenanceImplementationSchema = z.object({
-  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  version: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
-  digest: Sha256Schema
+  id: KebabIdSchema,
+  version: SemverSchema,
+  digest: Sha256DigestSchema
 }).strict()
 
 const ProvenanceSourceObjectSchema = z.object({
-  name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  recordType: z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']),
-  digest: Sha256Schema,
-  bytes: z.number().int().positive(),
+  name: KebabIdSchema,
+  recordType: FactoryRecordTypeSchema,
+  digest: Sha256DigestSchema,
+  bytes: PositiveIntSchema,
   objectClass: z.enum(['repository-authored-normalized-fixture', 'upstream-source-object']),
   upstreamResponse: z.boolean(),
   originUrl: z.string().regex(/^(?:file|https):\/\/\S+$/),
   artifactRepository: z.string().regex(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+$/).nullable(),
   artifactCommit: z.string().regex(/^[a-f0-9]{40}$/).nullable(),
-  sourceRelease: z.string().min(1),
-  retrievedAt: z.string().datetime({ offset: true }),
-  sourceIds: z.array(z.string().regex(/^[A-Z][A-Z0-9_]*$/)).min(1),
-  licenseId: z.string().min(1)
+  sourceRelease: NonEmptyStringSchema,
+  retrievedAt: OffsetDatetimeSchema,
+  sourceIds: z.array(SourceIdSchema).min(1),
+  licenseId: NonEmptyStringSchema
 }).strict()
 
 export const ProvenanceSchema = z.object({
-  releaseId: z.string().min(1),
-  releaseDigest: Sha256Schema,
+  releaseId: NonEmptyStringSchema,
+  releaseDigest: Sha256DigestSchema,
   recipe: ProvenanceArtifactSchema,
   sourceLock: ProvenanceArtifactSchema,
   sourceObjects: z.array(ProvenanceSourceObjectSchema).min(1),
@@ -67,7 +67,7 @@ const EvidenceSchema = z.object({
 }).strict()
 
 const CompoundSchema = z.object({
-  id: z.string().regex(/^CHEBI:[1-9][0-9]*$/),
+  id: ChebiIdSchema,
   name: z.string(),
   synonyms: z.array(z.string()),
   formula: z.string(),
@@ -77,13 +77,13 @@ const CompoundSchema = z.object({
 }).strict()
 
 const ParticipantSchema = z.object({
-  compoundId: z.string().regex(/^CHEBI:[1-9][0-9]*$/),
-  coefficient: z.number().int().positive()
+  compoundId: ChebiIdSchema,
+  coefficient: PositiveIntSchema
 }).strict()
 
 const ReactionSchema = z.object({
-  id: z.string().regex(/^RHEA:[1-9][0-9]*$/),
-  rheaMasterId: z.string().regex(/^RHEA:[1-9][0-9]*$/),
+  id: RheaIdSchema,
+  rheaMasterId: RheaIdSchema,
   name: z.string(),
   equation: z.string(),
   physiologicalDirection: z.enum(['left-to-right', 'right-to-left', 'bidirectional']),
@@ -94,7 +94,7 @@ const ReactionSchema = z.object({
 }).strict()
 
 const ProteinSchema = z.object({
-  id: z.string().regex(/^UniProtKB:[A-Z0-9]+$/),
+  id: UniProtIdSchema,
   name: z.string(),
   gene: z.string(),
   taxonId: TaxonIdSchema,
@@ -103,8 +103,8 @@ const ProteinSchema = z.object({
 
 const CatalysisSchema = z.object({
   id: z.string(),
-  proteinId: z.string().regex(/^UniProtKB:[A-Z0-9]+$/),
-  reactionId: z.string().regex(/^RHEA:[1-9][0-9]*$/),
+  proteinId: UniProtIdSchema,
+  reactionId: RheaIdSchema,
   taxonId: TaxonIdSchema,
   evidenceClass: EvidenceClassSchema,
   evidenceCode: z.string().regex(/^ECO:[0-9]{7}$/),
@@ -131,7 +131,7 @@ export const NetworkSchema = z.object({
 export const PresetSchema = z.enum(['baseline', 'reduced-mthfr', 'custom'])
 
 export const SimulationRequestSchema = z.object({
-  releaseId: z.string().min(1),
+  releaseId: NonEmptyStringSchema,
   taxonId: TaxonIdSchema,
   preset: PresetSchema,
   mthfrActivity: z.number().min(0.1).max(1.5),
@@ -160,21 +160,21 @@ export const SimulationRequestSchema = z.object({
 export const TopologyKindSchema = z.enum(['curated', 'model-only', 'boundary'])
 
 const TopologyEntitySchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
+  id: NonEmptyStringSchema,
+  name: NonEmptyStringSchema,
   kind: TopologyKindSchema,
   stateVariable: z.boolean(),
-  knowledgeCompoundId: z.string().regex(/^CHEBI:[1-9][0-9]*$/).optional()
+  knowledgeCompoundId: ChebiIdSchema.optional()
 }).strict()
 
 const TopologyReactionSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
+  id: NonEmptyStringSchema,
+  name: NonEmptyStringSchema,
   kind: TopologyKindSchema,
   reactantIds: z.array(z.string()),
   productIds: z.array(z.string()),
-  fluxSeriesId: z.string().min(1),
-  knowledgeReactionId: z.string().regex(/^RHEA:[1-9][0-9]*$/).optional()
+  fluxSeriesId: NonEmptyStringSchema,
+  knowledgeReactionId: RheaIdSchema.optional()
 }).strict()
 
 export const ModelSchema = z.object({
@@ -206,7 +206,7 @@ const SeriesSchema = z.object({
 
 export const SimulationResultSchema = z.object({
   status: z.literal('successful'),
-  runId: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  runId: Sha256DigestSchema,
   release: ReleaseSchema,
   modelVersion: z.string(),
   engineVersion: z.string(),

@@ -1,6 +1,6 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
 import { CalibrationArtifactSchema, MEASURED_CALIBRATION_ALGORITHM, MEASURED_CALIBRATION_PARTITION_DIGEST, MEASURED_GROUP_IDS } from '../../shared/measured-contracts.js'
-import { measuredSha256 } from './verification.js'
+import { canonicalSha256Hex } from '../commons/digest.js'
 
 function unique(values) {
   return [...new Set(values)].sort()
@@ -107,6 +107,6 @@ export function runMeasuredCalibration(repository, selection) {
     },
     status: reasons.length === 0 ? 'completed' : 'not-evaluable'
   }
-  const artifactDigest = measuredSha256(Buffer.from(canonicalJson(value)))
+  const artifactDigest = canonicalSha256Hex(value)
   return CalibrationArtifactSchema.parse({ ...value, artifactDigest })
 }

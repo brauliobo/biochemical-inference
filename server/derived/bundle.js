@@ -31,7 +31,7 @@ function artifactId(role, runId) {
   return `apap-${role}-${runId.replace('sha256:', '').slice(0, 16)}`
 }
 
-export function apapModelContent() {
+function apapModelContent() {
   return {
     contract_version: APAP_CONTRACT_VERSION,
     model_id: APAP_MODEL_ID,
@@ -44,7 +44,7 @@ export function apapModelContent() {
   }
 }
 
-export function apapProtocolArtifactContent(record) {
+function apapProtocolArtifactContent(record) {
   return {
     artifact_type: 'apap-exact-run-specification',
     contract_version: APAP_CONTRACT_VERSION,

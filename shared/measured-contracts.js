@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256HexSchema, UtcInstantSchema, IsoDateSchema, KebabIdSchema, ReleaseIdSchema, DecimalTextSchema, boundedIdentifierSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, StrictEmptyObjectSchema, PageLimitSchema, CursorSchema, pageLimitQuerySchema, isCanonicalBase64Url, releaseRefSchema } from './commons/schemas.js'
 
 export const MEASURED_BASELINE_RELEASE_ID = 'measured-apap-observation-commons-v1.0.0'
 export const MEASURED_BASELINE_RELEASE_DIGEST = '96bb00dc5b7f718275f890ab43b085eb87015b8ab4af023af51a1a9916830572'
@@ -70,40 +71,25 @@ export const MEASURED_PINS = Object.freeze({
   })
 })
 
-export const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/)
-const DateSchema = z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)
-const TimestampSchema = z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/)
-const IdentifierSchema = z.string().min(1).max(160).regex(/^[a-z][a-z0-9]*(?:[:.-][A-Za-z0-9]+)*$/)
-const ReleaseIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*-v[0-9]+\.[0-9]+\.[0-9]+$/)
-const DecimalTextSchema = z.string().max(64).regex(/^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/)
+export const Sha256Schema = Sha256HexSchema
+const IdentifierSchema = boundedIdentifierSchema(160)
 const RoleSchema = z.enum(['development', 'calibration', 'validation', 'external-held-out'])
-const NonemptyText = z.string().min(1)
-const UnitText = z.string().min(1).max(64)
-const CursorSchema = z.string().regex(/^[A-Za-z0-9_-]+$/).max(8192)
-
-function exactBase64Url(value, bytes) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.length !== Math.ceil(bytes * 8 / 6)) return false
-  const remainder = bytes % 3
-  if (remainder === 0) return true
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
-  const final = alphabet.indexOf(value.at(-1))
-  return final >= 0 && final % (remainder === 1 ? 16 : 4) === 0
-}
+const UnitText = NonEmptyStringSchema.max(64)
 
 export const MeasuredSignatureSchema = z.object({
   algorithm: z.literal('Ed25519'),
-  key_id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  signed_at: TimestampSchema,
-  value: z.string().refine((value) => exactBase64Url(value, 64))
+  key_id: KebabIdSchema,
+  signed_at: UtcInstantSchema,
+  value: z.string().refine((value) => isCanonicalBase64Url(value, 64))
 }).strict()
 
 export const MeasuredTrustKeySchema = z.object({
-  key_id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  key_id: KebabIdSchema,
   algorithm: z.literal('Ed25519'),
-  public_key: z.string().refine((value) => exactBase64Url(value, 32)),
+  public_key: z.string().refine((value) => isCanonicalBase64Url(value, 32)),
   status: z.enum(['active', 'retired', 'revoked']),
-  valid_from: DateSchema,
-  valid_until: DateSchema.nullable(),
+  valid_from: IsoDateSchema,
+  valid_until: IsoDateSchema.nullable(),
   reason: z.string().nullable()
 }).strict()
 
@@ -122,13 +108,13 @@ export const MeasuredTrustStoreSchema = z.object({
 })
 
 export const MeasuredRecordCountsSchema = z.object({
-  applicability: z.number().int().nonnegative(), assays: z.number().int().nonnegative(), contexts: z.number().int().nonnegative(),
-  exclusions: z.number().int().nonnegative(), experimental_units: z.number().int().nonnegative(), families: z.number().int().nonnegative(),
-  groups: z.number().int().nonnegative(), interventions: z.number().int().nonnegative(), licenses: z.number().int().nonnegative(),
-  limitations: z.number().int().nonnegative(), measurements: z.number().int().nonnegative(), missingness: z.number().int().nonnegative(),
-  observables: z.number().int().nonnegative(), partitions: z.number().int().nonnegative(), protocols: z.number().int().nonnegative(),
-  sources: z.number().int().nonnegative(), specimens: z.number().int().nonnegative(), studies: z.number().int().nonnegative(),
-  transformations: z.number().int().nonnegative(), uncertainties: z.number().int().nonnegative()
+  applicability: NonNegativeIntSchema, assays: NonNegativeIntSchema, contexts: NonNegativeIntSchema,
+  exclusions: NonNegativeIntSchema, experimental_units: NonNegativeIntSchema, families: NonNegativeIntSchema,
+  groups: NonNegativeIntSchema, interventions: NonNegativeIntSchema, licenses: NonNegativeIntSchema,
+  limitations: NonNegativeIntSchema, measurements: NonNegativeIntSchema, missingness: NonNegativeIntSchema,
+  observables: NonNegativeIntSchema, partitions: NonNegativeIntSchema, protocols: NonNegativeIntSchema,
+  sources: NonNegativeIntSchema, specimens: NonNegativeIntSchema, studies: NonNegativeIntSchema,
+  transformations: NonNegativeIntSchema, uncertainties: NonNegativeIntSchema
 }).strict()
 
 const CatalogReleaseSchema = z.object({
@@ -142,14 +128,14 @@ const CatalogReleaseSchema = z.object({
 
 export const MeasuredCatalogSchema = z.object({
   catalog_envelope_schema_version: z.literal('1.0.0'),
-  payload: z.object({ catalog_version: z.literal('1.0.0'), published_at: DateSchema, releases: z.array(CatalogReleaseSchema).max(16) }).strict(),
+  payload: z.object({ catalog_version: z.literal('1.0.0'), published_at: IsoDateSchema, releases: z.array(CatalogReleaseSchema).max(16) }).strict(),
   signature: MeasuredSignatureSchema
 }).strict()
 
 const ManifestFileSchema = z.object({
-  bytes: z.number().int().positive(),
+  bytes: PositiveIntSchema,
   path: z.string().regex(/^records\/[a-z_]+\.ndjson$/),
-  record_count: z.number().int().nonnegative(),
+  record_count: NonNegativeIntSchema,
   record_type: z.enum(['licenses', 'sources', 'families', 'studies', 'groups', 'experimental_units', 'specimens', 'protocols', 'assays', 'interventions', 'observables', 'contexts', 'uncertainties', 'transformations', 'measurements', 'missingness', 'partitions', 'limitations', 'applicability', 'exclusions']),
   sha256: Sha256Schema
 }).strict()
@@ -161,7 +147,7 @@ const MeasuredSemanticDiffSchema = z.object({
 }).strict()
 
 export const ApiViewDescriptorSchema = z.object({
-  count: z.number().int().nonnegative().max(100_000),
+  count: NonNegativeIntSchema.max(100_000),
   endpoint: z.string().regex(/^\/api\/measured\/v1\/releases\/[a-z0-9.-]+\/[a-z]+$/),
   query: z.record(z.string(), z.string().nullable()),
   record_type: z.enum(['licenses', 'sources', 'families', 'studies', 'groups', 'experimental_units', 'specimens', 'protocols', 'assays', 'interventions', 'observables', 'contexts', 'uncertainties', 'transformations', 'measurements', 'missingness', 'partitions', 'limitations', 'applicability', 'exclusions']),
@@ -197,17 +183,17 @@ export const MeasuredManifestSchema = z.object({
   files: z.array(ManifestFileSchema).min(1).max(32),
   immutable: z.literal(true),
   manifest_schema_version: z.literal('1.1.0'),
-  published_at: DateSchema,
+  published_at: IsoDateSchema,
   recipe_path: z.string().regex(/^recipes\/[a-z0-9.-]+\.json$/),
   recipe_sha256: Sha256Schema,
   record_counts: MeasuredRecordCountsSchema,
   release_digest: Sha256Schema,
   release_id: ReleaseIdSchema,
   schema_version: z.literal('1.0.0'),
-  scientific_scope: NonemptyText.max(2048),
+  scientific_scope: NonEmptyStringSchema.max(2048),
   source_lock_path: z.string().regex(/^sources\/locks\/[a-z0-9.-]+\.json$/),
   source_lock_sha256: Sha256Schema,
-  title: NonemptyText.max(256),
+  title: NonEmptyStringSchema.max(256),
   semantic_diff: MeasuredSemanticDiffSchema,
   api_views: z.array(ApiViewDescriptorSchema).length(10),
   selected_lineage_view: SelectedLineageViewDescriptorSchema
@@ -222,13 +208,13 @@ export const MeasuredEnvelopeSchema = z.object({
   signature: MeasuredSignatureSchema
 }).strict()
 
-export const MeasuredReleaseRefSchema = z.object({ id: ReleaseIdSchema, schema_version: z.literal('1.0.0'), digest: Sha256Schema }).strict()
+export const MeasuredReleaseRefSchema = releaseRefSchema(ReleaseIdSchema, '1.0.0', Sha256Schema)
 
 export const MeasuredDiscoverySchema = z.object({
   catalog_digest: Sha256Schema,
   contract_version: z.literal('1.0.0'),
-  heldout_policy: NonemptyText,
-  release_count: z.number().int().nonnegative(),
+  heldout_policy: NonEmptyStringSchema,
+  release_count: NonNegativeIntSchema,
   trust_digest: Sha256Schema
 }).strict()
 
@@ -237,7 +223,7 @@ export const MeasuredReleaseResponseSchema = z.object({ release: MeasuredRelease
 
 export const StudyFamilySchema = z.object({
   basis: z.enum(['independent-study-number', 'independent-publication']), id: IdentifierSchema, role: RoleSchema,
-  study_ids: z.array(IdentifierSchema).min(1).max(16), title: NonemptyText.max(256)
+  study_ids: z.array(IdentifierSchema).min(1).max(16), title: NonEmptyStringSchema.max(256)
 }).strict()
 
 const BiologicalContextSchema = z.object({
@@ -249,8 +235,8 @@ const BiologicalContextSchema = z.object({
 }).strict()
 
 export const StudySchema = z.object({
-  accession: NonemptyText.max(256), context: BiologicalContextSchema, family_id: IdentifierSchema, id: IdentifierSchema,
-  source_object_ids: z.array(IdentifierSchema).min(1).max(8), title: NonemptyText.max(256)
+  accession: NonEmptyStringSchema.max(256), context: BiologicalContextSchema, family_id: IdentifierSchema, id: IdentifierSchema,
+  source_object_ids: z.array(IdentifierSchema).min(1).max(8), title: NonEmptyStringSchema.max(256)
 }).strict()
 
 export const PartitionSchema = z.object({
@@ -259,36 +245,36 @@ export const PartitionSchema = z.object({
 }).strict()
 
 const CopyrightReviewSchema = z.object({
-  copyright_marker_present: z.literal(false), reviewed_at: DateSchema, reviewer_role: z.literal('source-rights-reviewer'),
+  copyright_marker_present: z.literal(false), reviewed_at: IsoDateSchema, reviewer_role: z.literal('source-rights-reviewer'),
   scope: z.literal('complete exact export bytes'), searched_markers: z.tuple([z.literal('copyright'), z.literal('©'), z.literal('(c)')])
 }).strict()
 
 export const SourceSchema = z.object({
-  accession: NonemptyText.max(256), adapter_id: z.enum(['ntp-cebs-clinchem-html-xls@1.0.0', 'ntp-web-policy-html@1.0.0', 'zenodo-record-metadata@1.0.0', 'exact-pdf@1.0.0', 'reviewed-gsh-transcription@1.0.0']),
-  bytes: z.number().int().positive().max(2 * 1024 * 1024), copyright_marker_review: CopyrightReviewSchema.nullable(), id: IdentifierSchema,
+  accession: NonEmptyStringSchema.max(256), adapter_id: z.enum(['ntp-cebs-clinchem-html-xls@1.0.0', 'ntp-web-policy-html@1.0.0', 'zenodo-record-metadata@1.0.0', 'exact-pdf@1.0.0', 'reviewed-gsh-transcription@1.0.0']),
+  bytes: PositiveIntSchema.max(2 * 1024 * 1024), copyright_marker_review: CopyrightReviewSchema.nullable(), id: IdentifierSchema,
   license_id: IdentifierSchema, live_verified: z.boolean(), md5: z.string().regex(/^[a-f0-9]{32}$/).nullable(),
   media_type: z.enum(['application/vnd.ms-excel', 'application/json', 'application/pdf', 'text/html']),
   object_class: z.enum(['official-data-export', 'rights-policy', 'repository-metadata', 'licensed-article', 'reviewed-transcription']),
-  origin_url: z.string().url().nullable(), repository_path: z.string().nullable(), retrieved_at: TimestampSchema, sha256: Sha256Schema,
-  source: z.enum(['NTP_CEBS', 'NTP', 'ZENODO', 'REPOSITORY_CURATION']), title: NonemptyText.max(256)
+  origin_url: z.string().url().nullable(), repository_path: z.string().nullable(), retrieved_at: UtcInstantSchema, sha256: Sha256Schema,
+  source: z.enum(['NTP_CEBS', 'NTP', 'ZENODO', 'REPOSITORY_CURATION']), title: NonEmptyStringSchema.max(256)
 }).strict()
 
 export const ApplicabilitySchema = z.object({
-  id: IdentifierSchema, observable_id: IdentifierSchema, reason: NonemptyText.max(2048),
+  id: IdentifierSchema, observable_id: IdentifierSchema, reason: NonEmptyStringSchema.max(2048),
   status: z.enum(['compatible-within-study-context', 'context-incomplete', 'heldout-gated']), study_id: IdentifierSchema
 }).strict()
 
 const LocatorSchema = z.object({
-  column: z.number().int().positive(), curation_grid_coordinate: z.string().nullable(), locator_kind: z.enum(['source-table', 'curation-grid']),
-  page: z.number().int().positive().nullable(), printed_page: z.number().int().positive().nullable(), row: z.number().int().positive(),
-  source_native_cell: z.string().nullable(), source_object_id: IdentifierSchema, table: NonemptyText.max(256)
+  column: PositiveIntSchema, curation_grid_coordinate: z.string().nullable(), locator_kind: z.enum(['source-table', 'curation-grid']),
+  page: PositiveIntSchema.nullable(), printed_page: PositiveIntSchema.nullable(), row: PositiveIntSchema,
+  source_native_cell: z.string().nullable(), source_object_id: IdentifierSchema, table: NonEmptyStringSchema.max(256)
 }).strict()
 
 export const MeasurementSchema = z.object({
   context_id: IdentifierSchema, family_id: IdentifierSchema, group_id: IdentifierSchema, id: IdentifierSchema,
   level: z.enum(['individual', 'aggregate']), locator: LocatorSchema,
   normalized: z.object({ scientific_origin: z.literal('derived-measurement'), transformation_id: IdentifierSchema, unit: UnitText, value: DecimalTextSchema }).strict(),
-  observable_id: IdentifierSchema, reported_annotations: z.array(z.string().min(1).max(32)).max(8), reported_unit: UnitText,
+  observable_id: IdentifierSchema, reported_annotations: z.array(NonEmptyStringSchema.max(32)).max(8), reported_unit: UnitText,
   reported_value: DecimalTextSchema, role: RoleSchema, scientific_origin: z.literal('measured'), source_object_id: IdentifierSchema,
   study_id: IdentifierSchema, uncertainty_id: IdentifierSchema,
   validation_state: z.enum(['source-verified', 'independently-reviewed-transcription'])
@@ -302,24 +288,24 @@ export const MissingnessSchema = z.object({
 
 export const ExclusionSchema = z.object({
   id: IdentifierSchema, reason_code: z.enum(['outside-declared-table', 'prose-not-ingested', 'assay-context-unreported']),
-  scope: NonemptyText.max(256), source_object_id: IdentifierSchema, statement: NonemptyText.max(2048)
+  scope: NonEmptyStringSchema.max(256), source_object_id: IdentifierSchema, statement: NonEmptyStringSchema.max(2048)
 }).strict()
 
-const GroupSchema = z.object({ id: IdentifierSchema, intervention_ids: z.array(IdentifierSchema).max(8), label: NonemptyText.max(256), size: z.number().int().positive().nullable(), study_id: IdentifierSchema }).strict()
-const ExperimentalUnitSchema = z.object({ group_id: IdentifierSchema, id: IdentifierSchema, source_subject_id: NonemptyText.max(256), study_id: IdentifierSchema, unit_type: z.literal('animal') }).strict()
+const GroupSchema = z.object({ id: IdentifierSchema, intervention_ids: z.array(IdentifierSchema).max(8), label: NonEmptyStringSchema.max(256), size: PositiveIntSchema.nullable(), study_id: IdentifierSchema }).strict()
+const ExperimentalUnitSchema = z.object({ group_id: IdentifierSchema, id: IdentifierSchema, source_subject_id: NonEmptyStringSchema.max(256), study_id: IdentifierSchema, unit_type: z.literal('animal') }).strict()
 const SpecimenSchema = z.object({ collection_time_unit: z.enum(['h', 'd']).nullable(), collection_time_value: DecimalTextSchema.nullable(), experimental_unit_id: IdentifierSchema.nullable(), group_id: IdentifierSchema, id: IdentifierSchema, matrix: z.string().nullable(), specimen_type: z.string().nullable(), study_id: IdentifierSchema, unreported_fields: z.array(z.enum(['specimen_type', 'matrix', 'collection_time'])).max(3) }).strict()
-const ProtocolSchema = z.object({ id: IdentifierSchema, name: NonemptyText.max(256), protocol_class: z.enum(['clinical-chemistry', 'published-group-summary']), source_object_id: IdentifierSchema, study_id: IdentifierSchema }).strict()
-const AssaySchema = z.object({ id: IdentifierSchema, method: z.string().nullable(), method_status: z.enum(['reported', 'unreported']), protocol_id: IdentifierSchema, source_label: NonemptyText.max(256) }).strict()
-const InterventionSchema = z.object({ dose_unit: UnitText.nullable(), dose_value: DecimalTextSchema.nullable(), id: IdentifierSchema, name: NonemptyText.max(256), route: z.string().nullable(), schedule: z.string().nullable(), source_label: NonemptyText.max(256), study_id: IdentifierSchema, time_unit: UnitText.nullable(), time_value: DecimalTextSchema.nullable(), unreported_fields: z.array(z.enum(['dose', 'route', 'time', 'schedule'])).max(4) }).strict()
-const ObservableSchema = z.object({ canonical_unit: UnitText, id: IdentifierSchema, name: NonemptyText.max(256), quantity_kind: z.enum(['source-reported-assay-result', 'mass-concentration', 'activity', 'ratio']), raw_unit: UnitText, source_label: NonemptyText.max(256) }).strict()
+const ProtocolSchema = z.object({ id: IdentifierSchema, name: NonEmptyStringSchema.max(256), protocol_class: z.enum(['clinical-chemistry', 'published-group-summary']), source_object_id: IdentifierSchema, study_id: IdentifierSchema }).strict()
+const AssaySchema = z.object({ id: IdentifierSchema, method: z.string().nullable(), method_status: z.enum(['reported', 'unreported']), protocol_id: IdentifierSchema, source_label: NonEmptyStringSchema.max(256) }).strict()
+const InterventionSchema = z.object({ dose_unit: UnitText.nullable(), dose_value: DecimalTextSchema.nullable(), id: IdentifierSchema, name: NonEmptyStringSchema.max(256), route: z.string().nullable(), schedule: z.string().nullable(), source_label: NonEmptyStringSchema.max(256), study_id: IdentifierSchema, time_unit: UnitText.nullable(), time_value: DecimalTextSchema.nullable(), unreported_fields: z.array(z.enum(['dose', 'route', 'time', 'schedule'])).max(4) }).strict()
+const ObservableSchema = z.object({ canonical_unit: UnitText, id: IdentifierSchema, name: NonEmptyStringSchema.max(256), quantity_kind: z.enum(['source-reported-assay-result', 'mass-concentration', 'activity', 'ratio']), raw_unit: UnitText, source_label: NonEmptyStringSchema.max(256) }).strict()
 const QualifierSchema = z.object({ column: z.literal(4), name: z.literal('CEBS Control Code'), raw_value: z.string().max(32), row: z.number().int().min(3).max(200), source_native_cell: z.string().regex(/^D[1-9][0-9]*$/), source_object_id: IdentifierSchema, status: z.enum(['reported', 'blank']) }).strict()
 const MeasurementContextSchema = z.object({ assay_id: IdentifierSchema, experimental_unit_id: IdentifierSchema.nullable(), group_id: IdentifierSchema, id: IdentifierSchema, intervention_ids: z.array(IdentifierSchema).max(8), protocol_id: IdentifierSchema, qualifiers: z.array(QualifierSchema).max(8), specimen_id: IdentifierSchema.nullable(), study_id: IdentifierSchema }).strict()
-const UncertaintySchema = z.object({ id: IdentifierSchema, kind: z.enum(['sem', 'not-reported']), measurement_id: IdentifierSchema, n: z.number().int().positive().nullable(), unit: UnitText.nullable(), value: DecimalTextSchema.nullable() }).strict()
-const TransformationSchema = z.object({ expression: NonemptyText.max(256), factor: DecimalTextSchema, id: IdentifierSchema, input_unit: UnitText, kind: z.enum(['identity', 'unit-conversion']), output_unit: UnitText, version: z.literal('1.0.0') }).strict()
+const UncertaintySchema = z.object({ id: IdentifierSchema, kind: z.enum(['sem', 'not-reported']), measurement_id: IdentifierSchema, n: PositiveIntSchema.nullable(), unit: UnitText.nullable(), value: DecimalTextSchema.nullable() }).strict()
+const TransformationSchema = z.object({ expression: NonEmptyStringSchema.max(256), factor: DecimalTextSchema, id: IdentifierSchema, input_unit: UnitText, kind: z.enum(['identity', 'unit-conversion']), output_unit: UnitText, version: z.literal('1.0.0') }).strict()
 
 export const LicenseSchema = z.object({
-  attribution: NonemptyText.max(2048), copyright_caveat_text: z.string().nullable(), copyright_status: z.enum(['not-asserted', 'copyright-retained']),
-  id: IdentifierSchema, name: NonemptyText.max(256), policy_last_updated: DateSchema.nullable(), public_domain_default_text: z.string().nullable(),
+  attribution: NonEmptyStringSchema.max(2048), copyright_caveat_text: z.string().nullable(), copyright_status: z.enum(['not-asserted', 'copyright-retained']),
+  id: IdentifierSchema, name: NonEmptyStringSchema.max(256), policy_last_updated: IsoDateSchema.nullable(), public_domain_default_text: z.string().nullable(),
   redistribution: z.literal('permitted'), rights_basis: z.enum(['official-federal-public-data-with-third-party-caveat', 'cc-by-4.0']),
   terms_source_object_id: IdentifierSchema.nullable(), terms_url: z.string().url(), third_party_caveat: z.string().nullable()
 }).strict()
@@ -340,7 +326,7 @@ const PAGE_SCHEMAS = Object.freeze({
 
 function pageSchema(recordType, itemSchema) {
   return z.object({
-    items: z.array(itemSchema).max(100), limit: z.number().int().min(1).max(100), next_cursor: CursorSchema.nullable(),
+    items: z.array(itemSchema).max(100), limit: PageLimitSchema, next_cursor: CursorSchema.nullable(),
     page_contract: z.literal('measured-records-v1'), query: z.record(z.string(), z.string().nullable()), record_type: z.literal(recordType),
     release: MeasuredReleaseRefSchema, sort: z.literal('id:asc')
   }).strict()
@@ -350,7 +336,7 @@ export const MeasuredPageSchema = z.discriminatedUnion('record_type', Object.ent
 export const MEASURED_PAGE_SCHEMAS = PAGE_SCHEMAS
 
 export const ConsumerCommitmentSchema = z.object({
-  commitment_schema_version: z.literal('1.0.0'), consumer_id: z.string().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/), created_at: TimestampSchema,
+  commitment_schema_version: z.literal('1.0.0'), consumer_id: NonEmptyStringSchema.max(128).regex(/^[A-Za-z0-9._:-]+$/), created_at: UtcInstantSchema,
   endpoint_mapping_digest: Sha256Schema, family_ids: z.array(IdentifierSchema).min(1).max(16), metric_threshold_policy_digest: Sha256Schema,
   model_digest: Sha256Schema, nonce: z.string().min(16).max(128).regex(/^[A-Za-z0-9_-]+$/), observable_ids: z.array(IdentifierSchema).min(1).max(128),
   parameter_policy_digest: Sha256Schema, prediction_digest: Sha256Schema, release_digest: Sha256Schema, release_id: ReleaseIdSchema,
@@ -361,19 +347,19 @@ export const ConsumerCommitmentSchema = z.object({
 })
 
 export const EvaluationRequestSchema = z.object({ evaluation_schema_version: z.literal('1.0.0'), commitment_digest: Sha256Schema, frozen_request: ConsumerCommitmentSchema }).strict()
-export const CommitmentResponseSchema = z.object({ commitment_contract: z.literal('consumer-measured-commitment-v1'), commitment_digest: Sha256Schema, committed_at: TimestampSchema, created_at: TimestampSchema, target_partition_digest: Sha256Schema }).strict()
+export const CommitmentResponseSchema = z.object({ commitment_contract: z.literal('consumer-measured-commitment-v1'), commitment_digest: Sha256Schema, committed_at: UtcInstantSchema, created_at: UtcInstantSchema, target_partition_digest: Sha256Schema }).strict()
 const DisclosedItemSchema = z.object({ family_id: IdentifierSchema, group_id: IdentifierSchema, measurement_id: IdentifierSchema, normalized: z.object({ scientific_origin: z.literal('derived-measurement'), transformation_id: IdentifierSchema, unit: UnitText, value: DecimalTextSchema }).strict(), observable_id: IdentifierSchema, reported_annotations: z.array(z.string()), reported_unit: UnitText, reported_value: DecimalTextSchema, study_id: IdentifierSchema, uncertainty: UncertaintySchema }).strict()
-export const EvaluationResponseSchema = z.object({ commitment_digest: Sha256Schema, disclosed_at: TimestampSchema, evaluation_contract: z.literal('consumer-measured-disclosure-v1'), items: z.array(DisclosedItemSchema).max(10_000), partition: PartitionSchema, release: MeasuredReleaseRefSchema }).strict()
+export const EvaluationResponseSchema = z.object({ commitment_digest: Sha256Schema, disclosed_at: UtcInstantSchema, evaluation_contract: z.literal('consumer-measured-disclosure-v1'), items: z.array(DisclosedItemSchema).max(10_000), partition: PartitionSchema, release: MeasuredReleaseRefSchema }).strict()
 
 export const FreezeIntentSchema = z.object({
   calibrationArtifactDigest: Sha256Schema,
   targetPartitionId: z.literal(MEASURED_HELDOUT_PARTITION_ID),
   nonce: z.string().min(16).max(128).regex(/^[A-Za-z0-9_-]+$/),
-  createdAt: TimestampSchema
+  createdAt: UtcInstantSchema
 }).strict()
 export const DisclosureIntentSchema = z.object({ commitmentDigest: Sha256Schema }).strict()
 
-const ConsumerArtifactRefSchema = z.object({ bytes: z.number().int().positive(), digest: Sha256Schema, kind: z.enum(['calibration', 'parameter-policy', 'endpoint-mapping', 'metric-threshold-policy', 'prediction']) }).strict()
+const ConsumerArtifactRefSchema = z.object({ bytes: PositiveIntSchema, digest: Sha256Schema, kind: z.enum(['calibration', 'parameter-policy', 'endpoint-mapping', 'metric-threshold-policy', 'prediction']) }).strict()
 export const FrozenArtifactRefsSchema = z.object({
   model: ConsumerArtifactRefSchema.extend({ kind: z.literal('calibration') }).strict(),
   parameterPolicy: ConsumerArtifactRefSchema.extend({ kind: z.literal('parameter-policy') }).strict(),
@@ -395,11 +381,11 @@ export const MeasuredLocalDiscoverySchema = z.object({ contractVersion: z.litera
   signerKeyId: z.literal(MEASURED_SIGNER_KEY_ID), signerPublicKey: z.literal(MEASURED_SIGNER_PUBLIC_KEY),
   baseline: z.object({ releaseId: z.literal(MEASURED_BASELINE_RELEASE_ID), releaseDigest: z.literal(MEASURED_BASELINE_RELEASE_DIGEST), manifestDigest: z.literal(MEASURED_BASELINE_MANIFEST_DIGEST), envelopeDigest: z.literal(MEASURED_BASELINE_ENVELOPE_DIGEST), signerKeyId: z.literal(MEASURED_BASELINE_SIGNER_KEY_ID), signerPublicKey: z.literal(MEASURED_BASELINE_SIGNER_PUBLIC_KEY) }).strict()
 }).strict(), status: MeasuredStatusSchema }).strict()
-export const MeasuredSyncRequestSchema = z.object({}).strict()
-export const MeasuredLocalPageQuerySchema = z.object({ cursor: CursorSchema.optional(), limit: z.coerce.number().int().min(1).max(100).default(25), role: z.enum(['development', 'calibration']).optional() }).strict()
+export const MeasuredSyncRequestSchema = StrictEmptyObjectSchema
+export const MeasuredLocalPageQuerySchema = z.object({ cursor: CursorSchema.optional(), limit: pageLimitQuerySchema(25), role: z.enum(['development', 'calibration']).optional() }).strict()
 export const MeasuredLocalRecordTypeSchema = z.enum(['families', 'studies', 'partitions', 'applicability', 'sources', 'measurements', 'missingness', 'exclusions'])
 function localPageSchema(recordType, itemSchema) {
-  return z.object({ filters: z.record(z.string()), items: z.array(itemSchema).max(100), limit: z.number().int().min(1).max(100), nextCursor: CursorSchema.nullable(), pageContract: z.literal('measured-local-records-v1'), recordType: z.literal(recordType), release: MeasuredReleaseRefSchema, sort: z.literal('id:asc'), source: z.literal('verified-local-mirror') }).strict()
+  return z.object({ filters: z.record(z.string()), items: z.array(itemSchema).max(100), limit: PageLimitSchema, nextCursor: CursorSchema.nullable(), pageContract: z.literal('measured-local-records-v1'), recordType: z.literal(recordType), release: MeasuredReleaseRefSchema, sort: z.literal('id:asc'), source: z.literal('verified-local-mirror') }).strict()
 }
 export const MeasuredLocalPageSchema = z.discriminatedUnion('recordType', Object.entries(PAGE_SCHEMAS).map(([type, schema]) => localPageSchema(type, schema)))
 export const MeasuredLocalLineageResponseSchema = z.object({ lineage: MeasuredLineageSchema, lineageDigest: Sha256Schema, release: MeasuredReleaseRefSchema, source: z.literal('verified-local-mirror') }).strict()
@@ -414,7 +400,7 @@ const CalibrationMeasurementPinSchema = z.object({ id: IdentifierSchema, lineage
 export const CalibrationArtifactSchema = z.object({
   accessProof: z.object({
     calls: z.object({ applicability: z.literal(1), calibrationMeasurements: z.literal(1), calibrationMissingness: z.literal(1), exclusions: z.literal(1), partition: z.literal(1), release: z.literal(1) }).strict(),
-    rows: z.object({ calibrationMeasurements: z.literal(34), calibrationMissingness: z.number().int().nonnegative(), exclusions: z.literal(3) }).strict(),
+    rows: z.object({ calibrationMeasurements: z.literal(34), calibrationMissingness: NonNegativeIntSchema, exclusions: z.literal(3) }).strict(),
     exposedMethods: z.tuple([z.literal('release'), z.literal('partition'), z.literal('applicability'), z.literal('calibrationMeasurements'), z.literal('calibrationMissingness'), z.literal('exclusions'), z.literal('accessReport')]),
     rolesObserved: z.tuple([z.literal('calibration')]),
     forbiddenMethodsAvailable: z.literal(false),
@@ -422,11 +408,11 @@ export const CalibrationArtifactSchema = z.object({
   }).strict(),
   algorithm: z.object({ id: z.literal(MEASURED_CALIBRATION_ALGORITHM), deterministic: z.literal(true), fit: z.literal('ordinary-least-squares-individual-observations') }).strict(),
   artifactDigest: Sha256Schema, artifactSchemaVersion: z.literal('1.0.0'), conclusion: z.literal('no-validation-conclusion'),
-  diagnostics: z.object({ assayIds: z.array(IdentifierSchema), doseUnit: UnitText.nullable(), groupCount: z.number().int().nonnegative(), measurementCount: z.number().int().nonnegative(), protocolIds: z.array(IdentifierSchema), time: z.object({ unit: z.literal('h'), value: z.literal('24') }).strict(), units: z.array(UnitText) }).strict(),
-  exclusions: z.array(ExclusionSchema), fit: z.object({ intercept: z.number().finite(), rSquared: z.number().finite(), slope: z.number().finite() }).strict().nullable(),
+  diagnostics: z.object({ assayIds: z.array(IdentifierSchema), doseUnit: UnitText.nullable(), groupCount: NonNegativeIntSchema, measurementCount: NonNegativeIntSchema, protocolIds: z.array(IdentifierSchema), time: z.object({ unit: z.literal('h'), value: z.literal('24') }).strict(), units: z.array(UnitText) }).strict(),
+  exclusions: z.array(ExclusionSchema), fit: z.object({ intercept: FiniteNumberSchema, rSquared: FiniteNumberSchema, slope: FiniteNumberSchema }).strict().nullable(),
   measurements: z.array(CalibrationMeasurementPinSchema), missingness: z.array(MissingnessSchema),
-  partition: PartitionSchema, reasons: z.array(NonemptyText), release: MeasuredReleaseRefSchema,
-  selection: CalibrationRequestObjectSchema.extend({ rationale: NonemptyText }).strict(), status: z.enum(['completed', 'not-evaluable'])
+  partition: PartitionSchema, reasons: z.array(NonEmptyStringSchema), release: MeasuredReleaseRefSchema,
+  selection: CalibrationRequestObjectSchema.extend({ rationale: NonEmptyStringSchema }).strict(), status: z.enum(['completed', 'not-evaluable'])
 }).strict()
 
 export const ConsumerArtifactContentSchema = z.discriminatedUnion('artifactKind', [
@@ -436,6 +422,4 @@ export const ConsumerArtifactContentSchema = z.discriminatedUnion('artifactKind'
   z.object({ artifactKind: z.literal('prediction'), artifactSchemaVersion: z.literal('1.0.0'), calibrationArtifactDigest: Sha256Schema, release: MeasuredReleaseRefSchema, targetPartition: PartitionSchema, status: z.literal('not-evaluable'), predictionCount: z.literal(0), predictions: z.tuple([]), reason: z.literal('Calibration was not evaluable; no predictions were generated.') }).strict()
 ])
 
-export const MeasuredIntegritySchema = z.object({ findings: z.array(z.string()), objects: z.number().int().nonnegative(), records: z.number().int().nonnegative(), status: z.enum(['valid', 'failed']) }).strict()
-
-export { CursorSchema, IdentifierSchema, ReleaseIdSchema, RoleSchema, TimestampSchema }
+export { CursorSchema, IdentifierSchema, ReleaseIdSchema, RoleSchema }

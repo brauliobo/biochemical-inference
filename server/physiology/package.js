@@ -1,4 +1,5 @@
-import { createHash, createPublicKey, verify } from 'node:crypto'
+import { createPublicKey, verify } from 'node:crypto'
+import { sha256Prefixed } from '../commons/digest.js'
 import yauzl from 'yauzl'
 import yazl from 'yazl'
 import { canonicalDigest, canonicalJson } from '../../shared/canonical-json.js'
@@ -15,13 +16,11 @@ import {
   BppSignatureSchema,
   CertificationSchema,
   PackageValidationResponseSchema,
-  PHYSIOLOGY_WARNING,
   PhysiologyPackageSchema
 } from '../../shared/physiology-contracts.js'
 
 const ZIP_MTIME = new Date('1980-01-01T00:00:00.000Z')
 const REQUIRED_FILES = new Set(['manifest.json', 'model.json', 'coupling.json', 'signature.json'])
-const digestBuffer = (buffer) => `sha256:${createHash('sha256').update(buffer).digest('hex')}`
 
 class BppValidationError extends Error {
   constructor(code, path, message) {
@@ -157,7 +156,7 @@ function verifyPublisher(manifest, signature, trustKey) {
   if (!verify(null, Buffer.from(signature.signedDigest), publicKey, Buffer.from(signature.signature, 'base64'))) invalid('signature_invalid', 'signature.json', 'Ed25519 publisher signature verification failed.')
 }
 
-export async function inspectBppPackage(buffer, options) {
+async function inspectBppPackage(buffer, options) {
   const files = await readArchive(buffer)
   for (const required of REQUIRED_FILES) if (!files.has(required)) invalid('missing_entry', required, `${required} is required.`)
   const manifest = parseCanonicalJson(files.get('manifest.json'), BppManifestSchema, 'manifest.json')
@@ -168,7 +167,7 @@ export async function inspectBppPackage(buffer, options) {
   for (const descriptor of manifest.contents) {
     const content = files.get(descriptor.path)
     if (!content) invalid('missing_content', descriptor.path, `${descriptor.path} is listed but missing.`)
-    if (content.length !== descriptor.bytes || digestBuffer(content) !== `sha256:${descriptor.sha256}`) invalid('content_digest_mismatch', descriptor.path, `${descriptor.path} does not match its declared byte count and SHA-256.`)
+    if (content.length !== descriptor.bytes || sha256Prefixed(content) !== `sha256:${descriptor.sha256}`) invalid('content_digest_mismatch', descriptor.path, `${descriptor.path} does not match its declared byte count and SHA-256.`)
     if (['model.json', 'coupling.json'].includes(descriptor.path) && descriptor.mediaType !== 'application/json') invalid('media_type_mismatch', descriptor.path, `${descriptor.path} must be application/json.`)
     if (descriptor.path.startsWith('process/') && descriptor.mediaType !== 'application/javascript') invalid('media_type_mismatch', descriptor.path, `${descriptor.path} must be application/javascript.`)
   }
@@ -180,9 +179,9 @@ export async function inspectBppPackage(buffer, options) {
   const checks = { signature: true, schema: true, ports: true, applicability: true, license: true, resources: true, conformanceBenchmark: false }
   const processAllowed = manifest.pluginKind === 'declarative' || options.processSandboxAvailable === true
   const record = PhysiologyPackageSchema.parse({
-    packageDigest: digestBuffer(buffer),
-    modelDescriptorDigest: digestBuffer(files.get('model.json')),
-    couplingDescriptorDigest: digestBuffer(files.get('coupling.json')),
+    packageDigest: sha256Prefixed(buffer),
+    modelDescriptorDigest: sha256Prefixed(files.get('model.json')),
+    couplingDescriptorDigest: sha256Prefixed(files.get('coupling.json')),
     bytes: buffer.length,
     installedAt: options.installedAt ?? new Date().toISOString(),
     builtIn: options.builtIn ?? false,
@@ -226,4 +225,4 @@ export function createBppArchive({ manifest, model, coupling, signature, process
   })
 }
 
-export { BppValidationError, digestBuffer, readArchive, verifyDescriptorClosure }
+export { BppValidationError, readArchive, verifyDescriptorClosure }
