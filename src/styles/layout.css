@@ -1,0 +1,98 @@
+/*
+ * Layout primitives. Compose these in markup instead of writing per-component
+ * layout CSS. Semantic tokens only. Each primitive exposes one local custom
+ * property for its spacing so it can be tuned without a new class.
+ */
+
+/* Centered page column with gutters. */
+.container {
+  inline-size: 100%;
+  max-inline-size: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--space-gutter);
+}
+.container--narrow { max-inline-size: var(--container-prose); }
+.container--wide { max-inline-size: var(--container-wide); }
+
+/* Readable line length for running text. */
+.prose {
+  max-inline-size: var(--measure);
+  line-height: var(--leading-prose);
+}
+.prose > * + * { margin-block-start: var(--space-stack); }
+
+/* Vertical rhythm between siblings. Tune with a modifier or by setting the
+   local property: style="--stack-space: var(--space-stack-loose)". The same
+   goes for --cluster-space and --grid-space. */
+.stack { --stack-space: var(--space-stack); }
+.stack > * + * { margin-block-start: var(--stack-space); }
+.stack--tight { --stack-space: var(--space-stack-tight); }
+.stack--loose { --stack-space: var(--space-stack-loose); }
+.stack--section { --stack-space: var(--space-section); }
+
+/* Inline group that wraps (nav links, tags, button rows). */
+.cluster {
+  --cluster-space: var(--space-cluster);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-space);
+}
+.cluster--end { justify-content: flex-end; }
+
+/* Two ends of a row; wraps when narrow. */
+.repel {
+  --cluster-space: var(--space-cluster);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cluster-space);
+}
+
+/* Responsive equal columns, no media queries. */
+.grid {
+  --grid-space: var(--space-stack);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min)), 1fr));
+  gap: var(--grid-space);
+}
+
+/* Fixed-width side column that drops below the content when narrow.
+   Children: first is the sidebar, last is the main content. */
+.sidebar {
+  --grid-space: var(--space-stack-loose);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--grid-space);
+}
+.sidebar > :first-child {
+  flex: 1 1 var(--sidebar-width);
+}
+.sidebar > :last-child {
+  flex: 999 1 0;
+  min-inline-size: 50%;
+}
+
+/* Padding inside a box. */
+.inset { padding: var(--space-inset); }
+.inset--loose { padding: var(--space-inset-loose); }
+
+/* Page frame: footer sticks to the bottom on short pages. */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+}
+.page > main { flex: 1; }
+
+/* Present to assistive technology only. */
+.visually-hidden:not(:focus, :active) {
+  position: absolute;
+  inline-size: var(--border-width); /* 1px */
+  block-size: var(--border-width);
+  margin: calc(-1 * var(--border-width));
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

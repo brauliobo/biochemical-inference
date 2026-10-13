@@ -1,0 +1,164 @@
+/*
+ * PRIMITIVE TOKENS: the only file in src/ where raw colour, px, rem and font
+ * literals may appear (enforced by tests/unit/design-tokens.test.js).
+ *
+ * Components never use these directly. They use the role tokens in
+ * tokens.semantic.css, which reference these by name. To retheme, change a
+ * semantic token's mapping; to add a new raw value, add it here first.
+ *
+ * Colours are hex only so the contrast test can compute ratios.
+ * Breakpoints cannot be custom properties; media queries use these values:
+ *   narrow 40rem (640px), wide 64rem (1024px).
+ */
+:root {
+  /* Neutral ramp (cool, slightly green) */
+  --neutral-0: #ffffff;
+  --neutral-50: #f5f8f7;
+  --neutral-100: #e9efed;
+  --neutral-200: #d4dedb;
+  --neutral-300: #b7c5c1;
+  --neutral-400: #8fa29d;
+  --neutral-500: #687e79;
+  --neutral-600: #4f635e;
+  --neutral-700: #3b4c48;
+  --neutral-800: #28403c;
+  --neutral-900: #16231f;
+  --neutral-950: #0c1413;
+
+  /* Teal ramp (brand) */
+  --teal-50: #e7f6f2;
+  --teal-100: #c6ebe2;
+  --teal-200: #9adccd;
+  --teal-300: #73d5be;
+  --teal-400: #3fb89f;
+  --teal-500: #1f9a82;
+  --teal-600: #137b69;
+  --teal-700: #0f6054;
+  --teal-800: #0b4a42;
+  --teal-900: #083733;
+
+  /* Amber ramp (caution) */
+  --amber-50: #fdf4e4;
+  --amber-100: #fbe5c0;
+  --amber-200: #f7cc8c;
+  --amber-300: #f0a65a;
+  --amber-400: #de8a2e;
+  --amber-500: #bd7016;
+  --amber-600: #9a580c;
+  --amber-700: #7a4309;
+  --amber-800: #5a3007;
+  --amber-900: #3a1f05;
+
+  /* Red ramp (danger) */
+  --red-50: #fdeceb;
+  --red-100: #fad3cf;
+  --red-200: #f6aaa2;
+  --red-300: #ff8f7e;
+  --red-400: #ec6652;
+  --red-500: #d1432e;
+  --red-600: #ae3220;
+  --red-700: #8c2618;
+  --red-800: #661c12;
+  --red-900: #44130c;
+
+  /* Green ramp (success) */
+  --green-50: #edf7e8;
+  --green-100: #d4ecc9;
+  --green-200: #addf9e;
+  --green-300: #8fd18a;
+  --green-400: #5fb35a;
+  --green-500: #3d9a3a;
+  --green-600: #2d7b2e;
+  --green-700: #215f24;
+  --green-800: #184a1c;
+  --green-900: #0f3014;
+
+  /* Blue ramp (information) */
+  --blue-50: #e9f2fc;
+  --blue-100: #cfe2f7;
+  --blue-200: #a7c9f0;
+  --blue-300: #7fb0e6;
+  --blue-400: #5593d8;
+  --blue-500: #2f73c4;
+  --blue-600: #225ba3;
+  --blue-700: #1c4a85;
+  --blue-800: #153866;
+  --blue-900: #0e2646;
+
+  /* Space (rem, 1rem = 16px at default browser size) */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Type */
+  --font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-size-1: 0.75rem;
+  --font-size-2: 0.875rem;
+  --font-size-3: 1rem;
+  --font-size-4: 1.125rem;
+  --font-size-5: 1.25rem;
+  --font-size-6: 1.5rem;
+  --font-size-7: 1.875rem;
+  --font-size-8: 2.25rem;
+  --font-size-9: clamp(2.25rem, 1.6rem + 2.6vw, 3.25rem);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.55;
+  --line-height-loose: 1.7;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.08em;
+
+  /* Shape */
+  --radius-0: 0;
+  --radius-1: 0.125rem;
+  --radius-2: 0.25rem;
+  --radius-3: 0.5rem;
+  --radius-4: 0.75rem;
+  --radius-round: 999px;
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-3: 3px;
+
+  /* Elevation */
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.12);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.16);
+  --shadow-3: 0 12px 32px rgb(0 0 0 / 0.24);
+
+  /* Motion */
+  --duration-0: 0ms;
+  --duration-1: 100ms;
+  --duration-2: 200ms;
+  --duration-3: 400ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-linear: linear;
+
+  /* Stacking */
+  --z-0: 0;
+  --z-1: 10;
+  --z-2: 100;
+  --z-3: 1000;
+  --z-4: 2000;
+
+  /* Sizes */
+  --size-target: 2.75rem; /* 44px, WCAG 2.2 AAA target size; AA minimum is 24px */
+  --size-icon: 1.25rem;
+  --size-container-narrow: 40rem;
+  --size-container: 72rem;
+  --size-container-wide: 96rem;
+  --size-measure: 68ch;
+  --size-sidebar: 16rem;
+  --size-grid-min: 16rem;
+}

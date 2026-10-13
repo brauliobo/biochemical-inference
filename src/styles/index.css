@@ -1,0 +1,6 @@
+/* Design system entry point. Order matters: tokens, base, layout, components. */
+@import "./tokens.primitive.css";
+@import "./tokens.semantic.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./components.css";
