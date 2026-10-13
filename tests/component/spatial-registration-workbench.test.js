@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { SPATIAL_REGISTRATION_PINS } from '../../shared/spatial-registration-contracts.js'
 import { pressWhenEnabled } from '../helpers/interactions.js'
 
@@ -142,5 +143,14 @@ describe('SpatialRegistrationWorkbench', () => {
     const result = await screen.findByTestId('spatial-registration-transform-result')
     expect(within(result).getByText('inverse')).toBeTruthy()
     expect(within(result).getByText(/not-assessed-off-grid \(metric scope only\)/)).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations with overlap metrics and a transform result', async () => {
+    render(SpatialRegistrationWorkbench)
+    await screen.findByTestId('spatial-registration-summary')
+    await pressWhenEnabled('spatial-registration-residual-overlap')
+    await pressWhenEnabled('spatial-registration-transform')
+    await screen.findByTestId('spatial-registration-transform-result')
+    await expectAccessible()
   })
 })

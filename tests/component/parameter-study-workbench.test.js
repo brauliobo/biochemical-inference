@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { createParameterFixtureClient } from '../../server/parameters/fixture.js'
 import { loadParameterOptions } from '../../server/parameters/selection.js'
 import { executeStudy } from '../../server/studies/service.js'
@@ -64,5 +65,13 @@ describe('ParameterStudyWorkbench', () => {
     expect(await screen.findByText(/Posterior predictive validation suppressed/)).toBeTruthy()
     expect(screen.getByText(/chain diagnostics did not pass/)).toBeTruthy()
     expect(screen.queryByText(/held-out observations covered/)).toBeNull()
+  })
+
+  it('has no WCAG 2.2 AA violations with a completed study', async () => {
+    render(ParameterStudyWorkbench)
+    const button = await screen.findByRole('button', { name: 'Run inference study' })
+    await fireEvent.submit(button.closest('form'))
+    await screen.findByText('Robustness matrix · robust')
+    await expectAccessible()
   })
 })

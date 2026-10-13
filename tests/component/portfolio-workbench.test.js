@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { runOde } from '../../server/portfolio/engines/ode.js'
 import { terminalResult } from '../../server/portfolio/execution.js'
 import { runIdentity } from '../../server/portfolio/identity.js'
@@ -45,5 +46,12 @@ describe('PortfolioWorkbench', () => {
     expect(screen.queryByLabelText('Duration (s)')).toBeNull()
     expect(screen.getByRole('button', { name: 'Run FBA benchmark' })).toBeTruthy()
     expect(screen.getByText(FBA_MODEL.limitations[0])).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations with an ODE result', async () => {
+    render(PortfolioWorkbench)
+    await fireEvent.submit((await screen.findByRole('button', { name: 'Run ODE benchmark' })).closest('form'))
+    await screen.findByText('ODE final state')
+    await expectAccessible()
   })
 })

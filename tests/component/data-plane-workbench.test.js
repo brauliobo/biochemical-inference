@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import {
@@ -187,5 +188,14 @@ describe('DataPlaneWorkbench', () => {
     expect(screen.getByRole('region', { name: 'proteins from the local verified mirror, sorted by ID' })).toBeTruthy()
     expect(screen.getByText('Page 1')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Next' }).disabled).toBe(true)
+  })
+
+  it('has no WCAG 2.2 AA violations with a published release pair and an audit', async () => {
+    api.loadDataPlaneDiscovery.mockReset().mockResolvedValue(readyDiscovery)
+    render(DataPlaneWorkbench)
+    expect(await screen.findByText('CHEBI:15377')).toBeTruthy()
+    await fireEvent.click(screen.getByRole('button', { name: 'Run offline audit' }))
+    await screen.findByText(report.reportDigest)
+    await expectAccessible()
   })
 })

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { createApapFixtureClient } from '../../server/apap/fixture.js'
 import { createApapRunService } from '../../server/apap/service.js'
 import { buildApapDerivedBundle } from '../../server/derived/bundle.js'
@@ -98,5 +99,11 @@ describe('ReviewWorkbench', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Accept' }))
 
     await waitFor(() => expect(api.appendDerivedReviewEvent).toHaveBeenCalledWith(second.digest, expect.objectContaining({ action: 'accepted' })))
+  })
+
+  it('has no WCAG 2.2 AA violations with a linked run and a pending assertion', async () => {
+    render(ReviewWorkbench, { props: { apapRun: record } })
+    await screen.findByText('Claim')
+    await expectAccessible()
   })
 })

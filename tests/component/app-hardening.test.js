@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { BUNDLED_PROVENANCE, BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
 import { MODEL } from '../../server/model.js'
 import { simulate } from '../../server/simulation.js'
@@ -137,5 +138,12 @@ describe('workbench request hardening', () => {
 
     await waitFor(() => expect(screen.queryByText('Stable run identity')).toBeNull())
     expect(screen.getByText('No simulation has been run')).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations on the single-page workbench after a run', async () => {
+    render(App)
+    await fireEvent.click(await screen.findByRole('button', { name: 'Run deterministic model' }))
+    await screen.findByText('Stable run identity')
+    await expectAccessible()
   })
 })

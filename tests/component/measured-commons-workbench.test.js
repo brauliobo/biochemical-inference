@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
+import { pressWhenEnabled } from '../helpers/interactions.js'
 
 const api = vi.hoisted(() => ({
   discloseMeasuredEvaluation: vi.fn(),
@@ -124,5 +126,19 @@ describe('MeasuredCommonsWorkbench', () => {
     expect(await screen.findByRole('alert')).toBeTruthy()
     expect(screen.getByText('mirror unreadable')).toBeTruthy()
     expect(screen.getByTestId('measured-sync')).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations through lineage, calibration, commitment and disclosure', async () => {
+    render(MeasuredCommonsWorkbench)
+    await screen.findByTestId('measured-table')
+    await pressWhenEnabled('inspect-lineage')
+    await screen.findByTestId('measured-lineage')
+    await pressWhenEnabled('run-measured-calibration')
+    await screen.findByTestId('calibration-artifact')
+    await pressWhenEnabled('freeze-measured')
+    await screen.findByTestId('commitment-receipt')
+    await pressWhenEnabled('disclose-measured')
+    await screen.findByTestId('disclosure-values')
+    await expectAccessible()
   })
 })

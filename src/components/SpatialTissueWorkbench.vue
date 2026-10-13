@@ -101,6 +101,6 @@ Panel.spatial-workbench(title="Synthetic lobule spatial view" title-id="spatial-
       p.muted Release field descriptor: {{ fieldDescriptor.interpolation }} interpolation; missing value {{ fieldDescriptor.missing_value_policy.mode }} at sentinel {{ fieldDescriptor.missing_value_policy.sentinel }}.
       p.muted LOD {{ lod.level }} · {{ lod.dimensions.join('×') }} · loaded {{ lod.content_id }} only for this viewport.
       p.muted {{ fieldDescriptor.uncertainty.kind }} means byte-exact synthetic fixture values, not zero biological uncertainty.
-    Toolbar(label="Select portal-to-central lobule bin without WebGL")
+    Toolbar.spatial-bin-controls(label="Select portal-to-central lobule bin without WebGL")
       button.button.button--secondary(v-for="bin in 12" :key="bin" type="button" :aria-pressed="selectedBin === bin - 1" @click="emit('selectBin', bin - 1)") Bin {{ bin }}
 </template>

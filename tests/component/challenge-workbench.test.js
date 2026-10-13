@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CHALLENGE_CONCLUSION_BOUNDARY, CHALLENGE_PINS } from '../../shared/challenge-contracts.js'
+import { expectAccessible } from '../helpers/axe.js'
 
 const api = vi.hoisted(() => ({
   discloseChallengeCommitment: vi.fn(),
@@ -226,5 +227,16 @@ describe('ChallengeWorkbench', () => {
       expect([...group.children].map((item) => item.tagName)).toEqual(['DT', 'DD'])
       expect(group.querySelector('dd code')).toBeTruthy()
     }
+  })
+
+  it('has no WCAG 2.2 AA violations when ready and after disclosure', async () => {
+    render(ChallengeWorkbench)
+    await fireEvent.click(await screen.findByTestId('challenge-freeze'))
+    await screen.findByTestId('challenge-commitment')
+    await expectAccessible()
+
+    await fireEvent.click(await screen.findByTestId('challenge-disclose'))
+    await screen.findByTestId('challenge-result')
+    await expectAccessible()
   })
 })

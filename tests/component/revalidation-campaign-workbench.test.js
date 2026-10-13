@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import RevalidationCampaignWorkbench from '../../src/components/RevalidationCampaignWorkbench.vue'
 import { revalidationReport, revalidationStatus, revalidationView } from '../fixtures/revalidation.js'
 
@@ -88,5 +89,17 @@ describe('Goal 15 revalidation campaign workbench', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Load next 2 work records' }))
     await waitFor(() => expect(screen.getAllByText('Review required · not automatically accepted')).toHaveLength(6))
     expect(api.loadRevalidationCampaignPage).toHaveBeenCalledWith(detail.campaign_id, { limit: 2, cursor: 'signed-page-cursor' }, expect.any(AbortSignal))
+  })
+
+  it('has no WCAG 2.2 AA violations with a terminal campaign and its report', async () => {
+    const detail = await revalidationView({ terminal: true, submitted: 6 })
+    api.loadRevalidationStatus.mockResolvedValue(revalidationStatus(1))
+    api.loadRevalidationCampaigns.mockResolvedValue([{ local_campaign_id: detail.campaign_id, producer_campaign_id: detail.producer.producer_campaign_id, event_head: detail.producer.event_head }])
+    api.loadRevalidationCampaign.mockResolvedValue(detail)
+    render(RevalidationCampaignWorkbench)
+    await screen.findByText('6 / 6 terminal')
+    await fireEvent.click(screen.getByRole('button', { name: 'Load technical report' }))
+    await screen.findByText('Bounded campaign report')
+    await expectAccessible()
   })
 })

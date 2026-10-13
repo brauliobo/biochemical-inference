@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { rm } from 'node:fs/promises'
 import { createPhysiologyClient } from '../../server/physiology/client.js'
 import { createPhysiologyService } from '../../server/physiology/service.js'
@@ -113,5 +114,12 @@ describe('PhysiologyPluginWorkbench', () => {
     expect(request.packageDigests).toHaveLength(3)
     expect(request.packageDigests).toContain(replacement.packageDigest)
     expect(request.packageDigests).not.toContain(original.packageDigest)
+  })
+
+  it('has no WCAG 2.2 AA violations with a coupling and a run', async () => {
+    api.loadPhysiologyWorkbench.mockResolvedValue({ ...workspace, couplings: [coupling], runs: [run] })
+    render(PhysiologyPluginWorkbench)
+    await screen.findByText(run.runDigest)
+    await expectAccessible()
   })
 })

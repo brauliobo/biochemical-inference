@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { createApapFixtureClient } from '../../server/apap/fixture.js'
 import { createApapRunService, loadApapClosure } from '../../server/apap/service.js'
 import { APAP_RELEASE_ID } from '../../shared/apap-contracts.js'
@@ -97,5 +98,13 @@ describe('APAPBenchmarkWorkbench', () => {
     pending.resolve(record)
     await Promise.resolve()
     expect(onCompleted).not.toHaveBeenCalled()
+  })
+
+  it('has no WCAG 2.2 AA violations with a completed run and the lobule view', async () => {
+    render(APAPBenchmarkWorkbench)
+    await fireEvent.click(await screen.findByRole('button', { name: 'Run APAP benchmark' }))
+    await screen.findByText('Canonical APAP run identity')
+    await screen.findByText('Synthetic lobule spatial view')
+    await expectAccessible()
   })
 })

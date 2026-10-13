@@ -4,8 +4,8 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
   await page.goto('/#/workbench/full')
 
   await expect(page.getByRole('heading', { name: 'Verified knowledge workspace' })).toBeVisible()
-  await expect(page.locator('.provenance-grid dd').filter({ hasText: /^one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)$/ })).toBeVisible()
-  await expect(page.locator('.status-panel .provenance-grid .digest')).toHaveText(/^sha256:[a-f0-9]{64}$/)
+  await expect(page.locator('[data-testid="release-pins"] dd').filter({ hasText: /^one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)$/ })).toBeVisible()
+  await expect(page.locator('[data-testid="release-pins"] dd.digest')).toHaveText(/^sha256:[a-f0-9]{64}$/)
   await page.getByText('Build provenance', { exact: true }).click()
   await expect(page.getByText('Recipe', { exact: true })).toBeVisible()
   await expect(page.getByText('Source lock', { exact: true })).toBeVisible()
@@ -19,7 +19,7 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
 
   await page.getByRole('button', { name: 'Run deterministic model' }).click()
   await expect(page.getByText('Stable run identity')).toBeVisible()
-  const baselineRunId = await page.locator('.run-header code').textContent()
+  const baselineRunId = await page.getByTestId('run-id').textContent()
   await expect(page.getByText('Integration diagnostics')).toBeVisible()
   await expect(page.getByText('Final concentration and flux values')).toBeVisible()
 
@@ -27,7 +27,7 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
   await page.getByRole('button', { name: 'Run deterministic model' }).click()
   await expect(page.getByText('Reduced-MTHFR directional comparison')).toBeVisible()
   await expect(page.getByText(/Homocysteine is higher and the SAM:SAH ratio is lower/)).toBeVisible()
-  await expect(page.locator('.run-header code')).not.toHaveText(baselineRunId ?? '')
+  await expect(page.getByTestId('run-id')).not.toHaveText(baselineRunId ?? '')
 
   await page.getByRole('button', { name: /CHEBI:58199/ }).click()
   await expect(page.getByText('Final model value')).toBeVisible()

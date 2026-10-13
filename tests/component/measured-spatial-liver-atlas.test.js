@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
+import { pressWhenEnabled } from '../helpers/interactions.js'
 import { MEASURED_SPATIAL_PINS } from '../../shared/measured-spatial-contracts.js'
 
 const api = vi.hoisted(() => ({
@@ -108,5 +110,15 @@ describe('MeasuredSpatialLiverAtlas', () => {
     expect(await within(result).findByText('disabled')).toBeTruthy()
     expect(screen.getByRole('group', { name: 'liver-mask level 1, Z chunk 0' })).toBeTruthy()
     expect(await screen.findByRole('button', { name: 'Check local integrity without network' })).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations with a verified chunk and the offline result', async () => {
+    render(MeasuredSpatialLiverAtlas)
+    const map = await screen.findByTestId('measured-spatial-chunk-map')
+    await fireEvent.click(within(map).getByRole('button', { name: 'Request Y 0, X 0' }))
+    await screen.findByText('Encoded and decoded verification passed')
+    await pressWhenEnabled('measured-spatial-complete')
+    await screen.findByTestId('measured-spatial-offline-result')
+    await expectAccessible()
   })
 })
