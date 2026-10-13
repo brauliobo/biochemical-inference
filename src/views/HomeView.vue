@@ -1,8 +1,10 @@
 <script setup vapor>
 import EvidenceBadge from '../components/kb/EvidenceBadge.vue'
+import PathCards from '../components/kb/PathCards.vue'
 import SearchBox from '../components/kb/SearchBox.vue'
 import { EVIDENCE_KEYS } from '../knowledge/evidence.js'
-import { KB_PATH, MAP_PATH } from '../kb/paths.js'
+import { PATH_CARDS } from '../kb/path-cards.js'
+import { KB_PATH, MAP_PATH, PATHS_PATH } from '../kb/paths.js'
 import { START_HERE } from '../kb/start-here.js'
 import { isStaticMode } from '../runtime-mode.js'
 import RouterLink from '../ui/RouterLink.vue'
@@ -31,6 +33,13 @@ const staticMode = isStaticMode()
       RouterLink.button.button--secondary(:to="MAP_PATH") Explore the map
 
   SearchBox
+
+  section.stack(aria-labelledby="paths-heading")
+    h2#paths-heading Guided paths
+    p.muted {{ PATH_CARDS.length }} short reading routes. Each step is one page and says why it comes next. New here? Start with the first.
+    PathCards(:paths="PATH_CARDS")
+    p
+      RouterLink(:to="PATHS_PATH") All guided paths
 
   section.stack(aria-labelledby="start-heading")
     h2#start-heading Start here

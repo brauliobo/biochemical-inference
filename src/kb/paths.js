@@ -15,6 +15,18 @@ export const MAP_PATH = '/kb/map'
 
 export const typePath = (type) => `${KB_PATH}/${type}`
 
+/** Guided paths: /kb/paths lists them, /kb/paths/<id>?step=<n> shows one step of one path. */
+export const PATHS_PATH = `${KB_PATH}/paths`
+
+/**
+ * Router path of a guided path; with `step` (1-based) the URL deep-links to that step.
+ * Registered before /kb/:type so "paths" is never read as an entity type.
+ */
+export function guidedPathPath(id, step) {
+  const base = `${PATHS_PATH}/${encodeURIComponent(id)}`
+  return step ? `${base}?step=${step}` : base
+}
+
 /** The claims audit is the claim listing, which groups claims by status. */
 export const CLAIMS_AUDIT_PATH = typePath('claim')
 

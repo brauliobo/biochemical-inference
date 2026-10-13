@@ -9,7 +9,7 @@ import { mountVapor } from '../helpers/mount-vapor.js'
 // The whole app shell plus each route, audited as a page (landmarks, one h1,
 // heading order). Workbenches show their API-required notice in the static
 // build; their working states are audited in each workbench's own test.
-const KNOWLEDGE_ROUTES = ['/', '/kb', '/kb/compound', '/kb/claim', '/kb/enzyme/gnmt', '/kb/reaction/gnmt-glycine-methylation', '/kb/map', '/kb/state/no-such-entry', '/no/such/page']
+const KNOWLEDGE_ROUTES = ['/', '/kb', '/kb/compound', '/kb/claim', '/kb/enzyme/gnmt', '/kb/reaction/gnmt-glycine-methylation', '/kb/map', '/kb/paths', '/kb/paths/glycine-belching-question?step=4', '/kb/paths/no-such-path', '/kb/state/no-such-entry', '/no/such/page']
 
 beforeEach(() => {
   window.scrollTo = vi.fn()

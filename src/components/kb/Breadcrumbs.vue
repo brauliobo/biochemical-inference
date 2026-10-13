@@ -10,7 +10,7 @@ const props = defineProps({ crumbs: { type: Array, required: true } })
 const items = computed(() => {
   const trail = props.crumbs.map((crumb) => ({
     label: crumb.label,
-    to: crumb.kind === 'home' ? '/' : crumb.kind === 'hub' ? typePath(crumb.type) : null
+    to: crumb.to ?? (crumb.kind === 'home' ? '/' : crumb.kind === 'hub' ? typePath(crumb.type) : null)
   }))
   trail.splice(1, 0, { label: 'Knowledge base', to: KB_PATH })
   trail[trail.length - 1].to = null

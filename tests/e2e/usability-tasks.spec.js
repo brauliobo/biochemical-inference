@@ -253,6 +253,64 @@ test.describe('keyboard only', () => {
     await expect(page.locator('main details[open] ol li').first()).toBeVisible()
   })
 
+  test('T9 follows the glycine-belching guided path from Home to its last step with the keyboard only', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    let presses = 0
+    const focusedHref = () => page.evaluate(() => document.activeElement?.getAttribute('href') ?? '')
+    const tabTo = async (matches, limit = 40) => {
+      for (let count = 0; count < limit; count += 1) {
+        await page.keyboard.press('Tab')
+        presses += 1
+        if (matches(await focusedHref(), await page.evaluate(() => document.activeElement?.textContent ?? ''))) return count + 1
+      }
+      throw new Error(`no matching control within ${limit} Tab presses`)
+    }
+    const toPath = await tabTo((href) => href === '#/kb/paths/glycine-belching-question')
+    record('T9 keyboard: Tab presses from page load to the glycine-belching path link', toPath)
+    await page.keyboard.press('Enter')
+    await expect(heading(page, 'The glycine-belching question')).toBeVisible()
+    await expect(page.getByRole('main')).toBeFocused()
+    const total = Number((await page.getByText(/^Step 1 of \d+$/).textContent()).match(/of (\d+)/)[1])
+    expect(total).toBeGreaterThan(3)
+
+    let step = 1
+    while (step < total) {
+      const perStep = await tabTo((href, text) => href.endsWith(`?step=${step + 1}`) && text.startsWith('Next:'), 6)
+      // From <main> (first step): three breadcrumb links, Read the page, Next. Later, from the focused heading:
+      // Read the page, Previous, Next.
+      expect(perStep).toBeLessThanOrEqual(step === 1 ? 5 : 3)
+      if (step === 2) record('T9 keyboard: Tab presses per step (from the step heading to Next)', perStep)
+      await page.keyboard.press('Enter')
+      step += 1
+      await expect(page.getByText(`Step ${step} of ${total}`, { exact: true })).toBeVisible()
+      await expect(page.locator('#step-heading')).toBeFocused() // the new step is where the keyboard is
+      expect(new URL(page.url()).hash).toBe(`#/kb/paths/glycine-belching-question?step=${step}`)
+    }
+    await expect(page.getByRole('progressbar')).toHaveJSProperty('value', total)
+    await expect(page.getByRole('link', { name: /^Next:/ })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: /^Previous:/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'End of the path: all guided paths' })).toHaveAttribute('href', '#/kb/paths')
+    record('T9 keyboard: Tab presses from Home to the last step', presses)
+    record('T9 keyboard: steps followed', total)
+  })
+
+  test('a step deep link reopens the same step in a fresh browser and the entity page links back to it (T6)', async ({ page, browser }) => {
+    await page.goto('/#/kb/paths/glycine-belching-question?step=5')
+    await expect(page.getByText(/^Step 5 of \d+$/)).toBeVisible()
+    const heading5 = await page.locator('#step-heading').textContent()
+    const fresh = await browser.newContext()
+    const other = await fresh.newPage()
+    await other.goto(page.url())
+    await expect(other.getByText(/^Step 5 of \d+$/)).toBeVisible()
+    await expect(other.locator('#step-heading')).toHaveText(heading5)
+    await fresh.close()
+    await page.goto('/#/kb/enzyme/gnmt')
+    const link = page.getByRole('link', { name: /^The glycine-belching question, step 5 of/ })
+    await link.click()
+    await expect(page.locator('#step-heading')).toHaveText(heading5)
+  })
+
   test('primary navigation is within 5 Tab presses of page load, on Home and on an entity page (F5)', async ({ page }) => {
     for (const route of ['/#/', '/#/kb/enzyme/gnmt']) {
       await page.goto(route)
@@ -299,7 +357,7 @@ test.describe('reflow and target size', () => {
   test('no horizontal scrolling at 320 CSS px on the key pages (A5)', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 640 })
     const overflowing = []
-    for (const route of ['/#/', '/#/kb', '/#/kb/claim', '/#/kb/reaction', '/#/kb/state/undermethylation', '/#/kb/reaction/gnmt-glycine-methylation', '/#/kb/compound/glycine?to=outcome%3Abelching', '/#/kb/map?id=compound%3Aglycine']) {
+    for (const route of ['/#/', '/#/kb', '/#/kb/claim', '/#/kb/reaction', '/#/kb/state/undermethylation', '/#/kb/reaction/gnmt-glycine-methylation', '/#/kb/compound/glycine?to=outcome%3Abelching', '/#/kb/map?id=compound%3Aglycine', '/#/kb/paths', '/#/kb/paths/glycine-belching-question?step=4']) {
       await page.goto(route)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
       await settle(page)
@@ -312,7 +370,7 @@ test.describe('reflow and target size', () => {
 
   test('buttons, form fields and disclosure summaries are at least 44 px tall (A4)', async ({ page }) => {
     const small = []
-    for (const route of ['/#/', '/#/kb', '/#/kb/claim', '/#/kb/compound/glycine?to=outcome%3Abelching']) {
+    for (const route of ['/#/', '/#/kb', '/#/kb/claim', '/#/kb/compound/glycine?to=outcome%3Abelching', '/#/kb/paths/glycine-belching-question?step=4']) {
       await page.goto(route)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
       await settle(page)

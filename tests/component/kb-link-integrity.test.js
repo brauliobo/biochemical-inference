@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import KbEntityView from '../../src/views/kb/KbEntityView.vue'
-import { graph } from '../../src/knowledge/index.js'
+import { getPath, graph } from '../../src/knowledge/index.js'
 import { TYPE_IDS, typeMeta } from '../../src/knowledge/types.js'
 import { entityPath, typePath } from '../../src/kb/paths.js'
 import { navigate, parseHash, resolveRoute } from '../../src/router.js'
@@ -40,7 +40,13 @@ describe('rendered link integrity', () => {
           else if (`${params.type}:${params.slug}` !== entity.id) onward += 1
         } else if (route.name === 'kb-type') {
           if (!TYPE_IDS.includes(params.type)) problems.push(`${entity.id}: ${href} is not a type`)
-        } else if (!['home', 'kb-hub', 'kbMap'].includes(route.name)) {
+        } else if (route.name === 'kb-path') {
+          // A guided path link must name a real path, and its step must land on this entity.
+          const path = getPath(params.id)
+          const step = Number(location.query.step)
+          if (!path) problems.push(`${entity.id}: ${href} has no guided path`)
+          else if (path.steps[step - 1]?.id !== entity.id) problems.push(`${entity.id}: ${href} does not land on this entity`)
+        } else if (!['home', 'kb-hub', 'kb-paths', 'kbMap'].includes(route.name)) {
           problems.push(`${entity.id}: ${href} resolves to ${route.name}`)
         }
       }

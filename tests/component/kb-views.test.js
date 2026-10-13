@@ -65,7 +65,8 @@ describe('/kb hub', () => {
   it('lists all 11 types with descriptions and counts, search and the claims audit', async () => {
     await open('/kb')
     expect(h1().textContent).toBe('Knowledge base')
-    expect(headings(3)).toHaveLength(TYPE_IDS.length)
+    const kinds = screen.getByRole('heading', { level: 2, name: 'Browse by kind' }).closest('section')
+    expect(within(kinds).getAllByRole('heading', { level: 3 })).toHaveLength(TYPE_IDS.length)
     expect(within(main()).getByText('Statements to be checked against the literature.')).toBeTruthy()
     expect(screen.getByRole('searchbox')).toBeTruthy()
     expect(within(main()).getByRole('link', { name: /\d+ unsupported/ }).getAttribute('href')).toBe('#/kb/claim?status=unsupported')

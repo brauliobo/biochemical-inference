@@ -5,6 +5,7 @@ import BodyText from '../../components/kb/BodyText.vue'
 import Breadcrumbs from '../../components/kb/Breadcrumbs.vue'
 import ClaimBlock from '../../components/kb/ClaimBlock.vue'
 import EntityNotFound from '../../components/kb/EntityNotFound.vue'
+import EntityPaths from '../../components/kb/EntityPaths.vue'
 import EvidenceBadge from '../../components/kb/EvidenceBadge.vue'
 import FactsTable from '../../components/kb/FactsTable.vue'
 import ItemList from '../../components/kb/ItemList.vue'
@@ -82,6 +83,8 @@ EntityNotFound(v-if="!model" :what="route.params.slug" :query="slugWords(route.p
   section.stack(v-if="model.body.length" aria-labelledby="about-heading")
     h2#about-heading Details
     BodyText(:paragraphs="model.body")
+
+  EntityPaths(:id="model.id")
 
   section.stack(v-if="facts.length" aria-labelledby="facts-heading")
     h2#facts-heading Facts and identifiers

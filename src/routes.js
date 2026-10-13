@@ -9,6 +9,9 @@ export const routes = [
   { name: 'home', path: '/', title: 'Home', load: () => import('./views/HomeView.vue') },
   { name: 'kb-hub', path: '/kb', title: 'Knowledge base', load: () => import('./views/kb/KbHubView.vue') },
   { name: 'kbMap', path: '/kb/map', title: 'Knowledge map', load: () => import('./views/kb/KbMapView.vue') },
+  // Guided paths must stay above /kb/:type, which would read "paths" as an entity type.
+  { name: 'kb-paths', path: '/kb/paths', title: 'Guided paths', load: () => import('./views/kb/KbPathsView.vue') },
+  { name: 'kb-path', path: '/kb/paths/:id', title: 'Guided path', load: () => import('./views/kb/KbPathView.vue') },
   { name: 'kb-type', path: '/kb/:type', title: 'Knowledge base', load: () => import('./views/kb/KbTypeView.vue') },
   { name: 'kb-entity', path: '/kb/:type/:slug', title: 'Knowledge base', load: () => import('./views/kb/KbEntityView.vue') },
   { name: 'workbench-index', path: '/workbench', title: 'Workbenches', load: () => import('./views/WorkbenchIndexView.vue') },

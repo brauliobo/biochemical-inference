@@ -39,5 +39,7 @@ describe('kb paths', () => {
     expect(resolveRoute(typePath('enzyme')).route.name).toBe('kb-type')
     expect(resolveRoute('/kb/map').route.name).toBe('kbMap')
     expect(resolveRoute('/kb').route.name).toBe('kb-hub')
+    expect(resolveRoute('/kb/paths').route.name).toBe('kb-paths')
+    expect(resolveRoute('/kb/paths/methyl-budget').route.name).toBe('kb-path')
   })
 })
