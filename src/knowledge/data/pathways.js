@@ -328,7 +328,7 @@ export default [
     id: "pathway:acid-bicarbonate-neutralisation",
     type: "pathway",
     name: "Acid-bicarbonate neutralisation and CO2 evolution",
-    aliases: ["neutralização do ácido por bicarbonato", "HCl + HCO3−", "liberação de CO2", "efervescência gástrica", "bicarbonato pancreático", "gás químico", "efervescência"],
+    aliases: ["neutralização do ácido por bicarbonato", "HCl + HCO3−", "liberação de CO2", "efervescência gástrica", "bicarbonato pancreático", "gás químico", "efervescência", "gás carbônico no estômago"],
     summary: "Gastric HCl meets pancreatic and biliary bicarbonate (or an antacid) and is converted via carbonic acid to water and dissolved CO2, catalysed by carbonic anhydrase.",
     body: [
       "H+ + HCO3- -> H2CO3 ([[reaction:proton-bicarbonate-protonation]]) and H2CO3 -> H2O + CO2 ([[reaction:carbonic-acid-dehydration]]), summarised as HCl + HCO3- -> CO2 + H2O + Cl- ([[reaction:hcl-bicarbonate-neutralisation]]). [[enzyme:carbonic-anhydrase]] (CA II, CA IV) speeds the interconversion at epithelial surfaces ([[reaction:carbonic-anhydrase-bicarbonate-dehydration]]). In the duodenum, pancreatic and biliary bicarbonate and Brunner-gland mucus neutralise acid chyme within centimetres of the pylorus. Dissolved CO2 is highly diffusible and mostly absorbed across the mucosa; a minor fraction is carried distally or released.",
@@ -498,7 +498,7 @@ export default [
     id: "pathway:gut-bacterial-glycine-fates",
     type: "pathway",
     name: "Proposed gut-bacterial fates of free glycine (Stickland reduction, bacterial glycine cleavage, BSH release)",
-    aliases: ["fermentação bacteriana da glicina", "descarboxilação bacteriana da glicina", "SIBO e glicina", "via de Stickland", "glicina e gás"],
+    aliases: ["fermentação bacteriana da glicina", "descarboxilação bacteriana da glicina", "SIBO e glicina", "via de Stickland", "glicina e gás", "fermentação intraluminal da glicina"],
     summary: "Proposed, largely conversation-only route by which overgrown upper-gut bacteria ferment free glycine to NH3 and CO2; supported as bacterial capability only, not as a shown cause of belching.",
     body: [
       "Two real bacterial enzyme systems can consume glycine: the selenium-dependent Stickland glycine reductase of some Clostridia ([[enzyme:bacterial-glycine-reductase]], [[reaction:bacterial-glycine-reductase]]) which gives acetyl phosphate and ammonia, and the bacterial glycine cleavage system ([[enzyme:bacterial-glycine-cleavage-system]], [[reaction:bacterial-glycine-cleavage]]) which gives CO2, ammonia and a folate one-carbon unit. In addition bile-salt hydrolase releases free glycine from glycine-conjugated bile acids in the lumen ([[reaction:bsh-glycocholate-deconjugation]]).",

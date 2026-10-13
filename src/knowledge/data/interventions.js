@@ -73,7 +73,7 @@ export default [
     id: "intervention:dietary-glycine-sources",
     type: "intervention",
     name: "Dietary glycine sources (gelatin, bone broth, slow-cooked meats)",
-    aliases: ["gelatina", "caldo de ossos", "carnes de cozimento lento", "bone broth", "gelatin"],
+    aliases: ["gelatina", "caldo de ossos", "carnes de cozimento lento", "bone broth", "gelatin", "matriz proteica sólida"],
     summary: "Whole-food routes to glycine: gelatin, skin and connective tissue, long-simmered broths and slow-cooked tough cuts, which deliver collagen-derived glycine within a solid food matrix.",
     body: [
       "A typical mixed diet provides roughly 3-5 g glycine/day from protein (glycine is about 4 % of average protein but about 20-25 % of gelatin and connective tissue). Slow cooking converts collagen to gelatin, which is more digestible than native collagen, while giving amino acids gradually within a mixed meal ([[compound:collagen]], [[compound:glycine]]). This is the practical basis for the advice to obtain glycine from food rather than concentrated powders in people who are sensitive to the latter ([[intervention:amino-acids-with-meals]]).",
@@ -115,7 +115,7 @@ export default [
     id: "intervention:betaine-hcl",
     type: "intervention",
     name: "Betaine hydrochloride (betaine HCl)",
-    aliases: ["betaína HCl", "betaine HCl", "cloridrato de betaína"],
+    aliases: ["betaína HCl", "betaine HCl", "cloridrato de betaína", "reacidificação", "reacidificar o estômago"],
     summary: "Acidifying supplement releasing about 6.5 mmol HCl per gram, marketed for hypochlorhydria; unvalidated and generally avoided with ulcers, gastritis, reflux or NSAID use.",
     body: [
       "Betaine HCl (molar mass 153.6 g/mol; 76 % betaine) dissociates in the stomach, delivering about 6.5 mmol H+ per gram, so a 650 mg capsule gives about 4.2 mmol acid, comparable to a few minutes of stimulated parietal output ([[compound:hydrochloric-acid]]). In volunteers with PPI-induced hypochlorhydria it transiently lowered gastric pH for under an hour (Yago 2013). The 'challenge' protocol of escalating capsules until warmth is felt is not validated ([[intervention:hcl-challenge-test]]), and no controlled trial shows clinical benefit in digestion, B12 or mineral absorption.",
@@ -425,7 +425,7 @@ export default [
     id: "intervention:zinc-carnosine",
     type: "intervention",
     name: "Zinc carnosine (polaprezinc, PepZin GI)",
-    aliases: ["zinco carnosina", "polaprezinc", "PepZin GI", "Promac"],
+    aliases: ["zinco carnosina", "polaprezinc", "PepZin GI", "Promac", "padrão-ouro pós-úlcera", "quelato polimérico de zinco"],
     summary: "Chelate of zinc and L-carnosine approved in Japan for gastric ulcer at 150 mg/day (about 34 mg zinc); local mucosal protection and healing support, with trials as H. pylori adjunct.",
     body: [
       "Polaprezinc adheres to ulcerated mucosa, releasing zinc and carnosine locally; proposed actions include antioxidant effects, stabilisation of mucus, promotion of epithelial repair and anti-H. pylori activity. It has been prescribed in Japan since 1994 at 75 mg twice daily (150 mg/day contains about 34 mg zinc) and has supportive RCTs in gastric ulcer healing, as an adjunct to H. pylori eradication, and for small-bowel NSAID injury (Mahmood 2007). Outside Japan most evidence is smaller and manufacturer-linked, so 'gold standard' overstates it.",
@@ -501,7 +501,7 @@ export default [
     id: "intervention:sodium-alginate",
     type: "intervention",
     name: "Sodium alginate raft-forming reflux products",
-    aliases: ["alginato de sódio", "Gaviscon", "alginate raft", "alginato"],
+    aliases: ["alginato de sódio", "Gaviscon", "alginate raft", "alginato", "balsa de gel", "raft de alginato"],
     summary: "Liquid or chewable alginate/bicarbonate/carbonate products taken after meals and at bedtime; form a floating gel raft that reduces acid and pepsin reflux without lowering acid secretion.",
     body: [
       "On contact with gastric acid, sodium alginate gels and, with CO2 from the bicarbonate/carbonate in the formulation, floats as a raft that displaces the post-prandial acid pocket and impedes reflux ([[compound:alginate]]). A meta-analysis (Leiman 2017) found alginates superior to placebo and antacids for GERD symptoms; evidence against PPIs is mixed, and for [[disease:lpr]] there are only small trials. In vitro, rafts can entrap pepsin and bile acids ([[compound:pepsin]]); clinical benefit for 'neutralising throat pepsin' is plausible but unproven. They do not suppress acid ([[compound:hydrochloric-acid]]).",
@@ -599,7 +599,7 @@ export default [
     id: "intervention:berberine-supplement",
     type: "intervention",
     name: "Berberine supplement",
-    aliases: ["berberina", "berberine HCl", "suplemento de berberina"],
+    aliases: ["berberina", "berberine HCl", "suplemento de berberina", "fitoterápicos antimicrobianos"],
     summary: "Alkaloid used at 500 mg two to three times daily for glucose and lipids and in herbal SIBO protocols; interacts with CYP enzymes and is avoided in pregnancy.",
     body: [
       "[[compound:berberine]] activates AMPK and modulates the gut microbiota. It improves fasting glucose and LDL in meta-analyses of mostly low-quality trials. One small trial found herbal regimens containing berberine comparable to rifaximin for SIBO breath-test normalisation (Chedid 2014); this is preliminary ([[disease:sibo]]).",

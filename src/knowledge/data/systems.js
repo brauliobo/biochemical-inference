@@ -5,7 +5,7 @@ export default [
     id: "system:vagal-tone",
     type: "system",
     name: "Vagal tone (parasympathetic control)",
-    aliases: ["Tônus vagal", "Nervo vago", "Vagus nerve activity", "Parasympathetic tone", "vago"],
+    aliases: ["Tônus vagal", "Nervo vago", "Vagus nerve activity", "Parasympathetic tone", "vago", "disautonomia", "tônus parassimpático", "sistema parassimpático"],
     summary: "Activity of the vagus nerve, which releases acetylcholine to slow the heart, drive gastric acid secretion and antral contractions, coordinate the LES and relax the pylorus; measured indirectly (HRV).",
     body: [
       "Vagal efferents release [[compound:acetylcholine]] onto M2 receptors in the sinoatrial node ([[system:cardiac-autonomic-control]]) and onto stomach nerves and parietal cells ([[pathway:gastric-acid-secretion]], [[system:gastric-physiology]]). The vagus also coordinates swallowing-related relaxation and vago-vagal reflexes of the [[system:lower-esophageal-sphincter]]. Vagal tone is commonly estimated from heart-rate variability.",
@@ -46,7 +46,7 @@ export default [
     id: "system:gut-microbiota",
     type: "system",
     name: "Gut microbiota",
-    aliases: ["Microbiota intestinal", "Microbiota alta", "Upper gut microbes", "Gut flora"],
+    aliases: ["Microbiota intestinal", "Microbiota alta", "Upper gut microbes", "Gut flora", "disbiose", "disbiose alta", "colonização bacteriana alta"],
     summary: "The microbial communities of the gut, dense in the colon and sparse in the stomach and proximal small bowel; they ferment substrates, make TMA, deconjugate bile acids and respond to acid suppression.",
     body: [
       "The healthy stomach and proximal small bowel hold relatively few bacteria because of acid, bile, motility and immune defences; counts rise distally. Microbes make hydrogen, methane, short-chain fatty acids and [[compound:trimethylamine]] from [[compound:choline]], and deconjugate and transform [[compound:bile-acids]] ([[system:bile]]). Excess proximal colonisation is [[disease:sibo]], whose diagnosis is imprecise.",

@@ -113,7 +113,7 @@ export default [
     id: "state:gastric-dysmotility",
     type: "state",
     name: "Gastric dysmotility",
-    aliases: ["Dismotilidade gástrica", "Slow gastric emptying", "Esvaziamento gástrico lento", "Impaired gastric motor function", "gastroparesia leve", "gastroparesia funcional", "esvaziamento lentificado"],
+    aliases: ["Dismotilidade gástrica", "Slow gastric emptying", "Esvaziamento gástrico lento", "Impaired gastric motor function", "gastroparesia leve", "gastroparesia funcional", "esvaziamento lentificado", "disautonomia gástrica", "disautonomia gástrica transitória", "estase digestiva"],
     summary: "Disordered stomach motor function: delayed emptying, impaired accommodation or abnormal contractions, from diabetes, drugs, post-viral injury or vagal damage; many cases are idiopathic.",
     body: [
       "Normal gastric emptying relies on proximal accommodation, antral contractions, pyloric coordination and duodenal feedback, orchestrated by the vagus ([[system:vagal-tone]]), the [[system:enteric-nervous-system]] and gut hormones. Dysmotility ranges from mild functional postprandial fullness ([[disease:functional-dyspepsia]]) to confirmed [[disease:gastroparesis]]. Established contributors are diabetes, opioids and other drugs, surgery, post-infectious injury and idiopathic neuropathy. Proton pump inhibitors modestly slow solid-meal emptying in some studies ([[claim:ppis-slow-gastric-emptying]]).",
@@ -216,7 +216,7 @@ export default [
     id: "state:acid-suppression",
     type: "state",
     name: "Pharmacological acid suppression",
-    aliases: ["Supressão ácida", "PPI therapy state", "Uso de IBP", "Acid-suppressed stomach"],
+    aliases: ["Supressão ácida", "PPI therapy state", "Uso de IBP", "Acid-suppressed stomach", "barreira de esterilização do estômago", "perda da esterilização gástrica"],
     summary: "Gastric acid reduced by PPIs, potassium-competitive blockers or H2 blockers; it heals ulcers and GERD but is associated with SIBO, B12 deficiency and slower solid-meal emptying.",
     body: [
       "[[intervention:ppi-therapy|PPIs]] therapy lifts gastric pH for most of the day and is first-line for ulcers and erosive reflux. Long-term acid suppression is a recognised cause of [[state:hypochlorhydria]]. Meta-analyses report a moderate association between PPI use and small-intestinal bacterial overgrowth (odds ratio about 1.7-2.3), with heterogeneity and test-dependence, and reviews show that PPIs delay emptying of solid meals ([[claim:ppis-cause-sibo]], [[claim:ppis-slow-gastric-emptying]]). Rebound acid hypersecretion after withdrawal is also described.",

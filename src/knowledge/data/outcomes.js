@@ -25,7 +25,7 @@ export default [
     id: "outcome:night-waking",
     type: "outcome",
     name: "Night waking at 2-3 am",
-    aliases: ["Despertar às 2-3h", "Nocturnal awakening", "Early-morning waking", "Insônia de manutenção"],
+    aliases: ["Despertar às 2-3h", "Nocturnal awakening", "Early-morning waking", "Insônia de manutenção", "acordar de madrugada"],
     summary: "Awakening in the small hours, sometimes with palpitations and heat. Has many causes (sleep apnoea, anxiety, reflux, alcohol, glucose dips); a histamine or vagal-brake explanation is a hypothesis only.",
     body: [
       "The source conversation attributes the user's waking with tachycardia and heat to a nocturnal histamine peak insufficiently cleared by [[enzyme:hnmt]], relieved by choline via [[enzyme:bhmt]], SAM and a vagal acetylcholine 'brake'. Plasma histamine does show circadian variation with a night/early-morning peak in some human data, partly from mast-cell clocks, but brain histaminergic neurons are least active in sleep, and the specific chain has not been tested ([[claim:histamine-peaks-2-4am]], [[claim:choline-fixed-night-waking-via-bhmt-hnmt]], [[claim:choline-supplies-nocturnal-vagal-brake]]).",
@@ -44,7 +44,7 @@ export default [
     id: "outcome:throat-burning",
     type: "outcome",
     name: "Throat burning",
-    aliases: ["Queimação na garganta", "Pharyngeal burning", "Laryngeal irritation", "Globus / throat clearing", "pigarro", "bolo na garganta", "globus"],
+    aliases: ["Queimação na garganta", "Pharyngeal burning", "Laryngeal irritation", "Globus / throat clearing", "pigarro", "bolo na garganta", "globus", "ardência na garganta"],
     summary: "A burning sensation in the throat. A symptom attributed to laryngopharyngeal reflux but with many other causes; reflux needs objective confirmation rather than assumption.",
     body: [
       "The [[system:larynx-pharynx]] has less mucus, bicarbonate and carbonic-anhydrase protection than the oesophagus, so small amounts of acid, [[compound:pepsin]] or bile may irritate it ([[disease:lpr]]). But throat burning also arises from voice overuse, post-nasal drip, allergy, infections, oesophageal motility problems, irritant foods, oregano oil and similar phenols, and anxiety. The AGA 2023 update recommends reflux testing before empiric PPIs when typical heartburn is absent ([[claim:throat-burning-means-lpr]]).",
@@ -243,7 +243,7 @@ export default [
     id: "outcome:ulcer-healing",
     type: "outcome",
     name: "Ulcer healing",
-    aliases: ["Cicatrização da úlcera", "Mucosal healing", "Endoscopic ulcer healing"],
+    aliases: ["Cicatrização da úlcera", "Mucosal healing", "Endoscopic ulcer healing", "reepitelização", "regeneração da mucosa"],
     summary: "Complete re-epithelialisation of an ulcer crater on endoscopy, typically in 4-8 weeks with PPI therapy and removal of the cause; symptom relief can precede true healing.",
     body: [
       "Healing rates with PPIs are high (commonly above 90% for duodenal ulcers in 4 weeks) when H. pylori and NSAIDs are addressed ([[disease:peptic-ulcer]], [[disease:h-pylori-infection]]). Adjuncts such as [[intervention:zinc-carnosine]] (polaprezinc, widely used in Japan) are supported by trials mainly as add-ons to PPIs; [[intervention:dgl-licorice]] has weak evidence ([[claim:zinc-carnosine-ulcer-healing]], [[claim:dgl-ulcer-healing]]). Educational only."
@@ -436,7 +436,7 @@ export default [
     id: "outcome:cholinergic-excess-symptoms",
     type: "outcome",
     name: "Cholinergic excess symptoms",
-    aliases: ["Sintomas colinérgicos", "Cholinergic crisis (loosely)", "Sweating, cramps, diarrhoea"],
+    aliases: ["Sintomas colinérgicos", "Cholinergic crisis (loosely)", "Sweating, cramps, diarrhoea", "hiperestimulação parassimpática", "sudorese, cólicas, diarreia"],
     summary: "Sweating, salivation, cramps, diarrhoea, nausea and hypotension from parasympathetic stimulation; reported at choline intakes of about 7.5-16 g/day. Not a true cholinergic crisis.",
     body: [
       "Very high choline doses can raise acetylcholine signalling and cause the muscarinic effects above ([[state:choline-excess]]). A true cholinergic crisis follows acetylcholinesterase inhibitors or organophosphates and is far more severe; the conversation's wording overstates the choline picture ([[claim:above-ul-fishy-odor-and-cholinergic-effects]]). Educational only."
