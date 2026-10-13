@@ -182,7 +182,8 @@ export default [
       { rel: "part-of", to: "pathway:folate-cycle", note: "only enzyme that releases THF from 5-MTHF" },
       { rel: "interacts-with", to: "compound:methylcobalamin", note: "cofactor / methyl carrier" },
       { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" }
-    ]
+    ],
+    refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "enzyme:mtrr",
@@ -210,7 +211,8 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "keeps methionine synthase active" },
       { rel: "interacts-with", to: "enzyme:mtr", note: "binds and reactivates MTR" },
       { rel: "interacts-with", to: "compound:sam", note: "methyl donor for reactivation" }
-    ]
+    ],
+    refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "enzyme:mat1a",
@@ -238,7 +240,8 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "interacts-with", to: "compound:magnesium", note: "obligatory divalent cation (Mg-ATP)" },
       { rel: "associated-with", to: "state:undermethylation", note: "low methionine, ATP or Mg limit SAM synthesis (plausible)" }
-    ]
+    ],
+    refs: ["article:mato-2008-methionine-metabolism-liver", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "enzyme:mat2a",
@@ -265,7 +268,8 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "interacts-with", to: "compound:magnesium", note: "obligatory divalent cation (Mg-ATP)" },
       { rel: "interacts-with", to: "compound:sam", note: "product feedback inhibition" }
-    ]
+    ],
+    refs: ["article:mato-2008-methionine-metabolism-liver", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "enzyme:ahcy",
@@ -293,7 +297,8 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "sets SAM:SAH methylation index" },
       { rel: "associated-with", to: "state:undermethylation", note: "elevated homocysteine pushes equilibrium toward SAH and lowers the SAM:SAH ratio" }
-    ]
+    ],
+    refs: ["article:selhub-1999-homocysteine-metabolism", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "enzyme:comt",
@@ -321,7 +326,8 @@ export default [
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "interacts-with", to: "compound:magnesium", note: "required divalent cation" },
       { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; product SAH inhibits" }
-    ]
+    ],
+    refs: ["article:meiser-2013-dopamine-metabolism"]
   },
 
   // ------------------------------------------------------------------ transsulfuration
@@ -352,7 +358,8 @@ export default [
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "interacts-with", to: "compound:sam", note: "allosteric activator" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "low PLP lowers CBS flux; post-methionine-load homocysteine is a functional marker" }
-    ]
+    ],
+    refs: ["article:morris-2017-cbs-deficiency-guidelines", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "enzyme:cth",
@@ -381,7 +388,8 @@ export default [
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "supplies cysteine" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "cystathionine rises when PLP is limiting" }
-    ]
+    ],
+    refs: ["article:reactome-sulfur-amino-acid-metabolism"]
   },
 
   // ------------------------------------------------------------------ folate / serine / glycine
@@ -412,7 +420,8 @@ export default [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent; limits glycine-serine interconversion" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:lamers-2007-glycine-flux"]
   },
   {
     id: "enzyme:shmt2",
@@ -440,7 +449,8 @@ export default [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:lamers-2007-glycine-flux"]
   },
   {
     id: "enzyme:mthfd1",
@@ -467,7 +477,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "interacts-with", to: "enzyme:shmt1", note: "supply of methylene-THF for formyl-THF generation" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "enzyme:gldc",
@@ -495,7 +506,8 @@ export default [
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent step of glycine catabolism" }
-    ]
+    ],
+    refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation"]
   },
   {
     id: "enzyme:amt",
@@ -522,7 +534,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "generates mitochondrial 5,10-methylene-THF" }
-    ]
+    ],
+    refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation"]
   },
   {
     id: "enzyme:gcsh",
@@ -546,7 +559,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "interacts-with", to: "enzyme:gldc", note: "accepts aminomethyl group" }
-    ]
+    ],
+    refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation"]
   },
   {
     id: "enzyme:dld",
@@ -572,7 +586,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "interacts-with", to: "compound:nad", note: "oxidant; produces NADH" }
-    ]
+    ],
+    refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation"]
   },
   {
     id: "enzyme:dmgdh",
@@ -600,7 +615,8 @@ export default [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route", note: "choline-derived glycine" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "donates one-carbon unit to mitochondrial THF" }
-    ]
+    ],
+    refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
   {
     id: "enzyme:sardh",
@@ -628,7 +644,8 @@ export default [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "enzyme:gnmt", note: "shared metabolite sarcosine; recaptures GNMT-derived methyl as one-carbon unit" }
-    ]
+    ],
+    refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
 
   // ------------------------------------------------------------------ choline oxidation
@@ -685,7 +702,8 @@ export default [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "ALDH7A1 deficiency traps PLP via P6C (pyridoxine-dependent epilepsy)" },
       { rel: "interacts-with", to: "compound:plp", note: "inactivated by P6C when the enzyme is deficient" }
-    ]
+    ],
+    refs: ["article:reactome-choline-catabolism"]
   },
 
   // ------------------------------------------------------------------ neurotransmitter / histamine
@@ -714,7 +732,8 @@ export default [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent; low PLP lowers GABA synthesis" }
-    ]
+    ],
+    refs: ["article:erlander-1991-two-gad-genes", "article:petroff-2002-gaba-glutamate"]
   },
   {
     id: "enzyme:gad2",
@@ -743,7 +762,8 @@ export default [
       { rel: "interacts-with", to: "compound:plp", note: "apoenzyme reservoir activated by PLP" },
       { rel: "associated-with", to: "disease:anxiety-disorder", note: "plausible GABA deficit with low PLP; conversation-reported benefit of P5P is anecdotal" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent" }
-    ]
+    ],
+    refs: ["article:erlander-1991-two-gad-genes", "article:battaglioli-2003-gad-isoform-kinetics"]
   },
   {
     id: "enzyme:abat",
@@ -770,7 +790,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" }
-    ]
+    ],
+    refs: ["article:petroff-2002-gaba-glutamate", "article:rhea-2022"]
   },
   {
     id: "enzyme:aldh5a1",
@@ -797,7 +818,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "interacts-with", to: "compound:nad", note: "oxidant; produces NADH" }
-    ]
+    ],
+    refs: ["article:petroff-2002-gaba-glutamate", "article:rhea-2022"]
   },
   {
     id: "enzyme:hnmt",
@@ -883,7 +905,8 @@ export default [
       { rel: "part-of", to: "pathway:vitamin-b6-activation" },
       { rel: "interacts-with", to: "compound:magnesium", note: "Mg-ATP substrate" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "drug inhibition or low kinase flux limits PLP supply" }
-    ]
+    ],
+    refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
   {
     id: "enzyme:pnpo",
@@ -909,7 +932,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:vitamin-b6-activation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "riboflavin (FMN) limitation lowers PLP formation" }
-    ]
+    ],
+    refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
 
   // ------------------------------------------------------------------ gastric acid / CO2 / urease
@@ -940,7 +964,8 @@ export default [
       { rel: "part-of", to: "pathway:gastric-acid-secretion" },
       { rel: "part-of", to: "pathway:acid-bicarbonate-neutralisation" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "conversation-only: low CA activity in under-methylation is unsupported; CA inhibitors do reduce acid output" }
-    ]
+    ],
+    refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase"]
   },
   {
     id: "enzyme:h-k-atpase",
@@ -968,7 +993,8 @@ export default [
       { rel: "associated-with", to: "state:hypochlorhydria", note: "PPI inhibition is the commonest cause of low acid" },
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "acid-peptic injury; PPIs promote healing" },
       { rel: "associated-with", to: "system:gastric-physiology" }
-    ]
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "enzyme:h-pylori-urease",
@@ -1023,7 +1049,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "enzyme:chdh", note: "competition for the free choline pool" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:pcyt1a",
@@ -1050,7 +1077,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "rate-regulating step" },
       { rel: "interacts-with", to: "compound:phosphatidylcholine", note: "membrane PC content regulates activity" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:chpt1",
@@ -1077,7 +1105,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "enzyme:cept1", note: "paralog acting in the ER" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:cept1",
@@ -1104,7 +1133,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "enzyme:pemt", note: "CEPT1-derived PE is the substrate for PEMT" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:etnk1",
@@ -1130,7 +1160,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "CDP-ethanolamine branch" },
       { rel: "interacts-with", to: "enzyme:pcyt2", note: "next step" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:pcyt2",
@@ -1157,7 +1188,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "CDP-ethanolamine branch" },
       { rel: "interacts-with", to: "enzyme:etnk1", note: "previous step" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:selenoi",
@@ -1184,7 +1216,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "CDP-ethanolamine branch" },
       { rel: "interacts-with", to: "enzyme:cept1", note: "overlapping PE synthesis" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "enzyme:chat",
@@ -1212,7 +1245,8 @@ export default [
       { rel: "part-of", to: "pathway:acetylcholine-synthesis" },
       { rel: "associated-with", to: "system:vagal-tone", note: "acetylcholine is the vagal transmitter; choline supply plausibly limits output at the margin" },
       { rel: "associated-with", to: "state:gastric-dysmotility", note: "conversation-proposed: low choline/ACh slows gastric emptying; evidence indirect" }
-    ]
+    ],
+    refs: ["article:blusztajn-2017-choline-brain", "article:zeisel-2009-choline-essential-nutrient"]
   },
 
   // ------------------------------------------------------------------ bile-acid conjugation
@@ -1241,7 +1275,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:bile-acid-conjugation" },
       { rel: "associated-with", to: "system:bile" }
-    ]
+    ],
+    refs: ["article:hofmann-2008-bile-acids-biology", "article:chen-2023-statpearls-bile-acids"]
   },
   {
     id: "enzyme:baat",
@@ -1269,7 +1304,8 @@ export default [
       { rel: "part-of", to: "pathway:bile-acid-conjugation" },
       { rel: "associated-with", to: "system:bile", note: "sets glycine/taurine conjugate composition of bile" },
       { rel: "interacts-with", to: "compound:taurine", note: "competes with glycine as acceptor amino acid" }
-    ]
+    ],
+    refs: ["article:hofmann-2008-bile-acids-biology", "article:chiang-2013-bile-acid-metabolism-signaling"]
   },
   {
     id: "enzyme:bile-salt-hydrolase",
@@ -1296,7 +1332,8 @@ export default [
       { rel: "part-of", to: "pathway:gut-bacterial-glycine-fates", note: "releases free glycine from conjugates" },
       { rel: "associated-with", to: "system:gut-microbiota" },
       { rel: "associated-with", to: "disease:sibo", note: "early deconjugation is a classical SIBO finding" }
-    ]
+    ],
+    refs: ["article:ridlon-2014-bile-acids-microbiome", "article:begley-2005-bacteria-and-bile"]
   },
 
   // ------------------------------------------------------------------ creatine
@@ -1325,7 +1362,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis", note: "rate-limiting first step" },
       { rel: "interacts-with", to: "compound:creatine", note: "end-product repression of expression" }
-    ]
+    ],
+    refs: ["article:brosnan-2007-creatine-review"]
   },
   {
     id: "enzyme:gamt",
@@ -1353,7 +1391,8 @@ export default [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "large SAM consumer; share debated" },
       { rel: "associated-with", to: "state:undermethylation", note: "consumes SAM; creatine supplementation spares methyl groups (plausible)" }
-    ]
+    ],
+    refs: ["article:brosnan-2007-creatine-review"]
   },
 
   // ------------------------------------------------------------------ TMA / TMAO
@@ -1382,7 +1421,8 @@ export default [
       { rel: "part-of", to: "pathway:tma-tmao-axis" },
       { rel: "associated-with", to: "system:gut-microbiota" },
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "supplies TMA that FMO3-deficient people cannot oxidise" }
-    ]
+    ],
+    refs: ["article:craciun-2012-choline-tma-glycyl-radical"]
   },
   {
     id: "enzyme:fmo3",
@@ -1409,7 +1449,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:tma-tmao-axis" },
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "FMO3 deficiency is the cause" }
-    ]
+    ],
+    refs: ["article:mackay-2011-trimethylaminuria", "article:zeisel-2017-tmao-review"]
   },
 
   // ------------------------------------------------------------------ bacterial glycine fates (proposed)
@@ -1492,7 +1533,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "rate-limiting step" },
       { rel: "interacts-with", to: "compound:glutathione", note: "feedback inhibition" }
-    ]
+    ],
+    refs: ["article:sekhar-2011-glynac-glutathione", "article:rhea-2022"]
   },
   {
     id: "enzyme:gss",
@@ -1549,7 +1591,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:collagen-synthesis" },
       { rel: "interacts-with", to: "compound:collagen", note: "modifies procollagen chains" }
-    ]
+    ],
+    refs: ["article:rahimi-2026-statpearls-collagen-synthesis", "article:shoulders-2009-collagen-structure"]
   },
 
   // ------------------------------------------------------------------ serine route
@@ -1606,7 +1649,8 @@ export default [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent" }
-    ]
+    ],
+    refs: ["article:mattaini-2016-serine-metabolism"]
   },
   {
     id: "enzyme:psph",
@@ -1632,7 +1676,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-serine-route", note: "irreversible last step" },
       { rel: "interacts-with", to: "enzyme:psat1", note: "previous step" }
-    ]
+    ],
+    refs: ["article:mattaini-2016-serine-metabolism"]
   },
   {
     id: "enzyme:glycine-cleavage-system",

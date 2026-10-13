@@ -80,7 +80,8 @@ export default [
       { rel: "increases", to: "pathway:collagen-synthesis", note: "Substrate supply" },
       { rel: "aggravates", to: "disease:histamine-intolerance", note: "Long-cooked broths are histamine-rich" },
       { rel: "mitigates", to: "outcome:belching", note: "Plausible relative to free powder; no direct trial" }
-    ]
+    ],
+    refs: ["article:wang-2013-glycine-metabolism"]
   },
   {
     id: "intervention:betaine-anhydrous",
@@ -290,7 +291,8 @@ export default [
       { rel: "increases", to: "compound:5-10-methylene-thf" },
       { rel: "interacts-with", to: "compound:folic-acid", note: "DHFR bypass" },
       { rel: "decreases", to: "compound:homocysteine" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:howard-2016-high-dose-methotrexate"]
   },
   {
     id: "intervention:methylcobalamin-supplement",
@@ -308,7 +310,8 @@ export default [
       { rel: "increases", to: "compound:methylcobalamin" },
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "Crystalline B12 bypasses acid-dependent food-B12 release" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "intervention:cyanocobalamin-supplement",
@@ -325,7 +328,8 @@ export default [
       { rel: "increases", to: "compound:cyanocobalamin" },
       { rel: "decreases", to: "compound:methylmalonic-acid" },
       { rel: "decreases", to: "compound:homocysteine" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "intervention:magnesium-l-threonate",
@@ -416,7 +420,8 @@ export default [
       { rel: "increases", to: "compound:zinc" },
       { rel: "associated-with", to: "compound:kryptopyrrole", note: "Zinc repletion is part of the speculative pyroluria model only" },
       { rel: "interacts-with", to: "compound:magnesium", note: "Competing minerals at high dose" }
-    ]
+    ],
+    refs: ["article:plum-2010-zinc-human-health", "article:iom-2001-micronutrients-zinc"]
   },
   {
     id: "intervention:dgl-licorice",
@@ -606,7 +611,8 @@ export default [
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "interacts-with", to: "compound:histamine" }
-    ]
+    ],
+    refs: ["article:lam-2013-ppi-b12-deficiency", "article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "intervention:prokinetic-drugs",
@@ -623,7 +629,8 @@ export default [
       { rel: "mitigates", to: "state:gastric-dysmotility" },
       { rel: "interacts-with", to: "compound:motilin" },
       { rel: "mitigates", to: "disease:sibo", note: "Relapse prevention; off-label" }
-    ]
+    ],
+    refs: ["article:camilleri-2022-acg-gastroparesis"]
   },
   {
     id: "intervention:h-pylori-eradication-therapy",
@@ -661,7 +668,8 @@ export default [
       { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Causes false negatives" },
       { rel: "interacts-with", to: "intervention:h-pylori-eradication-therapy", note: "Test of cure" },
       { rel: "associated-with", to: "disease:h-pylori-infection" }
-    ]
+    ],
+    refs: ["article:malfertheiner-2022-maastricht-vi", "article:chey-2024-acg-h-pylori-treatment"]
   },
   {
     id: "intervention:sibo-breath-test",
@@ -754,7 +762,8 @@ export default [
       { rel: "increases", to: "compound:1-methylnicotinamide" },
       { rel: "decreases", to: "compound:sam", note: "Methyl sink at gram doses" },
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses" }
-    ]
+    ],
+    refs: ["article:boden-2011-aim-high-niacin", "article:chen-2015-nicotinamide-skin-cancer", "article:pissios-2017-nnmt-methyl-sink"]
   },
   {
     id: "intervention:taurine-supplement",
@@ -829,7 +838,8 @@ export default [
       { rel: "associated-with", to: "compound:methylmalonic-acid" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "Cystathionine/PLP assays more specific" },
       { rel: "associated-with", to: "state:undermethylation", note: "Indirect surrogate only" }
-    ]
+    ],
+    refs: ["article:refsum-2004-homocysteine-recommendations", "article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "intervention:reflux-lifestyle-measures",

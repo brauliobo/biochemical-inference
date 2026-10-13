@@ -73,7 +73,8 @@ export default [
       { rel: "part-of", to: "pathway:pemt-pc-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "3 methyl groups per PC" },
       { rel: "interacts-with", to: "reaction:chpt1-cdp-choline-to-pc", note: "parallel route to PC (CDP-choline)" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:vance-2014-phospholipid-methylation"]
   },
   {
     id: "reaction:bhmt-betaine-homocysteine",
@@ -105,7 +106,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:choline-oxidation" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:ueland-2005-betaine-modulator"]
   },
   {
     id: "reaction:bhmt2-smm-homocysteine",
@@ -169,7 +171,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:folate-cycle" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "reaction:mtrr-cobalamin-reactivation",
@@ -201,7 +204,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "interacts-with", to: "reaction:mtr-methionine-synthase", note: "keeps the cobalamin cofactor active" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "reaction:mthfr-methylene-thf-reduction",
@@ -234,7 +238,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:methionine-cycle" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:froese-2018-mthfr-structure"]
   },
   {
     id: "reaction:mat-sam-synthesis",
@@ -266,7 +271,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "supply side of the methyl budget" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:mato-2008-methionine-metabolism-liver"]
   },
   {
     id: "reaction:ahcy-sah-hydrolysis",
@@ -298,7 +304,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "determines SAM:SAH methylation index" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "reaction:hnmt-histamine-methylation",
@@ -330,7 +337,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "part-of", to: "pathway:methyl-budget" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:yoshikawa-2019-hnmt-brain"]
   },
   {
     id: "reaction:gamt-creatine-synthesis",
@@ -362,7 +370,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:brosnan-2007-creatine-review"]
   },
   {
     id: "reaction:agat-guanidinoacetate-synthesis",
@@ -394,7 +403,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
       { rel: "interacts-with", to: "reaction:gamt-creatine-synthesis", note: "next step: methylation" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:brosnan-2007-creatine-review"]
   },
   {
     id: "reaction:comt-dopamine-methylation",
@@ -426,7 +436,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "interacts-with", to: "reaction:hnmt-histamine-methylation", note: "both draw on the same SAM pool and are inhibited by SAH" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:meiser-2013-dopamine-metabolism"]
   },
 
   // ------------------------------------------------------------------ transsulfuration
@@ -460,7 +471,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "interacts-with", to: "reaction:mtr-methionine-synthase", note: "competes for homocysteine; SAM sets the partition" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "reaction:cth-cystathionine-cleavage",
@@ -492,7 +504,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "supplies cysteine" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-sulfur-amino-acid-metabolism"]
   },
 
   // ------------------------------------------------------------------ folate / glycine
@@ -526,7 +539,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:glycine-serine-route" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism", "article:lamers-2007-glycine-flux"]
   },
   {
     id: "reaction:glycine-cleavage-system",
@@ -558,7 +572,8 @@ export default [
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "source of mitochondrial methylene-THF" },
       { rel: "interacts-with", to: "reaction:shmt-serine-glycine-interconversion", note: "alternative glycine fates" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-glycine-degradation", "article:kikuchi-2008-glycine-cleavage-system"]
   },
   {
     id: "reaction:mthfd1-methylene-thf-oxidation",
@@ -589,7 +604,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "interacts-with", to: "reaction:mthfd1-methenyl-thf-cyclohydrolase", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "reaction:mthfd1-methenyl-thf-cyclohydrolase",
@@ -620,7 +636,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "interacts-with", to: "reaction:mthfd1-formate-thf-ligase", note: "alternative entry of formate into 10-formyl-THF" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "reaction:mthfd1-formate-thf-ligase",
@@ -649,7 +666,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "interacts-with", to: "reaction:shmt-serine-glycine-interconversion", note: "mitochondrial SHMT2 is the main formate source" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism"]
   },
 
   // ------------------------------------------------------------------ choline oxidation
@@ -683,7 +701,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-choline-catabolism"]
   },
   {
     id: "reaction:sardh-sarcosine-demethylation",
@@ -715,7 +734,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-choline-catabolism"]
   },
   {
     id: "reaction:chdh-choline-oxidation",
@@ -747,7 +767,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "interacts-with", to: "reaction:choline-kinase-phosphocholine", note: "competes for free choline" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-choline-catabolism"]
   },
   {
     id: "reaction:badh-betaine-aldehyde-oxidation",
@@ -779,7 +800,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "interacts-with", to: "reaction:bhmt-betaine-homocysteine", note: "betaine product is the BHMT methyl donor" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:reactome-choline-catabolism"]
   },
 
   // ------------------------------------------------------------------ serine route
@@ -813,7 +835,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "reaction:psat1-phosphoserine-transamination", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:mattaini-2016-serine-metabolism"]
   },
   {
     id: "reaction:psat1-phosphoserine-transamination",
@@ -843,7 +866,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "reaction:psph-phosphoserine-hydrolysis", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:mattaini-2016-serine-metabolism"]
   },
   {
     id: "reaction:psph-phosphoserine-hydrolysis",
@@ -873,7 +897,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glycine-serine-route" },
       { rel: "interacts-with", to: "reaction:shmt-serine-glycine-interconversion", note: "serine feeds glycine synthesis" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:mattaini-2016-serine-metabolism"]
   },
 
   // ------------------------------------------------------------------ Kennedy pathway
@@ -905,7 +930,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "reaction:chdh-choline-oxidation", note: "competition for free choline" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "reaction:pcyt1a-cdp-choline-synthesis",
@@ -937,7 +963,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "rate-regulating step" },
       { rel: "interacts-with", to: "reaction:choline-kinase-phosphocholine", note: "previous step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "reaction:chpt1-cdp-choline-to-pc",
@@ -969,7 +996,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "reaction:pemt-pe-to-pc", note: "parallel route to PC; PEMT costs 3 SAM" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "reaction:etnk1-ethanolamine-phosphorylation",
@@ -999,7 +1027,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "reaction:pcyt2-cdp-ethanolamine-synthesis", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "reaction:pcyt2-cdp-ethanolamine-synthesis",
@@ -1031,7 +1060,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "interacts-with", to: "reaction:ept-cdp-ethanolamine-to-pe", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "reaction:ept-cdp-ethanolamine-to-pe",
@@ -1063,7 +1093,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "part-of", to: "pathway:pemt-pc-synthesis", note: "provides the PE substrate" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kennedy-1956-cytidine-coenzymes"]
   },
 
   // ------------------------------------------------------------------ bile acids
@@ -1097,7 +1128,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:bile-acid-conjugation" },
       { rel: "associated-with", to: "system:bile" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:hofmann-2008-bile-acids-biology"]
   },
   {
     id: "reaction:baat-glycine-conjugation",
@@ -1129,7 +1161,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:bile-acid-conjugation" },
       { rel: "associated-with", to: "system:bile", note: "glycine conjugates dominate human bile" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:hofmann-2008-bile-acids-biology"]
   },
   {
     id: "reaction:baat-taurine-conjugation",
@@ -1161,7 +1194,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:bile-acid-conjugation" },
       { rel: "interacts-with", to: "reaction:baat-glycine-conjugation", note: "alternative acceptor amino acid" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:hofmann-2008-bile-acids-biology"]
   },
   {
     id: "reaction:bsh-glycocholate-deconjugation",
@@ -1191,7 +1225,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:bile-acid-conjugation", note: "reverses conjugation" },
       { rel: "part-of", to: "pathway:gut-bacterial-glycine-fates", note: "luminal source of free glycine" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:ridlon-2014-bile-acids-microbiome"]
   },
 
   // ------------------------------------------------------------------ neurotransmitters
@@ -1225,7 +1260,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent; low PLP lowers GABA output" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:erlander-1991-two-gad-genes"]
   },
   {
     id: "reaction:abat-gaba-transamination",
@@ -1257,7 +1293,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "interacts-with", to: "reaction:gad-glutamate-decarboxylation", note: "regenerates the glutamate used by GAD" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:petroff-2002-gaba-glutamate"]
   },
   {
     id: "reaction:aldh5a1-succinate-semialdehyde-oxidation",
@@ -1289,7 +1326,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gaba-shunt" },
       { rel: "interacts-with", to: "reaction:abat-gaba-transamination", note: "previous step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:petroff-2002-gaba-glutamate"]
   },
   {
     id: "reaction:chat-acetylcholine-synthesis",
@@ -1321,7 +1359,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:acetylcholine-synthesis" },
       { rel: "associated-with", to: "system:vagal-tone", note: "acetylcholine is the vagal transmitter" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:blusztajn-2017-choline-brain"]
   },
 
   // ------------------------------------------------------------------ histamine
@@ -1355,7 +1394,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "low DAO activity is the proposed mechanism; contested" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:maintz-2007-histamine-intolerance"]
   },
 
   // ------------------------------------------------------------------ vitamin B6 activation
@@ -1387,7 +1427,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:vitamin-b6-activation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "kinase inhibition (theophylline, hydrazides) lowers PLP" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:parra-2018-vitamin-b6-metabolism"]
   },
   {
     id: "reaction:pnpo-pnp-oxidation",
@@ -1417,7 +1458,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:vitamin-b6-activation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "riboflavin (FMN) limitation lowers PLP formation" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:parra-2018-vitamin-b6-metabolism"]
   },
 
   // ------------------------------------------------------------------ acid / bicarbonate / CO2
@@ -1446,7 +1488,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:acid-bicarbonate-neutralisation" },
       { rel: "interacts-with", to: "reaction:carbonic-acid-dehydration", note: "next step" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kaunitz-2006-duodenal-co2-carbonic-anhydrase"]
   },
   {
     id: "reaction:carbonic-acid-dehydration",
@@ -1472,7 +1515,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:acid-bicarbonate-neutralisation" },
       { rel: "interacts-with", to: "reaction:carbonic-anhydrase-bicarbonate-dehydration", note: "enzyme-catalysed equivalent of the two uncatalysed steps" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kaunitz-2006-duodenal-co2-carbonic-anhydrase"]
   },
   {
     id: "reaction:carbonic-anhydrase-bicarbonate-dehydration",
@@ -1504,7 +1548,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:acid-bicarbonate-neutralisation" },
       { rel: "part-of", to: "pathway:gastric-acid-secretion", note: "supplies H+ and HCO3- in parietal cells" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kaunitz-2006-duodenal-co2-carbonic-anhydrase"]
   },
   {
     id: "reaction:hcl-bicarbonate-neutralisation",
@@ -1532,7 +1577,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:acid-bicarbonate-neutralisation" },
       { rel: "associated-with", to: "outcome:belching", note: "conversation-proposed mechanism; contribution of this CO2 to eructation unproven" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:kaunitz-2006-duodenal-co2-carbonic-anhydrase"]
   },
   {
     id: "reaction:h-k-atpase-proton-pumping",
@@ -1562,7 +1608,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "inhibition by PPIs lowers acid output" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "reaction:gastric-hcl-secretion",
@@ -1590,7 +1637,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "system:gastric-physiology" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "reaction:urease-urea-hydrolysis",
@@ -1620,7 +1668,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:h-pylori-urease-activity" },
       { rel: "associated-with", to: "disease:h-pylori-infection", note: "diagnostic via urea breath test" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:weeks-2000-urei-h-pylori-urease"]
   },
 
   // ------------------------------------------------------------------ glutathione
@@ -1652,7 +1701,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "rate-limiting" },
       { rel: "interacts-with", to: "reaction:cth-cystathionine-cleavage", note: "cysteine from transsulfuration" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:sekhar-2011-glynac-glutathione"]
   },
   {
     id: "reaction:gss-glutathione-synthesis",
@@ -1683,7 +1733,7 @@ export default [
       { rel: "part-of", to: "pathway:glutathione-synthesis" },
       { rel: "interacts-with", to: "reaction:gcl-gamma-glutamylcysteine-synthesis", note: "previous step" }
     ],
-    refs: ["article:melendez-hevia-2009-glycine-weak-link"]
+    refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:rhea-2022", "article:sekhar-2011-glynac-glutathione"]
   },
 
   // ------------------------------------------------------------------ collagen
@@ -1718,7 +1768,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:collagen-synthesis" },
       { rel: "interacts-with", to: "reaction:collagen-chain-assembly", note: "modifies the translated chain" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:rahimi-2026-statpearls-collagen-synthesis"]
   },
   {
     id: "reaction:collagen-chain-assembly",
@@ -1841,7 +1892,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:tma-tmao-axis" },
       { rel: "associated-with", to: "system:gut-microbiota" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:craciun-2012-choline-tma-glycyl-radical"]
   },
   {
     id: "reaction:fmo3-tma-n-oxidation",
@@ -1873,6 +1925,7 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:tma-tmao-axis" },
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "deficiency causes the disorder" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:mackay-2011-trimethylaminuria"]
   }
 ]

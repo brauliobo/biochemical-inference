@@ -75,7 +75,8 @@ export default [
       { rel: "interacts-with", to: "pathway:methionine-cycle", note: "diverts homocysteine from remethylation when SAM is high" },
       { rel: "interacts-with", to: "pathway:glutathione-synthesis", note: "provides cysteine" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "PLP-dependent; post-methionine-load homocysteine is a functional marker" }
-    ]
+    ],
+    refs: ["article:reactome-sulfur-amino-acid-metabolism", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "pathway:choline-oxidation",
@@ -146,7 +147,8 @@ export default [
       { rel: "interacts-with", to: "pathway:kennedy-pathway", note: "parallel route to PC" },
       { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: low SAM reduces PEMT PC and downstream choline/ACh; weak links" },
       { rel: "associated-with", to: "system:vagal-tone", note: "conversation-only: PC to choline to acetylcholine chain" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:resseguie-2011-pemt-estrogen-choline"]
   },
   {
     id: "pathway:acetylcholine-synthesis",
@@ -170,7 +172,8 @@ export default [
       { rel: "associated-with", to: "state:gastric-dysmotility", note: "conversation-proposed: low choline/ACh slows gastric emptying; indirect evidence" },
       { rel: "associated-with", to: "system:lower-esophageal-sphincter", note: "cholinergic tone sustains LES pressure" },
       { rel: "associated-with", to: "outcome:tachycardia", note: "conversation-proposed: reduced vagal brake at night; unproven" }
-    ]
+    ],
+    refs: ["article:blusztajn-2017-choline-brain"]
   },
   {
     id: "pathway:glycine-cleavage",
@@ -292,7 +295,8 @@ export default [
       { rel: "associated-with", to: "disease:anxiety-disorder", note: "plausible: reduced GABA with low PLP; response to P5P in the conversation is anecdotal" },
       { rel: "associated-with", to: "outcome:brain-fog", note: "conversation-only: glutamate/GABA imbalance and mental fog relieved by P5P" },
       { rel: "interacts-with", to: "pathway:vitamin-b6-activation", note: "supply of PLP" }
-    ]
+    ],
+    refs: ["article:petroff-2002-gaba-glutamate"]
   },
   {
     id: "pathway:gastric-acid-secretion",
@@ -339,7 +343,8 @@ export default [
       { rel: "associated-with", to: "system:gastric-physiology" },
       { rel: "associated-with", to: "system:bile", note: "biliary bicarbonate contributes to neutralisation" },
       { rel: "interacts-with", to: "pathway:gastric-acid-secretion", note: "acid source" }
-    ]
+    ],
+    refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase", "article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "pathway:glutathione-synthesis",
@@ -362,7 +367,8 @@ export default [
       { rel: "interacts-with", to: "pathway:transsulfuration", note: "supplies cysteine" },
       { rel: "interacts-with", to: "pathway:glycine-serine-route", note: "glycine demand" },
       { rel: "interacts-with", to: "compound:glycine", note: "glycine can limit GSS flux when supply is short (plausible)" }
-    ]
+    ],
+    refs: ["article:sekhar-2011-glynac-glutathione", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "pathway:collagen-synthesis",
@@ -459,7 +465,8 @@ export default [
       { rel: "interacts-with", to: "pathway:gaba-shunt", note: "supplies PLP to GAD/ABAT" },
       { rel: "interacts-with", to: "pathway:transsulfuration", note: "supplies PLP to CBS/CTH" },
       { rel: "interacts-with", to: "pathway:glycine-cleavage", note: "supplies PLP to GLDC" }
-    ]
+    ],
+    refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
   {
     id: "pathway:tma-tmao-axis",
@@ -481,7 +488,8 @@ export default [
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "FMO3 deficiency; high choline or betaine intake aggravates odour" },
       { rel: "associated-with", to: "system:gut-microbiota", note: "TMA-producing taxa" },
       { rel: "interacts-with", to: "pathway:choline-oxidation", note: "bacterial cleavage competes with host oxidation and membrane uses" }
-    ]
+    ],
+    refs: ["article:zeisel-2017-tmao-review", "article:wang-2011-gut-flora-phosphatidylcholine-cvd", "article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },
   {
     id: "pathway:gut-bacterial-glycine-fates",
@@ -527,6 +535,7 @@ export default [
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "H. pylori is a major cause of gastric and duodenal ulcers" },
       { rel: "associated-with", to: "outcome:belching", note: "conversation-only: urease gas as a cause of eructation" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "chronic corpus-predominant infection can reduce acid output" }
-    ]
+    ],
+    refs: ["article:weeks-2000-urei-h-pylori-urease", "article:kusters-2006-h-pylori-pathogenesis"]
   }
 ]

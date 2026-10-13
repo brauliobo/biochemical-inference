@@ -1149,6 +1149,11 @@ export default [
         "rel": "evidence-for",
         "to": "intervention:methylfolate-supplement",
         "note": "Mechanistic rationale only: higher cellular 5-methyl-THF could restrain GNMT; no in vivo test here."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:glycine-gnmt-depletes-sam-in-undermethylated",
+        "note": "GNMT is noncompetitively inhibited by 5-methyl-THF polyglutamate, a brake that works against unrestrained methyl drain; data are from purified rat enzyme."
       }
     ]
   },
@@ -1488,6 +1493,11 @@ export default [
         "rel": "evidence-for",
         "to": "intervention:betaine-anhydrous",
         "note": "Betaine was one of three nutrients in an uncontrolled intervention; effect not separable."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:walsh-under-over-methylation-categories-valid",
+        "note": "Shows that a methylation-capacity marker (plasma SAM:SAH) can differ between groups, but it does not validate histamine-based under- or over-methylator biotypes."
       }
     ]
   },
@@ -2125,6 +2135,11 @@ export default [
         "rel": "evidence-for",
         "to": "state:undermethylation",
         "note": "Mechanistic support for niacin as a methyl-consuming nutrient; no human dose-response shown."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:niacin-drains-methyl-groups",
+        "note": "Describes NNMT using SAM to methylate and clear nicotinamide, so the mechanism is real; the size of the drain at ordinary supplement doses is not established."
       }
     ]
   },
@@ -2388,6 +2403,11 @@ export default [
         "rel": "evidence-for",
         "to": "outcome:low-sam-sah-ratio",
         "note": "PEMT activity is sensitive to the SAM:SAH ratio."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
+        "note": "PEMT forms choline when dietary choline is scarce, but PEMT-null mice are healthy with adequate dietary choline and acetylcholine was not measured, so the claim holds only under low choline intake."
       }
     ]
   },
@@ -2494,6 +2514,11 @@ export default [
       {
         "rel": "evidence-for",
         "to": "compound:trimethylamine"
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:choline-28-35g-for-10g-glycine",
+        "note": "Does not test the arithmetic, but its 3.5 g/day upper level puts 28-35 g/day roughly eight to ten times above the tolerable intake, supporting the practical conclusion."
       }
     ]
   },
@@ -3746,6 +3771,11 @@ export default [
         "rel": "evidence-for",
         "to": "intervention:p5p-supplement",
         "note": "Mechanistic rationale: an apoGAD65 reserve could respond to PLP; in vitro, no supplementation test."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:p5p-gad-gaba-relieves-anxiety",
+        "note": "Supports the enzymology only: GAD activity depends on PLP cycling, especially GAD65; it does not address anxiety or supplementation."
       }
     ]
   },
@@ -3801,6 +3831,11 @@ export default [
         "rel": "evidence-for",
         "to": "intervention:p5p-supplement",
         "note": "B6 supplementation helped, but the form used was pyridoxine, so P5P superiority is untested."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:p5p-gad-gaba-relieves-anxiety",
+        "note": "Weak support: high-dose pyridoxine HCl (not P5P) lowered self-rated anxiety in healthy young adults, but the group-by-time interaction was not significant and serum B6 was not measured."
       }
     ]
   },
@@ -4369,6 +4404,16 @@ export default [
         "rel": "evidence-for",
         "to": "pathway:gastric-acid-secretion",
         "note": "Amino acid-specific acid stimulation, mainly Phe and Trp."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:free-glycine-stimulates-gastrin",
+        "note": "Instilled amino acids: phenylalanine and tryptophan were the potent stimulants of acid and gastrin; glycine had no effect on hormone release."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:collagen-peptides-excess-gastrin-delay-emptying",
+        "note": "Aromatic amino acids, not glycine, were the potent gastrin and acid stimulants; collagen lacks tryptophan, so a strong gastrin effect from collagen peptides is unlikely."
       }
     ]
   },
@@ -4530,6 +4575,11 @@ export default [
         "rel": "evidence-for",
         "to": "system:gastric-physiology",
         "note": "Protein and food buffers hold pH up until they empty."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:glycine-buffers-gastric-acid",
+        "note": "Shows that ingested material buffers gastric acid and that intragastric pH reflects buffer load against secretion rate, the principle behind the claim; glycine itself was not studied."
       }
     ]
   },
@@ -4627,6 +4677,11 @@ export default [
       {
         "rel": "evidence-for",
         "to": "system:gastric-physiology"
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        "note": "Confirms that neutralising gastric acid in the duodenum generates large volumes of CO2; the chemistry holds, but the duodenal mucosa absorbs that CO2 distal to the stomach."
       }
     ]
   },
@@ -4781,6 +4836,11 @@ export default [
         "rel": "evidence-for",
         "to": "system:vagal-tone",
         "note": "The gastric belch is a vagally mediated reflex, so it depends on intact vagal signalling."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        "note": "Excessive belching is dominated by swallowed-air (supragastric) belches; gastric CO2 from reflux of bicarbonate was not shown to cause it."
       }
     ]
   },
@@ -5089,6 +5149,11 @@ export default [
         "rel": "evidence-for",
         "to": "outcome:belching",
         "note": "Provides a plausible mechanism for gas-induced belching."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        "note": "Exogenous CO2 (a carbonated drink) provoked transient LES relaxations in healthy volunteers, supporting the principle that gastric CO2 triggers venting; endogenous acid-bicarbonate CO2 was not tested."
       }
     ]
   },
@@ -5256,6 +5321,11 @@ export default [
         "rel": "evidence-against",
         "to": "system:vagal-tone",
         "note": "The pH-evoked contractions were vagus-independent."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:acid-drives-secretin-motilin-mmc",
+        "note": "In the musk shrew, lowering duodenal pH to 3 triggered motilin-dependent gastric contractions, but so did pH 8; acid is one trigger among several and PPIs were not tested."
       }
     ]
   },
@@ -5741,6 +5811,11 @@ export default [
         "rel": "evidence-for",
         "to": "disease:sibo",
         "note": "Consensus on how to diagnose SIBO with breath tests."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:sibo-gas-appears-in-15-45-min-as-belching",
+        "note": "Consensus positivity criterion is a hydrogen rise by 90 minutes; breath gas arises from fermentation over an hour or more and is measured in breath, not as belching."
       }
     ]
   },
@@ -6507,6 +6582,11 @@ export default [
         "rel": "evidence-for",
         "to": "state:gastric-dysmotility",
         "note": "Functional dyspepsia with H. pylori may involve dysmotility; improvement is modest."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:h-pylori-causes-belching",
+        "note": "Eradication gives only a modest symptom benefit in functional dyspepsia (NNT 9 for improvement), and belching is not isolated as an outcome."
       }
     ]
   },
@@ -6769,6 +6849,11 @@ export default [
         "rel": "evidence-for",
         "to": "disease:peptic-ulcer",
         "note": "Gastric ulcer subtype."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:dgl-ulcer-healing",
+        "note": "A DGL-containing preparation healed gastric ulcers about as well as cimetidine (63% at 6 weeks), but the trial was single-blind with no placebo arm and conflicts with the placebo-controlled study."
       }
     ]
   },
@@ -6820,6 +6905,11 @@ export default [
       {
         "rel": "evidence-for",
         "to": "disease:peptic-ulcer"
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:dgl-ulcer-healing",
+        "note": "Double-blind crossover of a deglycyrrhizinated licorice preparation found no demonstrable healing effect over placebo in chronic gastric ulcer."
       }
     ]
   },
@@ -7028,6 +7118,11 @@ export default [
         "rel": "evidence-for",
         "to": "system:gastric-physiology",
         "note": "Pepsin from the stomach can reach and enter laryngeal cells."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:larynx-50-100x-more-sensitive",
+        "note": "Qualitative support: laryngeal tissue from reflux patients contained pepsin and was depleted of the protective protein Sep70; the 50-100-fold multiplier was not measured."
       }
     ]
   },
@@ -8086,6 +8181,11 @@ export default [
       {
         "rel": "evidence-for",
         "to": "compound:bile-acids"
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:glycine-overload-shifts-bile-conjugation-and-reflux",
+        "note": "Taurine feeding shifts bile acid conjugation toward taurine conjugates; the glycine feeding arm is reported second-hand not to change the pattern, and nothing links conjugate type to reflux."
       }
     ]
   },
@@ -8633,6 +8733,11 @@ export default [
         "rel": "evidence-against",
         "to": "state:b6-functional-deficiency",
         "note": "No robust link between elevated HPL and functional B6 loss."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:pyroluria-causes-b6-zinc-deficiency",
+        "note": "Systematic review found no robust evidence that elevated urinary HPL increases B6 or zinc loss, and no placebo-controlled treatment trials."
       }
     ]
   },
@@ -8690,6 +8795,11 @@ export default [
         "rel": "evidence-for",
         "to": "intervention:p5p-supplement",
         "note": "Claims improvement with B6 and zinc; form of B6 and controls not described in the abstract."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:pyroluria-causes-b6-zinc-deficiency",
+        "note": "Cohort data from proponents: urinary HPL correlated inversely with red-cell B6 activity and zinc; these are associations in mixed patient groups, not independent confirmation."
       }
     ]
   },
@@ -8785,6 +8895,11 @@ export default [
         "rel": "evidence-for",
         "to": "system:gut-microbiota",
         "note": "Glycine fermentation is a recognised microbial metabolic route, shown in one species."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        "note": "Shows that a gut anaerobe (C. difficile) ferments glycine through glycine reductase to ammonia; the work is in hamsters and does not involve SIBO or CO2 or belching."
       }
     ]
   },
@@ -8937,6 +9052,16 @@ export default [
         "rel": "evidence-for",
         "to": "compound:glycine",
         "note": "Glycine is the end product of the demethylation cascade."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:choline-derived-glycine-silent",
+        "note": "The curated pathway places choline-to-glycine conversion inside cells (CHDH, DMGDH and SARDH are mitochondrial), so the glycine is generated intracellularly; it says nothing about gas or tolerance."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:choline-fixed-night-waking-via-bhmt-hnmt",
+        "note": "Supports the first steps only: choline is oxidised to betaine, which BHMT uses to remethylate homocysteine; the link to night waking is not studied."
       }
     ]
   },
@@ -10331,7 +10456,19 @@ export default [
     ],
     "facts": {
       "design": "expert review"
-    }
+    },
+    "relations": [
+      {
+        "rel": "evidence-against",
+        "to": "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        "note": "Argues that symptomatic SIBO is unproven and breath tests unreliable, undermining the assumption of overgrown proximal bacteria fermenting glycine into belching gas."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:sibo-gas-appears-in-15-45-min-as-belching",
+        "note": "Questions the reliability of breath tests and the SIBO-symptom link that the timing claim relies on."
+      }
+    ]
   },
   {
     "id": "article:stabler-2013-vitamin-b12-deficiency",
@@ -10507,7 +10644,19 @@ export default [
     "facts": {
       "design": "human physiology study",
       "population": "Healthy volunteers"
-    }
+    },
+    "relations": [
+      {
+        "rel": "evidence-against",
+        "to": "claim:glycine-buffers-gastric-acid",
+        "note": "Intragastric glycine did not lower acidity; it raised measured acid output (5.6 vs 3.3 mmol/h) in volunteers. Intragastric pH was not reported, so buffering itself is untested."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:free-glycine-stimulates-gastrin",
+        "note": "Intragastric glycine raised acid output but serum gastrin did not change detectably, arguing against a gastrin-mediated mechanism."
+      }
+    ]
   },
   {
     "id": "article:gordan-2015-autonomic-cardiovascular-control",
@@ -10539,7 +10688,14 @@ export default [
     ],
     "facts": {
       "design": "review"
-    }
+    },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "claim:choline-supplies-nocturnal-vagal-brake",
+        "note": "Supports the premise only: parasympathetic input restrains the intrinsic sinoatrial pacemaker (about 100 beats/min); no choline data."
+      }
+    ]
   },
   {
     "id": "article:browning-2014-vagal-control-gi",
@@ -11096,5 +11252,337 @@ export default [
     "facts": {
       "design": "biochemistry"
     }
+  },
+  {
+    "id": "article:gershon-2007-serotonin-gi",
+    "type": "article",
+    "name": "The serotonin signaling system: from basic understanding to drug development for functional GI disorders",
+    "aliases": [
+      "Gershon & Tack 2007"
+    ],
+    "summary": "Review of serotonin in the gut: enterochromaffin cells release it to start peristaltic and secretory reflexes; 5-HT4 agonists and 5-HT3 antagonists are the main drug classes.",
+    "body": [
+      "Serotonin made by enterochromaffin cells ([[compound:serotonin]]) activates intrinsic and extrinsic afferent neurons, initiating peristalsis, secretion and signals to the brain. The review explains why 5-HT4 agonists promote motility, 5-HT3 antagonists such as ondansetron suppress nausea and diarrhoea, and 5-HT receptor subtypes are targets for [[intervention:prokinetic-drugs]] acting on the [[system:enteric-nervous-system]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Gershon MD",
+      "Tack J"
+    ],
+    "year": 2007,
+    "journal": "Gastroenterology",
+    "doi": "10.1053/j.gastro.2006.11.002",
+    "pmid": "17241888",
+    "url": "https://doi.org/10.1053/j.gastro.2006.11.002",
+    "verified": true,
+    "takeaways": [
+      "Serotonin is a paracrine messenger of enterochromaffin cells, which act as sensory transducers; it is made by TpH1 in these cells and TpH2 in neurons.",
+      "It starts peristaltic and secretory reflexes via intrinsic primary afferents and signals to the CNS via extrinsic afferents.",
+      "Tegaserod (5-HT4 partial agonist) treats constipation-predominant IBS; granisetron, ondansetron and alosetron (5-HT3 antagonists) treat nausea or diarrhoea-predominant IBS."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:plum-2010-zinc-human-health",
+    "type": "article",
+    "name": "The essential toxin: impact of zinc on human health",
+    "aliases": [
+      "Plum 2010"
+    ],
+    "summary": "Review of zinc and health: essential trace element whose deficiency is far more common than intoxication; chronic high-dose supplements cause copper deficiency.",
+    "body": [
+      "The review covers zinc deficiency from malnutrition, low-bioavailability foods, ageing and disease, and the toxicity of chronic high-dose [[compound:zinc]] intake, which works mainly through impaired copper uptake. It is the general background for [[intervention:zinc-supplement]] and the zinc-dependent enzymes in this knowledge base."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Plum LM",
+      "Rink L",
+      "Haase H"
+    ],
+    "year": 2010,
+    "journal": "International journal of environmental research and public health",
+    "doi": "10.3390/ijerph7041342",
+    "pmid": "20617034",
+    "url": "https://doi.org/10.3390/ijerph7041342",
+    "verified": true,
+    "takeaways": [
+      "Zinc is relatively harmless compared with chemically similar metals; acute intoxication is rare.",
+      "Long-term high-dose zinc supplementation interferes with copper uptake, and many toxic effects are due to copper deficiency.",
+      "Zinc deficiency, from malnutrition, low-bioavailability foods, ageing, certain diseases or deregulated homeostasis, is a far more common risk than intoxication and impairs growth, neuronal development and immunity."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:iom-2001-micronutrients-zinc",
+    "type": "article",
+    "name": "Dietary Reference Intakes for Vitamin A, Vitamin K, Arsenic, Boron, Chromium, Copper, Iodine, Iron, Manganese, Molybdenum, Nickel, Silicon, Vanadium, and Zinc",
+    "aliases": [
+      "IOM 2001 (zinc DRI)"
+    ],
+    "summary": "IOM Dietary Reference Intakes for micronutrients; sets the adult tolerable upper intake level for zinc at 40 mg/day, based on reduced copper status.",
+    "body": [
+      "The report provides RDAs and ULs for zinc and the other trace elements. The adult zinc UL of 40 mg/day is the figure cited for [[compound:zinc]] and [[intervention:zinc-supplement]]; European assessments use a lower figure."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Institute of Medicine (US) Panel on Micronutrients"
+    ],
+    "year": 2001,
+    "journal": "National Academies Press (Dietary Reference Intakes: micronutrients, zinc chapter)",
+    "doi": "10.17226/10026",
+    "pmid": "25057538",
+    "url": "https://doi.org/10.17226/10026",
+    "verified": true,
+    "takeaways": [
+      "The report sets Dietary Reference Intakes, including RDAs and tolerable upper intake levels, for 14 micronutrients.",
+      "The adult UL for zinc is 40 mg/day, derived from adverse effects on copper status.",
+      "ULs apply to total intake from food, fortification and supplements and are not recommended intakes."
+    ],
+    "facts": {
+      "design": "guideline"
+    }
+  },
+  {
+    "id": "article:mcnulty-2006-riboflavin-mthfr",
+    "type": "article",
+    "name": "Riboflavin lowers homocysteine in individuals homozygous for the MTHFR 677C->T polymorphism",
+    "aliases": [
+      "McNulty 2006"
+    ],
+    "summary": "Randomised trial: 1.6 mg/day riboflavin for 12 weeks lowered homocysteine by up to 22% in people with the MTHFR 677TT genotype and had no effect in CC or CT carriers.",
+    "body": [
+      "The MTHFR 677C>T variant loses its [[compound:riboflavin]]-derived FAD cofactor more easily, so [[enzyme:mthfr]] activity depends on flavin status in TT carriers. Improving riboflavin status lowered [[compound:homocysteine]] only in that genotype, an example of a genuine gene-nutrient interaction."
+    ],
+    "evidence": "established",
+    "authors": [
+      "McNulty H",
+      "Dowey le RC",
+      "Strain JJ",
+      "Dunne A",
+      "Ward M",
+      "Molloy AM",
+      "McAnena LB",
+      "Hughes JP",
+      "Hannon-Fletcher M",
+      "Scott JM"
+    ],
+    "year": 2006,
+    "journal": "Circulation",
+    "doi": "10.1161/CIRCULATIONAHA.105.580332",
+    "pmid": "16380544",
+    "url": "https://doi.org/10.1161/CIRCULATIONAHA.105.580332",
+    "verified": true,
+    "takeaways": [
+      "Thirty-five TT, 26 CT and 28 CC adults were randomised by genotype to 1.6 mg/day riboflavin or placebo for 12 weeks.",
+      "Riboflavin status improved similarly in all genotypes, but homocysteine fell only in the TT group (as much as 22%; 40% in those with poorer baseline riboflavin status).",
+      "No homocysteine response occurred in CC or CT carriers, even those with suboptimal riboflavin status."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "89 healthy adults selected by MTHFR 677C>T genotype"
+    }
+  },
+  {
+    "id": "article:howard-2016-high-dose-methotrexate",
+    "type": "article",
+    "name": "Preventing and Managing Toxicities of High-Dose Methotrexate",
+    "aliases": [
+      "Howard 2016"
+    ],
+    "summary": "Review of high-dose methotrexate toxicity: leucovorin rescue, hydration and urine alkalinisation are standard, with glucarpidase for delayed clearance.",
+    "body": [
+      "The review is the clinical reference for use of [[compound:folinic-acid]] (leucovorin) to rescue normal cells from methotrexate, an antifolate that blocks DHFR; folinic acid enters the folate pool downstream of that block ([[intervention:folinic-acid-supplement]]). It concerns oncology doses, not nutritional supplementation."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Howard SC",
+      "McCormick J",
+      "Pui CH",
+      "Buddington RK",
+      "Harvey RD"
+    ],
+    "year": 2016,
+    "journal": "The oncologist",
+    "doi": "10.1634/theoncologist.2015-0164",
+    "pmid": "27496039",
+    "url": "https://doi.org/10.1634/theoncologist.2015-0164",
+    "verified": true,
+    "takeaways": [
+      "High-dose methotrexate (above 500 mg/m2) causes acute kidney injury in 2-12% of patients, through crystallisation in renal tubules.",
+      "Prevention and treatment include hydration, urinary alkalinisation and leucovorin rescue.",
+      "If clearance is delayed despite these measures, high-dose leucovorin and glucarpidase usually permit renal recovery."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:chen-2015-nicotinamide-skin-cancer",
+    "type": "article",
+    "name": "A Phase 3 Randomized Trial of Nicotinamide for Skin-Cancer Chemoprevention",
+    "aliases": [
+      "ONTRAC (Chen 2015)"
+    ],
+    "summary": "Phase 3 trial (386 high-risk adults): 500 mg nicotinamide twice daily for 12 months cut new non-melanoma skin cancers by 23% versus placebo, with no excess adverse events.",
+    "body": [
+      "The ONTRAC trial supports [[compound:nicotinamide]] (not niacin) as a safe chemopreventive at gram-scale doses in high-risk skin patients ([[intervention:niacin-nicotinamide-supplement]]). The protective effect did not persist after stopping, and the study did not measure methylation or SAM balance."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Chen AC",
+      "Martin AJ",
+      "Choy B",
+      "Fernández-Peñas P",
+      "Dalziell RA",
+      "McKenzie CA",
+      "Scolyer RA",
+      "Dhillon HM",
+      "Vardy JL",
+      "Kricker A",
+      "et al."
+    ],
+    "year": 2015,
+    "journal": "The New England journal of medicine",
+    "doi": "10.1056/NEJMoa1506197",
+    "pmid": "26488693",
+    "url": "https://doi.org/10.1056/NEJMoa1506197",
+    "verified": true,
+    "takeaways": [
+      "Participants took 500 mg nicotinamide twice daily or placebo for 12 months.",
+      "New non-melanoma skin cancers were 23% lower (95% CI 4-38%) with nicotinamide, and actinic keratoses were 11-20% lower at the assessed times.",
+      "No noteworthy differences in adverse events were found, and there was no benefit after nicotinamide was discontinued."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "386 adults with at least two prior non-melanoma skin cancers"
+    }
+  },
+  {
+    "id": "article:boden-2011-aim-high-niacin",
+    "type": "article",
+    "name": "Niacin in patients with low HDL cholesterol levels receiving intensive statin therapy",
+    "aliases": [
+      "AIM-HIGH 2011"
+    ],
+    "summary": "Randomised trial (3,414 patients): adding extended-release niacin 1,500-2,000 mg/day to statin raised HDL and lowered triglycerides but did not reduce cardiovascular events.",
+    "body": [
+      "AIM-HIGH tested gram-dose [[compound:niacin]] in people with established vascular disease and controlled LDL. The lipid effects were as expected, but the trial stopped early for lack of efficacy, which tempered the case for [[intervention:niacin-nicotinamide-supplement]] as a lipid therapy. It did not assess methylation, though gram doses are where NNMT-mediated methyl use becomes plausible."
+    ],
+    "evidence": "established",
+    "authors": [
+      "AIM-HIGH Investigators",
+      "Boden WE",
+      "Probstfield JL",
+      "Anderson T",
+      "Chaitman BR",
+      "Desvignes-Nickens P",
+      "Koprowicz K",
+      "McBride R",
+      "Teo K",
+      "Weintraub W"
+    ],
+    "year": 2011,
+    "journal": "The New England journal of medicine",
+    "doi": "10.1056/NEJMoa1107579",
+    "pmid": "22085343",
+    "url": "https://doi.org/10.1056/NEJMoa1107579",
+    "verified": true,
+    "takeaways": [
+      "Extended-release niacin (1,500-2,000 mg/day) or placebo was added to simvastatin, with ezetimibe if needed to keep LDL at 40-80 mg/dL.",
+      "HDL rose from 35 to 42 mg/dL and triglycerides fell from 164 to 122 mg/dL with niacin.",
+      "The primary composite end point occurred in 16.4% with niacin versus 16.2% with placebo (HR 1.02), and the trial was stopped after about three years."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "3,414 patients with atherosclerotic cardiovascular disease and low HDL"
+    }
+  },
+  {
+    "id": "article:middleton-1986-plp-intestinal-hydrolysis",
+    "type": "article",
+    "name": "Intestinal hydrolysis of pyridoxal 5'-phosphate in vitro and in vivo in the rat. Effect of protein binding and pH",
+    "aliases": [
+      "Middleton 1986"
+    ],
+    "summary": "Rat intestine study: phosphatase-mediated hydrolysis is the first step in absorbing pyridoxal 5-phosphate; albumin binding blocks it at neutral pH, so gastric acid may aid dietary PLP absorption.",
+    "body": [
+      "Phosphorylated vitamin B6 ([[compound:plp]]) is dephosphorylated by intestinal alkaline phosphatase before the vitamin is absorbed, so the phosphate does not survive the gut. The finding argues against the idea that an oral [[intervention:p5p-supplement]] bypasses hepatic or cellular activation in any simple way.",
+      "It also raises the question, which the author states, of whether acid-lowering therapy affects vitamin B6 status. The data are from rat intestine in vitro and in perfused segments, not from people."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Middleton HM 3rd"
+    ],
+    "year": 1986,
+    "journal": "Gastroenterology",
+    "doi": "10.1016/0016-5085(86)90567-6",
+    "pmid": "3721120",
+    "url": "https://doi.org/10.1016/0016-5085(86)90567-6",
+    "verified": true,
+    "takeaways": [
+      "Hydrolysis by phosphatase is the first step in intestinal absorption of pyridoxal 5-phosphate.",
+      "Albumin binding of PLP at pH 5-7.4 markedly inhibited its hydrolysis, while at pH 3-4 binding was negligible and hydrolysis proceeded.",
+      "The author suggests gastric acid contributes to normal dietary PLP absorption, and that widespread acid lowering might affect vitamin B6 status."
+    ],
+    "facts": {
+      "design": "animal study",
+      "population": "Rat jejunum (in vitro and perfused segments)"
+    },
+    "relations": [
+      {
+        "rel": "evidence-against",
+        "to": "claim:p5p-bypasses-hepatic-activation",
+        "note": "In rat intestine, phosphorylated B6 is dephosphorylated by phosphatase before absorption, so oral P5P does not reach cells as the phosphate ester; the bypass is largely illusory."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "compound:plp",
+        "note": "Intestinal hydrolysis of PLP is the first step of its absorption; low pH favours it."
+      }
+    ]
+  },
+  {
+    "id": "article:walsh-2004-biochemical-therapy",
+    "type": "article",
+    "name": "Reduced violent behavior following biochemical therapy",
+    "aliases": [
+      "Walsh 2004"
+    ],
+    "summary": "Uncontrolled study by the Walsh/Pfeiffer group: 207 patients with behaviour disorders improved on biochemical therapy; no control group, run by the framework's proponents.",
+    "body": [
+      "Patients were screened for metal-metabolism, methylation and pyrrole abnormalities and treated with standardised protocols; most compliant patients reported fewer assaults. The design (before-after, no control, from the treatment centre that devised the classification) cannot show that the methylation biotypes are valid or that biotype-directed nutrients caused the change ([[state:undermethylation]], [[state:overmethylation]])."
+    ],
+    "evidence": "speculative",
+    "authors": [
+      "Walsh WJ",
+      "Glab LB",
+      "Haakenson ML"
+    ],
+    "year": 2004,
+    "journal": "Physiology & behavior",
+    "doi": "10.1016/j.physbeh.2004.06.023",
+    "pmid": "15451647",
+    "url": "https://doi.org/10.1016/j.physbeh.2004.06.023",
+    "verified": true,
+    "takeaways": [
+      "207 consecutive patients were treated with protocols based on a screen for imbalances including methylation abnormalities and disordered pyrrole chemistry.",
+      "Among compliant patients, 92% of the assaultive reported fewer assaults and 58% achieved elimination, with high statistical significance for the before-after change.",
+      "There was no comparison group, 24% discontinued, and the authors run the treatment centre, so the result is hypothesis-generating only."
+    ],
+    "facts": {
+      "design": "uncontrolled outcome study",
+      "population": "207 consecutive patients with behaviour disorders"
+    },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "claim:walsh-under-over-methylation-categories-valid",
+        "note": "Weak support: an uncontrolled before-after outcome study by the framework's proponents; it cannot validate the biotypes or show biotype-specific benefit."
+      }
+    ]
   }
 ];

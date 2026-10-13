@@ -53,7 +53,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:cbs", note: "Condenses with homocysteine to cystathionine" },
       { rel: "precursor-of", to: "compound:glycine" },
       { rel: "precursor-of", to: "compound:cysteine", note: "Carbon skeleton donor via transsulfuration" }
-    ]
+    ],
+    refs: ["article:mattaini-2016-serine-metabolism", "article:wang-2013-glycine-metabolism"]
   },
   {
     id: "compound:sarcosine",
@@ -92,7 +93,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:dmgdh" },
       { rel: "precursor-of", to: "compound:sarcosine" },
       { rel: "part-of", to: "pathway:choline-oxidation" }
-    ]
+    ],
+    refs: ["article:reactome-choline-catabolism", "article:craig-2004-betaine-human-nutrition"]
   },
   {
     id: "compound:betaine",
@@ -137,7 +139,8 @@ export default [
       { rel: "product-of", to: "enzyme:chdh" },
       { rel: "substrate-of", to: "enzyme:aldh7a1" },
       { rel: "precursor-of", to: "compound:betaine" }
-    ]
+    ],
+    refs: ["article:reactome-choline-catabolism"]
   },
   {
     id: "compound:choline",
@@ -207,7 +210,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:pemt" },
       { rel: "precursor-of", to: "compound:phosphatidylcholine" },
       { rel: "part-of", to: "pathway:kennedy-pathway", note: "Ethanolamine branch" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation"]
   },
   {
     id: "compound:cdp-choline",
@@ -225,7 +229,8 @@ export default [
       { rel: "precursor-of", to: "compound:phosphatidylcholine" },
       { rel: "precursor-of", to: "compound:choline", note: "After hydrolysis" },
       { rel: "part-of", to: "pathway:kennedy-pathway" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "compound:glycerophosphocholine",
@@ -241,7 +246,8 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:choline" },
       { rel: "precursor-of", to: "compound:acetylcholine", note: "Via choline" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:zeisel-2009-choline-essential-nutrient"]
   },
   {
     id: "compound:phosphocholine",
@@ -257,7 +263,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:kennedy-pathway" },
       { rel: "precursor-of", to: "compound:cdp-choline" }
-    ]
+    ],
+    refs: ["article:vance-2014-phospholipid-methylation", "article:kennedy-1956-cytidine-coenzymes"]
   },
   {
     id: "compound:acetylcholine",
@@ -356,7 +363,8 @@ export default [
       { rel: "product-of", to: "enzyme:mtr" },
       { rel: "product-of", to: "enzyme:bhmt" },
       { rel: "precursor-of", to: "compound:sam" }
-    ]
+    ],
+    refs: ["article:mudd-2007-methyl-balance", "article:reactome-sulfur-amino-acid-metabolism"]
   },
   {
     id: "compound:cysteine",
@@ -373,7 +381,8 @@ export default [
       { rel: "product-of", to: "pathway:transsulfuration" },
       { rel: "precursor-of", to: "compound:glutathione" },
       { rel: "precursor-of", to: "compound:taurine" }
-    ]
+    ],
+    refs: ["article:reactome-sulfur-amino-acid-metabolism", "article:sekhar-2011-glynac-glutathione"]
   },
   {
     id: "compound:cystathionine",
@@ -390,7 +399,8 @@ export default [
       { rel: "product-of", to: "enzyme:cbs" },
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "precursor-of", to: "compound:cysteine" }
-    ]
+    ],
+    refs: ["article:reactome-sulfur-amino-acid-metabolism", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "compound:taurine",
@@ -447,7 +457,8 @@ export default [
       { rel: "precursor-of", to: "compound:glutamine" },
       { rel: "part-of", to: "compound:glutathione" },
       { rel: "precursor-of", to: "compound:proline" }
-    ]
+    ],
+    refs: ["article:petroff-2002-gaba-glutamate"]
   },
   {
     id: "compound:glutamine",
@@ -463,7 +474,8 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:ammonia", note: "Via glutaminase" },
       { rel: "precursor-of", to: "compound:gaba", note: "Glutamate-GABA cycle" }
-    ]
+    ],
+    refs: ["article:shao-2008-osl-taurine-glutamine-arginine"]
   },
   {
     id: "compound:gaba",
@@ -518,7 +530,8 @@ export default [
       { rel: "precursor-of", to: "compound:histamine" },
       { rel: "precursor-of", to: "compound:carnosine" },
       { rel: "associated-with", to: "compound:thf", note: "Catabolism via FIGLU hands a one-carbon unit to THF" }
-    ]
+    ],
+    refs: ["article:maintz-2007-histamine-intolerance", "article:trexler-2015-issn-beta-alanine"]
   },
   {
     id: "compound:formate",
@@ -534,7 +547,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "associated-with", to: "compound:thf", note: "Re-enters the cytosolic pool as 10-formyl-THF" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "compound:folate",
@@ -553,7 +567,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:mtr", note: "As 5-methyl-THF" },
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "decreases", to: "compound:homocysteine" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:efsa-2022-5-mthf-dietary-folate-equivalents"]
   },
   {
     id: "compound:thf",
@@ -571,7 +586,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:shmt" },
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "product-of", to: "enzyme:mtr" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "compound:5-10-methylene-thf",
@@ -591,7 +607,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:mthfr" },
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "precursor-of", to: "compound:formate", note: "After oxidation in mitochondria" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism"]
   },
   {
     id: "compound:5-mthf",
@@ -646,7 +663,8 @@ export default [
       { rel: "precursor-of", to: "compound:5-10-methylene-thf" },
       { rel: "part-of", to: "compound:folate" },
       { rel: "interacts-with", to: "compound:folic-acid", note: "Bypasses DHFR step" }
-    ]
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:howard-2016-high-dose-methotrexate"]
   },
   {
     id: "compound:vitamin-b12",
@@ -683,7 +701,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:mtr" },
       { rel: "part-of", to: "compound:vitamin-b12" },
       { rel: "decreases", to: "compound:homocysteine" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency", "article:selhub-1999-homocysteine-metabolism"]
   },
   {
     id: "compound:adenosylcobalamin",
@@ -700,7 +719,8 @@ export default [
       { rel: "part-of", to: "compound:vitamin-b12" },
       { rel: "decreases", to: "compound:methylmalonic-acid" },
       { rel: "interacts-with", to: "compound:methylcobalamin", note: "Co-supplemented; separate enzymes" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "compound:cyanocobalamin",
@@ -717,7 +737,8 @@ export default [
       { rel: "precursor-of", to: "compound:methylcobalamin" },
       { rel: "precursor-of", to: "compound:adenosylcobalamin" },
       { rel: "part-of", to: "compound:vitamin-b12" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
   {
     id: "compound:vitamin-b6",
@@ -735,7 +756,8 @@ export default [
       { rel: "precursor-of", to: "compound:plp" },
       { rel: "cofactor-of", to: "enzyme:cbs", note: "As PLP" },
       { rel: "associated-with", to: "state:b6-functional-deficiency" }
-    ]
+    ],
+    refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
   {
     id: "compound:pyridoxine",
@@ -752,7 +774,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:pdxk" },
       { rel: "precursor-of", to: "compound:plp" },
       { rel: "part-of", to: "compound:vitamin-b6" }
-    ]
+    ],
+    refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
   {
     id: "compound:plp",
@@ -808,7 +831,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:dmgdh", note: "As covalent FAD" },
       { rel: "cofactor-of", to: "enzyme:sardh", note: "As covalent FAD" },
       { rel: "associated-with", to: "compound:plp", note: "FMN needed in the PNPO activation step" }
-    ]
+    ],
+    refs: ["article:mcnulty-2006-riboflavin-mthfr"]
   },
   {
     id: "compound:niacin",
@@ -842,7 +866,8 @@ export default [
       { rel: "precursor-of", to: "compound:1-methylnicotinamide" },
       { rel: "interacts-with", to: "compound:sam", note: "Consumed as methyl acceptor via NNMT" },
       { rel: "part-of", to: "compound:niacin" }
-    ]
+    ],
+    refs: ["article:pissios-2017-nnmt-methyl-sink", "article:chen-2015-nicotinamide-skin-cancer"]
   },
   {
     id: "compound:1-methylnicotinamide",
@@ -857,7 +882,8 @@ export default [
     facts: { formula: "C7H9N2O+", molarMass: "137.16 g/mol", pubchem: "CID 457" },
     relations: [
       { rel: "associated-with", to: "compound:sam", note: "Consumes SAM" }
-    ]
+    ],
+    refs: ["article:pissios-2017-nnmt-methyl-sink"]
   },
   {
     id: "compound:creatine",
@@ -893,7 +919,8 @@ export default [
       { rel: "precursor-of", to: "compound:creatine" },
       { rel: "increases", to: "compound:homocysteine", note: "Via SAM consumption" },
       { rel: "part-of", to: "pathway:creatine-synthesis" }
-    ]
+    ],
+    refs: ["article:brosnan-2007-creatine-review"]
   },
   {
     id: "compound:carnosine",
@@ -911,7 +938,8 @@ export default [
       { rel: "associated-with", to: "intervention:zinc-carnosine", note: "Ligand of the chelate" },
       { rel: "precursor-of", to: "compound:beta-alanine", note: "After carnosinase hydrolysis" },
       { rel: "interacts-with", to: "compound:zinc" }
-    ]
+    ],
+    refs: ["article:trexler-2015-issn-beta-alanine"]
   },
   {
     id: "compound:beta-alanine",
@@ -965,7 +993,8 @@ export default [
       { rel: "part-of", to: "compound:bile-acids" },
       { rel: "product-of", to: "pathway:bile-acid-conjugation" },
       { rel: "associated-with", to: "disease:gerd", note: "Acid plus bile reflux injury" }
-    ]
+    ],
+    refs: ["article:hofmann-2008-bile-acids-biology", "article:sjovall-1959-glycine-taurine-bile-conjugation"]
   },
   {
     id: "compound:taurocholic-acid",
@@ -982,7 +1011,8 @@ export default [
       { rel: "part-of", to: "compound:bile-acids" },
       { rel: "product-of", to: "pathway:bile-acid-conjugation" },
       { rel: "interacts-with", to: "system:gut-microbiota", note: "Substrate for bile salt hydrolases" }
-    ]
+    ],
+    refs: ["article:hofmann-2008-bile-acids-biology", "article:sjovall-1959-glycine-taurine-bile-conjugation"]
   },
   {
     id: "compound:gastrin",
@@ -1020,7 +1050,8 @@ export default [
       { rel: "increases", to: "compound:pepsin", note: "Activation of pepsinogen" },
       { rel: "aggravates", to: "disease:peptic-ulcer" },
       { rel: "decreases", to: "disease:sibo", note: "Bacterial barrier; evidence moderate" }
-    ]
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:martinsen-2005-gastric-acid-barrier", "article:fordtran-1973-gastric-buffer-meal"]
   },
   {
     id: "compound:bicarbonate",
@@ -1038,7 +1069,8 @@ export default [
       { rel: "decreases", to: "compound:hydrochloric-acid", note: "Neutralises H+" },
       { rel: "precursor-of", to: "compound:carbon-dioxide", note: "H+ + HCO3- reaction" },
       { rel: "part-of", to: "system:gastric-physiology", note: "Mucus-bicarbonate barrier" }
-    ]
+    ],
+    refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase", "article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "compound:carbon-dioxide",
@@ -1075,7 +1107,8 @@ export default [
       { rel: "product-of", to: "enzyme:h-pylori-urease" },
       { rel: "product-of", to: "enzyme:glycine-cleavage-system" },
       { rel: "associated-with", to: "disease:h-pylori-infection" }
-    ]
+    ],
+    refs: ["article:weeks-2000-urei-h-pylori-urease", "article:kikuchi-2008-glycine-cleavage-system"]
   },
   {
     id: "compound:urea",
@@ -1092,7 +1125,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:h-pylori-urease" },
       { rel: "measured-by", to: "intervention:h-pylori-testing" },
       { rel: "precursor-of", to: "compound:ammonia", note: "Via urease" }
-    ]
+    ],
+    refs: ["article:weeks-2000-urei-h-pylori-urease"]
   },
   {
     id: "compound:trimethylamine",
@@ -1142,7 +1176,8 @@ export default [
       { rel: "precursor-of", to: "compound:trimethylamine", note: "Via gut microbial CntA/B" },
       { rel: "associated-with", to: "compound:methionine", note: "Biosynthesis uses lysine and methionine-derived SAM methyls" },
       { rel: "interacts-with", to: "compound:sam", note: "Biosynthesis consumes three methyls" }
-    ]
+    ],
+    refs: ["article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },
   {
     id: "compound:pepsin",
@@ -1274,7 +1309,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:mtr" },
       { rel: "cofactor-of", to: "enzyme:carbonic-anhydrase" },
       { rel: "cofactor-of", to: "enzyme:pdxk" }
-    ]
+    ],
+    refs: ["article:plum-2010-zinc-human-health", "article:iom-2001-micronutrients-zinc"]
   },
   {
     id: "compound:atp",
@@ -1291,7 +1327,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:mat" },
       { rel: "precursor-of", to: "compound:sam" },
       { rel: "interacts-with", to: "compound:magnesium" }
-    ]
+    ],
+    refs: ["article:rhea-2022", "article:chebi-2016"]
   },
   {
     id: "compound:serotonin",
@@ -1308,7 +1345,8 @@ export default [
       { rel: "increases", to: "system:enteric-nervous-system", note: "5-HT4 facilitation of motility" },
       { rel: "associated-with", to: "system:gastric-physiology" },
       { rel: "associated-with", to: "compound:gingerols", note: "5-HT3 antagonism (in vitro)" }
-    ]
+    ],
+    refs: ["article:gershon-2007-serotonin-gi"]
   },
   {
     id: "compound:prostaglandin-e2",
@@ -1325,7 +1363,8 @@ export default [
       { rel: "increases", to: "compound:gastric-mucus" },
       { rel: "decreases", to: "disease:peptic-ulcer" },
       { rel: "decreases", to: "pathway:gastric-acid-secretion" }
-    ]
+    ],
+    refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "compound:gastric-mucus",
@@ -1342,7 +1381,8 @@ export default [
       { rel: "decreases", to: "disease:peptic-ulcer", note: "Protective barrier" },
       { rel: "part-of", to: "system:gastric-physiology" },
       { rel: "decreases", to: "compound:hydrochloric-acid", note: "Local neutralisation at surface" }
-    ]
+    ],
+    refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "compound:somatostatin",
@@ -1359,7 +1399,8 @@ export default [
       { rel: "decreases", to: "compound:gastrin" },
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "disease:h-pylori-infection" }
-    ]
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "compound:secretin",
@@ -1376,7 +1417,8 @@ export default [
       { rel: "increases", to: "compound:bicarbonate" },
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "system:gastric-physiology" }
-    ]
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "compound:motilin",
@@ -1393,7 +1435,8 @@ export default [
       { rel: "increases", to: "system:enteric-nervous-system", note: "Initiates MMC phase III" },
       { rel: "decreases", to: "disease:sibo", note: "Via MMC clearing, evidence moderate" },
       { rel: "associated-with", to: "state:gastric-dysmotility" }
-    ]
+    ],
+    refs: ["article:mondal-2017-duodenal-ph-mmc-motilin"]
   },
   {
     id: "compound:hippuric-acid",
@@ -1409,7 +1452,8 @@ export default [
     relations: [
       { rel: "decreases", to: "compound:glycine", note: "Conjugation consumes glycine" },
       { rel: "associated-with", to: "system:gut-microbiota", note: "Microbial polyphenol metabolism supplies benzoate" }
-    ]
+    ],
+    refs: ["article:wang-2013-glycine-metabolism"]
   },
   {
     id: "compound:methylmalonic-acid",
@@ -1426,7 +1470,8 @@ export default [
       { rel: "measured-by", to: "intervention:homocysteine-mma-testing" },
       { rel: "associated-with", to: "compound:vitamin-b12" },
       { rel: "associated-with", to: "disease:sibo", note: "Bacterial propionate can raise MMA" }
-    ]
+    ],
+    refs: ["article:stabler-2013-vitamin-b12-deficiency", "article:refsum-2004-homocysteine-recommendations"]
   },
   {
     id: "compound:oxalate",
@@ -1512,7 +1557,8 @@ export default [
       { rel: "causes", to: "outcome:tachycardia", note: "Palpitations or arrhythmia via hypokalaemia with excess intake (rare)" },
       { rel: "part-of", to: "intervention:dgl-licorice", note: "Removed (mostly) in DGL; residual amount matters in hypertension or hypokalaemia" },
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "Licorice derivative carbenoxolone was an ulcer drug but caused mineralocorticoid effects" }
-    ]
+    ],
+    refs: ["article:isbrucker-2006-licorice-glycyrrhizin-safety"]
   },
   {
     id: "compound:berberine",
