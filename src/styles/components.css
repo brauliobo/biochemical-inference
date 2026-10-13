@@ -536,6 +536,7 @@ fieldset { min-inline-size: 0; }
   block-size: var(--space-inset-tight);
   border-radius: var(--radius-pill);
   background: var(--color-warning-border);
+}
 
 /* ---- Knowledge base ---- */
 .badge--info { border-color: var(--color-info-border); color: var(--color-info-text); }

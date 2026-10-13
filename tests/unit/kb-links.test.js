@@ -7,18 +7,14 @@ import { resolveRoute } from '../../src/router.js'
 // every id that an entity page can link to has a route that resolves and an entity
 // behind it.
 //
-// Targets the engine itself reports as dangling (graph.dangling, the same list
-// `npm run kb:validate` prints) are rendered as plain text by the views, never as a
-// link, so by default they are tolerated here, but only while they are in that report:
-// a view may never invent a link target.
-//
-// KB_STRICT_LINKS=1 tolerates nothing except article targets while no article data
-// exists (src/knowledge/data/articles.js not merged yet). Run it once the content is
-// complete; it fails with the list of missing ids otherwise.
-const STRICT = process.env.KB_STRICT_LINKS === '1'
-const articlesLoaded = (graph.byType.get('article') ?? []).length > 0
+// Strict by default: every link target must exist. The views render targets that the
+// engine reports as dangling (graph.dangling, the same list `npm run kb:validate`
+// prints) as plain text, never as a link; KB_STRICT_LINKS=0 tolerates exactly those
+// reported targets (for working on content that is still incomplete). A view may
+// never invent a link target either way.
+const STRICT = process.env.KB_STRICT_LINKS !== '0'
 const reported = new Set(graph.dangling.map((entry) => entry.target))
-const tolerated = (id) => reported.has(id) && (!STRICT || (!articlesLoaded && id.startsWith('article:')))
+const tolerated = (id) => !STRICT && reported.has(id)
 
 function linkTargets(model) {
   const ids = []
@@ -49,7 +45,7 @@ describe('knowledge page links', () => {
     }
   })
 
-  it('links only to entities that exist (or, outside strict mode, that the engine reports as dangling)', () => {
+  it('links only to entities that exist (strict unless KB_STRICT_LINKS=0)', () => {
     const missing = []
     for (const model of models) {
       for (const id of linkTargets(model)) {

@@ -229,9 +229,12 @@ describe('Breadcrumbs', () => {
 
 describe('RelationGroups and ItemList', () => {
   it('shows labelled groups with counts, type badges and notes', () => {
-    const { container } = mount(RelationGroups, { groups: page('compound:glycine').relationGroups })
+    const groups = page('compound:glycine').relationGroups
+    const substrate = groups.find((group) => group.label === 'Substrate of')
+    expect(substrate.items.length).toBeGreaterThan(0)
+    const { container } = mount(RelationGroups, { groups })
     const headings = [...container.querySelectorAll('h3')].map((heading) => heading.textContent.trim())
-    expect(headings).toContain('Substrate of (9)')
+    expect(headings).toContain(`Substrate of (${substrate.items.length})`)
     expect(container.querySelectorAll('.badge').length).toBeGreaterThan(10)
   })
 

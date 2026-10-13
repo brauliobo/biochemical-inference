@@ -53,7 +53,10 @@ describe('home', () => {
   it('gets from the search box to GNMT in two interactions', async () => {
     await open('/')
     await fireEvent.update(screen.getByRole('searchbox'), 'GNMT')
-    await fireEvent.click(await within(main()).findByRole('link', { name: /Glycine N-methyltransferase/ }))
+    // Several articles are titled "Glycine N-methyltransferase ..."; the enzyme itself must be the best match.
+    const enzyme = await within(main()).findByRole('link', { name: 'Glycine N-methyltransferase (GNMT)' })
+    expect(enzyme.closest('ul').querySelector('a')).toBe(enzyme)
+    await fireEvent.click(enzyme)
     expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ })).toBeTruthy()
   })
 })

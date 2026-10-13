@@ -10,6 +10,12 @@ const WEIGHTS = {
   summary: { exact: 12, prefix: 12, word: 10, substring: 6 }
 }
 const PHRASE_BONUS = { name: 50, alias: 40 }
+// A parenthetical in a name is an abbreviation or a gloss: "Betaine (trimethylglycine, TMG)".
+// The text outside the parentheses is the head name; each parenthetical part is an acronym.
+// Both only count when they equal a query word, so 'betaine' finds the compound before
+// 'Betaine aldehyde', and 'GNMT' finds the enzyme named 'Glycine N-methyltransferase (GNMT)'.
+const HEAD_EXACT = 100
+const ACRONYM_EXACT = 90
 
 export function normalizeText(value) {
   return String(value).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
@@ -25,12 +31,20 @@ function matchKind(haystack, token) {
 
 const indexes = new WeakMap()
 
+function nameParts(name) {
+  const text = String(name ?? '')
+  const acronyms = [...text.matchAll(/\(([^()]*)\)/g)].flatMap((match) => match[1].split(/[;,]/)).map(normalizeText).filter(Boolean)
+  const head = normalizeText(text.replace(/\([^()]*\)/g, ' '))
+  return { head, acronyms }
+}
+
 function indexFor(graph) {
   let index = indexes.get(graph)
   if (!index) {
     index = graph.entities.map((entity) => ({
       entity,
       name: normalizeText(entity.name),
+      ...nameParts(entity.name),
       aliases: (entity.aliases ?? []).map((alias) => ({ text: alias, norm: normalizeText(alias) })),
       id: normalizeText(parseId(entity.id)?.slug ?? entity.id),
       summary: normalizeText(entity.summary)
@@ -48,6 +62,8 @@ function bestForToken(record, token) {
     if (score > best.score) best = { score, field, alias }
   }
   consider('name', record.name)
+  if (record.head === token && best.score < HEAD_EXACT) best = { score: HEAD_EXACT, field: 'name', alias: null }
+  if (record.acronyms.includes(token) && best.score < ACRONYM_EXACT) best = { score: ACRONYM_EXACT, field: 'name', alias: null }
   for (const alias of record.aliases) consider('alias', alias.norm, alias.text)
   consider('id', record.id)
   consider('summary', record.summary)
@@ -69,7 +85,8 @@ export function search(graph, query, { limit = 20, types } = {}) {
     const hits = tokens.map((token) => bestForToken(record, token))
     if (hits.some((hit) => hit.score === 0)) continue
     let score = hits.reduce((sum, hit) => sum + hit.score, 0)
-    if (record.name === phrase) score += PHRASE_BONUS.name
+    if (record.name === phrase || record.head === phrase) score += PHRASE_BONUS.name
+    else if (record.acronyms.includes(phrase)) score += PHRASE_BONUS.alias
     else if (record.aliases.some((alias) => alias.norm === phrase)) score += PHRASE_BONUS.alias
     const primary = hits.reduce((top, hit) => (hit.score > top.score ? hit : top))
     const { entity } = record
