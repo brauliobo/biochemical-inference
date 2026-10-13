@@ -1,5 +1,9 @@
-import { createApp } from 'vue'
+import { createVaporApp } from 'vue'
 import App from './App.vue'
-import './styles.css'
+import { installLegacyInterop } from './vapor-interop.js'
+import './styles/index.css'
 
-createApp(App).mount('#app')
+// The whole app runs in Vapor mode.
+const app = createVaporApp(App)
+installLegacyInterop(app) // temporary, see src/vapor-interop.js
+app.mount('#app')

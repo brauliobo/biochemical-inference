@@ -1,0 +1,128 @@
+/*
+ * SEMANTIC TOKENS: the role names components use. Values may only be var()
+ * references to primitives (tokens.primitive.css), never raw literals.
+ *
+ * Colours are light-dark(<light>, <dark>). The browser picks per the
+ * `color-scheme` property: `light dark` (below) follows prefers-color-scheme,
+ * and any subtree can force a scheme, e.g. `.legacy-workbench { color-scheme: dark }`.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Text */
+  --color-text: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-text-muted: light-dark(var(--neutral-600), var(--neutral-300));
+  --color-text-inverse: light-dark(var(--neutral-0), var(--neutral-950));
+
+  /* Surfaces and lines */
+  --color-surface: light-dark(var(--neutral-50), var(--neutral-950));
+  --color-surface-raised: light-dark(var(--neutral-0), var(--neutral-900));
+  --color-surface-sunken: light-dark(var(--neutral-100), var(--neutral-800));
+  --color-border: light-dark(var(--neutral-200), var(--neutral-700));
+  --color-border-strong: light-dark(var(--neutral-500), var(--neutral-400));
+  --color-selection: light-dark(var(--teal-100), var(--teal-800));
+
+  /* Interaction */
+  --color-link: light-dark(var(--teal-700), var(--teal-300));
+  --color-link-hover: light-dark(var(--teal-900), var(--teal-100));
+  --color-link-visited: light-dark(var(--blue-700), var(--blue-300));
+  --color-focus-ring: light-dark(var(--blue-600), var(--teal-300));
+  --color-accent: light-dark(var(--teal-700), var(--teal-300));
+  --color-accent-hover: light-dark(var(--teal-800), var(--teal-200));
+  --color-accent-text: light-dark(var(--neutral-0), var(--neutral-950));
+
+  /* Status: each has a text, surface and border colour */
+  --color-success-text: light-dark(var(--green-800), var(--green-200));
+  --color-success-surface: light-dark(var(--green-50), var(--green-900));
+  --color-success-border: light-dark(var(--green-600), var(--green-400));
+  --color-warning-text: light-dark(var(--amber-800), var(--amber-200));
+  --color-warning-surface: light-dark(var(--amber-50), var(--amber-900));
+  --color-warning-border: light-dark(var(--amber-600), var(--amber-400));
+  --color-danger-text: light-dark(var(--red-800), var(--red-200));
+  --color-danger-surface: light-dark(var(--red-50), var(--red-900));
+  --color-danger-border: light-dark(var(--red-600), var(--red-400));
+  --color-info-text: light-dark(var(--blue-800), var(--blue-200));
+  --color-info-surface: light-dark(var(--blue-50), var(--blue-900));
+  --color-info-border: light-dark(var(--blue-600), var(--blue-400));
+
+  /* Space */
+  --space-stack-tight: var(--space-2);
+  --space-stack: var(--space-4);
+  --space-stack-loose: var(--space-6);
+  --space-cluster: var(--space-3);
+  --space-cluster-tight: var(--space-1);
+  --space-control-inline: var(--space-3);
+  --space-inset-tight: var(--space-2);
+  --space-inset: var(--space-4);
+  --space-inset-loose: var(--space-5);
+  --space-gutter: var(--space-4);
+  --space-section: var(--space-7);
+
+  /* Type */
+  --font-body: var(--font-family-sans);
+  --font-heading: var(--font-family-sans);
+  --font-code: var(--font-family-mono);
+  --text-caption: var(--font-size-1);
+  --text-small: var(--font-size-2);
+  --text-body: var(--font-size-3);
+  --text-lead: var(--font-size-4);
+  --text-code: var(--font-size-2);
+  --text-h4: var(--font-size-4);
+  --text-h3: var(--font-size-5);
+  --text-h2: var(--font-size-7);
+  --text-h1: var(--font-size-9);
+  --leading-body: var(--line-height-normal);
+  --leading-prose: var(--line-height-loose);
+  --leading-heading: var(--line-height-tight);
+  --leading-compact: var(--line-height-snug);
+  --weight-body: var(--font-weight-regular);
+  --weight-strong: var(--font-weight-semibold);
+  --weight-heading: var(--font-weight-bold);
+  --tracking-heading: var(--letter-spacing-tight);
+  --tracking-label: var(--letter-spacing-wide);
+  --measure: var(--size-measure);
+
+  /* Shape and elevation */
+  --radius-control: var(--radius-2);
+  --radius-card: var(--radius-3);
+  --radius-pill: var(--radius-round);
+  --border-width: var(--border-1);
+  --border-width-strong: var(--border-2);
+  --border-width-accent: var(--border-3);
+  --shadow-card: var(--shadow-1);
+  --shadow-raised: var(--shadow-2);
+  --shadow-overlay: var(--shadow-3);
+
+  /* Accessibility */
+  --target-min: var(--size-target);
+  --focus-ring-width: var(--border-3);
+  --focus-ring-offset: var(--space-1);
+
+  /* Motion */
+  --motion-fast: var(--duration-1);
+  --motion-base: var(--duration-2);
+  --motion-slow: var(--duration-3);
+  --motion-ease: var(--easing-standard);
+
+  /* Stacking */
+  --z-raised: var(--z-1);
+  --z-sticky: var(--z-2);
+  --z-overlay: var(--z-3);
+  --z-skip-link: var(--z-4);
+
+  /* Layout */
+  --container-max: var(--size-container);
+  --container-prose: var(--size-container-narrow);
+  --container-wide: var(--size-container-wide);
+  --sidebar-width: var(--size-sidebar);
+  --grid-min: var(--size-grid-min);
+  --icon-size: var(--size-icon);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: var(--duration-0);
+    --motion-base: var(--duration-0);
+    --motion-slow: var(--duration-0);
+  }
+}

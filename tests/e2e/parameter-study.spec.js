@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('runs the pinned synthetic parameter study with inspectable partition and diagnostics', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.parameter-study-panel')
   await expect(workbench.getByRole('heading', { name: 'Synthetic decay inference study' })).toBeVisible()
   await expect(workbench.getByText('CANDIDATE:DECAY-INCOMPATIBLE-UNIT')).toBeVisible()
@@ -21,7 +21,7 @@ test('runs the pinned synthetic parameter study with inspectable partition and d
 
 test('downgrades the robustness conclusion for an explicit misspecified model alternative', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Covered by the desktop stress workflow')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.parameter-study-panel')
   await workbench.getByLabel('Include misspecified offset model (assumption stress)').check()
   await workbench.getByRole('button', { name: 'Run inference study' }).click()
@@ -31,7 +31,7 @@ test('downgrades the robustness conclusion for an explicit misspecified model al
 
 test('keeps the complete parameter study audit usable on mobile', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific parameter study workflow')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.parameter-study-panel')
   await workbench.getByRole('button', { name: 'Run inference study' }).click()
   await expect(workbench.getByText(/3\/3 held-out observations covered/)).toBeVisible()

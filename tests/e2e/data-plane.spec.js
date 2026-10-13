@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('syncs the signed release pair, audits it offline, and traverses local pages on desktop and mobile', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const panel = page.locator('.data-plane-panel')
   await expect(panel.getByRole('heading', { name: 'Data plane workbench' })).toBeVisible()
   await expect(panel.getByText('Local / offline reads')).toBeVisible()

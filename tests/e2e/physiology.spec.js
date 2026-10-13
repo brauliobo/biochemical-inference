@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('runs the signed synthetic physiology workbench on desktop and mobile', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const panel = page.locator('.physiology-panel')
   await expect(panel.getByRole('heading', { name: 'Physiology plugin workbench' })).toBeVisible()
   await expect(panel.getByText('Synthetic / non-clinical')).toBeVisible()
@@ -23,7 +23,7 @@ test('runs the signed synthetic physiology workbench on desktop and mobile', asy
 })
 
 test('blocks mouse extrapolation while retaining signed catalog evidence', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const panel = page.locator('.physiology-panel')
   await expect(panel.getByRole('heading', { name: 'Physiology plugin workbench' })).toBeVisible()
   await panel.getByLabel('Applicability taxon').selectOption('NCBITaxon:10090')

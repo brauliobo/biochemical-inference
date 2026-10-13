@@ -1,0 +1,182 @@
+/*
+ * Minimal component classes for the app shell and knowledge site. Built from
+ * semantic tokens only. Add a class here only when a pattern is used by more
+ * than one view; otherwise compose layout primitives (layout.css).
+ */
+
+/* ---- Skip link ---- */
+.skip-link {
+  position: absolute;
+  inset-block-start: var(--space-inset-tight);
+  inset-inline-start: var(--space-inset-tight);
+  z-index: var(--z-skip-link);
+  padding: var(--space-inset-tight) var(--space-inset);
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-weight: var(--weight-strong);
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+a.skip-link:where(:visited, :hover) { color: var(--color-accent-text); }
+
+/* ---- Site chrome ---- */
+.site-header {
+  border-block-end: var(--border-width) solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+.site-header .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: var(--space-inset-loose);
+}
+.site-title {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min);
+  color: var(--color-text);
+  font-weight: var(--weight-heading);
+  text-decoration: none;
+}
+a.site-title:where(:visited, :hover) { color: var(--color-text); }
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-cluster-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min);
+  padding-inline: var(--space-control-inline);
+  border-block-end: var(--border-width-strong) solid transparent;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.site-nav a:where(:hover) { border-color: var(--color-border-strong); }
+.site-nav a[aria-current] { border-color: var(--color-accent); font-weight: var(--weight-strong); }
+
+.site-main {
+  padding-block: var(--space-section);
+}
+
+.site-footer {
+  padding-block: var(--space-inset-loose);
+  border-block-start: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+
+/* ---- Typography helpers ---- */
+.eyebrow {
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+.lede {
+  max-inline-size: var(--measure);
+  color: var(--color-text-muted);
+  font-size: var(--text-lead);
+  line-height: var(--leading-prose);
+}
+.muted { color: var(--color-text-muted); }
+
+/* ---- Button (works on <a> and <button>) ---- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-inset-tight);
+  min-block-size: var(--target-min);
+  padding: var(--space-inset-tight) var(--space-inset-loose);
+  border: var(--border-width) solid var(--color-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-weight: var(--weight-strong);
+  text-decoration: none;
+  transition: background-color var(--motion-fast) var(--motion-ease);
+}
+.button:hover { background: var(--color-accent-hover); }
+a.button:where(:visited, :hover) { color: var(--color-accent-text); }
+.button--secondary {
+  background: transparent;
+  color: var(--color-text);
+}
+.button--secondary:hover { background: var(--color-surface-sunken); }
+a.button--secondary:where(:visited, :hover) { color: var(--color-text); }
+
+/* ---- Card ---- */
+.card {
+  padding: var(--space-inset-loose);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-card);
+}
+/* Card headings are section-level, not page-level. */
+.card :is(h2, h3) { font-size: var(--text-h3); }
+.grid > .card,
+.grid > * > .card { block-size: 100%; }
+a.card {
+  display: block;
+  color: var(--color-text);
+  text-decoration: none;
+}
+a.card:where(:visited, :hover) { color: var(--color-text); }
+a.card:hover { border-color: var(--color-accent); }
+
+/* ---- Badge ---- */
+.badge {
+  display: inline-block;
+  padding: var(--space-cluster-tight) var(--space-inset-tight);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+}
+
+/* Status variants, same palette as notices. */
+.badge--success { border-color: var(--color-success-border); color: var(--color-success-text); }
+.badge--warning { border-color: var(--color-warning-border); color: var(--color-warning-text); }
+.badge--danger { border-color: var(--color-danger-border); color: var(--color-danger-text); }
+
+/* ---- Notice (inline status message). Add role="status" or role="alert". ---- */
+.notice {
+  padding: var(--space-inset);
+  border: var(--border-width) solid var(--color-info-border);
+  border-inline-start-width: var(--border-width-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-info-surface);
+  color: var(--color-info-text);
+}
+.notice--warning {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-surface);
+  color: var(--color-warning-text);
+}
+.notice--danger {
+  border-color: var(--color-danger-border);
+  background: var(--color-danger-surface);
+  color: var(--color-danger-text);
+}
+.notice--success {
+  border-color: var(--color-success-border);
+  background: var(--color-success-surface);
+  color: var(--color-success-text);
+}
+.notice a { color: inherit; }
+
+/* ---- Plain list (no bullets) ---- */
+.plain-list {
+  padding: 0;
+  list-style: none;
+}

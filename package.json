@@ -13,6 +13,7 @@
     "dev:web": "vite",
     "build": "vite build && npm run build:server",
     "build:server": "node server/build.js",
+    "build:static": "VITE_STATIC_MODE=true vite build --outDir dist-static",
     "start": "node server-dist/server/index.js",
     "ops": "node scripts/operations.js",
     "ops:bootstrap": "node scripts/operations.js bootstrap",
@@ -49,20 +50,25 @@
     "fast-xml-parser": "^5.10.0",
     "fastify": "^5.2.1",
     "three": "^0.173.0",
-    "vue": "^3.5.13",
+    "vue": "3.6.0-rc.11",
     "yauzl": "^3.4.0",
     "yazl": "^3.3.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.51.0",
     "@testing-library/vue": "^8.1.0",
-    "@vitejs/plugin-vue": "^5.2.3",
+    "@vitejs/plugin-vue": "6.0.10",
     "@vue/test-utils": "^2.4.6",
     "concurrently": "^9.1.2",
     "jsdom": "^26.0.0",
+    "postcss": "^8.5.30",
     "pug": "^3.0.3",
     "vite": "^6.1.0",
     "vitest": "^3.0.6"
+  },
+  "overrides": {
+    "vue": "$vue"
   }
 }

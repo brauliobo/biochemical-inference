@@ -10,7 +10,7 @@ test('synchronizes, paginates, inspects lineage, isolates calibration, then expl
     if (path.endsWith('/api/v10/measured/commitments')) commitmentBody = request.postDataJSON()
     if (path.endsWith('/api/v10/measured/evaluation')) evaluationBody = request.postDataJSON()
   })
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.measured-workbench')
   await expect(workbench).toBeVisible()
   await workbench.getByTestId('measured-sync').click()

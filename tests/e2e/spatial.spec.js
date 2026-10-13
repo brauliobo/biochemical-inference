@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('links spatial bin, time, field, values, and provenance on desktop and mobile', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const apap = page.locator('.apap-panel')
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')
@@ -25,7 +25,7 @@ test('links spatial bin, time, field, values, and provenance on desktop and mobi
 
 test('retains the complete numeric workflow when WebGL is unavailable', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(window, 'WebGLRenderingContext', { configurable: true, value: undefined }))
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const apap = page.locator('.apap-panel')
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')
@@ -38,7 +38,7 @@ test('retains the complete numeric workflow when WebGL is unavailable', async ({
 
 test('handles WebGL context loss without losing semantic results', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Context-loss behavior is viewport-independent')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const apap = page.locator('.apap-panel')
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')

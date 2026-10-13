@@ -9,7 +9,7 @@ test('closes every test and workflow action into the documented gate selection',
     node_acceptance: 6,
     live_certification: 1,
     exclusions: 0,
-    workflow_actions: 5
+    workflow_actions: 8
   })
 })
 

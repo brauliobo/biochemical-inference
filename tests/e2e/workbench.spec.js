@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homocysteine', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   await expect(page.getByRole('heading', { name: 'Verified knowledge workspace' })).toBeVisible()
   await expect(page.locator('.provenance-grid dd').filter({ hasText: /^one-carbon-(human-mouse-v1\.0\.0|demo-2026\.1)$/ })).toBeVisible()
@@ -35,7 +35,7 @@ test('loads provenance, runs baseline, compares reduced MTHFR, and inspects homo
 })
 
 test('explores human atlas traversal, identity ambiguity, mouse orthology, gaps, and species isolation', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   const atlas = page.locator('.atlas-panel')
   await expect(atlas.getByRole('heading', { name: 'MTHFR evidence atlas' })).toBeVisible()
@@ -70,7 +70,7 @@ test('fails atlas verification visibly on a browser digest mismatch without disa
     const payload = await response.json()
     await route.fulfill({ response, json: payload.map((release) => ({ ...release, digest: `sha256:${'0'.repeat(64)}` })) })
   })
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   const atlas = page.locator('.atlas-panel')
   await expect(atlas.getByText('Context atlas unavailable')).toBeVisible()
@@ -84,7 +84,7 @@ test('rejects mismatched browser provenance without overstating reproducibility'
     const payload = await response.json()
     await route.fulfill({ response, json: { ...payload, releaseDigest: `sha256:${'0'.repeat(64)}` } })
   })
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   await expect(page.getByText('Build provenance unavailable')).toBeVisible()
   await expect(page.getByText('Build provenance does not match the verified release and digest.')).toBeVisible()
@@ -97,7 +97,7 @@ test('validates controls before sending a simulation request', async ({ page }) 
   page.on('request', (request) => {
     if (request.method() === 'POST' && request.url().includes('/simulations')) simulationRequests += 1
   })
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   await page.getByLabel('Duration', { exact: true }).fill('100')
   await page.getByRole('button', { name: 'Run deterministic model' }).click()
 
@@ -106,7 +106,7 @@ test('validates controls before sending a simulation request', async ({ page }) 
 })
 
 test('has no essential horizontal overflow at 360px', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   await expect(page.getByRole('button', { name: 'Run deterministic model' })).toBeVisible()
   await expect(page.locator('.atlas-panel').getByRole('button', { name: 'Traverse bounded graph' })).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -115,7 +115,7 @@ test('has no essential horizontal overflow at 360px', async ({ page }) => {
 
 test('supports the complete mobile post-run inspection workflow', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific workflow')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   await page.getByRole('button', { name: 'Run deterministic model' }).click()
   await expect(page.getByText('Stable run identity')).toBeVisible()
 
