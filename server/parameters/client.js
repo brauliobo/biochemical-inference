@@ -7,17 +7,11 @@ import {
   UpstreamParameterDatasetsResponseSchema
 } from '../../shared/parameter-contracts.js'
 import { createParameterFixtureClient } from './fixture.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_PARAMETER_URL = 'http://127.0.0.1:8000'
+const DEFAULT_PARAMETER_URL = 'http://127.0.0.1:8000'
 
-export class ParameterCompatibilityError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'ParameterCompatibilityError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'PARAMETER_INCOMPATIBLE'
-  }
-}
+export const ParameterCompatibilityError = defineProblemError('ParameterCompatibilityError', { statusCode: 409, code: 'PARAMETER_INCOMPATIBLE' })
 
 export function createParameterClient(env = process.env) {
   if (env.BIOCHEMICAL_PARAMETERS_USE_FIXTURE === 'true' || env.BIOCHEMICAL_INFERENCE_USE_FIXTURE === 'true') return createParameterFixtureClient()

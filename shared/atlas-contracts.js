@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256DigestSchema, IsoDateSchema, SourceIdSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema } from './commons/schemas.js'
 import { TaxonIdSchema } from './contracts.js'
 
 export const ATLAS_ENTITY_TYPES = [
@@ -17,16 +18,15 @@ export const ATLAS_ENTITY_TYPES = [
   'phenotype'
 ]
 
-const Sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
 const QualifiedIdSchema = z.string().regex(/^(?:HGNC|MGI|Ensembl|UniProtKB|CHEBI|RHEA|Reactome|GO|UBERON|MONDO|HP|MP):[A-Za-z0-9_.-]+$/)
 const EntityTypeSchema = z.enum(ATLAS_ENTITY_TYPES)
 const DerivationSchema = z.enum(['direct', 'inferred', 'orthology-transferred'])
 const PolaritySchema = z.enum(['supporting', 'contradicting'])
 
 export const AtlasReleaseSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  digest: Sha256Schema,
+  id: NonEmptyStringSchema,
+  title: NonEmptyStringSchema,
+  digest: Sha256DigestSchema,
   schemaVersion: z.literal('2.0.0'),
   supportedTaxa: z.array(TaxonIdSchema).min(1),
   verified: z.literal(true),
@@ -35,23 +35,23 @@ export const AtlasReleaseSchema = z.object({
 
 export const AtlasReleaseDetailSchema = z.object({
   release: AtlasReleaseSchema,
-  publishedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  publishedAt: IsoDateSchema,
   immutable: z.literal(true),
-  scientificScope: z.string().min(1),
-  recordCounts: z.record(z.number().int().nonnegative()),
+  scientificScope: NonEmptyStringSchema,
+  recordCounts: z.record(NonNegativeIntSchema),
   apiContract: z.literal('2.0.0')
 }).strict()
 
 const baseEntityShape = {
   id: QualifiedIdSchema,
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   taxonId: TaxonIdSchema.nullable(),
   externalIds: z.array(QualifiedIdSchema),
-  sourceIds: z.array(z.string().regex(/^[A-Z][A-Z0-9_]*$/)).min(1)
+  sourceIds: z.array(SourceIdSchema).min(1)
 }
 
 export const AtlasEntitySchema = z.discriminatedUnion('entityType', [
-  z.object({ ...baseEntityShape, entityType: z.literal('gene'), symbol: z.string().min(1) }).strict(),
+  z.object({ ...baseEntityShape, entityType: z.literal('gene'), symbol: NonEmptyStringSchema }).strict(),
   z.object({ ...baseEntityShape, entityType: z.literal('transcript'), geneId: QualifiedIdSchema, canonical: z.boolean() }).strict(),
   z.object({ ...baseEntityShape, entityType: z.literal('protein'), geneId: QualifiedIdSchema, reviewed: z.boolean() }).strict(),
   z.object({ ...baseEntityShape, entityType: z.literal('isoform'), proteinId: QualifiedIdSchema, sequenceStatus: z.enum(['displayed', 'alternative']) }).strict(),
@@ -63,7 +63,7 @@ export const AtlasEntitySchema = z.discriminatedUnion('entityType', [
     direction: z.enum(['left-to-right', 'right-to-left', 'bidirectional']),
     participants: z.array(z.object({
       compoundId: QualifiedIdSchema,
-      coefficient: z.number().int().positive(),
+      coefficient: PositiveIntSchema,
       side: z.enum(['reactant', 'product'])
     }).strict()).min(2)
   }).strict(),
@@ -75,8 +75,8 @@ export const AtlasEntitySchema = z.discriminatedUnion('entityType', [
 export const AtlasEvidenceSchema = z.object({
   id: z.string().regex(/^EVIDENCE:[A-Z0-9-]+$/),
   kind: z.enum(['database-record', 'publication', 'ontology-record']),
-  sourceId: z.string().regex(/^[A-Z][A-Z0-9_]*$/),
-  citation: z.string().min(1),
+  sourceId: SourceIdSchema,
+  citation: NonEmptyStringSchema,
   url: z.string().url(),
   taxonId: TaxonIdSchema.nullable()
 }).strict()
@@ -106,7 +106,7 @@ export const AtlasMappingSchema = z.object({
   targetId: QualifiedIdSchema.nullable(),
   candidateIds: z.array(QualifiedIdSchema),
   evidenceIds: z.array(z.string().regex(/^EVIDENCE:[A-Z0-9-]+$/)).min(1),
-  rationale: z.string().min(1)
+  rationale: NonEmptyStringSchema
 }).strict()
 
 export const AtlasTransformationSchema = z.object({
@@ -116,9 +116,9 @@ export const AtlasTransformationSchema = z.object({
   targetTaxonId: TaxonIdSchema,
   sourceClaimId: z.string().regex(/^CLAIM:[A-Z0-9-]+$/),
   entityPairs: z.array(z.object({ sourceId: QualifiedIdSchema, targetId: QualifiedIdSchema }).strict()).min(1),
-  method: z.string().min(1),
+  method: NonEmptyStringSchema,
   evidenceIds: z.array(z.string().regex(/^EVIDENCE:[A-Z0-9-]+$/)).min(1),
-  limitations: z.string().min(1)
+  limitations: NonEmptyStringSchema
 }).strict()
 
 export const AtlasCoverageSchema = z.object({
@@ -127,9 +127,9 @@ export const AtlasCoverageSchema = z.object({
   tissueId: QualifiedIdSchema.nullable(),
   entityType: EntityTypeSchema,
   evidenceClass: z.union([DerivationSchema, z.literal('uncovered')]),
-  numerator: z.number().int().nonnegative(),
-  denominator: z.number().int().positive(),
-  denominatorDefinition: z.string().min(1),
+  numerator: NonNegativeIntSchema,
+  denominator: PositiveIntSchema,
+  denominatorDefinition: NonEmptyStringSchema,
   expectedIds: z.array(z.string()).min(1),
   coveredIds: z.array(z.string()),
   gapIds: z.array(z.string())
@@ -138,13 +138,13 @@ export const AtlasCoverageSchema = z.object({
 export const AtlasLimitationSchema = z.object({
   id: z.string().regex(/^LIMITATION:[A-Z0-9-]+$/),
   category: z.enum(['scope', 'evidence', 'mapping', 'coverage']),
-  statement: z.string().min(1),
+  statement: NonEmptyStringSchema,
   coverageIds: z.array(z.string().regex(/^COVERAGE:[A-Z0-9-]+$/))
 }).strict()
 
 const atlasEnvelopeShape = {
-  releaseId: z.string().min(1),
-  releaseDigest: Sha256Schema
+  releaseId: NonEmptyStringSchema,
+  releaseDigest: Sha256DigestSchema
 }
 
 export const AtlasEntityResponseSchema = z.object({

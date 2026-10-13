@@ -1,39 +1,6 @@
-import { constants, chmodSync, closeSync, fstatSync, lstatSync, openSync } from 'node:fs'
-import { DatabaseSync } from 'node:sqlite'
-import { join } from 'node:path'
+import { openSecureDatabase } from '../commons/sqlite.js'
 
-const NOFOLLOW = constants.O_NOFOLLOW ?? 0
-
-function assertRegularOrMissing(path) {
-  try {
-    const details = lstatSync(path)
-    if (details.isSymbolicLink() || !details.isFile()) throw new Error(`Unsafe Goal 14 SQLite path: ${path}.`)
-  } catch (error) {
-    if (error?.code !== 'ENOENT') throw error
-  }
-}
-
-export function openMeasuredSpatialDatabase(root) {
-  const path = join(root, 'goal14.sqlite3')
-  for (const candidate of [path, `${path}-wal`, `${path}-shm`]) assertRegularOrMissing(candidate)
-  const descriptor = openSync(path, constants.O_CREAT | constants.O_RDWR | NOFOLLOW, 0o600)
-  try {
-    if (!fstatSync(descriptor).isFile()) throw new Error(`Unsafe Goal 14 SQLite descriptor: ${path}.`)
-    chmodSync(path, 0o600)
-  } finally {
-    closeSync(descriptor)
-  }
-  const database = new DatabaseSync(path)
-  const version  = database.prepare('PRAGMA user_version').get().user_version
-  if (![0, 1].includes(version)) {
-    database.close()
-    throw new Error(`Unsupported Goal 14 database schema version: ${version}.`)
-  }
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS snapshot (
       singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
       release_id TEXT NOT NULL UNIQUE,
@@ -62,10 +29,8 @@ export function openMeasuredSpatialDatabase(root) {
     CREATE TRIGGER IF NOT EXISTS goal14_completion_update BEFORE UPDATE ON offline_completion BEGIN SELECT RAISE(ABORT, 'Goal 14 offline completion is immutable'); END;
     CREATE TRIGGER IF NOT EXISTS goal14_completion_delete BEFORE DELETE ON offline_completion BEGIN SELECT RAISE(ABORT, 'Goal 14 offline completion is immutable'); END;
     PRAGMA user_version = 1;
-  `)
-  chmodSync(path, 0o600)
-  for (const candidate of [`${path}-wal`, `${path}-shm`]) {
-    try { chmodSync(candidate, 0o600) } catch (error) { if (error?.code !== 'ENOENT') throw error }
-  }
-  return database
+`
+
+export function openMeasuredSpatialDatabase(root) {
+  return openSecureDatabase(root, 'goal14.sqlite3', { label: 'Goal 14', versions: [0, 1], schema: SCHEMA })
 }

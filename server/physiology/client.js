@@ -1,5 +1,4 @@
-import { createHash } from 'node:crypto'
-import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex } from '../commons/digest.js'
 import {
   PHYSIOLOGY_RELEASE_DIGEST,
   PHYSIOLOGY_RELEASE_ID,
@@ -16,22 +15,16 @@ import {
   PhysiologyValidationResponseSchema
 } from '../../shared/physiology-contracts.js'
 import { createPhysiologyFixtureClient } from './fixture.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_PHYSIOLOGY_URL = 'http://127.0.0.1:8000'
+const DEFAULT_PHYSIOLOGY_URL = 'http://127.0.0.1:8000'
 
-export class PhysiologyCompatibilityError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'PhysiologyCompatibilityError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'PHYSIOLOGY_INCOMPATIBLE'
-  }
-}
+export const PhysiologyCompatibilityError = defineProblemError('PhysiologyCompatibilityError', { statusCode: 409, code: 'PHYSIOLOGY_INCOMPATIBLE' })
 
 function manifestDigest(manifest) {
   const payload = { ...manifest }
   delete payload.release_digest
-  return createHash('sha256').update(canonicalJson(payload)).digest('hex')
+  return canonicalSha256Hex(payload)
 }
 
 function verifyEvidenceClosure(evidence) {

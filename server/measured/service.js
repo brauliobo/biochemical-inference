@@ -1,7 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdtemp, realpath, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import {
   CalibrationArtifactSchema,
@@ -28,14 +25,18 @@ import {
   MeasuredLineageSchema
 } from '../../shared/measured-contracts.js'
 import { createDataPlaneObjectStore } from '../data-plane/object-store.js'
-import { assertNoSymlinkAncestors, ensurePrivateDirectory } from '../data-plane/safe-path.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
+import { decodeCursor as verifyCursor, decodeSecret, encodeCursor } from '../commons/cursor.js'
+import { defineRequestError } from '../commons/errors.js'
+import { isoNow as now } from '../commons/clock.js'
+import { transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { createMeasuredClient, validateMeasuredProtectedConfig } from './client.js'
 import { runMeasuredCalibration } from './calibration.js'
 import { openMeasuredDatabase } from './database.js'
 import { clearMeasuredJournal, recoverMeasuredJournal, writeMeasuredJournal } from './journal.js'
 import {
   MeasuredVerificationError,
-  measuredSha256,
   verifyMeasuredCatalog,
   verifyMeasuredDiscovery,
   verifyMeasuredEnvelope,
@@ -54,82 +55,31 @@ const FORBIDDEN_HELDOUT_IDENTIFIERS = [
   'uncertainty:zenodo7648975:prc-d200:gsh', 'uncertainty:zenodo7648975:prc-d250:gsh', 'uncertainty:zenodo7648975:prc:gsh'
 ]
 const FORBIDDEN_HELDOUT_VALUES = ['2.63', '2.74', '2.700', '2.57', '2.49', '2.47'].map((value) => `"reported_value":"${value}"`)
-const now = () => new Date().toISOString()
 
-export class MeasuredRequestError extends Error {
-  constructor(code, message, statusCode = 422) {
-    super(message)
-    this.name = 'MeasuredRequestError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const MeasuredRequestError = defineRequestError('MeasuredRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
+const rootInSource = () => new MeasuredRequestError('MEASURED_ROOT_IN_SOURCE', 'Measured storage root must be outside the source tree.', 500)
 
-async function selectRoot(options, env) {
-  const configured = options.root ?? env.BIOCHEMICAL_MEASURED_ROOT
-  if (!configured && env.NODE_ENV === 'test') {
-    const parent = resolve(env.BIOCHEMICAL_TEST_MEASURED_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await assertNoSymlinkAncestors(parent)
-    await ensurePrivateDirectory(parent)
-    const root = await mkdtemp(resolve(parent, 'measured-'))
-    await ensurePrivateDirectory(root)
-    return { root, ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'measured-commons-v2'))
-  if (inside(resolve(process.cwd()), root)) throw new MeasuredRequestError('MEASURED_ROOT_IN_SOURCE', 'Measured storage root must be outside the source tree.', 500)
-  await assertNoSymlinkAncestors(root)
-  await ensurePrivateDirectory(root)
-  const [sourceReal, rootReal] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceReal, rootReal)) throw new MeasuredRequestError('MEASURED_ROOT_IN_SOURCE', 'Measured storage root must be outside the source tree.', 500)
-  return { root: rootReal, ephemeral: false }
+function selectRoot(options, env) {
+  return selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_MEASURED_ROOT,
+    test: env.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_MEASURED_ROOT), prefix: 'measured-' } : null,
+    defaultName: 'measured-commons-v2',
+    secure: true,
+    inSourceError: rootInSource
+  })
 }
 
 function cursorSecret(env) {
   const value = env.BIOCHEMICAL_MEASURED_CURSOR_SECRET ?? (env.NODE_ENV === 'test' ? TEST_SECRET : undefined)
-  if (!value || !/^[A-Za-z0-9_-]{43}$/.test(value)) throw new MeasuredRequestError('MEASURED_CURSOR_SECRET_INVALID', 'BIOCHEMICAL_MEASURED_CURSOR_SECRET must be canonical unpadded base64url for 32 bytes.', 500)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== 32 || decoded.toString('base64url') !== value) throw new MeasuredRequestError('MEASURED_CURSOR_SECRET_INVALID', 'BIOCHEMICAL_MEASURED_CURSOR_SECRET is not canonical base64url.', 500)
-  return decoded
+  return decodeSecret(value, (reason) => {
+    throw new MeasuredRequestError('MEASURED_CURSOR_SECRET_INVALID', reason === 'shape' ? 'BIOCHEMICAL_MEASURED_CURSOR_SECRET must be canonical unpadded base64url for 32 bytes.' : 'BIOCHEMICAL_MEASURED_CURSOR_SECRET is not canonical base64url.', 500)
+  })
 }
 
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const result = action()
-    database.exec('COMMIT')
-    return result
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
-}
-
-function decodeCursor(value, secret) {
-  try {
-    if (typeof value !== 'string' || value.length > 8192 || !/^[A-Za-z0-9_-]+$/.test(value)) throw new Error()
-    const raw = Buffer.from(value, 'base64url')
-    if (raw.toString('base64url') !== value || raw.length <= 32) throw new Error()
-    const encoded = raw.subarray(0, -32)
-    const signature = raw.subarray(-32)
-    const expected = createHmac('sha256', secret).update(encoded).digest()
-    if (!timingSafeEqual(signature, expected)) throw new Error()
-    const payload = JSON.parse(encoded.toString('utf8'))
-    if (canonicalJson(payload) !== encoded.toString('utf8')) throw new Error()
-    return payload
-  } catch {
-    throw new MeasuredRequestError('MEASURED_CURSOR_INVALID', 'Measured local cursor is invalid or tampered.')
-  }
-}
-
-function encodeCursor(payload, secret) {
-  const encoded = Buffer.from(canonicalJson(payload))
-  return Buffer.concat([encoded, createHmac('sha256', secret).update(encoded).digest()]).toString('base64url')
-}
+const decodeCursor = (value, secret) => verifyCursor(value, secret, () => {
+  throw new MeasuredRequestError('MEASURED_CURSOR_INVALID', 'Measured local cursor is invalid or tampered.')
+})
 
 function parseEncoded(row, schema, label, field = 'encoded') {
   const text = Buffer.from(row[field]).toString('utf8')
@@ -191,7 +141,7 @@ export async function createMeasuredService(options = {}) {
     const row = database.prepare('SELECT * FROM immutable_artifacts WHERE digest=?').get(digest)
     if (!row || row.kind !== expectedKind || row.object_digest !== digest) throw new MeasuredRequestError('MEASURED_ARTIFACT_NOT_FOUND', `Immutable ${expectedKind} artifact ${digest} is not available.`, 404)
     const bytes = await objectBytes(digest, assertOwner)
-    if (bytes.length !== row.bytes || measuredSha256(bytes) !== digest) throw new MeasuredVerificationError(`Immutable ${expectedKind} artifact ${digest} failed CAS verification.`)
+    if (bytes.length !== row.bytes || sha256Hex(bytes) !== digest) throw new MeasuredVerificationError(`Immutable ${expectedKind} artifact ${digest} failed CAS verification.`)
     if (expectedKind === 'calibration') return artifactResponse(parseEncoded({ encoded: bytes }, CalibrationArtifactSchema.omit({ artifactDigest: true }), `Calibration artifact ${digest}`), digest)
     const content = parseEncoded({ encoded: bytes }, ConsumerArtifactContentSchema, `Immutable ${expectedKind} artifact ${digest}`)
     if (content.artifactKind !== expectedKind) throw new MeasuredVerificationError(`Immutable artifact ${digest} content kind does not match its index.`)
@@ -226,7 +176,7 @@ export async function createMeasuredService(options = {}) {
       const trust = verifyMeasuredTrust(await objectBytes(byPath.get(required[1]), assertOwner))
       const catalogBytes = await objectBytes(byPath.get(required[2]), assertOwner)
       const { entry } = verifyMeasuredCatalog(catalogBytes, trust.trust)
-      if (discovery.catalog_digest !== measuredSha256(catalogBytes)) throw new MeasuredVerificationError('Stored measured discovery and catalog disagree.')
+      if (discovery.catalog_digest !== sha256Hex(catalogBytes)) throw new MeasuredVerificationError('Stored measured discovery and catalog disagree.')
       const release = verifyMeasuredRelease(await objectBytes(byPath.get(required[3]), assertOwner), entry)
       const envelope = verifyMeasuredEnvelope(await objectBytes(byPath.get(required[4]), assertOwner), entry, release.manifest, trust.trust)
       if (envelope.envelope.signature.signed_at !== row.signed_at) throw new MeasuredVerificationError('Stored measured signer time changed.')
@@ -243,14 +193,14 @@ export async function createMeasuredService(options = {}) {
       const lineages = new Map()
       for (const lineage of lineageRows) {
         const value = parseEncoded(lineage, MeasuredLineageSchema, `Measured lineage ${lineage.measurement_id}`)
-        if (value.measurement.id !== lineage.measurement_id || value.measurement.role !== lineage.role || measuredSha256(Buffer.from(canonicalJson(value))) !== lineage.digest || containsHeldoutOutcome(lineage.encoded)) throw new MeasuredVerificationError(`Measured lineage index mismatch or heldout leakage for ${lineage.measurement_id}.`)
+        if (value.measurement.id !== lineage.measurement_id || value.measurement.role !== lineage.role || canonicalSha256Hex(value) !== lineage.digest || containsHeldoutOutcome(lineage.encoded)) throw new MeasuredVerificationError(`Measured lineage index mismatch or heldout leakage for ${lineage.measurement_id}.`)
         lineages.set(lineage.measurement_id, { value, digest: lineage.digest })
       }
       const traversals = new Map(MEASURED_API_VIEW_SPECS.map((spec) => [spec.viewId, records[spec.recordType].filter((item) => Object.entries(spec.query).filter(([, value]) => value !== null).every(([key, value]) => item[key] === value))]))
       verifyMeasuredSignedViews(release.manifest, traversals, lineages)
       for (const artifact of artifactRows) {
         const bytes = await objectBytes(artifact.digest, assertOwner)
-        if (artifact.object_digest !== artifact.digest || artifact.bytes !== bytes.length || measuredSha256(bytes) !== artifact.digest || containsHeldoutOutcome(bytes)) throw new MeasuredVerificationError(`Immutable artifact ${artifact.digest} has invalid CAS identity or heldout leakage.`)
+        if (artifact.object_digest !== artifact.digest || artifact.bytes !== bytes.length || sha256Hex(bytes) !== artifact.digest || containsHeldoutOutcome(bytes)) throw new MeasuredVerificationError(`Immutable artifact ${artifact.digest} has invalid CAS identity or heldout leakage.`)
         if (artifact.kind === 'calibration') artifactResponse(parseEncoded({ encoded: bytes }, CalibrationArtifactSchema.omit({ artifactDigest: true }), `Calibration artifact ${artifact.digest}`), artifact.digest)
         else {
           const content = parseEncoded({ encoded: bytes }, ConsumerArtifactContentSchema, `Immutable ${artifact.kind} artifact ${artifact.digest}`)
@@ -263,7 +213,7 @@ export async function createMeasuredService(options = {}) {
         if (frozen.model_digest !== refs.model.digest || frozen.parameter_policy_digest !== refs.parameterPolicy.digest || frozen.endpoint_mapping_digest !== refs.endpointMapping.digest || frozen.metric_threshold_policy_digest !== refs.metricThresholdPolicy.digest || frozen.prediction_digest !== refs.prediction.digest) throw new MeasuredVerificationError(`Frozen request ${freeze.commitment_digest} digest fields do not match its immutable artifact references.`)
         const intent = FreezeIntentSchema.parse({ calibrationArtifactDigest: refs.model.digest, targetPartitionId: frozen.target_partition_id, nonce: frozen.nonce, createdAt: frozen.created_at })
         const receipt = parseEncoded(freeze, CommitmentResponseSchema, `Freeze receipt ${freeze.commitment_digest}`, 'receipt')
-        if (freeze.nonce !== frozen.nonce || measuredSha256(Buffer.from(canonicalJson(frozen))) !== freeze.commitment_digest || measuredSha256(Buffer.from(canonicalJson(intent))) !== freeze.intent_digest || receipt.commitment_digest !== freeze.commitment_digest || receipt.created_at !== frozen.created_at || receipt.target_partition_digest !== frozen.target_partition_digest || containsHeldoutOutcome(freeze.frozen_request) || containsHeldoutOutcome(freeze.receipt)) throw new MeasuredVerificationError(`Frozen request ${freeze.commitment_digest} has invalid intent/receipt identity or heldout leakage.`)
+        if (freeze.nonce !== frozen.nonce || canonicalSha256Hex(frozen) !== freeze.commitment_digest || canonicalSha256Hex(intent) !== freeze.intent_digest || receipt.commitment_digest !== freeze.commitment_digest || receipt.created_at !== frozen.created_at || receipt.target_partition_digest !== frozen.target_partition_digest || containsHeldoutOutcome(freeze.frozen_request) || containsHeldoutOutcome(freeze.receipt)) throw new MeasuredVerificationError(`Frozen request ${freeze.commitment_digest} has invalid intent/receipt identity or heldout leakage.`)
         for (const ref of Object.values(refs)) {
           const indexed = artifactRows.find((artifact) => artifact.digest === ref.digest)
           if (!indexed || indexed.kind !== ref.kind || indexed.bytes !== ref.bytes) throw new MeasuredVerificationError(`Frozen request ${freeze.commitment_digest} references an invalid immutable artifact.`)
@@ -287,7 +237,7 @@ export async function createMeasuredService(options = {}) {
         if (!freeze) throw new MeasuredVerificationError('Disclosure digest state is orphaned.')
         const frozenRequest = parseEncoded(freeze, ConsumerCommitmentSchema, `Disclosure frozen request ${disclosure.commitment_digest}`, 'frozen_request')
         const evaluation = EvaluationRequestSchema.parse({ evaluation_schema_version: '1.0.0', commitment_digest: disclosure.commitment_digest, frozen_request: frozenRequest })
-        if (disclosure.request_digest !== measuredSha256(Buffer.from(canonicalJson(evaluation)))) throw new MeasuredVerificationError(`Disclosure ${disclosure.commitment_digest} request identity is invalid.`)
+        if (disclosure.request_digest !== canonicalSha256Hex(evaluation)) throw new MeasuredVerificationError(`Disclosure ${disclosure.commitment_digest} request identity is invalid.`)
       }
       const referenced = new Set([...syncRows.map((item) => item.digest), ...artifactRows.map((item) => item.object_digest)])
       if (objectRows.some((item) => !referenced.has(item.digest))) throw new MeasuredVerificationError('Measured CAS index contains an unreferenced object.')
@@ -340,7 +290,7 @@ export async function createMeasuredService(options = {}) {
       return existing.synced_at
     }
     const syncedAt = now()
-    const digests = bundle.objects.map((artifact) => measuredSha256(artifact.bytes))
+    const digests = bundle.objects.map((artifact) => sha256Hex(artifact.bytes))
     await writeMeasuredJournal(selectedRoot.root, { publicationType: 'sync', objectDigests: digests })
     assertOwner()
     await hooks.afterJournal?.({ digests })
@@ -359,7 +309,7 @@ export async function createMeasuredService(options = {}) {
       const insertObject = database.prepare('INSERT OR IGNORE INTO objects VALUES (?, ?, ?, ?)')
       const insertSync = database.prepare('INSERT INTO sync_objects VALUES (?, ?)')
       for (const artifact of bundle.objects) {
-        const digest = measuredSha256(artifact.bytes)
+        const digest = sha256Hex(artifact.bytes)
         insertObject.run(digest, artifact.bytes.length, 'application/json', syncedAt)
         insertSync.run(artifact.path, digest)
       }
@@ -455,7 +405,7 @@ export async function createMeasuredService(options = {}) {
 
   async function storeArtifact(kind, content) {
     const bytes = Buffer.from(canonicalJson(content))
-    const digest = measuredSha256(bytes)
+    const digest = sha256Hex(bytes)
     await recoverMeasuredJournal(selectedRoot.root, database, objects)
     const existing = database.prepare('SELECT * FROM immutable_artifacts WHERE digest=?').get(digest)
     if (existing) {
@@ -501,7 +451,7 @@ export async function createMeasuredService(options = {}) {
 
   async function executeFreeze(intent) {
     const row = requireReady()
-    const intentDigest = measuredSha256(Buffer.from(canonicalJson(intent)))
+    const intentDigest = canonicalSha256Hex(intent)
     const priorNonce = database.prepare('SELECT * FROM freezes WHERE nonce=?').get(intent.nonce)
     if (priorNonce && priorNonce.intent_digest !== intentDigest) throw new MeasuredRequestError('MEASURED_NONCE_CONFLICT', 'Freeze nonce is already bound to a different artifact intent.', 409)
     const assembled = await withStorage(async () => {
@@ -539,7 +489,7 @@ export async function createMeasuredService(options = {}) {
       return { frozenRequest, refs }
     })
     const receipt = await upstream.commit(assembled.frozenRequest)
-    const commitmentDigest = measuredSha256(Buffer.from(canonicalJson(assembled.frozenRequest)))
+    const commitmentDigest = canonicalSha256Hex(assembled.frozenRequest)
     if (receipt.commitment_digest !== commitmentDigest || receipt.created_at !== assembled.frozenRequest.created_at || receipt.target_partition_digest !== assembled.frozenRequest.target_partition_digest) throw new MeasuredVerificationError('Measured commitment receipt does not bind the exact frozen request.')
     const response = FreezeResponseSchema.parse({ freezeContract: 'artifact-bound-measured-freeze-v1', frozenRequest: assembled.frozenRequest, artifacts: assembled.refs, receipt })
     const encodedRequest = Buffer.from(canonicalJson(response.frozenRequest))
@@ -575,9 +525,9 @@ export async function createMeasuredService(options = {}) {
     if (!frozen) throw new MeasuredRequestError('MEASURED_FREEZE_NOT_FOUND', 'Disclosure requires an existing artifact-bound freeze.', 404)
     const frozenRequest = parseEncoded(frozen, ConsumerCommitmentSchema, 'Frozen disclosure request', 'frozen_request')
     const evaluation = EvaluationRequestSchema.parse({ evaluation_schema_version: '1.0.0', commitment_digest: intent.commitmentDigest, frozen_request: frozenRequest })
-    const requestDigest = measuredSha256(Buffer.from(canonicalJson(evaluation)))
+    const requestDigest = canonicalSha256Hex(evaluation)
     const response = await upstream.evaluate(evaluation)
-    const responseDigest = measuredSha256(Buffer.from(canonicalJson(response)))
+    const responseDigest = canonicalSha256Hex(response)
     await withStorage(() => persistDisclosure({ commitmentDigest: intent.commitmentDigest, requestDigest, responseDigest, disclosedAt: response.disclosed_at }))
     return response
   }

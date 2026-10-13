@@ -3,7 +3,7 @@ import { TextDecoder } from 'node:util'
 
 const utf8 = new TextDecoder('utf-8', { fatal: true })
 
-export const ENTITY_MENTION_JSON_LIMITS = Object.freeze({
+const ENTITY_MENTION_JSON_LIMITS = Object.freeze({
   maximumArrayLength:  2_000_000,
   maximumDepth:        32,
   maximumKeyBytes:     512,
@@ -51,7 +51,7 @@ function addValue(stack, state, label, limits) {
   }
 }
 
-export function assertBoundedJsonBytes(bytes, limits = ENTITY_MENTION_JSON_LIMITS, label = 'JSON') {
+function assertBoundedJsonBytes(bytes, limits = ENTITY_MENTION_JSON_LIMITS, label = 'JSON') {
   const text = Buffer.isBuffer(bytes) || bytes instanceof Uint8Array ? utf8.decode(bytes) : String(bytes)
   const stack = []
   const state = { nodes: 0 }

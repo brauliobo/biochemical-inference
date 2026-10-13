@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { canonicalDigest } from '../../shared/canonical-json.js'
 import { BppManifestSchema, BppSignatureSchema } from '../../shared/physiology-contracts.js'
 import { createPhysiologyClient } from '../../server/physiology/client.js'
-import { createBppArchive, digestBuffer, validateBppPackage, verifyDescriptorClosure } from '../../server/physiology/package.js'
+import { sha256Prefixed as digestBuffer } from '../../server/commons/digest.js'
+import { createBppArchive, validateBppPackage, verifyDescriptorClosure } from '../../server/physiology/package.js'
 import { createReferencePackages, REFERENCE_KEY_ID, REFERENCE_PUBLIC_KEY_SPKI_BASE64, REFERENCE_PUBLISHER, unsignedReferenceDefinitions } from '../../server/physiology/reference.js'
 
 const referenceTrust = (status = 'trusted') => ({ keyId: REFERENCE_KEY_ID, status, publisher: REFERENCE_PUBLISHER, publicKeySpkiBase64: REFERENCE_PUBLIC_KEY_SPKI_BASE64 })

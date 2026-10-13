@@ -1,4 +1,5 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { defineRequestError } from '../commons/errors.js'
 import {
   ProducerEventMetadataSchema,
   ProducerOutcomeWriteRequestSchema,
@@ -39,14 +40,7 @@ function verifyProductionPlanningPins(planning) {
   if (canonicalJson(actual) !== canonicalJson(GOAL15_PRODUCTION_PINS)) throw new RevalidationIntegrationError('producer-production-pin-drift', 'Producer planning differs from the independently pinned Goal 15 production closure.')
 }
 
-export class RevalidationIntegrationError extends Error {
-  constructor(code, message, statusCode = 409) {
-    super(message)
-    this.name = 'RevalidationIntegrationError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const RevalidationIntegrationError = defineRequestError('RevalidationIntegrationError', 409)
 
 function actor(env, role) {
   const defaults = role === 'campaign-author'

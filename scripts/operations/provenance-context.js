@@ -1,28 +1,11 @@
 #!/usr/bin/env node
-import { createHash } from 'node:crypto'
-import { execFile } from 'node:child_process'
 import { lstat, readFile, readdir, writeFile } from 'node:fs/promises'
-import { promisify } from 'node:util'
 import { relative, resolve, sep } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { compareUtf8, sha256Hex as sha256 } from '../../server/commons/digest.js'
+import { flags, git } from './cli.js'
 import { inspectNoSymlinkPath, syncPath } from '../../server/operations/path-safety.js'
 
-const execute = promisify(execFile)
-const compareUtf8 = (left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right))
-const sha256 = (value) => createHash('sha256').update(value).digest('hex')
-
-function flags(values) {
-  const output = {}
-  for (let index = 0; index < values.length; index += 2) {
-    if (!values[index]?.startsWith('--') || values[index + 1] === undefined) throw new Error('arguments must use --name value pairs')
-    output[values[index].slice(2)] = values[index + 1]
-  }
-  return output
-}
-
-async function git(repository, ...arguments_) {
-  return (await execute('git', ['-C', repository, ...arguments_], { encoding: 'utf8' })).stdout.trim()
-}
 
 async function repositoryIdentity(repository, name, expectedCommit, fixture) {
   if (fixture) {

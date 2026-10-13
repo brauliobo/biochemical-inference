@@ -1,7 +1,7 @@
 import { buildApp } from './app.js'
 import { acquireInferenceRuntimeLock } from './operations/runtime-lock.js'
 
-export function readServerConfiguration(env = process.env) {
+function readServerConfiguration(env = process.env) {
   const port = Number(env.PORT ?? 3000)
   const host = env.HOST ?? '127.0.0.1'
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer between 1 and 65535')

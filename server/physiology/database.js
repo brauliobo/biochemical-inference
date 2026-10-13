@@ -1,14 +1,6 @@
-import { DatabaseSync } from 'node:sqlite'
-import { join } from 'node:path'
+import { openDatabase } from '../commons/sqlite.js'
 
-export function openPhysiologyDatabase(root) {
-  const database = new DatabaseSync(join(root, 'physiology.sqlite3'))
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
-
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS trust_keys (
       key_id TEXT PRIMARY KEY,
       algorithm TEXT NOT NULL CHECK (algorithm = 'Ed25519'),
@@ -62,6 +54,8 @@ export function openPhysiologyDatabase(root) {
     CREATE TRIGGER IF NOT EXISTS physiology_runs_immutable_update BEFORE UPDATE ON physiology_runs BEGIN SELECT RAISE(ABORT, 'physiology runs are immutable'); END;
     CREATE TRIGGER IF NOT EXISTS physiology_runs_immutable_delete BEFORE DELETE ON physiology_runs BEGIN SELECT RAISE(ABORT, 'physiology runs are immutable'); END;
     PRAGMA user_version = 1;
-  `)
-  return database
+`
+
+export function openPhysiologyDatabase(root) {
+  return openDatabase(root, 'physiology.sqlite3', SCHEMA)
 }

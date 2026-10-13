@@ -1,46 +1,27 @@
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdtemp, realpath, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import { SPATIAL_REGISTRATION_PINS, SPATIAL_REGISTRATION_RECORD_TYPES, SpatialRegistrationBundleSchema } from '../../shared/spatial-registration-contracts.js'
 import { createDataPlaneObjectStore } from '../data-plane/object-store.js'
-import { assertNoSymlinkAncestors, ensurePrivateDirectory } from '../data-plane/safe-path.js'
+import { isoNow, isoSeconds as exactTimestamp } from '../commons/clock.js'
+import { defineRequestError } from '../commons/errors.js'
+import { transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { createSpatialRegistrationClient, encodeSpatialRegistrationBundle } from './client.js'
 import { openSpatialRegistrationDatabase } from './database.js'
 import { applyAffine, selectRegistrationChain } from './transform.js'
 import { recomputeSpatialRegistrationResidualOverlap, spatialRegistrationDigest, SpatialRegistrationVerificationError, verifySpatialRegistrationBundle, verifySpatialRegistrationChunkBytes } from './verification.js'
 
-export class SpatialRegistrationRequestError extends Error {
-  constructor(code, message, statusCode = 422) { super(message); this.name = 'SpatialRegistrationRequestError'; this.code = code; this.statusCode = statusCode }
-}
+export const SpatialRegistrationRequestError = defineRequestError('SpatialRegistrationRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
+function selectRoot(options, env) {
+  return selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_SPATIAL_REGISTRATION_ROOT,
+    test: env.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_SPATIAL_REGISTRATION_ROOT), prefix: 'goal14-registration-' } : null,
+    defaultName: 'goal14-spatial-registration-v1-1',
+    secure: true,
+    inSourceError: () => new SpatialRegistrationRequestError('SPATIAL_REGISTRATION_ROOT_IN_SOURCE', 'Goal 14 registration storage root must be outside the source tree.', 500)
+  })
 }
-
-async function selectRoot(options, env) {
-  const configured = options.root ?? env.BIOCHEMICAL_SPATIAL_REGISTRATION_ROOT
-  if (!configured && env.NODE_ENV === 'test') {
-    const parent = resolve(env.BIOCHEMICAL_TEST_SPATIAL_REGISTRATION_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await assertNoSymlinkAncestors(parent); await ensurePrivateDirectory(parent)
-    const root = await mkdtemp(resolve(parent, 'goal14-registration-')); await ensurePrivateDirectory(root)
-    return { root, ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'goal14-spatial-registration-v1-1'))
-  if (inside(resolve(process.cwd()), root)) throw new SpatialRegistrationRequestError('SPATIAL_REGISTRATION_ROOT_IN_SOURCE', 'Goal 14 registration storage root must be outside the source tree.', 500)
-  await assertNoSymlinkAncestors(root); await ensurePrivateDirectory(root)
-  const [sourceReal, rootReal] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceReal, rootReal)) throw new SpatialRegistrationRequestError('SPATIAL_REGISTRATION_ROOT_IN_SOURCE', 'Goal 14 registration storage root must be outside the source tree.', 500)
-  return { root: rootReal, ephemeral: false }
-}
-
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try { const result = action(); database.exec('COMMIT'); return result } catch (error) { database.exec('ROLLBACK'); throw error }
-}
-
-function exactTimestamp(now) { return new Date(now()).toISOString().replace(/\.\d{3}Z$/, 'Z') }
 
 function records(metadata) {
   return Object.freeze({
@@ -61,7 +42,7 @@ export async function createSpatialRegistrationService(options = {}) {
   const selectedRoot = await selectRoot(options, env)
   const database = openSpatialRegistrationDatabase(selectedRoot.root)
   const objects = await createDataPlaneObjectStore(selectedRoot.root, options.objectHooks)
-  const now = options.now ?? (() => new Date().toISOString())
+  const now = options.now ?? isoNow
   const client = options.client ?? createSpatialRegistrationClient(env, { ...options.clientOptions, now })
   let bundle = null
   let semantic = null

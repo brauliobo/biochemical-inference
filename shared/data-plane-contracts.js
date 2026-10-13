@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256HexSchema, UtcInstantSchema, IsoDateSchema, SemverSchema, KebabIdSchema, ReleaseIdSchema, NcbiTaxonIdSchema, ChebiIdSchema, RheaIdSchema, UniProtIdSchema, PubMedOrUniProtIdSchema, FactoryRecordTypeSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, StrictEmptyObjectSchema, PageLimitSchema, CursorSchema, pageLimitQuerySchema, isCanonicalBase64Url, releaseRefSchema } from './commons/schemas.js'
 
 export const DATA_PLANE_BASELINE_RELEASE_ID = 'one-carbon-authority-human-mouse-v2.0.0'
 export const DATA_PLANE_BASELINE_RELEASE_DIGEST = '310bd8a04320c9b1bd9d4e18795bd998627265ac11b1c0e2b07a0473ba48f8e0'
@@ -50,54 +51,34 @@ export const DATA_PLANE_RELEASE_PINS = Object.freeze([
   DATA_PLANE_PINS.candidate
 ])
 
-const DateSchema = z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/).refine((value) => {
+const DateSchema = IsoDateSchema.refine((value) => {
   const parsed = new Date(`${value}T00:00:00Z`)
   return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value
 })
-const TimestampSchema = z.string().regex(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$/).refine((value) => {
+const TimestampSchema = UtcInstantSchema.refine((value) => {
   const parsed = new Date(value)
   return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().replace('.000Z', 'Z') === value
 })
-const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/)
-const ReleaseIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*-v[0-9]+\.[0-9]+\.[0-9]+$/)
-const KeyIdSchema = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-const TaxonIdSchema = z.string().regex(/^NCBITaxon:[1-9][0-9]*$/)
-const CompoundIdSchema = z.string().regex(/^CHEBI:[1-9][0-9]*$/)
-const ReactionIdSchema = z.string().regex(/^RHEA:[1-9][0-9]*$/)
-const ProteinIdSchema = z.string().regex(/^UniProtKB:[A-Z0-9]+$/)
-const ReferenceIdSchema = z.string().regex(/^(?:PubMed:[1-9][0-9]*|UniProtKB:[A-Z0-9]+)$/)
-const SourceIdSchema = z.string().regex(/^[A-Z][A-Z0-9_]*$/)
-export const FactoryRecordTypeSchema = z.enum(['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations'])
-const BASE64URL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
-
-function canonicalBase64Url(value, bytes) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=') || value.length !== Math.ceil(bytes * 8 / 6)) return false
-  const remainder = bytes % 3
-  if (remainder === 0) return true
-  const finalIndex = BASE64URL_ALPHABET.indexOf(value.at(-1))
-  return finalIndex >= 0 && finalIndex % (remainder === 1 ? 16 : 4) === 0
-}
-
 export const FactoryRecordCountsSchema = z.object({
-  taxa: z.number().int().nonnegative(),
-  compounds: z.number().int().nonnegative(),
-  reactions: z.number().int().nonnegative(),
-  proteins: z.number().int().nonnegative(),
-  references: z.number().int().nonnegative(),
-  catalysis: z.number().int().nonnegative(),
-  limitations: z.number().int().nonnegative()
+  taxa: NonNegativeIntSchema,
+  compounds: NonNegativeIntSchema,
+  reactions: NonNegativeIntSchema,
+  proteins: NonNegativeIntSchema,
+  references: NonNegativeIntSchema,
+  catalysis: NonNegativeIntSchema,
+  limitations: NonNegativeIntSchema
 }).strict()
 
 export const FactoryTaxonSchema = z.object({
-  id: TaxonIdSchema,
-  scientific_name: z.string().min(1),
-  common_name: z.string().min(1),
+  id: NcbiTaxonIdSchema,
+  scientific_name: NonEmptyStringSchema,
+  common_name: NonEmptyStringSchema,
   source_ids: z.array(z.literal('NCBI_TAXONOMY')).min(1)
 }).strict()
 
 export const FactoryCompoundSchema = z.object({
-  id: CompoundIdSchema,
-  name: z.string().min(1),
+  id: ChebiIdSchema,
+  name: NonEmptyStringSchema,
   synonyms: z.array(z.string()),
   formula: z.string().regex(/^[A-Z][A-Za-z0-9]*$/),
   charge: z.number().int(),
@@ -105,14 +86,14 @@ export const FactoryCompoundSchema = z.object({
 }).strict()
 
 export const FactoryParticipantSchema = z.object({
-  compound_id: CompoundIdSchema,
-  coefficient: z.number().int().positive()
+  compound_id: ChebiIdSchema,
+  coefficient: PositiveIntSchema
 }).strict()
 
 export const FactoryReactionSchema = z.object({
-  id: ReactionIdSchema,
-  rhea_master_id: ReactionIdSchema,
-  name: z.string().min(1),
+  id: RheaIdSchema,
+  rhea_master_id: RheaIdSchema,
+  name: NonEmptyStringSchema,
   ec_numbers: z.array(z.string().regex(/^[0-9]+\.[0-9-]+\.[0-9-]+\.[0-9-]+$/)).min(1),
   physiological_direction: z.enum(['left-to-right', 'right-to-left', 'bidirectional']),
   equation: z.string().min(3),
@@ -122,11 +103,11 @@ export const FactoryReactionSchema = z.object({
 }).strict()
 
 export const FactoryProteinSchema = z.object({
-  id: ProteinIdSchema,
+  id: UniProtIdSchema,
   accession: z.string().regex(/^[A-Z0-9]+$/),
-  taxon_id: TaxonIdSchema,
-  gene_symbol: z.string().min(1),
-  recommended_name: z.string().min(1),
+  taxon_id: NcbiTaxonIdSchema,
+  gene_symbol: NonEmptyStringSchema,
+  recommended_name: NonEmptyStringSchema,
   reviewed: z.literal(true),
   source_ids: z.array(z.literal('UNIPROTKB')).min(1)
 }).strict()
@@ -134,24 +115,24 @@ export const FactoryProteinSchema = z.object({
 export const FactoryReferenceSchema = z.object({
   id: z.string().regex(/^PubMed:[1-9][0-9]*$/),
   kind: z.literal('pubmed'),
-  citation: z.string().min(1),
+  citation: NonEmptyStringSchema,
   url: z.string().url(),
   source_ids: z.array(z.literal('PUBMED')).min(1).max(1)
 }).strict()
 
 export const FactoryCatalysisSchema = z.object({
   id: z.string().regex(/^CATALYSIS:[A-Z0-9]+-[0-9]+$/),
-  protein_id: ProteinIdSchema,
-  reaction_id: ReactionIdSchema,
-  taxon_id: TaxonIdSchema,
+  protein_id: UniProtIdSchema,
+  reaction_id: RheaIdSchema,
+  taxon_id: NcbiTaxonIdSchema,
   evidence_class: z.enum(['direct', 'inferred']),
   evidence_code: z.enum(['ECO:0000250', 'ECO:0000269', 'ECO:0000305']),
-  reference_ids: z.array(ReferenceIdSchema).min(1)
+  reference_ids: z.array(PubMedOrUniProtIdSchema).min(1)
 }).strict()
 
 export const FactoryLimitationSchema = z.object({
   id: z.string().regex(/^LIMITATION:[A-Z0-9-]+$/),
-  statement: z.string().min(1)
+  statement: NonEmptyStringSchema
 }).strict()
 
 export const FACTORY_RECORD_SCHEMAS = Object.freeze({
@@ -165,11 +146,11 @@ export const FACTORY_RECORD_SCHEMAS = Object.freeze({
 })
 
 export const FactoryLicenseSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
+  id: NonEmptyStringSchema,
+  name: NonEmptyStringSchema,
   url: z.string().url(),
   redistribution: z.enum(['public', 'restricted']),
-  attribution: z.string().min(1)
+  attribution: NonEmptyStringSchema
 }).strict()
 
 export const FactoryAdapterSchema = z.object({
@@ -182,27 +163,27 @@ export const FactoryAdapterSchema = z.object({
     'pubmed-esummary-json-doi',
     'repository-curation-json'
   ]),
-  version: z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/),
-  implementation_sha256: Sha256Schema,
-  package_sha256: Sha256Schema
+  version: SemverSchema,
+  implementation_sha256: Sha256HexSchema,
+  package_sha256: Sha256HexSchema
 }).strict()
 
 export const FactoryManifestPartitionSchema = z.object({
   path: z.string().regex(/^records\/(?:taxa|compounds|reactions|proteins|references|catalysis|limitations)\/part-[0-9]{5}\.ndjson$/),
   record_type: FactoryRecordTypeSchema,
-  first_id: z.string().min(1),
-  last_id: z.string().min(1),
-  record_count: z.number().int().positive(),
-  bytes: z.number().int().positive(),
-  sha256: Sha256Schema
+  first_id: NonEmptyStringSchema,
+  last_id: NonEmptyStringSchema,
+  record_count: PositiveIntSchema,
+  bytes: PositiveIntSchema,
+  sha256: Sha256HexSchema
 }).strict()
 
 export const FactoryManifestInputSchema = z.object({
   name: z.string(),
   record_type: FactoryRecordTypeSchema,
   source: z.string(),
-  source_object_sha256: Sha256Schema,
-  source_object_bytes: z.number().int().positive(),
+  source_object_sha256: Sha256HexSchema,
+  source_object_bytes: PositiveIntSchema,
   adapter: FactoryAdapterSchema,
   license: FactoryLicenseSchema
 }).strict()
@@ -212,11 +193,11 @@ export const FactoryManifestSchema = z.object({
   release_id: ReleaseIdSchema,
   title: z.string(),
   schema_version: z.literal('2.0.0'),
-  release_digest: Sha256Schema,
+  release_digest: Sha256HexSchema,
   digest_algorithm: z.literal('sha256-rfc8785-manifest-v2'),
   published_at: z.string(),
   immutable: z.literal(true),
-  supported_taxa: z.array(TaxonIdSchema).min(1),
+  supported_taxa: z.array(NcbiTaxonIdSchema).min(1),
   scientific_scope: z.string(),
   sort: z.literal('id:asc'),
   partitions: z.array(FactoryManifestPartitionSchema).min(1),
@@ -226,9 +207,9 @@ export const FactoryManifestSchema = z.object({
 
 export const FactorySignatureSchema = z.object({
   algorithm: z.literal('Ed25519'),
-  key_id: KeyIdSchema,
+  key_id: KebabIdSchema,
   signed_at: TimestampSchema,
-  value: z.string().regex(/^[A-Za-z0-9_-]{86}$/).refine((value) => canonicalBase64Url(value, 64), 'Signature must be canonical unpadded base64url for 64 bytes.')
+  value: z.string().regex(/^[A-Za-z0-9_-]{86}$/).refine((value) => isCanonicalBase64Url(value, 64), 'Signature must be canonical unpadded base64url for 64 bytes.')
 }).strict()
 
 export const FactoryReleaseEnvelopeSchema = z.object({
@@ -236,12 +217,12 @@ export const FactoryReleaseEnvelopeSchema = z.object({
   payload: z.object({
     release_id: ReleaseIdSchema,
     schema_version: z.literal('2.0.0'),
-    release_digest: Sha256Schema,
-    manifest_sha256: Sha256Schema,
+    release_digest: Sha256HexSchema,
+    manifest_sha256: Sha256HexSchema,
     recipe_path: z.string().regex(/^recipes\/[a-z0-9.-]+\.json$/),
-    recipe_sha256: Sha256Schema,
+    recipe_sha256: Sha256HexSchema,
     source_lock_path: z.string().regex(/^sources\/locks\/[a-z0-9.-]+\.json$/),
-    source_lock_sha256: Sha256Schema
+    source_lock_sha256: Sha256HexSchema
   }).strict(),
   signature: FactorySignatureSchema
 }).strict()
@@ -249,10 +230,10 @@ export const FactoryReleaseEnvelopeSchema = z.object({
 export const FactoryCatalogReleaseSchema = z.object({
   release_id: ReleaseIdSchema,
   schema_version: z.literal('2.0.0'),
-  release_digest: Sha256Schema,
-  manifest_sha256: Sha256Schema,
+  release_digest: Sha256HexSchema,
+  manifest_sha256: Sha256HexSchema,
   envelope_path: z.string().regex(/^[a-z0-9.-]+\/envelope\.json$/),
-  envelope_sha256: Sha256Schema,
+  envelope_sha256: Sha256HexSchema,
   record_counts: FactoryRecordCountsSchema
 }).strict()
 
@@ -267,9 +248,9 @@ export const FactoryCatalogEnvelopeSchema = z.object({
 }).strict()
 
 export const FactoryTrustKeySchema = z.object({
-  key_id: KeyIdSchema,
+  key_id: KebabIdSchema,
   algorithm: z.literal('Ed25519'),
-  public_key: z.string().regex(/^[A-Za-z0-9_-]{43}$/).refine((value) => canonicalBase64Url(value, 32), 'Public key must be canonical unpadded base64url for 32 bytes.'),
+  public_key: z.string().regex(/^[A-Za-z0-9_-]{43}$/).refine((value) => isCanonicalBase64Url(value, 32), 'Public key must be canonical unpadded base64url for 32 bytes.'),
   status: z.enum(['active', 'retired', 'revoked']),
   valid_from: DateSchema,
   valid_until: DateSchema.nullable(),
@@ -292,8 +273,8 @@ export const FactoryTrustStoreSchema = z.object({
 
 export const FactoryDiscoverySchema = z.object({
   contract_version: z.literal('1.0.0'),
-  catalog_digest: Sha256Schema,
-  release_count: z.number().int().nonnegative(),
+  catalog_digest: Sha256HexSchema,
+  release_count: NonNegativeIntSchema,
   acknowledgments: z.array(z.string()),
   routes: z.object({
     releases: z.literal('/api/factory/v1/releases'),
@@ -306,11 +287,7 @@ export const FactoryDiscoverySchema = z.object({
   }).strict()
 }).strict()
 
-export const FactoryReleaseRefSchema = z.object({
-  id: ReleaseIdSchema,
-  schema_version: z.literal('2.0.0'),
-  digest: Sha256Schema
-}).strict()
+export const FactoryReleaseRefSchema = releaseRefSchema(ReleaseIdSchema, '2.0.0', Sha256HexSchema)
 
 function factoryPageSchema(recordType, itemSchema) {
   return z.object({
@@ -319,9 +296,9 @@ function factoryPageSchema(recordType, itemSchema) {
     record_type: z.literal(recordType),
     filters: z.record(z.string()),
     sort: z.literal('id:asc'),
-    limit: z.number().int().min(1).max(100),
+    limit: PageLimitSchema,
     items: z.array(itemSchema).max(100),
-    next_cursor: z.string().regex(/^[A-Za-z0-9_-]+$/).max(8192).nullable()
+    next_cursor: CursorSchema.nullable()
   }).strict()
 }
 
@@ -337,7 +314,7 @@ export const FactoryRecordPageSchema = z.discriminatedUnion('record_type', [
 
 const JsonValueSchema = z.lazy(() => z.union([
   z.string(),
-  z.number().finite(),
+  FiniteNumberSchema,
   z.boolean(),
   z.null(),
   z.array(JsonValueSchema),
@@ -352,14 +329,14 @@ const DiffValueChangeSchema = z.object({
 
 export const FactorySemanticDiffSchema = z.object({
   diff_schema_version: z.literal('2.0.0'),
-  diff_digest: Sha256Schema,
+  diff_digest: Sha256HexSchema,
   baseline: FactoryReleaseRefSchema,
   candidate: FactoryReleaseRefSchema,
   counts: z.object({
-    added: z.number().int().nonnegative(),
-    removed: z.number().int().nonnegative(),
-    changed: z.number().int().nonnegative(),
-    unchanged: z.number().int().nonnegative()
+    added: NonNegativeIntSchema,
+    removed: NonNegativeIntSchema,
+    changed: NonNegativeIntSchema,
+    unchanged: NonNegativeIntSchema
   }).strict(),
   record_changes: z.array(z.object({
     record_type: FactoryRecordTypeSchema,
@@ -380,11 +357,11 @@ export const FactorySemanticDiffSchema = z.object({
   packaging_changes: z.array(DiffValueChangeSchema.extend({ artifact: z.string() }).strict())
 }).strict()
 
-export const DataPlaneSyncRequestSchema = z.object({}).strict()
+export const DataPlaneSyncRequestSchema = StrictEmptyObjectSchema
 export const DataPlaneRecordTypeSchema = FactoryRecordTypeSchema
 export const DataPlanePageQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(25),
-  cursor: z.string().regex(/^[A-Za-z0-9_-]+$/).max(8192).optional(),
+  limit: pageLimitQuerySchema(25),
+  cursor: CursorSchema.optional(),
   id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9:_.-]*$/).max(128).optional(),
   taxon_id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9:_.-]*$/).max(128).optional(),
   reaction_id: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9:_.-]*$/).max(128).optional(),
@@ -396,7 +373,7 @@ export const DataPlaneStatusSchema = z.object({
   state: z.enum(['empty', 'syncing', 'ready', 'failed']),
   localOnly: z.literal(true),
   release: FactoryReleaseRefSchema.nullable(),
-  signerKeyId: KeyIdSchema.nullable(),
+  signerKeyId: KebabIdSchema.nullable(),
   lastSyncAt: z.string().nullable(),
   lastError: z.string().nullable(),
   integrity: z.enum(['empty', 'checking', 'valid', 'failed'])
@@ -445,7 +422,7 @@ export const DataPlaneDiscoverySchema = z.object({
 
 export const DataPlaneReleaseListSchema = z.array(z.object({
   release: FactoryReleaseRefSchema,
-  signerKeyId: KeyIdSchema,
+  signerKeyId: KebabIdSchema,
   signedAt: TimestampSchema,
   syncedAt: z.string(),
   active: z.boolean()
@@ -453,11 +430,11 @@ export const DataPlaneReleaseListSchema = z.array(z.object({
 
 export const DataPlaneReleaseDetailSchema = z.object({
   release: FactoryReleaseRefSchema,
-  catalogDigest: Sha256Schema,
-  trustDigest: Sha256Schema,
-  manifestDigest: Sha256Schema,
-  envelopeDigest: Sha256Schema,
-  signer: z.object({ keyId: KeyIdSchema, algorithm: z.literal('Ed25519'), signedAt: TimestampSchema, status: z.enum(['active', 'retired']) }).strict(),
+  catalogDigest: Sha256HexSchema,
+  trustDigest: Sha256HexSchema,
+  manifestDigest: Sha256HexSchema,
+  envelopeDigest: Sha256HexSchema,
+  signer: z.object({ keyId: KebabIdSchema, algorithm: z.literal('Ed25519'), signedAt: TimestampSchema, status: z.enum(['active', 'retired']) }).strict(),
   manifest: FactoryManifestSchema,
   envelope: FactoryReleaseEnvelopeSchema,
   syncedAt: z.string(),
@@ -471,9 +448,9 @@ function localPageSchema(recordType, itemSchema) {
     recordType: z.literal(recordType),
     filters: z.record(z.string()),
     sort: z.literal('id:asc'),
-    limit: z.number().int().min(1).max(100),
+    limit: PageLimitSchema,
     items: z.array(itemSchema),
-    nextCursor: z.string().regex(/^[A-Za-z0-9_-]+$/).max(8192).nullable(),
+    nextCursor: CursorSchema.nullable(),
     source: z.literal('local-mirror')
   }).strict()
 }
@@ -510,9 +487,9 @@ export const DataPlaneLocalRecordSchema = z.discriminatedUnion('recordType', [
 export const DataPlaneIntegritySchema = z.object({
   status: z.enum(['valid', 'failed']),
   checkedAt: z.string(),
-  releases: z.number().int().nonnegative(),
-  objects: z.number().int().nonnegative(),
-  records: z.number().int().nonnegative(),
+  releases: NonNegativeIntSchema,
+  objects: NonNegativeIntSchema,
+  records: NonNegativeIntSchema,
   findings: z.array(z.string())
 }).strict()
 
@@ -523,29 +500,29 @@ export const AuthorityClosureAuditRequestSchema = z.object({
 
 const AuthorityClosureResultSchema = z.object({
   recordCounts: FactoryRecordCountsSchema,
-  totalRecords: z.number().int().positive(),
-  partitionCount: z.number().int().positive(),
-  sourceObjectCount: z.number().int().positive(),
-  reactionBalance: z.object({ checked: z.number().int().nonnegative(), passed: z.literal(true) }).strict(),
-  taxonCatalysisClosure: z.object({ taxa: z.number().int().positive(), reactions: z.number().int().positive(), expectedAssertions: z.number().int().positive(), actualAssertions: z.number().int().positive(), passed: z.literal(true) }).strict(),
-  referenceClosure: z.object({ references: z.number().int().positive(), citedAssertions: z.number().int().positive(), unresolvedReferences: z.literal(0), passed: z.literal(true) }).strict(),
+  totalRecords: PositiveIntSchema,
+  partitionCount: PositiveIntSchema,
+  sourceObjectCount: PositiveIntSchema,
+  reactionBalance: z.object({ checked: NonNegativeIntSchema, passed: z.literal(true) }).strict(),
+  taxonCatalysisClosure: z.object({ taxa: PositiveIntSchema, reactions: PositiveIntSchema, expectedAssertions: PositiveIntSchema, actualAssertions: PositiveIntSchema, passed: z.literal(true) }).strict(),
+  referenceClosure: z.object({ references: PositiveIntSchema, citedAssertions: PositiveIntSchema, unresolvedReferences: z.literal(0), passed: z.literal(true) }).strict(),
   allChecksPassed: z.literal(true)
 }).strict()
 
 export const AuthorityClosureAuditReportSchema = z.object({
   reportSchemaVersion: z.literal('1.0.0'),
   algorithmVersion: z.literal(DATA_PLANE_AUDIT_ALGORITHM_VERSION),
-  reportDigest: Sha256Schema,
+  reportDigest: Sha256HexSchema,
   release: FactoryReleaseRefSchema,
   baseline: FactoryReleaseRefSchema,
   pins: z.object({
-    catalogDigest: Sha256Schema,
-    trustDigest: Sha256Schema,
-    envelopeDigest: Sha256Schema,
-    manifestDigest: Sha256Schema
+    catalogDigest: Sha256HexSchema,
+    trustDigest: Sha256HexSchema,
+    envelopeDigest: Sha256HexSchema,
+    manifestDigest: Sha256HexSchema
   }).strict(),
   signer: z.object({
-    keyId: KeyIdSchema,
+    keyId: KebabIdSchema,
     algorithm: z.literal('Ed25519'),
     signedAt: TimestampSchema,
     status: z.enum(['active', 'retired'])
@@ -555,7 +532,7 @@ export const AuthorityClosureAuditReportSchema = z.object({
     name: z.string(),
     recordType: FactoryRecordTypeSchema,
     source: z.string(),
-    sourceObject: z.object({ sha256: Sha256Schema, bytes: z.number().int().positive() }).strict(),
+    sourceObject: z.object({ sha256: Sha256HexSchema, bytes: PositiveIntSchema }).strict(),
     adapter: FactoryAdapterSchema,
     license: FactoryLicenseSchema
   }).strict()).min(1),
@@ -563,18 +540,18 @@ export const AuthorityClosureAuditReportSchema = z.object({
     digest: z.literal(DATA_PLANE_DIFF_DIGEST),
     responseDigest: z.literal(DATA_PLANE_DIFF_RESPONSE_DIGEST),
     semanticDiff: FactorySemanticDiffSchema,
-    classes: z.object({ scientific: z.number().int().nonnegative(), provenance: z.number().int().nonnegative(), rights: z.number().int().nonnegative(), packaging: z.number().int().nonnegative() }).strict()
+    classes: z.object({ scientific: NonNegativeIntSchema, provenance: NonNegativeIntSchema, rights: NonNegativeIntSchema, packaging: NonNegativeIntSchema }).strict()
   }).strict(),
   results: AuthorityClosureResultSchema,
   scientificValidation: z.literal('unsupported')
 }).strict()
 
 export const AuthorityClosureAuditListSchema = z.array(z.object({
-  reportDigest: Sha256Schema,
+  reportDigest: Sha256HexSchema,
   release: FactoryReleaseRefSchema,
   baseline: FactoryReleaseRefSchema,
   algorithmVersion: z.literal(DATA_PLANE_AUDIT_ALGORITHM_VERSION),
   createdAt: z.string()
 }).strict())
 
-export { JsonValueSchema, KeyIdSchema, ReleaseIdSchema, Sha256Schema }
+export { FactoryRecordTypeSchema, JsonValueSchema, ReleaseIdSchema, Sha256HexSchema as Sha256Schema }

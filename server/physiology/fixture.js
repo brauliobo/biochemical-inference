@@ -13,7 +13,7 @@ import {
   PhysiologyValidationResponseSchema
 } from '../../shared/physiology-contracts.js'
 
-export const PHYSIOLOGY_RELEASE = Object.freeze({ id: PHYSIOLOGY_RELEASE_ID, schema_version: PHYSIOLOGY_CONTRACT_VERSION, digest: PHYSIOLOGY_RELEASE_DIGEST })
+const PHYSIOLOGY_RELEASE = Object.freeze({ id: PHYSIOLOGY_RELEASE_ID, schema_version: PHYSIOLOGY_CONTRACT_VERSION, digest: PHYSIOLOGY_RELEASE_DIGEST })
 
 const contexts = [
   ['CIRCULATION', 'Human blood vasculature synthetic reference context', 'circulation', 'UBERON:0004537', 'blood vasculature'],
@@ -228,4 +228,3 @@ export function createPhysiologyFixtureClient() {
   }
 }
 
-export const PHYSIOLOGY_FIXTURE = Object.freeze({ manifest, contexts, applicability, quantities, modelEvidence, benchmark, observations, validation, coverage, limitations })

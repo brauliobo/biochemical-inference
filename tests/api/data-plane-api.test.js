@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, describe, expect, it } from 'vitest'
 import { buildApp } from '../../server/app.js'
 import { createFactoryClient } from '../../server/data-plane/client.js'

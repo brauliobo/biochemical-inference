@@ -1,15 +1,17 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { omitApiWorkbenches } from './scripts/vite-static-edition.js'
 
 // Deployment knobs, both read at build time:
 //   VITE_BASE         public path, e.g. "/biochemical-inference/" on GitHub Pages
 //   VITE_STATIC_MODE  "true" for the API-less static build (see src/runtime-mode.js)
 const base = process.env.VITE_BASE || '/'
+const staticMode = process.env.VITE_STATIC_MODE === 'true'
 
 export default defineConfig({
   base,
-  plugins: [vue()],
+  plugins: [vue(), ...(staticMode ? [omitApiWorkbenches()] : [])],
   server: {
     host: '127.0.0.1',
     port: 5173,

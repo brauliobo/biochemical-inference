@@ -1,11 +1,11 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { readBoundedBody, timeoutSignal, validateLoopbackOrigin } from '../commons/upstream.js'
 import { SPATIAL_REGISTRATION_PINS, SPATIAL_REGISTRATION_RECORD_TYPES, SPATIAL_REGISTRATION_RIGHTS_LINK } from '../../shared/spatial-registration-contracts.js'
 import {
   MAX_SPATIAL_REGISTRATION_CHUNK_BYTES,
   MAX_SPATIAL_REGISTRATION_METADATA_BYTES,
   MAX_SPATIAL_REGISTRATION_PAGE_BYTES,
   SpatialRegistrationVerificationError,
-  parseSpatialRegistrationCanonical,
   reconstructSpatialRegistrationInventory,
   reconstructSpatialRegistrationMetadata,
   spatialRegistrationSha256,
@@ -19,25 +19,15 @@ import {
   verifySpatialRegistrationRecordPage,
   verifySpatialRegistrationTrust
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export class SpatialRegistrationUpstreamError extends SpatialRegistrationVerificationError {
-  constructor(message, options = {}) { super(message, { code: options.code ?? 'SPATIAL_REGISTRATION_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 }); this.name = 'SpatialRegistrationUpstreamError' }
-}
+export const SpatialRegistrationUpstreamError = defineProblemError('SpatialRegistrationUpstreamError', { statusCode: 503, code: 'SPATIAL_REGISTRATION_UPSTREAM_FAILED', parent: SpatialRegistrationVerificationError })
 
 export function validateSpatialRegistrationLoopbackUrl(value) {
-  let url
-  try { url = new URL(value) } catch { throw new SpatialRegistrationUpstreamError('Goal 14 registration upstream must be an absolute loopback HTTP origin.', { statusCode: 500 }) }
-  if (url.protocol !== 'http:' || !['127.0.0.1', '[::1]'].includes(url.hostname) || url.username || url.password || url.search || url.hash || !['', '/'].includes(url.pathname)) throw new SpatialRegistrationUpstreamError('Goal 14 registration upstream is restricted to a loopback HTTP origin.', { statusCode: 500 })
-  return url.origin
+  return validateLoopbackOrigin(value, { ErrorClass: SpatialRegistrationUpstreamError, subject: 'Goal 14 registration upstream', codePrefix: 'SPATIAL_REGISTRATION_UPSTREAM' })
 }
 
-async function boundedBody(response, maximum, label) {
-  const length = response.headers.get('content-length')
-  if (length === null || !/^[1-9][0-9]*$/.test(length) || Number(length) > maximum) throw new SpatialRegistrationUpstreamError(`${label} has a missing, invalid, or excessive Content-Length.`)
-  const bytes = Buffer.from(await response.arrayBuffer())
-  if (bytes.length !== Number(length)) throw new SpatialRegistrationUpstreamError(`${label} body length differs from Content-Length.`)
-  return bytes
-}
+const boundedBody = (response, maximum, label) => readBoundedBody(response, { maximum, label, ErrorClass: SpatialRegistrationUpstreamError, allowEmpty: false })
 
 function jsonHeaders(response, bytes, releaseBound) {
   const digest = spatialRegistrationSha256(bytes)
@@ -53,7 +43,7 @@ export function createSpatialRegistrationClient(env = process.env, options = {})
   if (!Number.isInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 120_000) throw new SpatialRegistrationUpstreamError('Goal 14 registration timeout must be from 100 through 120000 milliseconds.', { statusCode: 500 })
   async function request(path, { maximum = MAX_SPATIAL_REGISTRATION_METADATA_BYTES, releaseBound = false, mediaType = 'application/json', signal } = {}) {
     let response
-    try { response = await fetchImpl(`${baseUrl}${path}`, { method: 'GET', headers: { accept: mediaType }, redirect: 'manual', signal: signal ? AbortSignal.any([AbortSignal.timeout(timeoutMs), signal]) : AbortSignal.timeout(timeoutMs) }) } catch (error) { if (error instanceof SpatialRegistrationVerificationError) throw error; throw new SpatialRegistrationUpstreamError(`Goal 14 registration producer is unavailable for ${path}.`) }
+    try { response = await fetchImpl(`${baseUrl}${path}`, { method: 'GET', headers: { accept: mediaType }, redirect: 'manual', signal: timeoutSignal(timeoutMs, signal) }) } catch (error) { if (error instanceof SpatialRegistrationVerificationError) throw error; throw new SpatialRegistrationUpstreamError(`Goal 14 registration producer is unavailable for ${path}.`) }
     if (response.status !== 200) throw new SpatialRegistrationUpstreamError(`Goal 14 registration producer returned ${response.status} for ${path}.`)
     const bytes = await boundedBody(response, maximum, path)
     return { response, bytes, verifyJson: () => jsonHeaders(response, bytes, releaseBound) }

@@ -1,39 +1,6 @@
-import { constants, chmodSync, closeSync, fstatSync, lstatSync, openSync } from 'node:fs'
-import { DatabaseSync } from 'node:sqlite'
-import { join } from 'node:path'
+import { openSecureDatabase } from '../commons/sqlite.js'
 
-const NOFOLLOW = constants.O_NOFOLLOW ?? 0
-
-function assertRegularOrMissing(path) {
-  try {
-    const details = lstatSync(path)
-    if (details.isSymbolicLink() || !details.isFile()) throw new Error(`Unsafe measured SQLite path: ${path}.`)
-  } catch (error) {
-    if (error?.code !== 'ENOENT') throw error
-  }
-}
-
-export function openMeasuredDatabase(root) {
-  const path = join(root, 'measured.sqlite3')
-  for (const candidate of [path, `${path}-wal`, `${path}-shm`]) assertRegularOrMissing(candidate)
-  const descriptor = openSync(path, constants.O_CREAT | constants.O_RDWR | NOFOLLOW, 0o600)
-  try {
-    if (!fstatSync(descriptor).isFile()) throw new Error(`Unsafe measured SQLite descriptor: ${path}.`)
-    chmodSync(path, 0o600)
-  } finally {
-    closeSync(descriptor)
-  }
-  const database = new DatabaseSync(path)
-  const version = database.prepare('PRAGMA user_version').get().user_version
-  if (![0, 2].includes(version)) {
-    database.close()
-    throw new Error(`Unsupported measured database schema version: ${version}.`)
-  }
-  database.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = FULL;
-    PRAGMA busy_timeout = 5000;
+const SCHEMA = `
     CREATE TABLE IF NOT EXISTS objects (
       digest TEXT PRIMARY KEY CHECK (length(digest) = 64),
       bytes INTEGER NOT NULL CHECK (bytes > 0),
@@ -105,10 +72,8 @@ export function openMeasuredDatabase(root) {
     CREATE TRIGGER IF NOT EXISTS measured_disclosures_update BEFORE UPDATE ON disclosures BEGIN SELECT RAISE(ABORT, 'measured disclosures are immutable'); END;
     CREATE TRIGGER IF NOT EXISTS measured_disclosures_delete BEFORE DELETE ON disclosures BEGIN SELECT RAISE(ABORT, 'measured disclosures are immutable'); END;
     PRAGMA user_version = 2;
-  `)
-  chmodSync(path, 0o600)
-  for (const candidate of [`${path}-wal`, `${path}-shm`]) {
-    try { chmodSync(candidate, 0o600) } catch (error) { if (error?.code !== 'ENOENT') throw error }
-  }
-  return database
+`
+
+export function openMeasuredDatabase(root) {
+  return openSecureDatabase(root, 'measured.sqlite3', { label: 'measured', versions: [0, 2], schema: SCHEMA })
 }

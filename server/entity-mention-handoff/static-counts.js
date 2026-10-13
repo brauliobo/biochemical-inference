@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto'
+import { sha256Hex } from '../commons/digest.js'
 import { TextDecoder } from 'node:util'
 import { canonicalJson } from '../../shared/canonical-json.js'
 
@@ -39,7 +39,7 @@ function exactIds(actual, expected, path) {
   if (canonicalJson(selected) !== canonicalJson(wanted)) fail(`${path} does not project the independently selected identities`)
 }
 
-const shardFor = (id) => createHash('sha256').update(id, 'utf8').digest('hex').slice(0, 2)
+const shardFor = (id) => sha256Hex(id).slice(0, 2)
 
 function canonicalRecords(parsed, family) {
   const document = parsed.get(`entity-records/${family}.json`)

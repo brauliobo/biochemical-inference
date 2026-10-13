@@ -1,4 +1,4 @@
-import { createHash, createPublicKey, verify as verifySignature } from 'node:crypto'
+import { createPublicKey, verify as verifySignature } from 'node:crypto'
 import { constants } from 'node:fs'
 import { TextDecoder } from 'node:util'
 import { gunzipSync } from 'node:zlib'
@@ -11,6 +11,7 @@ import {
   ProducerPagesSignatureEnvelopeSchema,
   StaticFileDescriptorSchema
 } from '../../shared/entity-mention-handoff-contracts.js'
+import { sha256Hex } from '../commons/digest.js'
 import { openPinnedDirectory, openRegularNoFollow } from '../data-plane/safe-path.js'
 import { parseBoundedJson } from './bounded-json.js'
 import { ENTITY_MENTION_HANDOFF_PINS } from './pins.js'
@@ -37,7 +38,7 @@ const ENTITY_RECORD_FAMILIES = Object.freeze([
   'slice_summary', 'source_coverage', 'source_lineage', 'source_mappings', 'sources', 'text_assertions', 'transformations'
 ])
 
-export const ENTITY_MENTION_IMPORT_LIMITS = Object.freeze({
+const ENTITY_MENTION_IMPORT_LIMITS = Object.freeze({
   files: 1_700,
   depth: 3,
   manifestBytes: 1024 * 1024,
@@ -121,7 +122,7 @@ export class EntityMentionHandoffVerificationError extends Error {
 }
 
 const fail = (message) => { throw new EntityMentionHandoffVerificationError(message) }
-export const entityMentionSha256 = (bytes) => createHash('sha256').update(bytes).digest('hex')
+export const entityMentionSha256 = sha256Hex
 
 function safePath(path) {
   if (typeof path !== 'string' || !SAFE_PATH.test(path) || path.includes('..')) fail(`Unsafe bundle path: ${path}.`)
@@ -202,7 +203,7 @@ function exactSet(values, expected, label) {
   if (canonicalJson(actual) !== canonicalJson(wanted)) fail(`${label} closure is incomplete or excessive.`)
 }
 
-export function verifyEntityMentionSemanticClosure(documents, handoff) {
+function verifyEntityMentionSemanticClosure(documents, handoff) {
   const entities = DocumentSchema.parse(documents.get('entity-records/entities.json')).records
   const candidate = CandidateEntitySchema.safeParse(entities.find((record) => record?.id === CANDIDATE_ID))
   const reaction = ReactionEntitySchema.safeParse(entities.find((record) => record?.id === REACTION_ID))

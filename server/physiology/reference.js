@@ -9,7 +9,8 @@ import {
   PHYSIOLOGY_RELEASE_ID,
   PHYSIOLOGY_WARNING
 } from '../../shared/physiology-contracts.js'
-import { createBppArchive, digestBuffer } from './package.js'
+import { sha256Prefixed } from '../commons/digest.js'
+import { createBppArchive } from './package.js'
 
 export const REFERENCE_PUBLISHER = 'Biochemical Inference synthetic reference publisher'
 export const REFERENCE_KEY_ID = 'ed25519:a3ecdaa33c234dc4'
@@ -85,8 +86,8 @@ export function unsignedReferenceDefinitions(evidence, publisher = { keyId: REFE
       permissions: { network: false, filesystem: 'none', subprocess: false },
       entrypoints: { model: 'model.json', coupling: 'coupling.json', process: null },
       contents: [
-        { path: 'model.json', sha256: digestBuffer(modelBytes).slice('sha256:'.length), bytes: modelBytes.length, mediaType: 'application/json' },
-        { path: 'coupling.json', sha256: digestBuffer(couplingBytes).slice('sha256:'.length), bytes: couplingBytes.length, mediaType: 'application/json' }
+        { path: 'model.json', sha256: sha256Prefixed(modelBytes).slice('sha256:'.length), bytes: modelBytes.length, mediaType: 'application/json' },
+        { path: 'coupling.json', sha256: sha256Prefixed(couplingBytes).slice('sha256:'.length), bytes: couplingBytes.length, mediaType: 'application/json' }
       ],
       synthetic: true,
       scientificValidation: 'unsupported',

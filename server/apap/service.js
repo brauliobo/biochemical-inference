@@ -17,18 +17,12 @@ import {
   runTimestepRefinement,
   systemicSeries
 } from './model.js'
+import { defineProblemError } from '../commons/errors.js'
 
 const mean = (values) => values.reduce((sum, value) => sum + value, 0) / values.length
 const round = (value) => Number(value.toFixed(10))
 
-export class ApapRequestError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'ApapRequestError'
-    this.statusCode = options.statusCode ?? 422
-    this.code = options.code ?? 'INVALID_APAP_RUN'
-  }
-}
+export const ApapRequestError = defineProblemError('ApapRequestError', { statusCode: 422, code: 'INVALID_APAP_RUN' })
 
 function requireUnique(items, id, description) {
   const selected = items.filter((item) => item.id === id)

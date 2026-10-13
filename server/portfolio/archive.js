@@ -5,7 +5,7 @@ import { canonicalJson } from '../../shared/canonical-json.js'
 import { ExperimentSchema, PORTFOLIO_MAX_ARCHIVE_BYTES, PortfolioModelSchema } from '../../shared/portfolio-contracts.js'
 import { modelDigest } from './identity.js'
 
-export const COMBINE_PROFILE = 'portfolio-combine-1.0'
+const COMBINE_PROFILE = 'portfolio-combine-1.0'
 const MAX_ENTRY_BYTES = 2_000_000
 const MAX_TOTAL_BYTES = 5_000_000
 const MAX_ENTRIES = 32

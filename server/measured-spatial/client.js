@@ -1,4 +1,5 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { readBoundedBody, timeoutSignal, validateLoopbackOrigin } from '../commons/upstream.js'
 import {
   MEASURED_SPATIAL_PINS,
   MEASURED_SPATIAL_RECORD_TYPES
@@ -21,53 +22,17 @@ import {
   verifyMeasuredSpatialRecordPage,
   verifyMeasuredSpatialTrust
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_MEASURED_SPATIAL_URL = 'http://127.0.0.1:8000'
+const DEFAULT_MEASURED_SPATIAL_URL = 'http://127.0.0.1:8000'
 
-export class MeasuredSpatialUpstreamError extends MeasuredSpatialVerificationError {
-  constructor(message, options = {}) {
-    super(message, { code: options.code ?? 'MEASURED_SPATIAL_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 })
-    this.name = 'MeasuredSpatialUpstreamError'
-  }
-}
+export const MeasuredSpatialUpstreamError = defineProblemError('MeasuredSpatialUpstreamError', { statusCode: 503, code: 'MEASURED_SPATIAL_UPSTREAM_FAILED', parent: MeasuredSpatialVerificationError })
 
 export function validateMeasuredSpatialLoopbackUrl(value) {
-  let url
-  try {
-    url = new URL(value)
-  } catch {
-    throw new MeasuredSpatialUpstreamError('Goal 14 upstream URL must be an absolute loopback HTTP origin.', { statusCode: 500, code: 'MEASURED_SPATIAL_UPSTREAM_URL_INVALID' })
-  }
-  if (url.protocol !== 'http:' || !['127.0.0.1', '[::1]'].includes(url.hostname) || url.username || url.password || url.search || url.hash || !['', '/'].includes(url.pathname)) throw new MeasuredSpatialUpstreamError('Goal 14 upstream is restricted to an origin-only 127.0.0.1 or [::1] HTTP URL.', { statusCode: 500, code: 'MEASURED_SPATIAL_UPSTREAM_URL_REJECTED' })
-  return url.origin
+  return validateLoopbackOrigin(value, { ErrorClass: MeasuredSpatialUpstreamError, subject: 'Goal 14 upstream', codePrefix: 'MEASURED_SPATIAL_UPSTREAM' })
 }
 
-function timeoutSignal(timeoutMs, signal) {
-  const timeout = AbortSignal.timeout(timeoutMs)
-  return signal ? AbortSignal.any([timeout, signal]) : timeout
-}
-
-async function boundedBody(response, maximum, label) {
-  const rawLength = response.headers.get('content-length')
-  if (rawLength === null || !/^(?:0|[1-9][0-9]*)$/.test(rawLength) || Number(rawLength) <= 0 || Number(rawLength) > maximum) throw new MeasuredSpatialUpstreamError(`${label} has a missing, invalid, or excessive Content-Length.`)
-  if (!response.body) throw new MeasuredSpatialUpstreamError(`${label} has no body.`)
-  const chunks = []
-  let total = 0
-  const reader = response.body.getReader()
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      total += value.byteLength
-      if (total > maximum || total > Number(rawLength)) throw new MeasuredSpatialUpstreamError(`${label} exceeded its declared byte boundary.`)
-      chunks.push(Buffer.from(value))
-    }
-  } finally {
-    reader.releaseLock()
-  }
-  if (total !== Number(rawLength)) throw new MeasuredSpatialUpstreamError(`${label} body length does not match Content-Length.`)
-  return Buffer.concat(chunks, total)
-}
+const boundedBody = (response, maximum, label) => readBoundedBody(response, { maximum, label, ErrorClass: MeasuredSpatialUpstreamError, allowEmpty: false })
 
 function verifyJsonHeaders(response, bytes, { releaseBound = false, expectedDigest } = {}) {
   if (response.headers.get('content-type') !== 'application/json') throw new MeasuredSpatialUpstreamError('Goal 14 producer response has an incompatible content type.')

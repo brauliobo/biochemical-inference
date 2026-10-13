@@ -1,70 +1,67 @@
 import { z } from 'zod'
+import { Sha256HexSchema, IsoDateSchema, ReleaseIdSchema, SourceIdSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, releaseRefSchema } from './commons/schemas.js'
 
-export const EvidenceDigestSchema = z.string().regex(/^[a-f0-9]{64}$/)
+export const EvidenceDigestSchema = Sha256HexSchema
 export const EvidenceDocumentIdSchema = z.string().regex(/^EVIDENCE-DOC:[0-9]+$/)
 export const EvidenceSectionIdSchema = z.string().regex(/^SECTION:[A-Z0-9-]+$/)
 export const EvidenceSpanIdSchema = z.string().regex(/^SPAN:[A-Z0-9-]+$/)
 
-export const EvidenceReleaseRefSchema = z.object({
-  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*-v[0-9]+\.[0-9]+\.[0-9]+$/),
-  schema_version: z.literal('3.0.0'),
-  digest: EvidenceDigestSchema
-}).strict()
+export const EvidenceReleaseRefSchema = releaseRefSchema(ReleaseIdSchema, '3.0.0', EvidenceDigestSchema)
 
 export const EvidenceHealthSchema = z.object({
   status: z.literal('ok'),
   release: EvidenceReleaseRefSchema,
-  documents: z.number().int().nonnegative()
+  documents: NonNegativeIntSchema
 }).strict()
 
 export const EvidenceDocumentSchema = z.object({
   id: EvidenceDocumentIdSchema,
   canonical_id: z.string().regex(/^PMID:[1-9][0-9]*$/),
-  title: z.string().min(1),
-  authors: z.array(z.string().min(1)).min(1),
-  journal: z.string().min(1),
-  publication_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  title: NonEmptyStringSchema,
+  authors: z.array(NonEmptyStringSchema).min(1),
+  journal: NonEmptyStringSchema,
+  publication_date: IsoDateSchema,
   publication_status: z.enum(['active', 'corrected', 'retracted', 'deleted']),
   content_scope: z.enum(['metadata-only', 'licensed-excerpts']),
-  source_ids: z.array(z.string().regex(/^[A-Z][A-Z0-9_]*$/)).min(1)
+  source_ids: z.array(SourceIdSchema).min(1)
 }).strict()
 
 export const EvidenceIdentifierSchema = z.object({
   id: z.string().regex(/^IDENTIFIER:[A-Z0-9-]+$/),
   document_id: EvidenceDocumentIdSchema,
   namespace: z.enum(['PMID', 'PMCID', 'DOI']),
-  value: z.string().min(1).regex(/^[A-Za-z0-9./-]+$/),
+  value: NonEmptyStringSchema.regex(/^[A-Za-z0-9./-]+$/),
   relation: z.enum(['canonical', 'exact-alias']),
-  source_id: z.string().regex(/^[A-Z][A-Z0-9_]*$/)
+  source_id: SourceIdSchema
 }).strict()
 
 export const EvidenceLicenseSchema = z.object({
   id: z.string().regex(/^LICENSE:[A-Z0-9.-]+$/),
-  name: z.string().min(1),
+  name: NonEmptyStringSchema,
   url: z.string().url(),
   redistribution: z.enum(['metadata-only', 'full-text-permitted']),
-  attribution: z.string().min(1)
+  attribution: NonEmptyStringSchema
 }).strict()
 
 export const EvidenceLifecycleSchema = z.object({
   id: z.string().regex(/^LIFECYCLE:[A-Z0-9-]+$/),
   document_id: EvidenceDocumentIdSchema,
   event_type: z.enum(['published', 'corrected', 'retracted', 'deleted']),
-  occurred_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  source_id: z.string().regex(/^[A-Z][A-Z0-9_]*$/),
-  source_record_id: z.string().min(1),
-  note: z.string().min(1)
+  occurred_at: IsoDateSchema,
+  source_id: SourceIdSchema,
+  source_record_id: NonEmptyStringSchema,
+  note: NonEmptyStringSchema
 }).strict()
 
 export const EvidenceSectionSchema = z.object({
   id: EvidenceSectionIdSchema,
   document_id: EvidenceDocumentIdSchema,
   section_type: z.enum(['title', 'abstract', 'introduction', 'results']),
-  source_id: z.string().regex(/^[A-Z][A-Z0-9_]*$/),
-  source_locator: z.string().min(1),
-  source_offset: z.number().int().nonnegative(),
-  source_end: z.number().int().positive(),
-  text: z.string().min(1).nullable(),
+  source_id: SourceIdSchema,
+  source_locator: NonEmptyStringSchema,
+  source_offset: NonNegativeIntSchema,
+  source_end: PositiveIntSchema,
+  text: NonEmptyStringSchema.nullable(),
   access: z.enum(['redistributable', 'metadata-only']),
   license_id: z.string().regex(/^LICENSE:[A-Z0-9.-]+$/)
 }).strict().superRefine((section, context) => {
@@ -78,11 +75,11 @@ export const EvidenceSpanSchema = z.object({
   id: EvidenceSpanIdSchema,
   document_id: EvidenceDocumentIdSchema,
   section_id: EvidenceSectionIdSchema,
-  start: z.number().int().nonnegative(),
-  end: z.number().int().positive(),
-  source_offset: z.number().int().nonnegative(),
-  source_end: z.number().int().positive(),
-  text: z.string().min(1),
+  start: NonNegativeIntSchema,
+  end: PositiveIntSchema,
+  source_offset: NonNegativeIntSchema,
+  source_end: PositiveIntSchema,
+  text: NonEmptyStringSchema,
   license_id: z.string().regex(/^LICENSE:[A-Z0-9.-]+$/)
 }).strict().superRefine((span, context) => {
   if (span.end <= span.start || span.source_end <= span.source_offset) context.addIssue({ code: z.ZodIssueCode.custom, message: 'span end offsets must exceed start offsets' })
@@ -94,9 +91,9 @@ export const EvidenceAnnotationSchema = z.object({
   document_id: EvidenceDocumentIdSchema,
   span_id: EvidenceSpanIdSchema,
   annotation_type: z.enum(['Gene', 'Chemical', 'Disease', 'Species', 'Variant']),
-  normalized_id: z.string().min(1).nullable(),
+  normalized_id: NonEmptyStringSchema.nullable(),
   source_id: z.literal('PUBTATOR'),
-  source_annotation_id: z.string().min(1)
+  source_annotation_id: NonEmptyStringSchema
 }).strict()
 
 export const EvidenceRelationSchema = z.object({
@@ -105,14 +102,14 @@ export const EvidenceRelationSchema = z.object({
   relation_type: z.enum(['Association', 'Negative_Correlation', 'Positive_Correlation']),
   subject_annotation_id: z.string().regex(/^ANNOTATION:[A-Z0-9-]+$/),
   object_annotation_id: z.string().regex(/^ANNOTATION:[A-Z0-9-]+$/),
-  confidence: z.number().finite().min(0).max(1),
+  confidence: FiniteNumberSchema.min(0).max(1),
   source_id: z.literal('PUBTATOR'),
-  source_relation_id: z.string().min(1)
+  source_relation_id: NonEmptyStringSchema
 }).strict()
 
-const RrfComponentSchema = z.object({ rank: z.number().int().positive(), rrf: z.number().finite().positive() }).strict()
-const Bm25ComponentSchema = z.object({ rank: z.number().int().positive(), raw: z.number().finite(), rrf: z.number().finite().positive() }).strict()
-const VectorComponentSchema = z.object({ rank: z.number().int().positive(), cosine: z.number().finite().min(-1).max(1), rrf: z.number().finite().positive() }).strict()
+const RrfComponentSchema = z.object({ rank: PositiveIntSchema, rrf: FiniteNumberSchema.positive() }).strict()
+const Bm25ComponentSchema = z.object({ rank: PositiveIntSchema, raw: FiniteNumberSchema, rrf: FiniteNumberSchema.positive() }).strict()
+const VectorComponentSchema = z.object({ rank: PositiveIntSchema, cosine: FiniteNumberSchema.min(-1).max(1), rrf: FiniteNumberSchema.positive() }).strict()
 
 export const EvidenceScoreComponentsSchema = z.object({
   exact: RrfComponentSchema.optional(),
@@ -128,29 +125,29 @@ export const EvidenceSearchRequestSchema = z.object({
 
 export const EvidenceVectorMetadataSchema = z.object({
   release_digest: EvidenceDigestSchema,
-  model: z.string().min(1),
+  model: NonEmptyStringSchema,
   model_digest: EvidenceDigestSchema,
-  dimensions: z.number().int().positive(),
+  dimensions: PositiveIntSchema,
   attribution: z.enum(['digest-bound', 'trusted-local-unverified']).optional()
 }).strict()
 
 export const EvidenceSearchResultSchema = z.object({
   document: EvidenceDocumentSchema,
-  score: z.number().finite().positive(),
+  score: FiniteNumberSchema.positive(),
   score_components: EvidenceScoreComponentsSchema
 }).strict()
 
 export const EvidenceSearchResponseSchema = z.object({
   release: EvidenceReleaseRefSchema,
-  query: z.string().min(1),
+  query: NonEmptyStringSchema,
   ranking: z.literal('reciprocal-rank-fusion-v1'),
   vector_metadata: EvidenceVectorMetadataSchema.nullable(),
   explanations: z.object({
-    exact: z.string().min(1),
-    annotation: z.string().min(1),
-    bm25: z.string().min(1),
-    vector: z.string().min(1),
-    rrf: z.string().min(1)
+    exact: NonEmptyStringSchema,
+    annotation: NonEmptyStringSchema,
+    bm25: NonEmptyStringSchema,
+    vector: NonEmptyStringSchema,
+    rrf: NonEmptyStringSchema
   }).strict(),
   items: z.array(EvidenceSearchResultSchema)
 }).strict()
@@ -178,14 +175,14 @@ export const EvidenceCandidateSchema = z.object({
   release_digest: EvidenceDigestSchema,
   document_id: EvidenceDocumentIdSchema,
   span_ids: z.array(EvidenceSpanIdSchema).min(1),
-  model: z.string().min(1),
+  model: NonEmptyStringSchema,
   model_digest: EvidenceDigestSchema,
   prompt_digest: EvidenceDigestSchema,
   input_digest: EvidenceDigestSchema,
   output_digest: EvidenceDigestSchema,
-  subject: z.string().min(1),
-  relation: z.string().min(1),
-  object: z.string().min(1),
+  subject: NonEmptyStringSchema,
+  relation: NonEmptyStringSchema,
+  object: NonEmptyStringSchema,
   unresolved_entities: z.array(z.string()),
   missing_context: z.array(z.string())
 }).strict()
