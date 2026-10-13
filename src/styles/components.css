@@ -50,7 +50,6 @@ a.site-title:where(:visited, :hover) { color: var(--color-text); }
   padding: 0;
   list-style: none;
 }
-.site-nav li + li { margin-block-start: 0; }
 .site-nav a {
   display: inline-flex;
   align-items: center;
@@ -123,6 +122,10 @@ a.button--secondary:where(:visited, :hover) { color: var(--color-text); }
   background: var(--color-surface-raised);
   box-shadow: var(--shadow-card);
 }
+/* Card headings are section-level, not page-level. */
+.card :is(h2, h3) { font-size: var(--text-h3); }
+.grid > .card,
+.grid > * > .card { block-size: 100%; }
 a.card {
   display: block;
   color: var(--color-text);

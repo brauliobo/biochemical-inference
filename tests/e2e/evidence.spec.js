@@ -4,7 +4,7 @@ const useFixture = process.env.E2E_USE_FIXTURE === 'true'
 
 test('performs real non-vector evidence search and inspects licensed exact spans', async ({ page }) => {
   test.skip(useFixture, 'Requires the real evidence service')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   const evidence = page.locator('.evidence-panel')
   await expect(evidence.getByText('mthfr-evidence-v1.0.0')).toBeVisible()
@@ -26,7 +26,7 @@ test('performs real non-vector evidence search and inspects licensed exact spans
 
 test('extracts and reopens a fixture candidate without crossing the trust boundary', async ({ page }) => {
   test.skip(!useFixture, 'Uses deterministic extraction without live generation')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
 
   const evidence = page.locator('.evidence-panel')
   await evidence.getByRole('button', { name: /Structural basis for the regulation/ }).click()

@@ -5,7 +5,7 @@ import { workspaceSpecification } from '../fixtures/workspace.js'
 
 test('persists, runs, reports, and exports a controlled experiment', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Desktop workflow is covered separately from the mobile layout check')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workspace = page.locator('.experiment-workspace')
   await expect(workspace.getByRole('heading', { name: 'Durable local research runs' })).toBeVisible()
   await workspace.getByLabel('Existing experiment').selectOption('')
@@ -27,7 +27,7 @@ test('persists, runs, reports, and exports a controlled experiment', async ({ pa
 
 test('keeps the controlled experiment workflow within a mobile viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific workspace workflow')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workspace = page.locator('.experiment-workspace')
   await expect(workspace.getByLabel('Portfolio design')).toBeVisible()
   await workspace.getByLabel('Existing experiment').selectOption('')
@@ -48,7 +48,7 @@ test('imports an exact external model as inspectable, exportable, read-only stat
   expect(exportedResponse.ok()).toBe(true)
   const exported = await exportedResponse.json()
 
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workspace = page.locator('.experiment-workspace')
   await expect(workspace.getByText(/not in the exact local registry/)).toBeVisible()
   await workspace.locator('#workspace-import').setInputFiles({ name: exported.fileName, mimeType: 'application/zip', buffer: Buffer.from(exported.bundleBase64, 'base64') })

@@ -63,10 +63,6 @@ ol {
   padding-inline-start: var(--space-inset-loose);
 }
 
-li + li {
-  margin-block-start: var(--space-stack-tight);
-}
-
 img,
 svg,
 canvas,

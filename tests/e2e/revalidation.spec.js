@@ -15,7 +15,7 @@ test('executes and resumes the signed Goal 15 campaign on desktop and mobile', a
     if (headers['cache-control'] !== 'no-store' || headers.pragma !== 'no-cache' || headers.etag !== undefined) responsePolicyFailures.push({ path, headers })
   })
 
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.revalidation-workbench')
   await expect(workbench.getByRole('heading', { name: 'Signed impact execution ledger' })).toBeVisible()
   await expect(workbench).toContainText('Terminal software outcomes do not become scientific conclusions.')

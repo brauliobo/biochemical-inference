@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('runs the ODE, SSA, and FBA standards portfolio with inspectable terminal results', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const portfolio = page.locator('.portfolio-panel')
   await expect(portfolio.getByRole('heading', { name: 'ODE · SSA · FBA workbench' })).toBeVisible()
   await expect(portfolio.getByText('Reactant A concentration · mol/L')).toBeVisible()
@@ -28,7 +28,7 @@ test('runs the ODE, SSA, and FBA standards portfolio with inspectable terminal r
 
 test('keeps all portfolio controls and result tables usable on mobile', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific portfolio workflow')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const portfolio = page.locator('.portfolio-panel')
   await portfolio.getByLabel('Model and engine').selectOption('bounded_growth_fba')
   await portfolio.getByRole('button', { name: 'Run FBA benchmark' }).click()

@@ -8,7 +8,7 @@ test('verifies the integrated measured liver atlas on desktop/mobile and reloads
     if (/\/api\/v12\/measured-spatial\/chunks\/[^/]+\/\d+\/\d+\/\d+\/\d+$/.test(path)) chunkRequests.push(path)
   })
 
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const atlas = page.locator('.measured-atlas')
   await expect(atlas).toBeVisible()
   const sync = atlas.getByTestId('measured-spatial-sync')

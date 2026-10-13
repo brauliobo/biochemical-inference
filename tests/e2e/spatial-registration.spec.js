@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('verifies corrected Learn2Reg attribution, residual overlap, ROI-independent transforms, and offline replay', async ({ page }) => {
   test.setTimeout(240_000)
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const workbench = page.locator('.registration-workbench')
   await expect(workbench).toBeVisible()
 

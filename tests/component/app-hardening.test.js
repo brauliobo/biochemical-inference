@@ -21,7 +21,7 @@ const api = vi.hoisted(() => ({
 
 vi.mock('../../src/api.js', () => api)
 
-import App from '../../src/App.vue'
+import App from '../../src/views/workbench/FullWorkbench.vue'
 
 function deferred() {
   let resolve

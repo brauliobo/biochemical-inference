@@ -20,6 +20,7 @@
   line-height: var(--leading-prose);
 }
 .prose > * + * { margin-block-start: var(--space-stack); }
+.prose li + li { margin-block-start: var(--space-stack-tight); }
 
 /* Vertical rhythm between siblings. Tune with a modifier or by setting the
    local property: style="--stack-space: var(--space-stack-loose)". The same

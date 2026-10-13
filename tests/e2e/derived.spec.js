@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('submits, accepts, reproduces, and inspects an APAP derived assertion without mixing layers', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'The complete desktop review workflow covers signed mutation sequencing')
-  await page.goto('/')
+  await page.goto('/#/workbench/full')
   const apap = page.locator('.apap-panel')
   const review = page.locator('.review-panel')
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
