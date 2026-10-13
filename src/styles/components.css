@@ -169,6 +169,7 @@ a.card:hover { border-color: var(--color-accent); }
   background: var(--color-border);
 }
 .metrics--wide { --metric-min: calc(var(--target-min) * 7); }
+.metrics--compact { --metric-min: calc(var(--target-min) * 2.5); }
 .metrics > * {
   min-inline-size: 0;
   padding: var(--space-inset);
@@ -259,6 +260,13 @@ a.card:hover { border-color: var(--color-accent); }
   border-inline-start-width: var(--border-width-accent);
   background: var(--color-surface-sunken);
 }
+/* A button whose action is destructive or cannot be undone. */
+.button--danger {
+  border-color: var(--color-danger-border);
+  background: transparent;
+  color: var(--color-danger-text);
+}
+.button--danger:hover { background: var(--color-danger-surface); }
 /* A toggle button that is on. */
 .button--secondary[aria-pressed="true"] {
   background: var(--color-accent);
