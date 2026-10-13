@@ -8,6 +8,7 @@
 export const routes = [
   { name: 'home', path: '/', title: 'Home', load: () => import('./views/HomeView.vue') },
   { name: 'kb-hub', path: '/kb', title: 'Knowledge base', load: () => import('./views/kb/KbHubView.vue') },
+  { name: 'kbMap', path: '/kb/map', title: 'Knowledge map', load: () => import('./views/kb/KbMapView.vue') },
   { name: 'kb-type', path: '/kb/:type', title: 'Knowledge base', load: () => import('./views/kb/KbTypeView.vue') },
   { name: 'kb-entity', path: '/kb/:type/:slug', title: 'Knowledge base', load: () => import('./views/kb/KbEntityView.vue') },
   { name: 'workbench-index', path: '/workbench', title: 'Workbenches', load: () => import('./views/WorkbenchIndexView.vue') },
