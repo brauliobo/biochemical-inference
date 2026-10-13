@@ -5,11 +5,11 @@ import InputField from '../../ui/InputField.vue'
 import Notice from '../../ui/Notice.vue'
 import Panel from '../../ui/Panel.vue'
 import SelectField from '../../ui/SelectField.vue'
-import { exactModelKey } from './draft.js'
+import { exactModelKey } from '../../experiment-draft.js'
 
 // Create an experiment, or write the next immutable revision of the selected
 // one. Revisions that embed a model outside the exact local registry are
-// read-only. `draft` is edited in place (see draft.js).
+// read-only. `draft` is edited in place (see experiment-draft.js).
 const props = defineProps({
   draft: { type: Object, required: true },
   models: { type: Array, required: true },

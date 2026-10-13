@@ -1,10 +1,10 @@
 /*
- * Minimal component classes for the app shell and knowledge site. Built from
- * semantic tokens only. Add a class here only when a pattern is used by more
- * than one view; otherwise compose layout primitives (layout.css).
+ * Component classes. Built from semantic tokens only; markup composes these with
+ * the layout primitives (layout.css). Each block names the src/ui component that
+ * renders it. Add a class here only when more than one view needs it.
  */
 
-/* ---- Skip link ---- */
+/* ---- Site chrome ---- */
 .skip-link {
   position: absolute;
   inset-block-start: var(--space-inset-tight);
@@ -20,7 +20,6 @@
 .skip-link:focus { transform: none; }
 a.skip-link:where(:visited, :hover) { color: var(--color-accent-text); }
 
-/* ---- Site chrome ---- */
 .site-header {
   border-block-end: var(--border-width) solid var(--color-border);
   background: var(--color-surface-raised);
@@ -62,9 +61,7 @@ a.site-title:where(:visited, :hover) { color: var(--color-text); }
 .site-nav a:where(:hover) { border-color: var(--color-border-strong); }
 .site-nav a[aria-current] { border-color: var(--color-accent); font-weight: var(--weight-strong); }
 
-.site-main {
-  padding-block: var(--space-section);
-}
+.site-main { padding-block: var(--space-section); }
 
 .site-footer {
   padding-block: var(--space-inset-loose);
@@ -88,6 +85,28 @@ a.site-title:where(:visited, :hover) { color: var(--color-text); }
   line-height: var(--leading-prose);
 }
 .muted { color: var(--color-text-muted); }
+
+/* Long identifiers (hashes, digests, CURIEs). */
+.digest {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: var(--font-code);
+  font-size: var(--text-code);
+}
+
+.plain-list {
+  padding: 0;
+  list-style: none;
+}
+
+/* Disclosure arrow. <summary> is a flex box (base.css), so the native marker is
+   not drawn; this puts one back and flips it when the details are open. */
+details > summary { gap: var(--space-cluster-tight); }
+details > summary::before {
+  content: "\25B8";
+  flex: none;
+}
+details[open] > summary::before { content: "\25BE"; }
 
 /* ---- Button (works on <a> and <button>) ---- */
 .button {
@@ -113,8 +132,31 @@ a.button:where(:visited, :hover) { color: var(--color-accent-text); }
 }
 .button--secondary:hover { background: var(--color-surface-sunken); }
 a.button--secondary:where(:visited, :hover) { color: var(--color-text); }
+/* A toggle button that is on. */
+.button--secondary[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+/* A button whose action is destructive or cannot be undone. */
+.button--danger {
+  border-color: var(--color-danger-border);
+  background: transparent;
+  color: var(--color-danger-text);
+}
+.button--danger:hover { background: var(--color-danger-surface); }
+/* A button that reads as a link (table rows, result titles). */
+.button--link {
+  justify-content: flex-start;
+  padding-inline: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-link);
+  text-align: start;
+  text-decoration: underline;
+}
+.button--link:hover { background: transparent; color: var(--color-link-hover); }
 
-/* ---- Card ---- */
+/* ---- Card (ui/Card.vue) and Panel (ui/Panel.vue) ---- */
 .card {
   padding: var(--space-inset-loose);
   border: var(--border-width) solid var(--color-border);
@@ -133,136 +175,40 @@ a.card {
 }
 a.card:where(:visited, :hover) { color: var(--color-text); }
 a.card:hover { border-color: var(--color-accent); }
-
-/* ---- Badge ---- */
-.badge {
-  display: inline-block;
-  padding: var(--space-cluster-tight) var(--space-inset-tight);
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
-  font-size: var(--text-caption);
-  font-weight: var(--weight-strong);
-}
-
-/* Status variants, same palette as notices. */
-.badge--success { border-color: var(--color-success-border); color: var(--color-success-text); }
-.badge--warning { border-color: var(--color-warning-border); color: var(--color-warning-text); }
-.badge--danger { border-color: var(--color-danger-border); color: var(--color-danger-text); }
-
-/* ---- Workbench section (ui/Section.vue): a card whose headings are demoted ---- */
-.card--section h3,
-.card--section h4 { font-size: var(--text-h4); }
+/* Sunken and flat: a record inside a panel. */
 .card--flat {
   padding: var(--space-inset);
   background: var(--color-surface-sunken);
   box-shadow: none;
 }
+/* Nested cards sit flat inside a card and use smaller headings. */
+.card .card {
+  background: var(--color-surface);
+  box-shadow: none;
+  overflow-wrap: anywhere; /* digests and identifiers in plain text */
+}
+.card .card :is(h2, h3) { font-size: var(--text-h4); }
+.card.card--flat { background: var(--color-surface-sunken); }
+/* A titled card: its content headings sit one step below its own. */
+.panel { min-inline-size: 0; }
+.panel :is(h3, h4) { font-size: var(--text-h4); }
 
-/* ---- Metrics: labelled value cells (dl > div > dt + dd), see ui/Metric.vue ---- */
-.metrics {
-  --metric-min: calc(var(--target-min) * 4);
+/* A <button class="card" aria-pressed> that selects one option. */
+button.card {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--metric-min)), 1fr));
-  gap: var(--border-width);
-  padding: var(--border-width);
-}
-.metrics--wide { --metric-min: calc(var(--target-min) * 7); }
-.metrics--compact { --metric-min: calc(var(--target-min) * 2.5); }
-/* Cells are separated by a one-line gap that their outlines fill, so a short
-   last row leaves no coloured hole. */
-.metrics > * {
-  min-inline-size: 0;
-  padding: var(--space-inset);
-  outline: var(--border-width) solid var(--color-border);
-  background: var(--color-surface-sunken);
-}
-.metrics dt {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-}
-.metrics dd {
-  margin: var(--space-cluster-tight) 0 0;
-  overflow-wrap: anywhere;
-}
-.metrics dd + dd {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-}
-.metric__value {
-  font-size: var(--text-h4);
-  font-weight: var(--weight-heading);
-}
-
-/* Key/value rows: label left, value right (dl > div > dt + dd). */
-.facts > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-cluster);
-  padding-block: var(--space-cluster-tight);
-  border-block-end: var(--border-width) solid var(--color-border);
-}
-.facts dt { color: var(--color-text-muted); }
-.facts dd {
-  margin: 0;
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-  text-align: end;
-}
-
-.facts dd.digest {
-  flex-basis: 100%;
+  gap: var(--space-cluster-tight);
+  justify-items: start;
+  inline-size: 100%;
   text-align: start;
+  cursor: pointer;
+}
+button.card:hover:not(:disabled) { border-color: var(--color-accent); }
+button.card[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-inline-start-width: var(--border-width-accent);
 }
 
-/* Disclosure arrow. <summary> is a flex box (base.css), so the native marker is
-   not drawn; this puts one back and flips it when the details are open. */
-details > summary { gap: var(--space-cluster-tight); }
-details > summary::before {
-  content: "\25B8";
-  flex: none;
-}
-details[open] > summary::before { content: "\25BE"; }
-
-/* Long identifiers (hashes, digests, CURIEs). */
-.digest {
-  display: block;
-  overflow-wrap: anywhere;
-  font-family: var(--font-code);
-  font-size: var(--text-code);
-}
-
-/* ---- Form: label above control; controls fill the column ---- */
-.form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-stack-tight);
-  align-content: start;
-  min-inline-size: 0;
-}
-/* A wide <select> or input in a wrapping row shrinks instead of overflowing. */
-.cluster > :is(select, input, textarea) {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-.form > label { margin-block-start: var(--space-stack-tight); }
-.form > label:first-child { margin-block-start: 0; }
-.form > :is(.button, button) {
-  margin-block-start: var(--space-stack);
-  justify-self: start;
-}
-.form small { color: var(--color-text-muted); }
-.form .field-error { color: var(--color-danger-text); }
-/* A checkbox or radio next to its text, in one 44 px target. */
-.choice {
-  display: flex;
-  align-items: center;
-  gap: var(--space-cluster);
-  min-block-size: var(--target-min);
-  font-weight: var(--weight-body);
-}
-
-/* ---- Tile: a full-width button that selects one item of a list ---- */
+/* A full-width button that selects one item of a list. */
 .tile {
   display: grid;
   gap: var(--space-cluster-tight);
@@ -280,24 +226,191 @@ details[open] > summary::before { content: "\25BE"; }
   border-inline-start-width: var(--border-width-accent);
   background: var(--color-surface-sunken);
 }
-/* A button whose action is destructive or cannot be undone. */
-.button--danger {
+
+/* ---- Badge (ui/Badge.vue) ---- */
+.badge {
+  display: inline-block;
+  padding: var(--space-cluster-tight) var(--space-inset-tight);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+}
+.badge--success { border-color: var(--color-success-border); color: var(--color-success-text); }
+.badge--warning { border-color: var(--color-warning-border); color: var(--color-warning-text); }
+.badge--danger { border-color: var(--color-danger-border); color: var(--color-danger-text); }
+.badge--info { border-color: var(--color-info-border); color: var(--color-info-text); }
+
+/* ---- Notice (ui/Notice.vue, ErrorNotice, LiveMessage). Add role="status" or role="alert". ---- */
+.notice {
+  padding: var(--space-inset);
+  border: var(--border-width) solid var(--color-info-border);
+  border-inline-start-width: var(--border-width-accent);
+  border-radius: var(--radius-control);
+  background: var(--color-info-surface);
+  color: var(--color-info-text);
+}
+.notice--warning {
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-surface);
+  color: var(--color-warning-text);
+}
+.notice--danger {
   border-color: var(--color-danger-border);
-  background: transparent;
+  background: var(--color-danger-surface);
   color: var(--color-danger-text);
 }
-.button--danger:hover { background: var(--color-danger-surface); }
-/* A toggle button that is on. */
-.button--secondary[aria-pressed="true"] {
-  background: var(--color-accent);
-  color: var(--color-accent-text);
+.notice--success {
+  border-color: var(--color-success-border);
+  background: var(--color-success-surface);
+  color: var(--color-success-text);
 }
+.notice a { color: inherit; }
+/* A persistent live region (role="status") that is empty must not add a gap. */
+.stack > [role="status"]:empty { margin-block-start: 0; }
 
-/* ---- Progress (native <progress>) ---- */
+/* Nothing to list yet (ui/EmptyState.vue). */
+.empty-state {
+  padding: var(--space-inset-loose);
+  border: var(--border-width) dashed var(--color-border-strong);
+  border-radius: var(--radius-control);
+  text-align: center;
+}
+.empty-state strong { color: var(--color-text); }
+
+/* ---- Facts (ui/Facts.vue): a definition list of labelled values ---- */
+.facts {
+  --fact-min: calc(var(--target-min) * 4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--fact-min)), 1fr));
+  gap: var(--border-width);
+  padding: var(--border-width);
+}
+.facts--wide { --fact-min: calc(var(--target-min) * 7); }
+.facts--compact { --fact-min: calc(var(--target-min) * 2.5); }
+/* Cells are separated by a one-line gap that their outlines fill, so a short
+   last row leaves no coloured hole. */
+.facts > * {
+  min-inline-size: 0;
+  padding: var(--space-inset);
+  outline: var(--border-width) solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+.facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+.facts dd {
+  margin: var(--space-cluster-tight) 0 0;
+  overflow-wrap: anywhere;
+}
+.facts dd + dd {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+.facts dd code {
+  display: block;
+  color: var(--color-text-muted);
+}
+.fact__value {
+  font-size: var(--text-h4);
+  font-weight: var(--weight-heading);
+}
+/* One label/value pair per row, value at the end. */
+.facts--rows {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+}
+.facts--rows > * {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  padding-inline: 0;
+  outline: 0;
+  border-block-end: var(--border-width) solid var(--color-border);
+  background: transparent;
+}
+.facts--rows dd { margin: 0; text-align: end; }
+
+/* ---- Forms: Field, InputField, SelectField (ui/) ---- */
+.field {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  align-content: start;
+  min-inline-size: 0;
+}
+.field :is(input:not([type="checkbox"], [type="radio"]), select, textarea) { inline-size: 100%; }
+.field--inline {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-cluster);
+  min-block-size: var(--target-min);
+}
+.field--inline small { grid-column: 2; }
+.field__error { color: var(--color-danger-text); }
+fieldset { min-inline-size: 0; }
+/* A wide <select> or input in a wrapping row shrinks instead of overflowing. */
+.cluster > :is(select, input, textarea) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.stack > :is(input, select, textarea) { inline-size: 100%; }
+.cluster > .grow { flex: 1 1 var(--sidebar-width); }
+/* A radio or checkbox next to its text, in one 44 px target. */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-cluster);
+  min-block-size: var(--target-min);
+  font-weight: var(--weight-body);
+}
 .progress {
   inline-size: 100%;
   block-size: var(--space-inset-tight);
   accent-color: var(--color-accent);
+}
+
+/* ---- Data table (ui/DataTable.vue): a scrollable, keyboard-reachable table ---- */
+.data-table {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+/* Narrower than this the wrapper scrolls instead of crushing the columns. */
+.data-table table { min-inline-size: calc(var(--grid-min) * 2); }
+.data-table caption { padding-inline: var(--space-inset); color: var(--color-text-muted); }
+.data-table thead th {
+  background: var(--color-surface-sunken);
+  font-size: var(--text-small);
+}
+.data-table tbody tr:last-child :is(th, td) { border-block-end: 0; }
+.data-table tr[aria-current="true"] { background: var(--color-selection); }
+
+/* ---- Heatmap: a row of selectable bins, each with a bar scaled by --heat (0 to 1) ---- */
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--target-min), 1fr));
+  gap: var(--space-cluster-tight);
+}
+.heatmap > button {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  justify-items: center;
+  padding-inline: var(--space-cluster-tight);
+}
+.heatmap > button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-width: var(--border-width-accent);
+}
+.heatmap__bar {
+  --heat: 0;
+  display: block;
+  inline-size: calc(var(--heat) * 100%);
+  block-size: var(--space-inset-tight);
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-border);
 }
 
 /* ---- 3D scene host (three.js canvas, or the text fallback) ---- */
@@ -320,13 +433,13 @@ details[open] > summary::before { content: "\25BE"; }
   text-align: center;
 }
 
-/* ---- Chart (inline SVG inside ui/ChartFrame.vue) ---- */
+/* ---- Chart (inline SVG, ui/LineChart.vue inside ui/ChartFrame.vue) ---- */
 .chart {
   inline-size: 100%;
   max-inline-size: calc(var(--target-min) * 17);
   overflow: visible;
 }
-/* A chart drawn on a unit square that is stretched to the box (preserveAspectRatio="none"). */
+/* Drawn on a unit square that is stretched to the box (preserveAspectRatio="none"). */
 .chart--stretch {
   max-inline-size: none;
   block-size: calc(var(--target-min) * 6);
@@ -375,176 +488,7 @@ details[open] > summary::before { content: "\25BE"; }
   transform: rotate(45deg);
 }
 
-/* ---- Notice (inline status message). Add role="status" or role="alert". ---- */
-.notice {
-  padding: var(--space-inset);
-  border: var(--border-width) solid var(--color-info-border);
-  border-inline-start-width: var(--border-width-accent);
-  border-radius: var(--radius-control);
-  background: var(--color-info-surface);
-  color: var(--color-info-text);
-}
-.notice--warning {
-  border-color: var(--color-warning-border);
-  background: var(--color-warning-surface);
-  color: var(--color-warning-text);
-}
-.notice--danger {
-  border-color: var(--color-danger-border);
-  background: var(--color-danger-surface);
-  color: var(--color-danger-text);
-}
-.notice--success {
-  border-color: var(--color-success-border);
-  background: var(--color-success-surface);
-  color: var(--color-success-text);
-}
-.notice a { color: inherit; }
-
-/* ---- Plain list (no bullets) ---- */
-.plain-list {
-  padding: 0;
-  list-style: none;
-}
-
-/* ---- Button link: a button that reads as a link (table rows, result titles) ---- */
-.button--link {
-  justify-content: flex-start;
-  padding-inline: 0;
-  border-color: transparent;
-  background: transparent;
-  color: var(--color-link);
-  text-align: start;
-  text-decoration: underline;
-}
-.button--link:hover { background: transparent; color: var(--color-link-hover); }
-
-/* ---- Toggle card: a <button class="card" aria-pressed> that selects one option ---- */
-button.card {
-  display: grid;
-  gap: var(--space-cluster-tight);
-  justify-items: start;
-  inline-size: 100%;
-  text-align: start;
-  cursor: pointer;
-}
-button.card:hover:not(:disabled) { border-color: var(--color-accent); }
-button.card[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  border-inline-start-width: var(--border-width-accent);
-}
-
-/* Nested cards sit flat inside a card and use smaller headings. */
-.card .card {
-  background: var(--color-surface);
-  box-shadow: none;
-  overflow-wrap: anywhere; /* digests and identifiers in plain text */
-}
-.card .card :is(h2, h3) { font-size: var(--text-h4); }
-
-/* ---- Panel (ui/Panel.vue): a titled card that spans the full row of a parent grid ---- */
-.panel { grid-column: 1 / -1; min-inline-size: 0; }
-.panel .panel { grid-column: auto; block-size: auto; }
-
-/* A persistent live region (role="status") that is empty must not add a gap. */
-.stack > [role="status"]:empty { margin-block-start: 0; }
-
-/* ---- Field (ui/Field.vue): label, control, hint ---- */
-.field {
-  display: grid;
-  gap: var(--space-cluster-tight);
-  align-content: start;
-  min-inline-size: 0;
-}
-.field :is(input:not([type="checkbox"], [type="radio"]), select, textarea) { inline-size: 100%; }
-.field--inline {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--space-cluster);
-  min-block-size: var(--target-min);
-}
-.field--inline small { grid-column: 2; }
-fieldset { min-inline-size: 0; }
-
-/* ---- Data table (ui/DataTable.vue): a scrollable, keyboard-reachable table ---- */
-.data-table {
-  overflow-x: auto;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-control);
-}
-/* Narrower than this the wrapper scrolls instead of crushing the columns. */
-.data-table table { min-inline-size: calc(var(--grid-min) * 2); }
-.data-table caption { padding-inline: var(--space-inset); color: var(--color-text-muted); }
-.data-table thead th {
-  background: var(--color-surface-sunken);
-  font-size: var(--text-small);
-}
-.data-table tbody tr:last-child :is(th, td) { border-block-end: 0; }
-.data-table tr[aria-current="true"] { background: var(--color-selection); }
-
-/* ---- Facts: a definition list as a grid of labelled values ---- */
-.facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min)), 1fr));
-  gap: var(--space-cluster);
-}
-.facts > div {
-  min-inline-size: 0;
-  padding: var(--space-inset-tight) var(--space-inset);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-control);
-  background: var(--color-surface-sunken);
-}
-.facts dt { color: var(--color-text-muted); font-size: var(--text-small); }
-.facts dd { margin: 0; overflow-wrap: anywhere; }
-.facts dd code { display: block; color: var(--color-text-muted); }
-/* One label/value pair per row, value at the end. */
-.facts--rows { grid-template-columns: minmax(0, 1fr); gap: 0; }
-.facts--rows > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-cluster-tight) var(--space-cluster);
-  padding-inline: 0;
-  border: 0;
-  border-block-end: var(--border-width) solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-}
-.facts--rows dd { text-align: end; }
-
-/* ---- Heatmap: a row of selectable bins, each with a bar scaled by --heat (0 to 1) ---- */
-.heatmap {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--target-min), 1fr));
-  gap: var(--space-cluster-tight);
-}
-.heatmap > button {
-  display: grid;
-  gap: var(--space-cluster-tight);
-  justify-items: center;
-  padding-inline: var(--space-cluster-tight);
-}
-.heatmap > button[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  border-width: var(--border-width-accent);
-}
-.heatmap__bar {
-  --heat: 0;
-  display: block;
-  inline-size: calc(var(--heat) * 100%);
-  block-size: var(--space-inset-tight);
-  border-radius: var(--radius-pill);
-  background: var(--color-warning-border);
-}
-
 /* ---- Knowledge base ---- */
-.badge--info { border-color: var(--color-info-border); color: var(--color-info-text); }
-
-/* Form controls placed in a stack fill its width; in a cluster, .grow lets one stretch. */
-.stack > :is(input, select, textarea) { inline-size: 100%; }
-.cluster > .grow { flex: 1 1 var(--sidebar-width); }
-
 .breadcrumbs {
   display: flex;
   flex-wrap: wrap;

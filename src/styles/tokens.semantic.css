@@ -4,7 +4,7 @@
  *
  * Colours are light-dark(<light>, <dark>). The browser picks per the
  * `color-scheme` property: `light dark` (below) follows prefers-color-scheme,
- * and any subtree can force a scheme, e.g. `.legacy-workbench { color-scheme: dark }`.
+ * and a subtree can force a scheme with the `color-scheme` property.
  */
 :root {
   color-scheme: light dark;
@@ -112,8 +112,6 @@
 
   /* Layout */
   --container-max: var(--size-container);
-  --container-prose: var(--size-container-narrow);
-  --container-wide: var(--size-container-wide);
   --sidebar-width: var(--size-sidebar);
   --grid-min: var(--size-grid-min);
   --icon-size: var(--size-icon);

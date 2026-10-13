@@ -11,8 +11,6 @@
   margin-inline: auto;
   padding-inline: var(--space-gutter);
 }
-.container--narrow { max-inline-size: var(--container-prose); }
-.container--wide { max-inline-size: var(--container-wide); }
 
 /* Readable line length for running text. */
 .prose {
@@ -29,7 +27,6 @@
 .stack > * + * { margin-block-start: var(--stack-space); }
 .stack--tight { --stack-space: var(--space-stack-tight); }
 .stack--loose { --stack-space: var(--space-stack-loose); }
-.stack--section { --stack-space: var(--space-section); }
 
 /* Inline group that wraps (nav links, tags, button rows). */
 .cluster {
@@ -39,8 +36,6 @@
   align-items: center;
   gap: var(--cluster-space);
 }
-.cluster--end { justify-content: flex-end; }
-.cluster--bottom { align-items: flex-end; }
 .cluster--tight { --cluster-space: var(--space-cluster-tight); }
 
 /* Two ends of a row; wraps when narrow. */
@@ -98,10 +93,6 @@
 /* Wide tables and maps scroll sideways inside their own box. Give it
    tabindex="0", role="region" and an aria-label so keyboard users can scroll it. */
 .scroll-x { overflow-x: auto; }
-
-/* Padding inside a box. */
-.inset { padding: var(--space-inset); }
-.inset--loose { padding: var(--space-inset-loose); }
 
 /* Page frame: footer sticks to the bottom on short pages. */
 .page {

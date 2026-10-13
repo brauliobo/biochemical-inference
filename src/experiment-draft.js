@@ -1,6 +1,6 @@
 // The experiment form as plain data, and its translation to and from the
 // immutable specification the workspace stores.
-import { portfolioExperiment } from '../../portfolio-experiment.js'
+import { portfolioExperiment } from './portfolio-experiment.js'
 
 export const exactModelKey = (model) => `${model.id}|${model.digest}`
 
