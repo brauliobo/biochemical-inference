@@ -52,8 +52,8 @@ must make sense on its own.
 |---|---|---|---|
 | E1 | Unassisted task success, T1 to T6 | at least 90 percent per task | Moderated test, 5 or more participants per round, including at least 2 assistive-technology users |
 | E2 | Participants who, after T8, say the site is educational and not medical advice | at least 95 percent | Same test, one question |
-| E3 | Entities reachable from Home | 100 percent in 3 or fewer interactions | Automated: breadth-first search over the rendered link graph from `#/` (to be added with the entity views) |
-| E4 | Link integrity | 0 broken internal links, every page has at least one outgoing content link | Automated link-graph test (with E3) |
+| E3 | Entities reachable from Home | 100 percent in 3 or fewer interactions | Automated: Home links to every kind (`usability-tasks.spec.js`, E3) and each kind's listing links to every entry (`tests/component/kb-link-integrity.test.js`), so every entity is 2 interactions away |
+| E4 | Link integrity | 0 broken internal links, every page has at least one outgoing content link | Automated: `tests/component/kb-link-integrity.test.js` renders every entity page and resolves every link to a route and an entity; `tests/unit/kb-links.test.js` does the same on the page models (`KB_STRICT_LINKS=1` also fails on dangling data references) |
 | E5 | Deep links | A URL copied from the address bar reopens the same page after reload, at the Pages sub-path | `tests/e2e/shell.spec.js`; static build checked by hand |
 | E6 | Unknown routes | A 404 page with a way out, never a blank screen | `tests/component/shell.test.js`, `shell.spec.js` |
 
@@ -66,7 +66,7 @@ An interaction is one activation of a link or control (click, tap, or Enter).
 | F1 | Interactions to reach an entity from Home | 3 or fewer; 1 per relationship hop | E3 |
 | F2 | Median time on task | T2 under 30 s; T1 under 60 s | Moderated test |
 | F3 | Largest Contentful Paint / Interaction to Next Paint / Cumulative Layout Shift | 2.5 s / 200 ms / 0.1 or better, mid-range mobile, throttled 4G | Lighthouse or WebPageTest per release |
-| F4 | Initial JavaScript, home route | 100 kB gzip or less (about 67 kB today); workbench code never loads on knowledge pages | `npm run build:static` output |
+| F4 | Initial JavaScript, home route | 100 kB gzip or less before the first heading renders (the knowledge data, about 182 kB gzip, loads lazily after first paint, see `src/kb/knowledge-lazy.js`); workbench code never loads on knowledge pages | `npm run build:static` output, network log (see Results) |
 | F5 | Keyboard cost | Skip link first; primary navigation within 5 Tab presses of page load | `shell.spec.js` |
 
 ### Satisfaction
@@ -111,8 +111,11 @@ An interaction is one activation of a link or control (click, tap, or Enter).
 
 ## Verification
 
-Automated, on every change: `npm test` (contrast, tokens, router, shell) and
-`npm run test:acceptance:e2e` (`shell.spec.js`, axe, keyboard, targets).
+Automated, on every change: `npm test` (contrast, tokens, router, shell, knowledge
+views, link integrity) and `npm run test:acceptance:e2e` (`shell.spec.js`, axe, keyboard,
+targets). The same browser specs run against the static build, with no API, through
+`npm run build:static && npm run test:e2e:static` (`shell.spec.js` and
+`usability-tasks.spec.js`, desktop and mobile projects).
 
 Manual, each release, on the home page, one entity page and one workbench page:
 
@@ -126,6 +129,49 @@ Manual, each release, on the home page, one entity page and one workbench page:
 Moderated usability round, before each major content release: 5 to 8 participants
 across the user groups, T1 to T6 with think-aloud, record success, time, errors,
 SEQ per task, SUS at the end; fix every task that misses E1 before release.
+
+## Results
+
+Automated task measures, static build, Chromium desktop (1280 x 720) and the mobile
+project (360 x 740), 2026-10-12, 50 browser tests passing. An interaction is one
+click, tap or Enter. Source: `tests/e2e/usability-tasks.spec.js` (prints a `MEASURE` line
+per measure) and `tests/e2e/shell.spec.js`.
+
+| Measure | Target | Result |
+|---|---|---|
+| T1 learn what betaine is, from Home | 3 or fewer | 1 interaction (Start here link); page shows plain summary and the evidence grade explained in words |
+| T2 reach GNMT by search | 3 or fewer | 2 interactions (focus the box, choose the result); 1 interaction with the keyboard (type, Enter) |
+| T2 reach GNMT by browsing | 3 or fewer | 2 interactions (Enzymes, then GNMT) |
+| T2 filter the enzyme list by "methyltransferase" | n/a | 11 matches of 58 |
+| T3 enzyme to the reaction it catalyses, then to a compound | 3 or fewer | 2 interactions |
+| T3 "what links glycine to belching": guided link on Home | 3 or fewer | 1 interaction, a 2-step chain with a named relationship on every step |
+| T3 same question, choosing the target on the Glycine page | 4 (open, focus, choose + page) | 4 interactions |
+| T4 under- to over-methylation, with the relationship between them | 4 | 4 interactions |
+| T5 evidence behind a statement | 3 or fewer | 2 interactions (claims audit, a claim with status and both evidence sections) |
+| E3 every kind from Home | 1 interaction | 11 of 11 kinds, each first entry 2 interactions |
+| E4 link integrity, all entity pages rendered | 0 broken links | 0 broken, 0 unnamed links on 411 pages; every page links onward |
+| T6 deep link (`?to=`) reopened in a fresh browser | same page and result | passes |
+| T8 "not medical advice" notice fully inside the first screen | visible without scrolling | passes at 1280 x 720 (bottom edge 352 px) and 360 x 740 (591 px of 740) |
+| Keyboard only: Tab presses to the search box on Home | n/a | 8 |
+| Keyboard only: search, Down/Up/Escape through results, Enter | operable | passes |
+| Keyboard only: Tab to a reaction link on an entity page, then the "connected to" control | operable | 20 Tab presses to the first reaction or enzyme link; control opens and chooses with Enter |
+| F5 Tab presses to the primary navigation (Home, entity page) | 5 or fewer | 3 and 3 |
+| Focus indicator on every Tab stop (Home, claims, reaction) | always visible | 0 stops without an outline |
+| A1 axe WCAG 2.2 AA, 17 routes, light and dark, desktop and mobile | 0 violations | 0 (also with search results, every disclosure open and a filtered listing) |
+| A4 buttons, fields, disclosure summaries in `main` on 4 key pages | 44 px or more | 0 under 44 px |
+| A5 horizontal overflow at 320 px, 8 key routes | none | 0 routes overflow |
+| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 71.9 kB (index 65.6 kB); the data chunk (181.9 kB) follows lazily, 255 kB in total |
+| JavaScript, an entity page (data is required) | n/a | 258 kB gzip in total |
+
+Not measured here (needs people or devices): E1, E2, F2, F3, S1 to S4, screen readers,
+zoom to 400 percent, forced colours. They stay on the manual list above.
+
+Findings from running these measures that changed the design: the first build put the
+knowledge data in the home route's initial JavaScript (255 kB, over F4), so the home page
+and its search box now load it lazily; the "not medical advice" notice was below the first
+screen on a phone (923 px), so it now sits directly under the page heading; long relation
+lists made entity pages very long on a phone (Glycine was about 16,000 px tall on a phone, now about 11,600 px), so groups
+show 8 items and fold the rest behind "Show N more".
 
 ## Definition of done for a new view
 

@@ -53,18 +53,18 @@ describe('app shell', () => {
     expect(nav().getByRole('link', { name: 'Home' }).getAttribute('aria-current')).toBeNull()
     expect(document.title).toBe('Knowledge base · Biochemical Inference')
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('main')))
-    expect(screen.getByRole('status').textContent).toBe(document.title)
+    expect(screen.getAllByRole('status').map((status) => status.textContent)).toContain(document.title)
   })
 
   it('renders entity routes with params and keeps their section marked', async () => {
-    navigate('/kb/enzymes/mthfr')
+    navigate('/kb/enzyme/gnmt')
     mountVapor(App)
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'mthfr' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ })).toBeTruthy()
     expect(nav().getByRole('link', { name: 'Knowledge base' }).getAttribute('aria-current')).toBe('true')
 
-    navigate('/kb/enzymes/comt')
-    expect(await screen.findByRole('heading', { level: 1, name: 'comt' })).toBeTruthy()
+    navigate('/kb/enzyme/bhmt')
+    expect(await screen.findByRole('heading', { level: 1, name: /Betaine-homocysteine/ })).toBeTruthy()
   })
 
   it('shows a 404 page with a way out', async () => {
