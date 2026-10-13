@@ -1,0 +1,37 @@
+// A small, fully valid knowledge base covering every entity type (produces 0 errors, 1 warning).
+// FIXTURE DATA for engine tests; it is not real content and cites fictional papers.
+
+const ref = () => ['article:fixture-gnmt-review']
+
+export default [
+  { id: 'compound:glycine', type: 'compound', name: 'Glycine', aliases: ['Gly', 'glicina'], summary: 'Smallest amino acid; methyl acceptor for GNMT.', evidence: 'established', refs: ref(), facts: { formula: 'C2H5NO2', chebi: 'CHEBI:15428' }, relations: [{ rel: 'precursor-of', to: 'compound:sarcosine', note: 'via methylation' }], body: ['Glycine is the substrate of [[enzyme:gnmt|GNMT]] and is used as a [[intervention:glycine-supplement]].'] },
+  { id: 'compound:sam', type: 'compound', name: 'S-adenosylmethionine', aliases: ['SAMe', 'SAM', 'S-adenosilmetionina'], summary: 'Universal methyl donor.', evidence: 'established', refs: ref(), facts: { formula: 'C15H22N6O5S' }, relations: [{ rel: 'precursor-of', to: 'compound:sah' }], body: ['SAMe donates methyl groups; see [[pathway:methionine-cycle]].'] },
+  { id: 'compound:sah', type: 'compound', name: 'S-adenosylhomocysteine', aliases: ['SAH'], summary: 'Product of methyl transfer; inhibits methyltransferases.', evidence: 'established', refs: ref(), relations: [{ rel: 'precursor-of', to: 'compound:homocysteine' }] },
+  { id: 'compound:sarcosine', type: 'compound', name: 'Sarcosine', aliases: ['N-methylglycine'], summary: 'N-methylglycine, product of GNMT.', evidence: 'established', refs: ref() },
+  { id: 'compound:betaine', type: 'compound', name: 'Betaine', aliases: ['TMG', 'trimethylglycine'], summary: 'Methyl donor for BHMT.', evidence: 'established', refs: ref(), relations: [{ rel: 'precursor-of', to: 'compound:dimethylglycine' }] },
+  { id: 'compound:dimethylglycine', type: 'compound', name: 'Dimethylglycine', aliases: ['DMG'], summary: 'Product of the BHMT reaction.', evidence: 'established', refs: ref() },
+  { id: 'compound:homocysteine', type: 'compound', name: 'Homocysteine', aliases: ['Hcy', 'homocisteína'], summary: 'Sulfur amino acid remethylated to methionine.', evidence: 'established', refs: ref(), relations: [{ rel: 'precursor-of', to: 'compound:methionine' }] },
+  { id: 'compound:methionine', type: 'compound', name: 'Methionine', aliases: ['Met'], summary: 'Essential amino acid and SAMe precursor.', evidence: 'established', refs: ref(), relations: [{ rel: 'precursor-of', to: 'compound:sam' }] },
+
+  { id: 'enzyme:gnmt', type: 'enzyme', name: 'Glycine N-methyltransferase', aliases: ['GNMT'], summary: 'Liver enzyme that buffers SAMe by methylating glycine.', evidence: 'established', refs: ref(), facts: { gene: 'GNMT', ec: '2.1.1.20', uniprot: 'Q14749' }, relations: [{ rel: 'decreases', to: 'compound:sam' }] },
+  { id: 'enzyme:bhmt', type: 'enzyme', name: 'Betaine-homocysteine methyltransferase', aliases: ['BHMT'], summary: 'Remethylates homocysteine using betaine.', evidence: 'established', refs: ref(), facts: { gene: 'BHMT', ec: '2.1.1.5' } },
+
+  { id: 'reaction:gnmt-methylation', type: 'reaction', name: 'GNMT methylation of glycine', summary: 'Glycine + SAMe become sarcosine + SAH.', evidence: 'established', refs: ref(), reaction: { reactants: [{ id: 'compound:glycine', n: 1 }, { id: 'compound:sam', n: 1 }], products: [{ id: 'compound:sarcosine', n: 1 }, { id: 'compound:sah', n: 1 }], ec: '2.1.1.20', enzymes: ['enzyme:gnmt'], reversible: false, compartment: 'cytosol' }, relations: [{ rel: 'part-of', to: 'pathway:methionine-cycle' }] },
+  { id: 'reaction:bhmt-remethylation', type: 'reaction', name: 'BHMT remethylation', summary: 'Betaine + homocysteine become DMG + methionine.', evidence: 'established', refs: ref(), reaction: { reactants: [{ id: 'compound:betaine', n: 1 }, { id: 'compound:homocysteine', n: 1 }], products: [{ id: 'compound:dimethylglycine', n: 1 }, { id: 'compound:methionine', n: 1 }], ec: '2.1.1.5', enzymes: ['enzyme:bhmt'], reversible: true }, relations: [{ rel: 'part-of', to: 'pathway:methionine-cycle' }] },
+
+  { id: 'pathway:methionine-cycle', type: 'pathway', name: 'Methionine cycle', aliases: ['Ciclo da metionina'], summary: 'Cycle regenerating methionine and SAMe from homocysteine.', evidence: 'established', refs: ref(), body: ['Cycles methyl groups between [[compound:methionine]], [[compound:sam]] and [[compound:homocysteine]].'] },
+
+  { id: 'state:under-methylation', type: 'state', name: 'Under-methylation', aliases: ['submetilação'], summary: 'Methyl supply insufficient for demand.', evidence: 'plausible', relations: [{ rel: 'measured-by', to: 'compound:homocysteine' }, { rel: 'manifests-as', to: 'outcome:belching' }] },
+  { id: 'state:hypochlorhydria', type: 'state', name: 'Hypochlorhydria', aliases: ['low stomach acid', 'hipocloridria'], summary: 'Reduced gastric acid output.', evidence: 'established', refs: ref(), relations: [{ rel: 'causes', to: 'disease:sibo' }, { rel: 'associated-with', to: 'system:stomach' }] },
+  { id: 'disease:sibo', type: 'disease', name: 'Small intestinal bacterial overgrowth', aliases: ['SIBO'], summary: 'Excess bacteria in the small intestine.', evidence: 'established', refs: ref(), relations: [{ rel: 'manifests-as', to: 'outcome:belching' }] },
+  { id: 'outcome:belching', type: 'outcome', name: 'Belching', aliases: ['arroto', 'eructação'], summary: 'Upper gastrointestinal gas release.', evidence: 'plausible' },
+  { id: 'system:stomach', type: 'system', name: 'Stomach', aliases: ['estômago'], summary: 'Acid-secreting organ of the upper gut.', evidence: 'established', refs: ref() },
+
+  { id: 'intervention:glycine-supplement', type: 'intervention', name: 'Glycine supplement', aliases: ['glicina em pó'], summary: 'Oral glycine powder.', evidence: 'plausible', relations: [{ rel: 'aggravates', to: 'outcome:belching' }, { rel: 'contraindicated-in', to: 'disease:sibo', note: 'may feed fermentation' }, { rel: 'interacts-with', to: 'intervention:tmg-supplement' }] },
+  { id: 'intervention:tmg-supplement', type: 'intervention', name: 'TMG supplement', aliases: ['betaine supplement'], summary: 'Oral trimethylglycine.', evidence: 'plausible', relations: [{ rel: 'mitigates', to: 'state:under-methylation' }, { rel: 'increases', to: 'compound:methionine' }] },
+
+  { id: 'claim:glycine-depletes-sam', type: 'claim', name: 'Glycine depletes SAMe', summary: 'High-dose glycine drains methyl groups via GNMT.', evidence: 'speculative', statement: 'Taking large doses of glycine depletes SAMe through GNMT.', source: 'conversation', status: 'partly-supported', refs: ref(), relations: [{ rel: 'associated-with', to: 'enzyme:gnmt' }], body: ['Raised about [[intervention:glycine-supplement|glycine powder]].'] },
+
+  { id: 'article:fixture-gnmt-review', type: 'article', name: 'A fixture review of GNMT and SAMe buffering', summary: 'Fictional review used in tests.', evidence: 'established', authors: ['Ada Fixture', 'Bob Sample', 'Cy Test'], year: 2001, journal: 'Journal of Fixtures', doi: '10.0000/fixture-1', pmid: '12345678', verified: true, takeaways: ['GNMT buffers SAMe.'] },
+  { id: 'article:fixture-unverified', type: 'article', name: 'An unverified fixture note on glycine', summary: 'Fictional unverified citation used in tests.', evidence: 'speculative', authors: ['Dee Draft'], year: 2015, journal: 'Draft Letters', verified: false, takeaways: ['Glycine may not deplete SAMe.'], relations: [{ rel: 'evidence-against', to: 'claim:glycine-depletes-sam' }] }
+]
