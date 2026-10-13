@@ -23,3 +23,6 @@ playwright-report/
 test-results/
 .env
 .biochemical-workspace/
+
+# scratch: screenshots, the source conversation and its coverage checklist (local only)
+tmp/
