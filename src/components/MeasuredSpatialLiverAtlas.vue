@@ -331,6 +331,6 @@ Section.measured-atlas(title="DigiMouse liver label atlas" title-id="measured-at
           li(v-for="item in limitations" :key="item.id") {{ item.statement }}
         p
           strong Registration:
-          |  {{ registration.status }}. {{ registration.reason }}
+          | {{ ` ${registration.status}. ${registration.reason}` }}
   p.visually-hidden(role="status") {{ announcement }}
 </template>

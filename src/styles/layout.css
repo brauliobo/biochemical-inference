@@ -66,6 +66,7 @@
 /* Explicit column count for data that is a matrix (set --grid-columns). */
 .grid--fixed {
   --grid-columns: 1;
+  align-content: start;
   grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
 }
 

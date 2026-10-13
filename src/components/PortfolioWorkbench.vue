@@ -142,8 +142,7 @@ Section.portfolio-panel(title="ODE · SSA · FBA workbench" title-id="portfolio-
       dl.facts
         div
           dt Model digest
-          dd
-            code.digest {{ model.digest }}
+          dd.digest {{ model.digest }}
         div
           dt Knowledge release
           dd {{ model.knowledgeRelease.id }}
@@ -167,7 +166,7 @@ Section.portfolio-panel(title="ODE · SSA · FBA workbench" title-id="portfolio-
       span(:class="badgeClass(result.outcome)") {{ result.lifecycle }} · {{ result.outcome }}
     template(v-if="result.data?.engine === 'ode'")
       ChartFrame(id="portfolio-chart" :title="`Reactant trajectory (${result.data.trajectories[0].unit.symbol})`" :summary="odeSummary" table-label="Show trajectory samples")
-        svg.chart(viewBox="0 0 100 100" preserveAspectRatio="none" role="img" :aria-label="`ODE reactant trajectory with ${result.data.time.length} points`")
+        svg.chart.chart--stretch(viewBox="0 0 100 100" preserveAspectRatio="none" role="img" :aria-label="`ODE reactant trajectory with ${result.data.time.length} points`")
           line.chart__axis(x1="0" y1="100" x2="100" y2="100")
           line.chart__axis(x1="0" y1="0" x2="0" y2="100")
           line.chart__gridline(x1="0" y1="50" x2="100" y2="50")

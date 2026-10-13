@@ -192,8 +192,8 @@ Section.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow=
               span(:class="claimBadge('polarity', claim.polarity)") {{ claim.polarity }}
             p
               strong {{ displayEntity(claim.subjectId) }}
-              span.relation  {{ claim.relation.replaceAll('_', ' ') }}
-              strong  {{ displayEntity(claim.objectId) }}
+              span {{ ` ${claim.relation.replaceAll('_', ' ')} ` }}
+              strong {{ displayEntity(claim.objectId) }}
             small.muted Taxon {{ claim.context.taxonId }} · tissue {{ claim.context.tissueId ?? 'unknown' }} · compartment {{ claim.context.compartmentId ?? 'unknown' }} · cell {{ claim.context.cellId ?? 'unknown' }}
             details.stack.stack--tight
               summary Evidence lineage ({{ claim.evidenceIds.length }})

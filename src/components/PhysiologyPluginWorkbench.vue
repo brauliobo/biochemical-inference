@@ -169,24 +169,19 @@ Section.physiology-panel(title="Physiology plugin workbench" title-id="physiolog
           dl.facts
             div
               dt Package digest
-              dd
-                code.digest {{ item.packageDigest }}
+              dd.digest {{ item.packageDigest }}
             div
               dt Model descriptor
-              dd
-                code.digest {{ item.modelDescriptorDigest }}
+              dd.digest {{ item.modelDescriptorDigest }}
             div
               dt Coupling descriptor
-              dd
-                code.digest {{ item.couplingDescriptorDigest }}
+              dd.digest {{ item.couplingDescriptorDigest }}
             div
               dt Publisher key
-              dd
-                code.digest {{ item.signature.keyId }}
+              dd.digest {{ item.signature.keyId }}
             div
               dt Signature
-              dd
-                code.digest {{ item.signature.signature }}
+              dd.digest {{ item.signature.signature }}
             div
               dt License
               dd {{ item.manifest.license.spdx }} · redistributable
@@ -200,8 +195,9 @@ Section.physiology-panel(title="Physiology plugin workbench" title-id="physiolog
           h5 Ports · exact evidence binding
           ul.plain-list.stack.stack--tight
             li.card.card--flat.stack.stack--tight(v-for="port in evidenceByPlugin.get(item.manifest.pluginId)?.ports" :key="port.id")
-              strong {{ port.direction }} · {{ port.id }}
-              span.muted {{ port.semantic }} · {{ port.dimension }} · {{ port.unit }}
+              p
+                strong {{ port.direction }} · {{ port.id }}
+              p.muted {{ port.semantic }} · {{ port.dimension }} · {{ port.unit }}
           p.muted {{ contextById.get(item.manifest.applicability.contextIds[0])?.name }} · {{ item.manifest.applicability.taxonIds[0] }}
           label.choice
             input(type="radio" :name="`physiology-package-${item.manifest.pluginId}`" :checked="selectedPackageDigests[item.manifest.pluginId] === item.packageDigest" :disabled="isBusy || item.trust.status !== 'trusted'" @change="choosePackage(item)")

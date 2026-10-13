@@ -331,7 +331,7 @@ Section.measured-workbench(title="Qualified observations and isolated evaluation
         ul
           li(v-for="item in disclosure.items" :key="item.measurement_id")
             code {{ item.group_id }}
-            |  {{ item.reported_value }} {{ item.reported_unit }} · SEM {{ item.uncertainty.value }} · n={{ item.uncertainty.n }}
+            | {{ ` ${item.reported_value}` }} {{ item.reported_unit }} · SEM {{ item.uncertainty.value }} · n={{ item.uncertainty.n }}
         p Labels remain external-held-out; disclosure does not produce a validation conclusion.
   p.visually-hidden(role="status") {{ announcement }}
 </template>

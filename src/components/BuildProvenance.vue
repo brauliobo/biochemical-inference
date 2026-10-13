@@ -19,7 +19,7 @@ const licenseIds = computed(() => [...new Set(props.provenance?.sourceObjects.ma
 
 <template lang="pug">
 details.stack(:open="status === 'unavailable'")
-  summary.repel
+  summary.cluster
     strong Build provenance
     span(:class="badgeClass(status)") {{ label }}
   .stack
