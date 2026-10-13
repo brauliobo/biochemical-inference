@@ -1,5 +1,5 @@
 <script setup vapor>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import {
   cancelWorkspaceAttempt,
   cloneWorkspaceExperiment,
@@ -21,13 +21,20 @@ import {
   queueWorkspaceRun,
   restartWorkspaceCheckpoint
 } from '../api.js'
-import DataTable from '../ui/DataTable.vue'
-import Field from '../ui/Field.vue'
+import { usePolling } from '../composables/usePolling.js'
+import { useWorkflow } from '../composables/useWorkflow.js'
+import ErrorNotice from '../ui/ErrorNotice.vue'
+import LiveMessage from '../ui/LiveMessage.vue'
 import Panel from '../ui/Panel.vue'
+import { statusTone } from '../ui/tone.js'
+import AttemptHistory from './experiments/AttemptHistory.vue'
+import AttemptInspector from './experiments/AttemptInspector.vue'
+import ExperimentForm from './experiments/ExperimentForm.vue'
+import RevisionLedger from './experiments/RevisionLedger.vue'
+import { buildSpecification, draftFromRevision, exactModelKey, interventionTargets, newDraft } from './experiments/draft.js'
 
-const TONES = { ready: 'success', successful: 'success', failed: 'danger', 'resource-exhausted': 'danger', cancelled: 'warning' }
-const statusTone = (value) => TONES[value] ?? ''
-const statusClass = (value) => (statusTone(value) ? `badge--${statusTone(value)}` : '')
+const HISTORY_LIMIT = 25
+const POLL_MS = 750
 
 const registryModels = ref([])
 const embeddedModels = ref([])
@@ -40,569 +47,308 @@ const events = ref([])
 const artifacts = ref([])
 const report = ref()
 const comparison = ref()
-const state = ref('loading')
-const message = ref('')
 const exportHref = ref('')
 const exportName = ref('experiment.zip')
-const name = ref('Controlled first-order experiment')
-const description = ref('Local, digest-pinned portfolio experiment.')
-const modelKey = ref('')
-const resourceProfileId = ref('local-default')
-const taxonId = ref('NCBITaxon:9606')
-const tissueId = ref('')
-const duration = ref(10)
-const seed = ref(20260713)
-const design = ref('single')
-const ensembleMembers = ref(3)
-const interventionTarget = ref('')
-const interventionTime = ref(5)
-const interventionValue = ref(5)
-const numericalKind = ref('exact')
-const absoluteTolerance = ref(1e-9)
-const relativeTolerance = ref(1e-7)
-const filters = ref({ status: '', release: '', model: '', taxon: '', tissue: '' })
+const draft = reactive(newDraft())
+const filters = reactive({ status: '', release: '', model: '', taxon: '', tissue: '' })
 const historyOffset = ref(0)
-const historyLimit = 25
-let pollTimer
-let controller
-let attemptController
-let pollController
-let attemptGeneration = 0
-let pollGeneration = 0
+// Every operation is one workflow step: it supersedes the previous one and its
+// results appear together with the new state.
+const { state, message, step } = useWorkflow({ settled: ['ready', 'failed'] })
 
-const exactModelKey = (item) => `${item.id}|${item.digest}`
 const models = computed(() => {
-  const exactRegistry = new Set(registryModels.value.map(exactModelKey))
-  return [...registryModels.value, ...embeddedModels.value.filter((item) => !exactRegistry.has(exactModelKey(item)))]
+  const exact = new Set(registryModels.value.map(exactModelKey))
+  return [...registryModels.value, ...embeddedModels.value.filter((item) => !exact.has(exactModelKey(item)))]
 })
-const model = computed(() => models.value.find((item) => exactModelKey(item) === modelKey.value))
+const model = computed(() => models.value.find((item) => exactModelKey(item) === draft.modelKey))
+const targets = computed(() => interventionTargets(model.value))
+const isRegistry = (item) => registryModels.value.some((candidate) => candidate.id === item.id && candidate.digest === item.digest)
 const latestRevision = computed(() => detail.value?.revisions.at(-1))
-const isReadOnly = computed(() => Boolean(latestRevision.value) && latestRevision.value.specification.entries.some((entry) => !isRegistryModel(entry.model)))
-const successfulAttempts = computed(() => history.value.items.filter((item) => item.attempt.outcome === 'successful' && item.attempt.resultArtifactId))
-const modelFilterIds = computed(() => [...new Set(models.value.map((item) => item.id))])
-const attemptStatus = computed(() => selectedAttempt.value?.attempt.outcome ?? selectedAttempt.value?.attempt.state ?? '')
-const historyStart = computed(() => history.value.total === 0 ? 0 : history.value.offset + 1)
-const historyEnd = computed(() => Math.min(history.value.offset + history.value.items.length, history.value.total))
-const interventionTargets = computed(() => {
-  if (!model.value) return []
-  if (model.value.engine.type === 'fba') return model.value.definition.reactions.map((item) => ({ id: item.id, unit: item.unit }))
-  return [...model.value.definition.species, ...model.value.definition.parameters].map((item) => ({ id: item.id, unit: item.unit }))
-})
+const readOnly = computed(() => Boolean(latestRevision.value) && latestRevision.value.specification.entries.some((entry) => !isRegistry(entry.model)))
+const successful = computed(() => history.value.items.filter((item) => item.attempt.outcome === 'successful' && item.attempt.resultArtifactId))
+const modelIds = computed(() => [...new Set(models.value.map((item) => item.id))])
 
-function isRegistryModel(item) {
-  return registryModels.value.some((candidate) => candidate.id === item.id && candidate.digest === item.digest)
-}
-
-function setFailure(error, fallback) {
-  state.value = 'failed'
-  message.value = error instanceof Error ? error.message : fallback
-}
-
-function isAbort(error) {
-  return error instanceof DOMException && error.name === 'AbortError'
-}
-
-function chooseModel() {
-  interventionTarget.value = interventionTargets.value[0]?.id ?? ''
-}
-
-function portfolioExperiment(selected, entrySeed, interventions) {
-  const controls = selected.engine.type === 'ode'
-    ? { method: 'dormand-prince-5-4', timeUnit: 'second', duration: duration.value, outputInterval: 1, fixedStep: 0.1, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
-    : selected.engine.type === 'ssa'
-      ? { method: 'gillespie-direct', timeUnit: 'second', duration: duration.value, outputInterval: 1, replicates: 128, maxEventsPerReplicate: 100000 }
-      : { method: 'two-phase-simplex', feasibilityTolerance: 1e-8, maxIterations: 10000 }
-  return {
-    contractVersion: '2.0.0',
-    modelId: selected.id,
-    modelDigest: selected.digest,
-    knowledgeRelease: selected.knowledgeRelease,
-    engine: { ...selected.engine, algorithm: controls.method, algorithmVersion: '1.0.0' },
-    seed: entrySeed,
-    assumptions: ['Registry values are used without substitution unless the immutable revision declares a portfolio variant.'],
-    limitations: ['Workspace execution is a bounded numerical experiment, not a physiological or clinical prediction.'],
-    interventions,
-    controls
-  }
-}
-
-function specification() {
-  const selected = model.value
-  const target = interventionTargets.value.find((item) => item.id === interventionTarget.value)
-  const interventions = design.value === 'intervention-schedule' && target
-    ? [{ targetId: target.id, time: selected.engine.type === 'fba' ? 0 : interventionTime.value, value: interventionValue.value, unit: target.unit }]
-    : []
-  const count = design.value === 'ensemble' ? ensembleMembers.value : 1
-  const entries = Array.from({ length: count }, (_, index) => ({
-    id: count === 1 ? 'primary' : `member_${index + 1}`,
-    label: count === 1 ? 'Primary specification' : `Ensemble member ${index + 1}`,
-    model: selected,
-    experiment: portfolioExperiment(selected, (seed.value + index) >>> 0, interventions)
-  }))
-  const designContract = design.value === 'ensemble' ? { type: 'ensemble', members: count } : { type: design.value }
-  return {
-    contractVersion: '1.0.0',
-    design: designContract,
-    context: { taxonId: taxonId.value, tissueId: tissueId.value || null },
-    entries,
-    numericalContract: numericalKind.value === 'exact' ? { kind: 'exact' } : { kind: 'tolerance', absolute: absoluteTolerance.value, relative: relativeTolerance.value },
-    tags: ['workspace']
-  }
-}
+const chooseModel = () => { draft.interventionTarget = targets.value[0]?.id ?? '' }
 
 function applyRevision(revision) {
-  const spec = revision.specification
-  for (const entry of spec.entries) {
+  for (const entry of revision.specification.entries) {
     if (!models.value.some((item) => item.id === entry.model.id && item.digest === entry.model.digest)) embeddedModels.value.push(entry.model)
   }
-  modelKey.value = exactModelKey(spec.entries[0].model)
-  taxonId.value = spec.context.taxonId
-  tissueId.value = spec.context.tissueId ?? ''
-  design.value = ['single', 'ensemble', 'intervention-schedule'].includes(spec.design.type) ? spec.design.type : 'single'
-  ensembleMembers.value = spec.entries.length
-  seed.value = spec.entries[0].experiment.seed
-  duration.value = spec.entries[0].experiment.controls.duration ?? 10
-  numericalKind.value = spec.numericalContract.kind
-  if (spec.numericalContract.kind === 'tolerance') {
-    absoluteTolerance.value = spec.numericalContract.absolute
-    relativeTolerance.value = spec.numericalContract.relative
-  }
+  Object.assign(draft, draftFromRevision(revision))
+  if (!revision.specification.entries[0].experiment.interventions[0]) chooseModel()
+}
+
+function showDetail(loaded) {
+  detail.value = loaded
+  draft.name = loaded.experiment.name
+  draft.description = loaded.experiment.description
+  applyRevision(loaded.revisions.at(-1))
+  exportHref.value = ''
+}
+
+function showNewExperiment() {
+  detail.value = undefined
+  Object.assign(draft, { ...newDraft(), modelKey: registryModels.value[0] ? exactModelKey(registryModels.value[0]) : '', resourceProfileId: draft.resourceProfileId })
   chooseModel()
-  const intervention = spec.entries[0].experiment.interventions[0]
-  if (intervention) {
-    interventionTarget.value = intervention.targetId
-    interventionTime.value = intervention.time
-    interventionValue.value = intervention.value
-  }
+  exportHref.value = ''
 }
 
-async function refreshHistory(reset = false) {
+const historyQuery = (offset = historyOffset.value) => ({ ...filters, limit: HISTORY_LIMIT, offset })
+
+async function attemptState(attemptId, { signal, fresh }) {
+  const [attempt, loadedEvents, loadedArtifacts] = fresh(await Promise.all([
+    loadWorkspaceAttempt(attemptId, signal),
+    loadWorkspaceEvents(attemptId, signal),
+    loadWorkspaceArtifacts(attemptId, signal)
+  ]))
+  return { attempt, events: loadedEvents, artifacts: loadedArtifacts }
+}
+
+const poll = usePolling(async (task) => {
+  const attemptId = selectedAttempt.value?.attempt.attemptId
+  const loaded = await attemptState(attemptId, task)
+  if (selectedAttempt.value?.attempt.attemptId !== attemptId) return false
+  selectedAttempt.value = loaded.attempt
+  events.value = loaded.events
+  artifacts.value = loaded.artifacts
+  if (loaded.attempt.attempt.state !== 'terminal') return true
+  history.value = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
+  return false
+}, { interval: POLL_MS, onError: () => true })
+
+function showAttempt(loaded) {
+  selectedAttempt.value = loaded.attempt
+  events.value = loaded.events
+  artifacts.value = loaded.artifacts
+  report.value = undefined
+  if (loaded.attempt.attempt.state === 'terminal') poll.stop()
+  else poll.start()
+}
+
+const refreshHistory = (reset = false) => {
   if (reset) historyOffset.value = 0
-  history.value = await loadWorkspaceHistory({ ...filters.value, limit: historyLimit, offset: historyOffset.value }, controller?.signal)
+  return step('loading', async ({ signal, fresh }) => fresh(await loadWorkspaceHistory(historyQuery(), signal)), {
+    done: (loaded) => {
+      history.value = loaded
+      return 'ready'
+    },
+    failure: 'History could not be loaded.'
+  })
 }
 
-async function previousHistoryPage() {
-  historyOffset.value = Math.max(0, historyOffset.value - historyLimit)
-  await refreshHistory()
-}
-
-async function nextHistoryPage() {
-  if (historyOffset.value + history.value.items.length >= history.value.total) return
-  historyOffset.value += historyLimit
-  await refreshHistory()
-}
-
-async function initialize() {
-  controller?.abort()
-  controller = new AbortController()
-  state.value = 'loading'
-  try {
-    const [loadedModels, loadedProfiles, loadedExperiments, loadedHistory] = await Promise.all([
-      loadPortfolioModels(controller.signal),
-      loadWorkspaceResourceProfiles(controller.signal),
-      loadWorkspaceExperiments(controller.signal),
-      loadWorkspaceHistory({ limit: historyLimit, offset: 0 }, controller.signal)
-    ])
+const initialize = () => step('loading', async ({ signal, fresh }) => {
+  const [loadedModels, loadedProfiles, loadedExperiments, loadedHistory] = fresh(await Promise.all([
+    loadPortfolioModels(signal),
+    loadWorkspaceResourceProfiles(signal),
+    loadWorkspaceExperiments(signal),
+    loadWorkspaceHistory({ limit: HISTORY_LIMIT, offset: 0 }, signal)
+  ]))
+  const first = loadedExperiments[0] ? fresh(await loadWorkspaceExperiment(loadedExperiments[0].experimentId, signal)) : undefined
+  return { loadedModels, loadedProfiles, loadedExperiments, loadedHistory, first }
+}, {
+  done: ({ loadedModels, loadedProfiles, loadedExperiments, loadedHistory, first }) => {
     registryModels.value = loadedModels
     profiles.value = loadedProfiles
     experiments.value = loadedExperiments
     history.value = loadedHistory
-    modelKey.value ||= loadedModels[0] ? exactModelKey(loadedModels[0]) : ''
+    draft.modelKey ||= loadedModels[0] ? exactModelKey(loadedModels[0]) : ''
     chooseModel()
-    if (loadedExperiments[0]) await selectExperiment(loadedExperiments[0].experimentId)
-    state.value = 'ready'
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
-    setFailure(error, 'Experiment workspace could not be loaded.')
-  }
-}
+    if (first) showDetail(first)
+    return 'ready'
+  },
+  failure: 'Experiment workspace could not be loaded.'
+})
 
-async function selectExperiment(experimentId) {
-  if (!experimentId) {
-    detail.value = undefined
-    modelKey.value = registryModels.value[0] ? exactModelKey(registryModels.value[0]) : ''
-    name.value = 'Controlled first-order experiment'
-    description.value = 'Local, digest-pinned portfolio experiment.'
-    exportHref.value = ''
-    message.value = ''
-    chooseModel()
-    return
-  }
-  detail.value = await loadWorkspaceExperiment(experimentId)
-  name.value = detail.value.experiment.name
-  description.value = detail.value.experiment.description
-  applyRevision(detail.value.revisions.at(-1))
-  exportHref.value = ''
-  message.value = ''
-}
+const selectExperiment = (experimentId) => step('loading', async ({ signal, fresh }) => (experimentId ? fresh(await loadWorkspaceExperiment(experimentId, signal)) : undefined), {
+  done: (loaded) => {
+    if (loaded) showDetail(loaded)
+    else showNewExperiment()
+    return 'ready'
+  },
+  failure: 'Experiment could not be loaded.'
+})
 
-async function createExperiment() {
-  state.value = 'saving'
-  try {
-    detail.value = await createWorkspaceExperiment({ name: name.value, description: description.value, specification: specification(), resourceProfileId: resourceProfileId.value })
-    experiments.value = await loadWorkspaceExperiments()
-    state.value = 'ready'
+const createExperiment = () => step('saving', async ({ signal, fresh }) => {
+  const created = fresh(await createWorkspaceExperiment({ name: draft.name, description: draft.description, specification: buildSpecification(draft, model.value), resourceProfileId: draft.resourceProfileId }))
+  return { created, list: fresh(await loadWorkspaceExperiments(signal)) }
+}, {
+  done: ({ created, list }) => {
+    detail.value = created
+    experiments.value = list
     message.value = 'Experiment and immutable revision created.'
-  } catch (error) {
-    setFailure(error, 'Experiment could not be created.')
-  }
-}
+    return 'ready'
+  },
+  failure: 'Experiment could not be created.'
+})
 
-async function saveRevision() {
-  if (isReadOnly.value) return
+function saveRevision() {
+  if (readOnly.value) return undefined
   if (!detail.value) return createExperiment()
-  state.value = 'saving'
-  try {
-    await createWorkspaceRevision(detail.value.experiment.experimentId, { specification: specification(), resourceProfileId: resourceProfileId.value })
-    await selectExperiment(detail.value.experiment.experimentId)
-    experiments.value = await loadWorkspaceExperiments()
-    state.value = 'ready'
-    message.value = 'A new immutable revision was created; prior revisions were retained.'
-  } catch (error) {
-    setFailure(error, 'Revision could not be created.')
-  }
+  const { experimentId } = detail.value.experiment
+  return step('saving', async ({ signal, fresh }) => {
+    fresh(await createWorkspaceRevision(experimentId, { specification: buildSpecification(draft, model.value), resourceProfileId: draft.resourceProfileId }))
+    return { loaded: fresh(await loadWorkspaceExperiment(experimentId, signal)), list: fresh(await loadWorkspaceExperiments(signal)) }
+  }, {
+    done: ({ loaded, list }) => {
+      showDetail(loaded)
+      experiments.value = list
+      message.value = 'A new immutable revision was created; prior revisions were retained.'
+      return 'ready'
+    },
+    failure: 'Revision could not be created.'
+  })
 }
 
-async function cloneExperiment() {
-  if (!detail.value || isReadOnly.value) return
-  try {
-    detail.value = await cloneWorkspaceExperiment(detail.value.experiment.experimentId)
-    experiments.value = await loadWorkspaceExperiments()
+const cloneExperiment = () => detail.value && !readOnly.value && step('saving', async ({ signal, fresh }) => {
+  const cloned = fresh(await cloneWorkspaceExperiment(detail.value.experiment.experimentId))
+  return { cloned, list: fresh(await loadWorkspaceExperiments(signal)) }
+}, {
+  done: ({ cloned, list }) => {
+    detail.value = cloned
+    experiments.value = list
     message.value = 'Experiment cloned with an independent immutable revision history.'
-  } catch (error) {
-    setFailure(error, 'Experiment could not be cloned.')
-  }
-}
+    return 'ready'
+  },
+  failure: 'Experiment could not be cloned.'
+})
 
-async function queueRun() {
-  if (!latestRevision.value || isReadOnly.value) return
-  try {
-    const attempt = await queueWorkspaceRun(latestRevision.value.revisionId, resourceProfileId.value)
-    await refreshHistory()
-    await inspectAttempt(attempt.attemptId)
-    message.value = 'Attempt queued. Its scientific identity is stable; this attempt identity is unique.'
-  } catch (error) {
-    setFailure(error, 'Run could not be queued.')
-  }
-}
+// Queue or restart: the new attempt, the refreshed history and its detail arrive together.
+const startAttempt = (begin, text, failure) => step('saving', async (task) => {
+  const queued = task.fresh(await begin(task))
+  const loadedHistory = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
+  return { loadedHistory, loaded: await attemptState(queued.attemptId, task) }
+}, {
+  done: ({ loadedHistory, loaded }) => {
+    history.value = loadedHistory
+    showAttempt(loaded)
+    message.value = text
+    return 'ready'
+  },
+  failure
+})
 
-async function inspectAttempt(attemptId) {
-  stopPolling()
-  const generation = ++attemptGeneration
-  attemptController?.abort()
-  attemptController = new AbortController()
-  try {
-    const [loadedAttempt, loadedEvents, loadedArtifacts] = await Promise.all([
-      loadWorkspaceAttempt(attemptId, attemptController.signal),
-      loadWorkspaceEvents(attemptId, attemptController.signal),
-      loadWorkspaceArtifacts(attemptId, attemptController.signal)
-    ])
-    if (generation !== attemptGeneration) return
-    selectedAttempt.value = loadedAttempt
-    events.value = loadedEvents
-    artifacts.value = loadedArtifacts
-    report.value = undefined
-    startPolling()
-  } catch (error) {
-    if (!isAbort(error) && generation === attemptGeneration) setFailure(error, 'Attempt detail could not be loaded.')
-  }
-}
+const queueRun = () => latestRevision.value && !readOnly.value && startAttempt(
+  () => queueWorkspaceRun(latestRevision.value.revisionId, draft.resourceProfileId),
+  'Attempt queued. Its scientific identity is stable; this attempt identity is unique.',
+  'Run could not be queued.'
+)
 
-function stopPolling() {
-  pollGeneration += 1
-  clearTimeout(pollTimer)
-  pollController?.abort()
-  pollController = undefined
-}
-
-function startPolling() {
-  stopPolling()
-  const attemptId = selectedAttempt.value?.attempt.attemptId
-  if (!attemptId || selectedAttempt.value.attempt.state === 'terminal') return
-  const generation = pollGeneration
-  pollTimer = setTimeout(() => pollSelectedAttempt(attemptId, generation), 750)
-}
-
-async function pollSelectedAttempt(attemptId, generation) {
-  if (generation !== pollGeneration) return
-  const requestController = new AbortController()
-  pollController = requestController
-  try {
-    const [loadedAttempt, loadedEvents, loadedArtifacts] = await Promise.all([
-      loadWorkspaceAttempt(attemptId, requestController.signal),
-      loadWorkspaceEvents(attemptId, requestController.signal),
-      loadWorkspaceArtifacts(attemptId, requestController.signal)
-    ])
-    if (generation !== pollGeneration || selectedAttempt.value?.attempt.attemptId !== attemptId) return
-    selectedAttempt.value = loadedAttempt
-    events.value = loadedEvents
-    artifacts.value = loadedArtifacts
-    if (loadedAttempt.attempt.state === 'terminal') {
-      await refreshHistory()
-      return
-    }
-  } catch (error) {
-    if (generation !== pollGeneration || isAbort(error)) return
-  } finally {
-    if (pollController === requestController) pollController = undefined
-  }
-  if (generation === pollGeneration) pollTimer = setTimeout(() => pollSelectedAttempt(attemptId, generation), 750)
-}
-
-async function cancelAttempt() {
-  if (!selectedAttempt.value) return
-  try {
-    await cancelWorkspaceAttempt(selectedAttempt.value.attempt.attemptId)
-    await refreshHistory()
-    await inspectAttempt(selectedAttempt.value.attempt.attemptId)
-  } catch (error) {
-    setFailure(error, 'Attempt could not be cancelled.')
-  }
-}
-
-async function restartAttempt() {
-  if (!selectedAttempt.value) return
-  try {
+const restartAttempt = () => selectedAttempt.value && startAttempt(
+  async () => {
     const checkpoints = await loadWorkspaceCheckpoints(selectedAttempt.value.attempt.attemptId)
-    const attempt = await restartWorkspaceCheckpoint(checkpoints.at(-1).checkpointId, resourceProfileId.value)
-    await refreshHistory()
-    await inspectAttempt(attempt.attemptId)
-    message.value = 'Restart queued from the exact specification checkpoint. No engine state was continued.'
-  } catch (error) {
-    setFailure(error, 'Specification restart could not be queued.')
-  }
+    return restartWorkspaceCheckpoint(checkpoints.at(-1).checkpointId, draft.resourceProfileId)
+  },
+  'Restart queued from the exact specification checkpoint. No engine state was continued.',
+  'Specification restart could not be queued.'
+)
+
+const inspectAttempt = (attemptId) => {
+  poll.stop()
+  return step('loading', (task) => attemptState(attemptId, task), {
+    done: (loaded) => {
+      showAttempt(loaded)
+      return 'ready'
+    },
+    failure: 'Attempt detail could not be loaded.'
+  })
 }
 
-async function compareLatest() {
-  if (successfulAttempts.value.length < 2) return
-  try {
-    comparison.value = await compareWorkspaceAttempts({ leftAttemptId: successfulAttempts.value[1].attempt.attemptId, rightAttemptId: successfulAttempts.value[0].attempt.attemptId, contract: { kind: 'tolerance', absolute: absoluteTolerance.value, relative: relativeTolerance.value } })
-  } catch (error) {
-    setFailure(error, 'Attempts could not be compared.')
-  }
-}
+const cancelAttempt = () => selectedAttempt.value && step('saving', async (task) => {
+  const attemptId = selectedAttempt.value.attempt.attemptId
+  task.fresh(await cancelWorkspaceAttempt(attemptId))
+  const loadedHistory = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
+  return { loadedHistory, loaded: await attemptState(attemptId, task) }
+}, {
+  done: ({ loadedHistory, loaded }) => {
+    history.value = loadedHistory
+    showAttempt(loaded)
+    return 'ready'
+  },
+  failure: 'Attempt could not be cancelled.'
+})
 
-async function generateReport() {
-  if (!selectedAttempt.value) return
-  try {
-    report.value = await createWorkspaceReport(selectedAttempt.value.attempt.attemptId)
-    artifacts.value = await loadWorkspaceArtifacts(selectedAttempt.value.attempt.attemptId)
-  } catch (error) {
-    setFailure(error, 'Report could not be generated.')
-  }
-}
+const compareLatest = () => successful.value.length >= 2 && step('loading', async ({ fresh }) => fresh(await compareWorkspaceAttempts({
+  leftAttemptId: successful.value[1].attempt.attemptId,
+  rightAttemptId: successful.value[0].attempt.attemptId,
+  contract: { kind: 'tolerance', absolute: draft.absoluteTolerance, relative: draft.relativeTolerance }
+})), {
+  done: (compared) => {
+    comparison.value = compared
+    return 'ready'
+  },
+  failure: 'Attempts could not be compared.'
+})
 
-async function exportExperiment() {
-  if (!detail.value) return
-  try {
-    const exported = await exportWorkspaceExperiment(detail.value.experiment.experimentId)
+const generateReport = () => selectedAttempt.value && step('saving', async ({ signal, fresh }) => {
+  const attemptId = selectedAttempt.value.attempt.attemptId
+  const created = fresh(await createWorkspaceReport(attemptId))
+  return { created, files: fresh(await loadWorkspaceArtifacts(attemptId, signal)) }
+}, {
+  done: ({ created, files }) => {
+    report.value = created
+    artifacts.value = files
+    return 'ready'
+  },
+  failure: 'Report could not be generated.'
+})
+
+const exportExperiment = () => detail.value && step('saving', async ({ fresh }) => fresh(await exportWorkspaceExperiment(detail.value.experiment.experimentId)), {
+  done: (exported) => {
     exportName.value = exported.fileName
     exportHref.value = `data:application/zip;base64,${exported.bundleBase64}`
     message.value = 'Portable bundle verified and ready for download.'
-  } catch (error) {
-    setFailure(error, 'Experiment could not be exported.')
-  }
-}
+    return 'ready'
+  },
+  failure: 'Experiment could not be exported.'
+})
 
 async function importExperiment(event) {
-  const file = event.target.files?.[0]
+  const input = event.target
+  const file = input.files?.[0]
   if (!file) return
-  try {
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    let binary = ''
-    for (let offset = 0; offset < bytes.length; offset += 32768) binary += String.fromCharCode(...bytes.subarray(offset, offset + 32768))
-    detail.value = await importWorkspaceExperiment(btoa(binary))
-    experiments.value = await loadWorkspaceExperiments()
-    applyRevision(detail.value.revisions.at(-1))
-    message.value = 'Portable bundle imported. Reruns will be checked against its declared numerical contract.'
-  } catch (error) {
-    setFailure(error, 'Portable bundle could not be imported.')
-  } finally {
-    event.target.value = ''
-  }
+  const bytes = new Uint8Array(await file.arrayBuffer())
+  let binary = ''
+  for (let offset = 0; offset < bytes.length; offset += 32768) binary += String.fromCharCode(...bytes.subarray(offset, offset + 32768))
+  await step('saving', async ({ signal, fresh }) => {
+    const imported = fresh(await importWorkspaceExperiment(btoa(binary)))
+    return { imported, list: fresh(await loadWorkspaceExperiments(signal)) }
+  }, {
+    done: ({ imported, list }) => {
+      detail.value = imported
+      experiments.value = list
+      applyRevision(imported.revisions.at(-1))
+      message.value = 'Portable bundle imported. Reruns will be checked against its declared numerical contract.'
+      return 'ready'
+    },
+    failure: 'Portable bundle could not be imported.'
+  })
+  input.value = ''
 }
 
-onMounted(() => {
-  initialize()
-})
-onBeforeUnmount(() => {
-  controller?.abort()
-  attemptGeneration += 1
-  attemptController?.abort()
-  stopPolling()
-})
+function previousHistoryPage() {
+  historyOffset.value = Math.max(0, historyOffset.value - HISTORY_LIMIT)
+  return refreshHistory()
+}
+
+function nextHistoryPage() {
+  if (historyOffset.value + history.value.items.length >= history.value.total) return undefined
+  historyOffset.value += HISTORY_LIMIT
+  return refreshHistory()
+}
+
+onMounted(initialize)
 </script>
 
 <template lang="pug">
-Panel(title-id="experiment-workspace-title" title="Durable local research runs" eyebrow="Controlled experiment workspace" :status="state" :tone="statusTone(state)")
+Panel(title="Durable local research runs" title-id="experiment-workspace-title" eyebrow="Controlled experiment workspace" :status="state" :tone="statusTone(state)")
   p.lede Immutable specifications, distinct scientific and attempt identities, bounded child workers, exact specification restarts, content-addressed artifacts, and offline portable bundles.
-  .notice.notice--danger(v-if="state === 'failed'" role="alert") {{ message }}
-  div(role="status")
-    p.notice(v-if="state !== 'failed' && message") {{ message }}
+  ErrorNotice(v-if="state === 'failed'" :message="message")
+  LiveMessage(visible :text="state !== 'failed' ? message : ''")
 
   .grid(v-if="models.length")
-    Panel(title-id="workspace-editor-title" :title="detail ? 'Edit as a new revision' : 'Create experiment'" :level="3")
-      form.stack(@submit.prevent="detail ? saveRevision() : createExperiment()")
-        p.notice.notice--warning(v-if="isReadOnly" role="note") This revision embeds a model that is not in the exact local registry. Its ID and digest remain inspectable and exportable, but revision and execution controls are read-only.
-        Field(id="workspace-existing" label="Existing experiment")
-          select#workspace-existing(:value="detail?.experiment.experimentId ?? ''" @change="selectExperiment($event.target.value)")
-            option(value="") New experiment
-            option(v-for="item in experiments" :key="item.experimentId" :value="item.experimentId") {{ item.name }}
-        Field(id="workspace-name" label="Name")
-          input#workspace-name(v-model="name" maxlength="160" required :disabled="isReadOnly")
-        Field(id="workspace-description" label="Description")
-          textarea#workspace-description(v-model="description" rows="3" maxlength="2000" :disabled="isReadOnly")
-        Field(id="workspace-model" label="Portfolio model")
-          select#workspace-model(v-model="modelKey" :disabled="isReadOnly" @change="chooseModel")
-            option(v-for="item in models" :key="exactModelKey(item)" :value="exactModelKey(item)") {{ item.name }} · {{ item.id }} · {{ item.digest }}{{ isRegistryModel(item) ? '' : ' · embedded external' }}
-        .grid
-          Field(id="workspace-taxon" label="Taxon")
-            select#workspace-taxon(v-model="taxonId" :disabled="isReadOnly")
-              option(value="NCBITaxon:9606") Human · NCBITaxon:9606
-              option(value="NCBITaxon:10090") Mouse · NCBITaxon:10090
-          Field(id="workspace-tissue" label="Tissue CURIE (optional)")
-            input#workspace-tissue(v-model="tissueId" placeholder="UBERON:0002107" :disabled="isReadOnly")
-        Field(id="workspace-design" label="Portfolio design")
-          select#workspace-design(v-model="design" :disabled="isReadOnly")
-            option(value="single") Single specification
-            option(value="ensemble") Seeded ensemble
-            option(value="intervention-schedule") Intervention schedule
-        Field(v-if="design === 'ensemble'" id="workspace-members" label="Ensemble members")
-          input#workspace-members(v-model.number="ensembleMembers" type="number" min="2" max="8" :disabled="isReadOnly")
-        template(v-if="design === 'intervention-schedule'")
-          Field(id="workspace-intervention-target" label="Assignment target")
-            select#workspace-intervention-target(v-model="interventionTarget" :disabled="isReadOnly")
-              option(v-for="target in interventionTargets" :key="target.id" :value="target.id") {{ target.id }} · {{ target.unit.symbol }}
-          .grid
-            Field(id="workspace-intervention-time" label="Time")
-              input#workspace-intervention-time(v-model.number="interventionTime" type="number" min="0" :disabled="isReadOnly || model.engine.type === 'fba'")
-            Field(id="workspace-intervention-value" label="Assigned value")
-              input#workspace-intervention-value(v-model.number="interventionValue" type="number" min="0" :disabled="isReadOnly")
-        .grid
-          Field(v-if="model.engine.type !== 'fba'" id="workspace-duration" label="Duration (s)")
-            input#workspace-duration(v-model.number="duration" type="number" min="1" max="100000" :disabled="isReadOnly")
-          Field(id="workspace-seed" label="Seed")
-            input#workspace-seed(v-model.number="seed" type="number" min="0" max="4294967295" :disabled="isReadOnly")
-        Field(id="workspace-contract" label="Rerun contract")
-          select#workspace-contract(v-model="numericalKind" :disabled="isReadOnly")
-            option(value="exact") Exact canonical result
-            option(value="tolerance") Absolute + relative tolerance
-        .grid(v-if="numericalKind === 'tolerance'")
-          Field(id="workspace-absolute" label="Absolute tolerance")
-            input#workspace-absolute(v-model.number="absoluteTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
-          Field(id="workspace-relative" label="Relative tolerance")
-            input#workspace-relative(v-model.number="relativeTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
-        Field(id="workspace-profile" label="Resource profile")
-          select#workspace-profile(v-model="resourceProfileId" :disabled="isReadOnly")
-            option(v-for="item in profiles" :key="item.id" :value="item.id") {{ item.name }} · {{ item.concurrency }} workers · {{ item.memoryMb }} MB
-        button.button(type="submit" :disabled="state === 'saving' || isReadOnly") {{ detail ? 'Create immutable revision' : 'Create experiment' }}
+    ExperimentForm(:draft="draft" :models="models" :engine="model?.engine.type" :is-registry="isRegistry" :targets="targets" :experiments="experiments" :profiles="profiles" :selected-id="detail?.experiment.experimentId ?? ''" :read-only="readOnly" :saving="state === 'saving'" :revising="Boolean(detail)" @submit="saveRevision" @select="selectExperiment" @model="chooseModel")
+    RevisionLedger(:detail="detail" :read-only="readOnly" :export-href="exportHref" :export-name="exportName" @queue="queueRun" @clone="cloneExperiment" @export="exportExperiment" @import="importExperiment")
 
-    Panel(title-id="workspace-ledger-title" title="Revision ledger" :level="3")
-      template(v-if="detail")
-        p {{ detail.experiment.name }} · {{ detail.revisions.length }} immutable revision{{ detail.revisions.length === 1 ? '' : 's' }}
-        ol.plain-list.stack.stack--tight
-          li.card.stack.stack--tight(v-for="revision in detail.revisions" :key="revision.revisionId")
-            strong Revision {{ revision.ordinal }} · {{ revision.source }}
-            p
-              code {{ revision.specificationDigest }}
-            p Snapshot {{ revision.snapshotDigest }}
-            p(v-for="entry in revision.specification.entries" :key="`${entry.model.id}-${entry.model.digest}`") Model {{ entry.model.id }} · {{ entry.model.digest }}
-        .cluster
-          button.button(type="button" :disabled="isReadOnly" @click="queueRun") Queue latest revision
-          button.button.button--secondary(type="button" :disabled="isReadOnly" @click="cloneExperiment") Clone experiment
-          button.button.button--secondary(type="button" @click="exportExperiment") Export portable ZIP
-          a.button.button--secondary(v-if="exportHref" :href="exportHref" :download="exportName") Download {{ exportName }}
-        Field(id="workspace-import" label="Import portable ZIP")
-          input#workspace-import(type="file" accept=".zip,application/zip" @change="importExperiment")
-      template(v-else)
-        .stack.stack--tight
-          strong No persisted experiment selected
-          p Configure the form to create the first immutable revision, or import a verified portable ZIP.
-        Field(id="workspace-import-empty" label="Import portable ZIP")
-          input#workspace-import-empty(type="file" accept=".zip,application/zip" @change="importExperiment")
-
-  Panel(title-id="workspace-history-title" title="Queue and searchable history" :level="3")
-    template(v-slot:actions)
-      button.button.button--secondary(type="button" @click="refreshHistory(true)") Refresh
-    p.muted {{ history.total }} attempt{{ history.total === 1 ? '' : 's' }}. Filters apply to immutable revision metadata.
-    form.stack(aria-label="History filters" @submit.prevent="refreshHistory(true)")
-      .grid
-        Field(id="history-status" label="Status")
-          select#history-status(v-model="filters.status")
-            option(value="") All
-            option(value="queued") Queued
-            option(value="running") Running
-            option(value="successful") Successful
-            option(value="failed") Failed
-            option(value="resource-exhausted") Resource exhausted
-            option(value="cancelled") Cancelled
-        Field(id="history-model" label="Model")
-          select#history-model(v-model="filters.model")
-            option(value="") All
-            option(v-for="id in modelFilterIds" :key="id" :value="id") {{ id }}
-        Field(id="history-taxon" label="Taxon")
-          select#history-taxon(v-model="filters.taxon")
-            option(value="") All
-            option(value="NCBITaxon:9606") Human
-            option(value="NCBITaxon:10090") Mouse
-        Field(id="history-tissue" label="Tissue")
-          input#history-tissue(v-model="filters.tissue" placeholder="UBERON:...")
-        Field(id="history-release" label="Release")
-          input#history-release(v-model="filters.release" placeholder="release id")
-      div
-        button.button.button--secondary(type="submit") Apply filters
-    DataTable(caption="Durable run attempts" :columns="['Experiment', 'Attempt', 'Kind', 'State / outcome', 'Context']" :count="history.items.length" empty-text="No attempts match these filters.")
-      tr(v-for="item in history.items" :key="item.attempt.attemptId")
-        th(scope="row")
-          button.button.button--link(type="button" @click="inspectAttempt(item.attempt.attemptId)") {{ item.experimentName }}
-        td
-          code {{ item.attempt.attemptId }}
-        td {{ item.attempt.kind }}{{ item.attempt.restartMode ? ' · from specification' : '' }}
-        td
-          span.badge(:class="statusClass(item.attempt.outcome ?? item.attempt.state)") {{ item.attempt.outcome ?? item.attempt.state }}
-        td {{ item.taxonId }}{{ item.tissueId ? ` · ${item.tissueId}` : '' }}
-    nav.repel(aria-label="History pagination")
-      p {{ `Showing ${historyStart}–${historyEnd} of ${history.total}` }}
-      .cluster
-        button.button.button--secondary(type="button" :disabled="history.offset === 0" @click="previousHistoryPage") Previous page
-        button.button.button--secondary(type="button" :disabled="history.offset + history.items.length >= history.total" @click="nextHistoryPage") Next page
-
-  Panel(v-if="selectedAttempt" title-id="attempt-title" title="Attempt inspector" :level="3" :status="attemptStatus" :tone="statusTone(attemptStatus)")
-    dl.facts
-      div
-        dt Attempt identity
-        dd
-          code {{ selectedAttempt.attempt.attemptId }}
-      div
-        dt Scientific identity
-        dd
-          code {{ selectedAttempt.attempt.runId }}
-    p.notice.notice--warning(v-if="selectedAttempt.attempt.kind === 'restart'" role="note") Restarted from the exact specification. This is not stateful continuation.
-    .cluster
-      button.button.button--secondary(v-if="selectedAttempt.attempt.state !== 'terminal'" type="button" @click="cancelAttempt") Cancel attempt
-      button.button.button--secondary(v-else type="button" @click="restartAttempt") Restart from specification
-      button.button.button--secondary(v-if="selectedAttempt.attempt.resultArtifactId" type="button" @click="generateReport") Generate offline report
-      button.button.button--secondary(v-if="successfulAttempts.length >= 2" type="button" @click="compareLatest") Compare latest successful attempts
-    .grid
-      .stack.stack--tight
-        h4 Events
-        ol.plain-list.stack.stack--tight
-          li(v-for="event in events" :key="event.eventId")
-            strong {{ event.sequence }} · {{ event.type }}
-            |
-            time(:datetime="event.at") {{ event.at }}
-      .stack.stack--tight
-        h4 Artifacts
-        ul.plain-list.stack.stack--tight
-          li(v-for="artifact in artifacts" :key="artifact.artifactId")
-            a(:href="`/api/v7/workspace/artifacts/${encodeURIComponent(artifact.artifactId)}`") {{ artifact.name }}
-            |
-            span {{ artifact.bytes }} bytes · {{ artifact.digest }}
-        p(v-if="artifacts.length === 0") No artifact has been atomically published.
-    .notice(v-if="comparison" role="status")
-      strong Comparison {{ comparison.status }}
-      p {{ comparison.specificationChanged ? 'Specifications changed.' : 'Specifications are identical.' }} {{ comparison.differences.length }} numeric difference{{ comparison.differences.length === 1 ? '' : 's' }} recorded.
-    .cluster(v-if="report")
-      strong Static offline report
-      a(v-for="format in ['html', 'json', 'csv', 'svg']" :key="format" :href="`/api/v7/workspace/reports/${encodeURIComponent(report.reportId)}/files/${format}`" target="_blank" rel="noreferrer") {{ format.toUpperCase() }}
+  AttemptHistory(:history="history" :filters="filters" :model-ids="modelIds" @refresh="refreshHistory" @inspect="inspectAttempt" @previous="previousHistoryPage" @next="nextHistoryPage")
+  AttemptInspector(v-if="selectedAttempt" :attempt="selectedAttempt" :events="events" :artifacts="artifacts" :comparison="comparison" :report="report" :can-compare="successful.length >= 2" @cancel="cancelAttempt" @restart="restartAttempt" @report="generateReport" @compare="compareLatest")
 </template>
