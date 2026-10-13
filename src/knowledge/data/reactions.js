@@ -513,7 +513,7 @@ export default [
     id: "reaction:shmt-serine-glycine-interconversion",
     type: "reaction",
     name: "SHMT: serine + THF <-> glycine + 5,10-methylene-THF + H2O",
-    aliases: ["serina + THF ⇌ glicina + 5,10-metileno-THF", "serina hidroximetiltransferase"],
+    aliases: ["serina + THF ⇌ glicina + 5,10-metileno-THF", "serina hidroximetiltransferase", "serina + THF ⇌ glicina + metileno-THF", "interconversão serina-glicina"],
     summary: "Reversible PLP-dependent transfer of the serine side-chain carbon to THF, linking serine, glycine and the folate one-carbon pool.",
     body: [
       "[[compound:serine]] + [[compound:thf]] <-> [[compound:glycine]] + [[compound:5-10-methylene-thf]] + [[compound:water]], by cytosolic [[enzyme:shmt1]] and mitochondrial [[enzyme:shmt2]] ([[compound:plp]]). In mitochondria the net direction is usually serine breakdown (feeding one-carbon units to the cytosol as formate); in cytosol of liver and kidney it may run toward serine when glycine and methylene-THF are abundant. Rhea lists the serine-forming direction as the master record (RHEA:15481). Because the reverse reaction consumes glycine and 5,10-methylene-THF, a large glycine load could in principle compete with MTHFR for methylene-THF; the net effect in humans is not established."
@@ -579,7 +579,7 @@ export default [
     id: "reaction:mthfd1-methylene-thf-oxidation",
     type: "reaction",
     name: "MTHFD1 dehydrogenase: 5,10-methylene-THF + NADP+ <-> 5,10-methenyl-THF + NADPH",
-    aliases: ["metileno-THF desidrogenase", "5,10-CH2-THF → 5,10-CH=THF"],
+    aliases: ["metileno-THF desidrogenase", "5,10-CH2-THF → 5,10-CH=THF", "oxidação do 5,10-metileno-THF"],
     summary: "NADP+-dependent oxidation of 5,10-methylene-THF to 5,10-methenyl-THF by the dehydrogenase domain of MTHFD1.",
     body: [
       "[[compound:5-10-methylene-thf]] + [[compound:nadp]] <-> [[compound:5-10-methenyl-thf]] + [[compound:nadph]] by [[enzyme:mthfd1]]. First of the three activities that convert methylene-THF to formyl-THF; fully reversible, so cytosolic one-carbon flux can run toward 10-formyl-THF (purines) or back to methylene-THF."
@@ -1003,7 +1003,7 @@ export default [
     id: "reaction:etnk1-ethanolamine-phosphorylation",
     type: "reaction",
     name: "ETNK1: ethanolamine + ATP -> phosphoethanolamine + ADP + H+",
-    aliases: ["etanolamina + ATP → fosfoetanolamina", "Kennedy ramo PE passo 1"],
+    aliases: ["etanolamina + ATP → fosfoetanolamina", "Kennedy ramo PE passo 1", "fosforilação da etanolamina"],
     summary: "ATP-dependent phosphorylation of ethanolamine, first step of the CDP-ethanolamine branch.",
     body: [
       "[[compound:ethanolamine]] + [[compound:atp]] -> [[compound:phosphoethanolamine]] + [[compound:adp]] + H+ by [[enzyme:etnk1]] (and the choline/ethanolamine kinases). Starts the branch that supplies PE, the PEMT substrate."
@@ -1034,7 +1034,7 @@ export default [
     id: "reaction:pcyt2-cdp-ethanolamine-synthesis",
     type: "reaction",
     name: "PCYT2: phosphoethanolamine + CTP + H+ -> CDP-ethanolamine + pyrophosphate",
-    aliases: ["fosfoetanolamina + CTP → CDP-etanolamina", "Kennedy ramo PE passo 2"],
+    aliases: ["fosfoetanolamina + CTP → CDP-etanolamina", "Kennedy ramo PE passo 2", "síntese de CDP-etanolamina"],
     summary: "Rate-limiting cytidylyl transfer of the CDP-ethanolamine branch.",
     body: [
       "[[compound:phosphoethanolamine]] + [[compound:ctp]] + H+ -> [[compound:cdp-ethanolamine]] + [[compound:pyrophosphate]] by [[enzyme:pcyt2]]."
@@ -1927,5 +1927,77 @@ export default [
       { rel: "associated-with", to: "disease:trimethylaminuria", note: "deficiency causes the disorder" }
     ],
     refs: ["article:rhea-2022", "article:mackay-2011-trimethylaminuria"]
+  },
+  {
+    id: "reaction:carns1-carnosine-synthesis",
+    type: "reaction",
+    name: "CARNS1: beta-alanine + L-histidine + ATP -> carnosine + ADP + phosphate + H+",
+    aliases: ["beta-alanina + histidina → carnosina", "síntese de carnosina", "carnosina sintase"],
+    summary: "ATP-driven ligation of beta-alanine to L-histidine, forming the antioxidant dipeptide carnosine.",
+    body: [
+      "[[compound:beta-alanine]] + [[compound:histidine]] + [[compound:atp]] -> [[compound:carnosine]] + [[compound:adp]] + [[compound:phosphate]] + H+, catalysed by [[enzyme:carns1]]. The stoichiometric formation of ADP (not AMP) placed the enzyme in the ATP-grasp family ([[article:drozak-2010-carnosine-synthase-atpgd1]]).",
+      "In the source conversation this is the step that turns supplemental beta-alanine into carnosine ([[claim:beta-alanine-carnosine-tissue-protection]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "6.3.2.11",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      compartment: "cytosol",
+      direction: "ATP-driven; effectively irreversible"
+    },
+    reaction: {
+      reactants: [{ id: "compound:beta-alanine", n: 1 }, { id: "compound:histidine", n: 1 }, { id: "compound:atp", n: 1 }],
+      products: [
+        { id: "compound:carnosine", n: 1 },
+        { id: "compound:adp", n: 1 },
+        { id: "compound:phosphate", n: 1 },
+        { id: "compound:proton", n: 1 }
+      ],
+      ec: "6.3.2.11",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      reversible: false,
+      compartment: "cytosol",
+      enzymes: ["enzyme:carns1"]
+    },
+    relations: [
+      {
+        rel: "interacts-with",
+        to: "intervention:beta-alanine-supplement",
+        note: "Supplemental beta-alanine supplies the limiting substrate."
+      }
+    ],
+    refs: ["article:rhea-2022", "article:drozak-2010-carnosine-synthase-atpgd1"]
+  },
+  {
+    id: "reaction:tyms-thymidylate-synthesis",
+    type: "reaction",
+    name: "TYMS: dUMP + 5,10-methylene-THF -> dTMP + DHF",
+    aliases: ["dUMP + metileno-THF → dTMP + DHF", "síntese de timidilato", "metilação do dUMP"],
+    summary: "Reductive methylation of dUMP by 5,10-methylene-THF, giving dTMP and dihydrofolate; the single de novo route to thymine nucleotides.",
+    body: [
+      "[[compound:dump]] + [[compound:5-10-methylene-thf]] -> [[compound:dtmp]] + [[compound:dhf]], catalysed by [[enzyme:tyms]]. The folate supplies the carbon and the reducing power, so it leaves as dihydrofolate and must be regenerated before it can be reloaded with one-carbon units by [[enzyme:shmt]] ([[pathway:nucleotide-synthesis]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.45",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      compartment: "cytosol",
+      direction: "effectively irreversible"
+    },
+    reaction: {
+      reactants: [{ id: "compound:dump", n: 1 }, { id: "compound:5-10-methylene-thf", n: 1 }],
+      products: [{ id: "compound:dtmp", n: 1 }, { id: "compound:dhf", n: 1 }],
+      ec: "2.1.1.45",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      reversible: false,
+      compartment: "cytosol",
+      enzymes: ["enzyme:tyms"]
+    },
+    relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
+    refs: ["article:rhea-2022", "article:carreras-1995-thymidylate-synthase"]
   }
 ]

@@ -460,7 +460,7 @@ export default [
     id: "enzyme:mthfd1",
     type: "enzyme",
     name: "Trifunctional C1-tetrahydrofolate synthase (MTHFD1)",
-    aliases: ["MTHFD1", "C1-THF sintase", "metilenotetraidrofolato desidrogenase 1", "formil-THF sintetase"],
+    aliases: ["MTHFD1", "C1-THF sintase", "metilenotetraidrofolato desidrogenase 1", "formil-THF sintetase", "C1-tetraidrofolato sintase"],
     summary: "Cytosolic trifunctional enzyme (dehydrogenase, cyclohydrolase, synthetase) interconverting 5,10-methylene-THF, 10-formyl-THF and formate.",
     body: [
       "MTHFD1 combines three activities: NADP+-dependent oxidation of [[compound:5-10-methylene-thf]] to 5,10-methenyl-THF ([[reaction:mthfd1-methylene-thf-oxidation]]), hydrolysis of methenyl-THF to [[compound:10-formyl-thf]] ([[reaction:mthfd1-methenyl-thf-cyclohydrolase]]), and the ATP-driven formation of 10-formyl-THF from [[compound:formate]] and [[compound:thf]] ([[reaction:mthfd1-formate-thf-ligase]]). 10-formyl-THF is the one-carbon donor for two steps of purine synthesis.",
@@ -715,7 +715,7 @@ export default [
     id: "enzyme:gad1",
     type: "enzyme",
     name: "Glutamate decarboxylase 1 (GAD1; GAD67)",
-    aliases: ["GAD1", "GAD67", "glutamato descarboxilase 67", "GAD"],
+    aliases: ["GAD1", "GAD67", "glutamato descarboxilase 67", "GAD", "glutamato descarboxilase 1"],
     summary: "PLP-dependent cytosolic isoform that provides baseline GABA by decarboxylating glutamate; largely saturated with PLP.",
     body: [
       "GAD67 is the constitutively active, cytosolic isoform of glutamate decarboxylase ([[reaction:gad-glutamate-decarboxylation]]), producing [[compound:gaba]] and [[compound:carbon-dioxide]] from [[compound:glutamate]] with [[compound:plp]] as cofactor. It is mostly in the holoenzyme form and supplies the tonic, non-vesicular GABA pool and the GABA used in the GABA shunt ([[pathway:gaba-shunt]]).",
@@ -743,7 +743,7 @@ export default [
     id: "enzyme:gad2",
     type: "enzyme",
     name: "Glutamate decarboxylase 2 (GAD2; GAD65)",
-    aliases: ["GAD2", "GAD65", "glutamato descarboxilase 65", "anti-GAD"],
+    aliases: ["GAD2", "GAD65", "glutamato descarboxilase 65", "anti-GAD", "glutamato descarboxilase 2"],
     summary: "Vesicle-associated PLP-dependent isoform that makes GABA on demand; around half is apoenzyme, so its output tracks PLP availability.",
     body: [
       "GAD65 is anchored to synaptic vesicle membranes and synthesises [[compound:gaba]] for release ([[reaction:gad-glutamate-decarboxylation]]). A large part of the pool is present as inactive apoenzyme that is rapidly activated by binding [[compound:plp]], so it behaves as a reserve that responds to PLP supply and to neuronal activity. This is the biochemical basis for the 'glutamate to GABA' argument in the conversation: excitatory [[compound:glutamate]] is converted to the inhibitory transmitter via a B6-dependent step ([[pathway:gaba-shunt]]).",
@@ -996,7 +996,8 @@ export default [
       { rel: "part-of", to: "pathway:gastric-acid-secretion" },
       { rel: "associated-with", to: "state:hypochlorhydria", note: "PPI inhibition is the commonest cause of low acid" },
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "acid-peptic injury; PPIs promote healing" },
-      { rel: "associated-with", to: "system:gastric-physiology" }
+      { rel: "associated-with", to: "system:gastric-physiology" },
+      { rel: "part-of", to: "system:gastric-parietal-cells" }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -1632,7 +1633,7 @@ export default [
     id: "enzyme:psat1",
     type: "enzyme",
     name: "Phosphoserine aminotransferase 1 (PSAT1)",
-    aliases: ["PSAT1", "fosfoserina aminotransferase", "PSAT"],
+    aliases: ["PSAT1", "fosfoserina aminotransferase", "PSAT", "fosfosserina aminotransferase"],
     summary: "PLP-dependent transaminase of the serine pathway that converts 3-phosphohydroxypyruvate and glutamate into 3-phosphoserine.",
     body: [
       "PSAT1 transfers the amino group of [[compound:glutamate]] onto [[compound:3-phosphohydroxypyruvate]], yielding [[compound:3-phosphoserine]] and [[compound:2-oxoglutarate]] ([[reaction:psat1-phosphoserine-transamination]]). Written in the direction of serine synthesis the equilibrium is nearly neutral and pulled forward by [[enzyme:psph]].",
@@ -1660,7 +1661,7 @@ export default [
     id: "enzyme:psph",
     type: "enzyme",
     name: "Phosphoserine phosphatase (PSPH)",
-    aliases: ["PSPH", "fosfoserina fosfatase", "PSP"],
+    aliases: ["PSPH", "fosfoserina fosfatase", "PSP", "fosfosserina fosfatase"],
     summary: "Mg2+-dependent phosphatase that hydrolyses 3-phosphoserine to serine, the irreversible final step of serine synthesis.",
     body: [
       "PSPH removes the phosphate from [[compound:3-phosphoserine]] to give [[compound:serine]] and [[compound:phosphate]] ([[reaction:psph-phosphoserine-hydrolysis]]). This irreversible step drives the whole route from [[enzyme:phgdh]] onward and is inhibited by serine.",
@@ -1817,5 +1818,60 @@ export default [
       { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" }
     ],
     refs: ["article:pissios-2017-nnmt-methyl-sink"]
+  },
+  {
+    id: "enzyme:carns1",
+    type: "enzyme",
+    name: "Carnosine synthase 1 (CARNS1; ATPGD1)",
+    aliases: ["CARNS1", "ATPGD1", "carnosina sintase", "carnosina sintetase"],
+    summary: "ATP-grasp ligase that joins beta-alanine and L-histidine into carnosine (and GABA plus histidine into homocarnosine, less efficiently); beta-alanine supply limits it.",
+    body: [
+      "CARNS1 builds the dipeptide [[compound:carnosine]] from [[compound:beta-alanine]], [[compound:histidine]] and [[compound:atp]], releasing [[compound:adp]] and phosphate ([[reaction:carns1-carnosine-synthesis]]). It prefers beta-alanine over GABA by a factor of 15-25 in catalytic efficiency ([[article:drozak-2010-carnosine-synthase-atpgd1]]).",
+      "Because histidine is usually plentiful and beta-alanine is scarce, beta-alanine availability controls how much carnosine tissues can make; this is the reason beta-alanine rather than carnosine itself is the usual supplement ([[intervention:beta-alanine-supplement]], [[article:boldyrev-2013-carnosine-physiology]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "CARNS1",
+      ec: "6.3.2.11",
+      uniprot: "A5YM72",
+      rhea: "RHEA:19297",
+      reactome: "R-HSA-6786245",
+      kegg: "ec:6.3.2.11",
+      compartment: "cytosol",
+      tissue: "skeletal muscle, brain"
+    },
+    relations: [
+      {
+        rel: "associated-with",
+        to: "intervention:beta-alanine-supplement",
+        note: "Supplemental beta-alanine raises the substrate for this enzyme."
+      }
+    ],
+    refs: ["article:drozak-2010-carnosine-synthase-atpgd1", "article:boldyrev-2013-carnosine-physiology"]
+  },
+  {
+    id: "enzyme:tyms",
+    type: "enzyme",
+    name: "Thymidylate synthase (TYMS)",
+    aliases: ["TYMS", "TS", "timidilato sintase", "timidilato sintetase"],
+    summary: "Cytosolic enzyme that methylates dUMP with 5,10-methylene-THF to make dTMP and dihydrofolate; the only de novo source of thymine nucleotides for DNA.",
+    body: [
+      "TYMS transfers a methylene group from [[compound:5-10-methylene-thf]] to [[compound:dump]] and reduces it to a methyl group, producing [[compound:dtmp]] and [[compound:dhf]] ([[reaction:tyms-thymidylate-synthesis]]). Because it is the sole de novo route to thymine nucleotides, cell division depends on it ([[pathway:nucleotide-synthesis]]).",
+      "It connects the dietary themes of this site to DNA: the folate pool that [[enzyme:shmt]], the glycine cleavage system and the choline-derived chain ([[enzyme:dmgdh]], [[enzyme:sardh]]) fill is drawn on here. Fluoropyrimidine and antifolate cancer drugs act on this step, which is why it is well characterised ([[article:carreras-1995-thymidylate-synthase]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "TYMS",
+      ec: "2.1.1.45",
+      uniprot: "P04818",
+      rhea: "RHEA:12104",
+      reactome: "R-HSA-73605",
+      kegg: "ec:2.1.1.45",
+      compartment: "cytosol (and nucleus in S phase)",
+      tissue: "proliferating tissues",
+      cofactors: "5,10-methylene-THF (co-substrate)"
+    },
+    relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
+    refs: ["article:carreras-1995-thymidylate-synthase", "article:ducker-2017-one-carbon-metabolism"]
   }
 ]

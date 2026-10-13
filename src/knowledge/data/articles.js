@@ -7064,7 +7064,8 @@ export default [
         "rel": "evidence-for",
         "to": "system:gastric-physiology",
         "note": "Mechanism involves H+,K+-ATPase and NO."
-      }
+      },
+      { "rel": "evidence-against", "to": "claim:espinheira-santa-prostaglandin-mucus", "note": "Protection came from lower acid and nitric oxide, not increased mucus." }
     ]
   },
   {
@@ -11582,6 +11583,519 @@ export default [
         "rel": "evidence-for",
         "to": "claim:walsh-under-over-methylation-categories-valid",
         "note": "Weak support: an uncontrolled before-after outcome study by the framework's proponents; it cannot validate the biotypes or show biotype-specific benefit."
+      }
+    ]
+  },
+  {
+    "id": "article:ben-salem-2015-artichoke-pharmacology",
+    "type": "article",
+    "name": "Pharmacological Studies of Artichoke Leaf Extract and Their Health Benefits",
+    "aliases": ["Ben 2015"],
+    "summary": "Narrative review of artichoke leaf extract pharmacology: antioxidant, choleretic, hepatoprotective, bile-enhancing and lipid-lowering effects, with conclusive human evidence still lacking.",
+    "body": [
+      "Secondary source for the traditional claim that artichoke leaf stimulates bile flow ([[intervention:artichoke-leaf-extract]], [[claim:artichoke-stimulates-bile-flow-and-emptying]]). It is a narrative review that mixes animal and clinical work, so it supports plausibility rather than a specific effect size."
+    ],
+    "evidence": "plausible",
+    "authors": ["Ben Salem M", "Affes H", "Ksouda K", "Dhouibi R", "Sahnoun Z", "Hammami S", "Zeghal KM"],
+    "year": 2015,
+    "journal": "Plant foods for human nutrition (Dordrecht, Netherlands)",
+    "doi": "10.1007/s11130-015-0503-8",
+    "pmid": "26310198",
+    "url": "https://doi.org/10.1007/s11130-015-0503-8",
+    "verified": true,
+    "takeaways": [
+      "The review reports antioxidant, choleretic, hepatoprotective, bile-enhancing and lipid-lowering effects of artichoke leaf extract in experimental and clinical studies.",
+      "Strongest effects appear to be on the liver in animal studies; the authors state that research is not yet conclusive.",
+      "The long traditional use for digestive problems is described as plausibly justified, not proven."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "intervention:artichoke-leaf-extract",
+        "note": "Choleretic and bile-enhancing effects reported; not conclusive."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:artichoke-stimulates-bile-flow-and-emptying",
+        "note": "Supports bile flow; says nothing specific about duodenal emptying."
+      },
+      { "rel": "evidence-for", "to": "system:bile" }
+    ]
+  },
+  {
+    "id": "article:nilsson-2019-choline-phospholipid-digestion",
+    "type": "article",
+    "name": "Pancreatic and mucosal enzymes in choline phospholipid digestion",
+    "aliases": ["Nilsson 2019"],
+    "summary": "Review: dietary phosphatidylcholine is digested in the small intestine by pancreatic phospholipase A2 and mucosal enzymes, and the choline is recycled into bile and chylomicron phospholipid.",
+    "body": [
+      "Physiological background for the claim that phospholipid forms of choline do not rely on stomach acid ([[claim:alpha-gpc-pc-absorbed-without-acid]], [[intervention:phosphatidylcholine-supplement]]). It describes digestion of phosphatidylcholine and sphingomyelin, not alpha-GPC specifically, and does not test mucosal tolerance."
+    ],
+    "evidence": "established",
+    "authors": ["Nilsson Å", "Duan RD"],
+    "year": 2019,
+    "journal": "American journal of physiology. Gastrointestinal and liver physiology",
+    "doi": "10.1152/ajpgi.00320.2018",
+    "pmid": "30576217",
+    "url": "https://doi.org/10.1152/ajpgi.00320.2018",
+    "verified": true,
+    "takeaways": [
+      "In the proximal small intestine, pancreatic phospholipase A2 IB hydrolyses phosphatidylcholine to 1-lyso-PC and a free fatty acid, at the same time as dietary triacylglycerol digestion.",
+      "Part of the digestion continues in the jejunum and ileum through brush-border phospholipase B/lipase and mucosal secreted phospholipase A2 X.",
+      "Absorbed lyso-PC is partly degraded and partly reacylated into chylomicron PC; choline is also reused for bile phosphatidylcholine made by the liver.",
+      "The review also notes interaction of choline phospholipid digestion with intestinal bacterial choline metabolism."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "compound:phosphatidylcholine",
+        "note": "Digestion occurs by pancreatic and mucosal enzymes in the small intestine."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:alpha-gpc-pc-absorbed-without-acid",
+        "note": "Supports acid-independent digestion of phosphatidylcholine; says nothing on alpha-GPC or mucosal irritation."
+      },
+      { "rel": "evidence-for", "to": "intervention:phosphatidylcholine-supplement" },
+      { "rel": "evidence-for", "to": "system:duodenum" }
+    ]
+  },
+  {
+    "id": "article:boeckxstaens-2014-symptomatic-reflux-disease",
+    "type": "article",
+    "name": "Symptomatic reflux disease: the present, the past and the future",
+    "aliases": ["Boeckxstaens 2014"],
+    "summary": "Review of reflux mechanisms: hiatal hernia as a central factor, low sphincter pressure, transient LES relaxations and acid pocket position; weakly acidic or non-acid reflux can cause symptoms.",
+    "body": [
+      "Context article for why reflux and belching are linked through the sphincter ([[outcome:transient-les-relaxations]], [[system:lower-esophageal-sphincter]], [[disease:gerd]]). It also states that reflux symptoms can come from weakly acidic or non-acid reflux, a point relevant to throat symptoms ([[disease:lpr]])."
+    ],
+    "evidence": "established",
+    "authors": ["Boeckxstaens G", "El-Serag HB", "Smout AJ", "Kahrilas PJ"],
+    "year": 2014,
+    "journal": "Gut",
+    "doi": "10.1136/gutjnl-2013-306393",
+    "pmid": "24607936",
+    "url": "https://doi.org/10.1136/gutjnl-2013-306393",
+    "verified": true,
+    "takeaways": [
+      "GORD is multifactorial; obesity, age, genetics, pregnancy and trauma can impair the oesophagogastric junction mechanically.",
+      "A hiatal hernia is now a central player, affecting sphincter pressure, transient lower oesophageal sphincter relaxations, oesophageal clearance and acid pocket position.",
+      "Since proton pump inhibitors became available, the clinical challenge shifted from healing mucosa to PPI-resistant symptoms.",
+      "Reflux symptoms can arise from weakly acidic or non-acid reflux, which prompted searches for treatments that reduce all types of reflux."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "outcome:transient-les-relaxations",
+        "note": "TLESRs are one of the mechanisms of reflux."
+      },
+      { "rel": "evidence-for", "to": "disease:gerd" },
+      { "rel": "evidence-for", "to": "system:lower-esophageal-sphincter" }
+    ]
+  },
+  {
+    "id": "article:ducker-2017-one-carbon-metabolism",
+    "type": "article",
+    "name": "One-Carbon Metabolism in Health and Disease",
+    "aliases": ["Ducker 2017"],
+    "summary": "Review of mammalian one-carbon metabolism: folate-dependent synthesis of purines and thymidine, amino-acid homeostasis, methylation and redox, with an emphasis on mitochondrial reactions.",
+    "body": [
+      "The best single overview for how methyl and one-carbon units from [[compound:betaine]], [[compound:serine]] and [[compound:glycine]] reach DNA building blocks ([[pathway:nucleotide-synthesis]], [[pathway:folate-cycle]]). Its emphasis on mitochondrial one-carbon units exported to the cytosol matches the conversation's description of the mitochondrial folate pool."
+    ],
+    "evidence": "established",
+    "authors": ["Ducker GS", "Rabinowitz JD"],
+    "year": 2017,
+    "journal": "Cell metabolism",
+    "doi": "10.1016/j.cmet.2016.08.009",
+    "pmid": "27641100",
+    "url": "https://doi.org/10.1016/j.cmet.2016.08.009",
+    "verified": true,
+    "takeaways": [
+      "One-carbon metabolism, mediated by folate, supports biosynthesis of purines and thymidine, amino-acid homeostasis (glycine, serine, methionine), epigenetic maintenance and redox defence.",
+      "The reactions are compartmentalised within cells and across organs.",
+      "An emerging theme is that mitochondrial one-carbon reactions produce units exported to the cytosol and also make glycine and NADPH.",
+      "Differential use of the folate pathway in cancer, stem cells, development and adult physiology is described as an opportunity for selective therapy."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      { "rel": "evidence-for", "to": "pathway:nucleotide-synthesis" },
+      {
+        "rel": "evidence-for",
+        "to": "pathway:folate-cycle",
+        "note": "Compartmentalised folate-dependent one-carbon reactions."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "enzyme:shmt2",
+        "note": "Mitochondrial one-carbon units are exported to the cytosol."
+      },
+      { "rel": "evidence-for", "to": "enzyme:tyms" }
+    ]
+  },
+  {
+    "id": "article:pedley-2017-purinosome",
+    "type": "article",
+    "name": "A New View into the Regulation of Purine Metabolism: The Purinosome",
+    "aliases": ["Pedley 2017"],
+    "summary": "Review of de novo purine biosynthesis and the purinosome, a dynamic multienzyme complex that forms near mitochondria when purine demand is high.",
+    "body": [
+      "Used for the statement that purines are building blocks for DNA, RNA and cellular energy and cofactors, and that their de novo synthesis is organised and regulated ([[pathway:nucleotide-synthesis]], [[compound:imp]]). It is cell biology; it does not address dietary methyl donors."
+    ],
+    "evidence": "established",
+    "authors": ["Pedley AM", "Benkovic SJ"],
+    "year": 2017,
+    "journal": "Trends in biochemical sciences",
+    "doi": "10.1016/j.tibs.2016.09.009",
+    "pmid": "28029518",
+    "url": "https://doi.org/10.1016/j.tibs.2016.09.009",
+    "verified": true,
+    "takeaways": [
+      "Purine metabolites supply DNA and RNA building blocks as well as energy and cofactors for cell survival and proliferation.",
+      "When purine demand is high, the de novo biosynthetic enzymes cluster near mitochondria and microtubules into dynamic complexes called purinosomes.",
+      "The purinosome is presented as a new level of metabolic organisation and a potential therapeutic target in cancer."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "pathway:nucleotide-synthesis",
+        "note": "Organisation and regulation of de novo purine synthesis."
+      },
+      { "rel": "evidence-for", "to": "compound:imp" }
+    ]
+  },
+  {
+    "id": "article:hattori-2017-histamine-cardiovascular",
+    "type": "article",
+    "name": "Regulation of the Cardiovascular System by Histamine",
+    "aliases": ["Hattori 2017"],
+    "summary": "Review of histamine H1 to H4 receptors in the heart and vessels; histamine may not normally regulate cardiovascular function but mast-cell release produces clear effects.",
+    "body": [
+      "Adds a needed qualification to the idea that night-time histamine drives palpitations: the review says histamine \"may not normally play a significant role\" in cardiovascular regulation, while large releases in allergy, inflammation or tissue injury have clear effects ([[pathway:histamine-receptor-signalling]], [[claim:histamine-h1-h2-tachycardia-flushing]])."
+    ],
+    "evidence": "established",
+    "authors": ["Hattori Y", "Hattori K", "Matsuda N"],
+    "year": 2017,
+    "journal": "Handbook of experimental pharmacology",
+    "doi": "10.1007/164_2016_15",
+    "pmid": "27838850",
+    "url": "https://doi.org/10.1007/164_2016_15",
+    "verified": true,
+    "takeaways": [
+      "Histamine acts on the cardiovascular system through H1 and H2 receptors, whose distribution, function and pathophysiological role are well recognised, and through H3 and H4 receptors with newer roles.",
+      "Under normal conditions histamine may not play a significant part in regulating cardiovascular function.",
+      "During tissue injury, inflammation and allergy, mast cells release large amounts of histamine, leading to noticeable cardiovascular effects."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "pathway:histamine-receptor-signalling",
+        "note": "Cardiovascular H1/H2 receptor actions."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:histamine-h1-h2-tachycardia-flushing",
+        "note": "Supports the effect of released histamine; also notes it is not a normal regulator."
+      },
+      { "rel": "evidence-for", "to": "outcome:tachycardia" },
+      { "rel": "evidence-for", "to": "outcome:flushing" }
+    ]
+  },
+  {
+    "id": "article:reeds-2001-glutamine-and-the-bowel",
+    "type": "article",
+    "name": "Glutamine and the bowel",
+    "aliases": ["Reeds 2001"],
+    "summary": "Review concluding that glutamine supports intestinal mucosal function but that its mechanisms and the benefit of glutamine supplementation remain equivocal.",
+    "body": [
+      "Balanced review for the popular idea that supplemental glutamine rebuilds the gut lining ([[intervention:l-glutamine-supplement]], [[claim:glutamine-fuels-enterocytes-and-repairs-epithelium]]). It supports a role for glutamine in the intestine but is cautious about supplements."
+    ],
+    "evidence": "established",
+    "authors": ["Reeds PJ", "Burrin DG"],
+    "year": 2001,
+    "journal": "The Journal of nutrition",
+    "doi": "10.1093/jn/131.9.2505S",
+    "pmid": "11533302",
+    "url": "https://doi.org/10.1093/jn/131.9.2505S",
+    "verified": true,
+    "takeaways": [
+      "Since the pioneering work of Windmueller and Spaeth the importance of glutamine to intestinal mucosal metabolism has been generally accepted.",
+      "Biochemical and physiological evidence suggests systemic glutamine supports mucosal function, yet the effect is not compellingly explained by its use as an oxidative fuel.",
+      "Mucosal cells both use and synthesise glutamine, and glutamine activates genes involved in cell-cycle progression, hinting at a regulatory role.",
+      "Whether glutamine supplementation uniformly benefits mucosal health is described as equivocal at best."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "compound:glutamine",
+        "note": "Importance of glutamine for the intestinal mucosa."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:glutamine-fuels-enterocytes-and-repairs-epithelium",
+        "note": "Supports the importance of glutamine to the mucosa, but calls the fuel explanation and the benefit of supplements equivocal."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "intervention:l-glutamine-supplement",
+        "note": "Notes the unresolved benefit of supplementation."
+      }
+    ]
+  },
+  {
+    "id": "article:debelle-1999-elastin-molecular-description",
+    "type": "article",
+    "name": "Elastin: molecular description and function",
+    "aliases": ["Debelle 1999"],
+    "summary": "Review of elastin as the protein behind the elastic recoil of vertebrate tissues, its biosynthesis, structure, proposed mechanism of elasticity and associated diseases.",
+    "body": [
+      "Background source for elastin as an extracellular polymer of the connective tissue ([[compound:elastin]]). The abstract does not give residue percentages; the glycine fraction quoted on the elastin page is counted from the UniProt sequence."
+    ],
+    "evidence": "established",
+    "authors": ["Debelle L", "Tamburro AM"],
+    "year": 1999,
+    "journal": "The international journal of biochemistry & cell biology",
+    "doi": "10.1016/s1357-2725(98)00098-3",
+    "pmid": "10216959",
+    "url": "https://doi.org/10.1016/s1357-2725(98)00098-3",
+    "verified": true,
+    "takeaways": [
+      "Elastin provides the elastic properties of vertebrate tissues and was long regarded as an amorphous polymer.",
+      "Newer biochemical and biophysical work shows that it interacts with many other extracellular molecules and has a more dynamic structure than assumed.",
+      "The review describes biosynthesis, the elastic mechanism and pathologies in which elastin is involved."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      { "rel": "evidence-for", "to": "compound:elastin", "note": "Function and biochemistry of elastin." },
+      { "rel": "evidence-for", "to": "system:connective-tissue" }
+    ]
+  },
+  {
+    "id": "article:drozak-2010-carnosine-synthase-atpgd1",
+    "type": "article",
+    "name": "Molecular identification of carnosine synthase as ATP-grasp domain-containing protein 1 (ATPGD1)",
+    "aliases": ["Drozak 2010"],
+    "summary": "Identified human and mouse ATPGD1 (CARNS1) as the ATP-grasp enzyme that makes carnosine and homocarnosine, using beta-alanine far better than GABA.",
+    "body": [
+      "Biochemical identification of the enzyme behind the reaction in which beta-alanine and histidine are joined ([[enzyme:carns1]], [[reaction:carns1-carnosine-synthesis]]). It explains why beta-alanine supply controls carnosine content."
+    ],
+    "evidence": "established",
+    "authors": ["Drozak J", "Veiga-da-Cunha M", "Vertommen D", "Stroobant V", "Van Schaftingen E"],
+    "year": 2010,
+    "journal": "The Journal of biological chemistry",
+    "doi": "10.1074/jbc.M109.095505",
+    "pmid": "20097752",
+    "url": "https://doi.org/10.1074/jbc.M109.095505",
+    "verified": true,
+    "takeaways": [
+      "Purified chicken carnosine synthase made carnosine with stoichiometric ADP formation, not AMP, pointing to an ATP-grasp family ligase.",
+      "Database mining identified ATPGD1 as the candidate; the mouse and human proteins expressed in HEK293T cells synthesised carnosine and homocarnosine.",
+      "Catalytic efficiency was 15-25 times higher for beta-alanine than for gamma-aminobutyrate, in line with the earlier biochemical data."
+    ],
+    "facts": { "design": "in-vitro enzymology" },
+    "relations": [
+      { "rel": "evidence-for", "to": "enzyme:carns1", "note": "Identification of the gene and reaction." },
+      { "rel": "evidence-for", "to": "reaction:carns1-carnosine-synthesis" },
+      { "rel": "evidence-for", "to": "compound:carnosine" }
+    ]
+  },
+  {
+    "id": "article:boldyrev-2013-carnosine-physiology",
+    "type": "article",
+    "name": "Physiology and pathophysiology of carnosine",
+    "aliases": ["Boldyrev 2013"],
+    "summary": "Review of carnosine (beta-alanyl-L-histidine): pH buffering, metal chelation, antioxidant and anti-glycation properties, with promising but mostly preclinical therapeutic data.",
+    "body": [
+      "Main source for the statement that carnosine is a water-soluble antioxidant ([[compound:carnosine]]). It reviews roles in excitable tissues and supplementation studies; it does not show that carnosine speeds healing of the gastrointestinal mucosa ([[claim:beta-alanine-carnosine-tissue-protection]])."
+    ],
+    "evidence": "established",
+    "authors": ["Boldyrev AA", "Aldini G", "Derave W"],
+    "year": 2013,
+    "journal": "Physiological reviews",
+    "doi": "10.1152/physrev.00039.2012",
+    "pmid": "24137022",
+    "url": "https://doi.org/10.1152/physrev.00039.2012",
+    "verified": true,
+    "takeaways": [
+      "Carnosine is found in skeletal muscle and other excitable tissues; humans lack the methylated variant anserine that many animals have.",
+      "Its biochemical properties include pH buffering, metal-ion chelation, antioxidant capacity and protection against advanced glycation and lipoxidation end-products.",
+      "Therapeutic testing has given promising preclinical and some clinical results in diabetes complications, eye disease, ageing and neurological disorders, but the review states that far more physiological work is needed.",
+      "The imidazole ring of histidine is regarded as the main active component, while beta-alanine mostly regulates how much carnosine is made."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "compound:carnosine",
+        "note": "Antioxidant, chelating and buffering properties."
+      },
+      { "rel": "evidence-for", "to": "compound:beta-alanine", "note": "Beta-alanine limits carnosine synthesis." },
+      {
+        "rel": "evidence-for",
+        "to": "claim:beta-alanine-carnosine-tissue-protection",
+        "note": "Supports the antioxidant statement, not tissue recovery in the gut."
+      }
+    ]
+  },
+  {
+    "id": "article:carreras-1995-thymidylate-synthase",
+    "type": "article",
+    "name": "The catalytic mechanism and structure of thymidylate synthase",
+    "aliases": ["Carreras 1995"],
+    "summary": "Review of the chemical mechanism and structure of thymidylate synthase, which methylates dUMP with 5,10-methylene-THF to make dTMP and dihydrofolate.",
+    "body": [
+      "Classic enzymology review used here for the one-carbon step that turns folate-bound methyl units into DNA thymine ([[enzyme:tyms]], [[reaction:tyms-thymidylate-synthesis]]). It concerns the enzyme chemistry; the link to dietary methyl donors is made elsewhere ([[pathway:nucleotide-synthesis]])."
+    ],
+    "evidence": "established",
+    "authors": ["Carreras CW", "Santi DV"],
+    "year": 1995,
+    "journal": "Annual review of biochemistry",
+    "doi": "10.1146/annurev.bi.64.070195.003445",
+    "pmid": "7574499",
+    "url": "https://doi.org/10.1146/annurev.bi.64.070195.003445",
+    "verified": true,
+    "takeaways": [
+      "Thymidylate synthase (EC 2.1.1.45) catalyses the reductive methylation of dUMP by 5,10-methylene-tetrahydrofolate, producing dTMP and dihydrofolate.",
+      "The reaction is unusual because the folate cofactor donates both a one-carbon unit and a reducing equivalent, so tetrahydrofolate is oxidised to dihydrofolate and must be regenerated by DHFR.",
+      "The review covers assays, crystal structures and mutagenesis data that define the catalytic mechanism."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      { "rel": "evidence-for", "to": "enzyme:tyms", "note": "Mechanism and structure of thymidylate synthase." },
+      { "rel": "evidence-for", "to": "reaction:tyms-thymidylate-synthesis" },
+      { "rel": "evidence-for", "to": "compound:dtmp" }
+    ]
+  },
+  {
+    "id": "article:sugano-2015-kyoto-gastritis-consensus",
+    "type": "article",
+    "name": "Kyoto global consensus report on Helicobacter pylori gastritis",
+    "aliases": ["Sugano 2015"],
+    "summary": "Delphi consensus on classifying chronic gastritis and duodenitis, separating H. pylori dyspepsia from functional dyspepsia, diagnosing gastritis and deciding whom to treat.",
+    "body": [
+      "International consensus that treats [[disease:gastritis]] as a histological and aetiological classification and names H. pylori infection as the most important cause ([[disease:h-pylori-infection]]). Useful here because it covers gastritis and duodenitis in one framework."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Sugano K",
+      "Tack J",
+      "Kuipers EJ",
+      "Graham DY",
+      "El-Omar EM",
+      "Miura S",
+      "Haruma K",
+      "Asaka M",
+      "Uemura N",
+      "Malfertheiner P"
+    ],
+    "year": 2015,
+    "journal": "Gut",
+    "doi": "10.1136/gutjnl-2015-309252",
+    "pmid": "26187502",
+    "url": "https://doi.org/10.1136/gutjnl-2015-309252",
+    "verified": true,
+    "takeaways": [
+      "The meeting covered four domains: classification of chronic gastritis and duodenitis, telling H. pylori dyspepsia apart from functional dyspepsia, diagnostic assessment of gastritis, and when and how to treat H. pylori gastritis.",
+      "Statements were produced by expert panels using an anonymous Delphi process on 23 clinical questions.",
+      "The report is a consensus of experts rather than a trial; it fixes terminology so that gastritis is described by cause and pattern rather than by symptoms alone."
+    ],
+    "facts": { "design": "consensus" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "disease:gastritis",
+        "note": "Classification framework for gastritis and duodenitis."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "disease:h-pylori-infection",
+        "note": "H. pylori gastritis is treated as an infectious disease in the consensus."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "disease:functional-dyspepsia",
+        "note": "Distinguishes H. pylori dyspepsia from functional dyspepsia."
+      }
+    ]
+  },
+  {
+    "id": "article:tomlin-1991-normal-flatus",
+    "type": "article",
+    "name": "Investigation of normal flatus production in healthy volunteers",
+    "aliases": ["Tomlin 1991"],
+    "summary": "Ten healthy volunteers produced a median 705 ml of flatus per day, mostly hydrogen and CO2 from colonic fermentation; a fibre-free diet removed these fermentation gases.",
+    "body": [
+      "Measured by rectal catheter over 24 hours on a normal diet plus baked beans. It gives the reference picture of flatulence as colonic fermentation gas ([[outcome:flatulence]]), which is why belching without flatulence points away from the colon ([[outcome:belching]]) but does not say what produces the gas in the stomach."
+    ],
+    "evidence": "established",
+    "authors": ["Tomlin J", "Lowis C", "Read NW"],
+    "year": 1991,
+    "journal": "Gut",
+    "doi": "10.1136/gut.32.6.665",
+    "pmid": "1648028",
+    "url": "https://doi.org/10.1136/gut.32.6.665",
+    "verified": true,
+    "takeaways": [
+      "Total flatus volume ranged from 476 to 1491 ml per 24 h (median 705 ml); women and men produced similar amounts.",
+      "Median hydrogen output was 361 ml per day, carbon dioxide 68 ml and the unidentified residue (largely nitrogen) 213 ml; three of ten volunteers made methane.",
+      "Flatus volume was larger after meals and lower during sleep than in the day.",
+      "A 48 h fibre-free diet cut the volume to a median of 214 ml and almost eliminated hydrogen, showing that fermentation gases make the largest contribution to normal flatus."
+    ],
+    "facts": { "design": "physiology study", "population": "Ten healthy volunteers" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "outcome:flatulence",
+        "note": "Quantifies normal flatus volume and composition."
+      },
+      { "rel": "evidence-for", "to": "system:colon", "note": "Fermentation gases dominate flatus." }
+    ]
+  },
+  {
+    "id": "article:deloose-2012-migrating-motor-complex",
+    "type": "article",
+    "name": "The migrating motor complex: control mechanisms and its role in health and disease",
+    "aliases": ["Deloose 2012"],
+    "summary": "Review of the fasting migrating motor complex (MMC): its four phases, control by motilin, ghrelin, serotonin and vagus, and its absence in gastroparesis and small intestinal bacterial overgrowth.",
+    "body": [
+      "Standard review of the interdigestive \"housekeeping\" wave. Phase III is the strong burst that sweeps from stomach or duodenum toward the ileum; feeding interrupts the cycle ([[pathway:migrating-motor-complex]]). The authors report that the MMC is absent or disturbed in gastroparesis, intestinal pseudo-obstruction and [[disease:sibo]], but state that its physiological role is still incompletely understood, so the cleaning role is an association rather than a proven mechanism."
+    ],
+    "evidence": "established",
+    "authors": ["Deloose E", "Janssen P", "Depoortere I", "Tack J"],
+    "year": 2012,
+    "journal": "Nature reviews. Gastroenterology & hepatology",
+    "doi": "10.1038/nrgastro.2012.57",
+    "pmid": "22450306",
+    "url": "https://doi.org/10.1038/nrgastro.2012.57",
+    "verified": true,
+    "takeaways": [
+      "The MMC is a recurring fasting motility pattern of the stomach and small bowel with four phases; phase III is the most active, and eating interrupts the cycle.",
+      "Antral phase III can be triggered in humans by motilin, erythromycin or ghrelin; serotonin or somatostatin trigger phase III that starts in the duodenum.",
+      "The vagus nerve matters for the gastric part of the MMC only: vagotomy abolishes stomach activity but leaves the periodic activity of the small bowel intact.",
+      "Absence of the MMC has been associated with gastroparesis, pseudo-obstruction and bacterial overgrowth; the review calls its physiological role incompletely understood."
+    ],
+    "facts": { "design": "review" },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "pathway:migrating-motor-complex",
+        "note": "Primary review for phases, hormonal control and disease associations."
+      },
+      { "rel": "evidence-for", "to": "compound:motilin", "note": "Motilin triggers antral phase III." },
+      {
+        "rel": "evidence-for",
+        "to": "disease:sibo",
+        "note": "Absence of the MMC is associated with overgrowth; association, not shown causal."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "system:vagal-tone",
+        "note": "Vagal control of the MMC is restricted to the stomach."
       }
     ]
   }

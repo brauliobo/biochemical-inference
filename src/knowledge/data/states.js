@@ -5,7 +5,7 @@ export default [
     id: "state:undermethylation",
     type: "state",
     name: "Under-methylation",
-    aliases: ["Submetilação", "Hipometilação", "Low methylation capacity", "Undermethylation (Walsh biotype)", "Histadelia (Pfeiffer term)"],
+    aliases: ["Submetilação", "Hipometilação", "Low methylation capacity", "Undermethylation (Walsh biotype)", "Histadelia (Pfeiffer term)", "submetilado", "submetilados", "pessoa submetilada"],
     summary: "Reduced methylation capacity (low SAM or SAM:SAH). Biochemically measurable; as a clinical diagnosis ('undermethylator' biotype) it is contested and not mainstream.",
     body: [
       "The word 'under-methylation' is used in two quite different ways. In biochemistry it means a lowered capacity to transfer methyl groups: a low [[compound:sam]] supply, a low [[compound:sam]]:[[compound:sah]] ratio (the so-called methylation index), impaired remethylation of [[compound:homocysteine]], or reduced DNA/protein methylation. These are measurable quantities. In the Pfeiffer/Walsh nutrient-therapy tradition it is also a 'biotype' of patients (said to be identified mainly by high whole-blood histamine and a low SAM:SAH ratio) who are linked to anxiety, OCD-type traits, depression and seasonal allergy, and treated with SAMe, methionine and other agents. That second usage is contested: the evidence is largely the proponents' own patient database and clinical observation, there are no validated diagnostic criteria, no randomized trials of the biotype-directed approach, and whole-blood histamine is non-specific (it depends on basophil count). Mainstream guidelines do not recognise it. Everything below is educational, not a diagnosis.",
@@ -38,7 +38,7 @@ export default [
     id: "state:overmethylation",
     type: "state",
     name: "Over-methylation",
-    aliases: ["Sobremetilação", "Hipermetilação", "Hypermethylation", "Overmethylation (Walsh biotype)", "Histapenia (Pfeiffer term)"],
+    aliases: ["Sobremetilação", "Hipermetilação", "Hypermethylation", "Overmethylation (Walsh biotype)", "Histapenia (Pfeiffer term)", "sobremetilado", "sobremetilados"],
     summary: "Excess methylation flux or a high SAM:SAH ratio. Real in rare disorders such as GNMT deficiency; as a clinical 'biotype' of the Walsh protocol it is contested and unvalidated.",
     body: [
       "As with [[state:undermethylation]], the term has a measurable biochemical meaning and a contested clinical one. Biochemically, a persistently high [[compound:sam]] or high [[compound:sam]]:[[compound:sah]] ratio is documented in a few genetic disorders. The clearest is glycine N-methyltransferase deficiency (OMIM 606664), in which loss of the [[enzyme:gnmt]] 'valve' leaves methionine and SAM persistently raised, usually with mild liver-enzyme abnormalities, and GNMT knockout mice show SAM many-fold above normal. Large methionine loads, very high betaine doses in cystathionine beta-synthase deficiency (which can push methionine to hazardous levels) and aberrant DNA hypermethylation of tumour-suppressor promoters in cancer are separate phenomena that should not be conflated with a general 'overmethylation' diagnosis.",
@@ -65,7 +65,7 @@ export default [
     id: "state:hypochlorhydria",
     type: "state",
     name: "Hypochlorhydria",
-    aliases: ["Hipocloridria", "Low stomach acid", "Achlorhydria (absent acid)", "Baixa acidez gástrica"],
+    aliases: ["Hipocloridria", "Low stomach acid", "Achlorhydria (absent acid)", "Baixa acidez gástrica", "baixo ácido gástrico", "pouco ácido no estômago", "hipocloridria funcional"],
     summary: "Reduced gastric acid output (raised pH), usually from PPIs, H. pylori, autoimmune gastritis or ageing; it weakens the bacterial barrier and impairs B12 and iron absorption.",
     body: [
       "Gastric acid, produced by parietal cells through [[pathway:gastric-acid-secretion]], keeps the stomach near pH 1-3, activates [[compound:pepsin]] and kills most swallowed bacteria. Established causes of low output are acid-suppressive drugs ([[state:acid-suppression]], [[intervention:ppi-therapy|PPIs]]), chronic [[disease:h-pylori-infection]] with corpus atrophy, autoimmune gastritis ([[disease:atrophic-gastritis]]), advanced age, and previous gastric surgery. Consequences include impaired absorption of vitamin B12, iron and some minerals, reduced protein digestion, and a higher risk of upper-gut bacterial colonisation ([[disease:sibo]]), though the size of that last effect is debated.",
@@ -111,7 +111,7 @@ export default [
     id: "state:gastric-dysmotility",
     type: "state",
     name: "Gastric dysmotility",
-    aliases: ["Dismotilidade gástrica", "Slow gastric emptying", "Esvaziamento gástrico lento", "Impaired gastric motor function"],
+    aliases: ["Dismotilidade gástrica", "Slow gastric emptying", "Esvaziamento gástrico lento", "Impaired gastric motor function", "gastroparesia leve", "gastroparesia funcional", "esvaziamento lentificado"],
     summary: "Disordered stomach motor function: delayed emptying, impaired accommodation or abnormal contractions, from diabetes, drugs, post-viral injury or vagal damage; many cases are idiopathic.",
     body: [
       "Normal gastric emptying relies on proximal accommodation, antral contractions, pyloric coordination and duodenal feedback, orchestrated by the vagus ([[system:vagal-tone]]), the [[system:enteric-nervous-system]] and gut hormones. Dysmotility ranges from mild functional postprandial fullness ([[disease:functional-dyspepsia]]) to confirmed [[disease:gastroparesis]]. Established contributors are diabetes, opioids and other drugs, surgery, post-infectious injury and idiopathic neuropathy. Proton pump inhibitors modestly slow solid-meal emptying in some studies ([[claim:ppis-slow-gastric-emptying]]).",
@@ -165,9 +165,10 @@ export default [
       { rel: "increases", to: "compound:5-mthf", note: "Accumulates in the trapped pool." },
       { rel: "causes", to: "state:hyperhomocysteinemia" },
       { rel: "measured-by", to: "outcome:elevated-homocysteine" },
-      { rel: "associated-with", to: "disease:vitamin-b12-deficiency" }
+      { rel: "associated-with", to: "disease:vitamin-b12-deficiency" },
+      { rel: "decreases", to: "pathway:nucleotide-synthesis", note: "Classical mechanism of megaloblastic anaemia; shown indirectly." }
     ],
-    refs: ["article:stabler-2013-vitamin-b12-deficiency"]
+    refs: ["article:stabler-2013-vitamin-b12-deficiency", "article:ducker-2017-one-carbon-metabolism"]
   },
   {
     id: "state:hyperhomocysteinemia",
@@ -289,5 +290,41 @@ export default [
       { rel: "measured-by", to: "outcome:blood-histamine-level", note: "Plasma histamine is short-lived; poor routine marker." }
     ],
     refs: ["article:maintz-2007-histamine-intolerance", "article:nakamura-2017-mast-cell-clock-histamine"]
+  },
+  {
+    id: "state:duodenogastric-reflux",
+    type: "state",
+    name: "Duodenogastric (bile) reflux",
+    aliases: [
+      "refluxo duodenogástrico",
+      "refluxo biliar",
+      "refluxo duodeno-gástrico alcalino",
+      "refluxo alcalino",
+      "bile reflux",
+      "alkaline reflux"
+    ],
+    summary: "Backflow of bile and duodenal juice into the stomach. A little occurs in healthy people; more is linked to gastritis and GERD, but its link to everyday belching or gas is not shown.",
+    body: [
+      "Normally the pylorus lets food leave the stomach and keeps most duodenal fluid from returning. Small amounts of bile still reach the stomach in healthy people. After gastric surgery, or with pyloric or motility problems, more can reflux and irritate the lining ([[system:pylorus]], [[system:bile]]).",
+      "In one cohort of 341 people with GORD, 38 % had raised gastric bilirubin, and those with raised gastric and oesophageal bilirubin mostly had oesophagitis or Barrett's oesophagus ([[article:fein-2006-duodenogastric-reflux-gord]]). Ursodeoxycholic acid has been tried in alkaline reflux gastritis ([[article:stefaniwsky-1985-udca-alkaline-reflux-gastritis]]).",
+      "The source conversation says glycine overload changes the glycine:taurine ratio of bile and so provokes \"irritating alkaline duodenogastric reflux\" that triggers belching. That chain is unsupported: human bile is already mostly glycine-conjugated and large glycine doses did not shift the pattern ([[claim:glycine-overload-shifts-bile-conjugation-and-reflux]]). Persistent symptoms need medical evaluation; this is educational only."
+    ],
+    evidence: "plausible",
+    relations: [
+      { rel: "associated-with", to: "system:pylorus" },
+      { rel: "associated-with", to: "system:bile" },
+      {
+        rel: "associated-with",
+        to: "disease:gerd",
+        note: "Increased gastric bilirubin in 38 % of GORD patients in one cohort."
+      },
+      { rel: "associated-with", to: "disease:gastritis" },
+      {
+        rel: "associated-with",
+        to: "outcome:reflux-episodes",
+        note: "Bile-containing reflux is detected by bilirubin and impedance monitoring."
+      }
+    ],
+    refs: ["article:fein-2006-duodenogastric-reflux-gord", "article:stefaniwsky-1985-udca-alkaline-reflux-gastritis"]
   }
 ];

@@ -222,7 +222,7 @@ export default [
     id: "system:cardiac-autonomic-control",
     type: "system",
     name: "Cardiac autonomic control",
-    aliases: ["Controle autonômico cardíaco", "Vagal brake of the heart", "Sinoatrial node control"],
+    aliases: ["Controle autonômico cardíaco", "Vagal brake of the heart", "Sinoatrial node control", "receptores muscarínicos M2", "nó sinoatrial", "freio vagal"],
     summary: "Heart rate is set by sympathetic acceleration (beta-1 receptors) and vagal braking (M2 muscarinic receptors on the sinoatrial node); nocturnal vagal dominance lowers heart rate during sleep.",
     body: [
       "Acetylcholine from vagal terminals acts on M2 receptors in the sinoatrial node to slow depolarisation ([[compound:acetylcholine]]). Histamine acting on H1/H2 receptors and adrenergic discharge raise heart rate. Heart-rate variability is a surrogate for parasympathetic tone ([[system:vagal-tone]]). Whether dietary choline limits the nocturnal brake in people with adequate intake has not been shown ([[claim:choline-supplies-nocturnal-vagal-brake]]).",
@@ -241,7 +241,7 @@ export default [
     id: "system:mucosal-barrier",
     type: "system",
     name: "Gastroduodenal mucosal barrier",
-    aliases: ["Barreira mucosa", "Mucus-bicarbonate barrier", "Epithelial barrier"],
+    aliases: ["Barreira mucosa", "Mucus-bicarbonate barrier", "Epithelial barrier", "barreira mucosa gastroduodenal", "barreira de muco"],
     summary: "The stomach and duodenum's defences against acid and pepsin: surface mucus gel holding a bicarbonate layer, epithelial tight junctions, prostaglandins and mucosal blood flow.",
     body: [
       "A mucus gel layer with trapped [[compound:bicarbonate]] maintains near-neutral pH at the epithelial surface even when luminal pH is about 2 ([[compound:hydrochloric-acid]], [[compound:pepsin]]). Prostaglandins sustain mucus and bicarbonate secretion, which is why NSAIDs injure the barrier. Barrier failure plus acid causes [[disease:peptic-ulcer]]; recovery follows removal of the cause ([[state:post-ulcer-mucosal-recovery]]).",
@@ -296,7 +296,7 @@ export default [
     id: "system:kidney",
     type: "system",
     name: "Kidney (betaine, choline and homocysteine handling)",
-    aliases: ["Rim", "Renal handling", "Renal clearance"],
+    aliases: ["Rim", "Renal handling", "Renal clearance", "rins"],
     summary: "The kidney oxidises choline to betaine, hosts BHMT, filters and reabsorbs homocysteine and TMAO, and impaired function raises both markers independently of diet or methylation.",
     body: [
       "Renal tissue expresses [[enzyme:bhmt]] and choline dehydrogenase; [[compound:betaine]] is also an osmolyte. [[compound:homocysteine]] and [[compound:tmao]] depend on kidney clearance, so reduced glomerular filtration raises both ([[outcome:elevated-homocysteine]], [[outcome:elevated-tmao]]), which complicates interpretation of these markers as diet or methylation readouts ([[disease:cardiovascular-disease]]). Educational only."
@@ -309,5 +309,88 @@ export default [
       { rel: "associated-with", to: "outcome:elevated-homocysteine" }
     ],
     refs: ["article:ueland-2011-choline-betaine"]
+  },
+  {
+    id: "system:gastric-g-cells",
+    type: "system",
+    name: "Antral G cells (gastrin cells)",
+    aliases: ["células G", "células G antrais", "G cells", "gastrin cells"],
+    summary: "Endocrine cells of the gastric antrum that release gastrin in response to peptides and amino acids, distension and alkaline pH; acid and somatostatin restrain them.",
+    body: [
+      "G cells sit in the lower stomach (antrum) and sense the meal. Peptides and certain amino acids, especially phenylalanine and tryptophan, stretch of the stomach wall and a less acidic lumen make them release [[compound:gastrin]], which drives acid secretion by [[system:gastric-parietal-cells]]. As the stomach becomes acidic, somatostatin from neighbouring cells switches them off ([[compound:somatostatin]], [[article:schubert-2008-gastric-acid-secretion-control]], [[article:feng-2010-casr-gastrin-secretion]]).",
+      "The conversation says free glycine and collagen peptides are potent stimulators of these cells. In human tests glycine was not among the amino acids that raised gastrin ([[claim:free-glycine-stimulates-gastrin]], [[article:taylor-1982-amino-acids-gastric-acid]]). Chronic acid suppression raises gastrin because the brake is lost ([[outcome:elevated-gastrin]])."
+    ],
+    evidence: "established",
+    relations: [
+      { rel: "part-of", to: "system:gastric-physiology" },
+      { rel: "increases", to: "compound:gastrin" },
+      {
+        rel: "interacts-with",
+        to: "system:gastric-parietal-cells",
+        note: "Gastrin from G cells stimulates acid secretion."
+      }
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:feng-2010-casr-gastrin-secretion"]
+  },
+  {
+    id: "system:gastric-parietal-cells",
+    type: "system",
+    name: "Gastric parietal cells",
+    aliases: ["células parietais", "célula parietal", "células oxínticas", "oxyntic cells"],
+    summary: "Acid-secreting cells of the gastric corpus that also make intrinsic factor; stimulated by gastrin, acetylcholine and histamine and driven by the H+/K+-ATPase proton pump.",
+    body: [
+      "Parietal cells make the stomach's hydrochloric acid ([[compound:hydrochloric-acid]]). Three signals switch them on: gastrin (CCK2 receptors), acetylcholine from vagal neurons (M3 receptors) and histamine from neighbouring cells (H2 receptors). Each converges on the proton pump [[enzyme:h-k-atpase]] ([[pathway:gastric-acid-secretion]], [[article:schubert-2008-gastric-acid-secretion-control]]).",
+      "This is why different drugs lower acid: PPIs block the pump itself, H2 blockers block the histamine route ([[intervention:ppi-therapy]], [[intervention:h2-receptor-antagonists]]). Loss of parietal cells, as in autoimmune atrophic gastritis, causes low acid and, through lost intrinsic factor, B12 deficiency ([[disease:atrophic-gastritis]], [[disease:vitamin-b12-deficiency]]). The conversation attributes low acid in under-methylated people to weak cholinergic drive on these cells; that has not been shown ([[claim:undermethylated-hypochlorhydria]])."
+    ],
+    evidence: "established",
+    relations: [
+      { rel: "part-of", to: "system:gastric-physiology" },
+      { rel: "increases", to: "compound:hydrochloric-acid" },
+      { rel: "interacts-with", to: "compound:gastrin" },
+      { rel: "interacts-with", to: "compound:histamine" },
+      { rel: "interacts-with", to: "compound:acetylcholine" }
+    ],
+    refs: ["article:schubert-2008-gastric-acid-secretion-control"]
+  },
+  {
+    id: "system:ileum",
+    type: "system",
+    name: "Ileum and ileocaecal valve",
+    aliases: ["íleo", "intestino delgado distal", "válvula ileocecal", "íleo terminal", "distal small bowel"],
+    summary: "Distal small bowel, where bacterial density rises toward the colon; the terminal ileum absorbs B12 and bile acids, and the ileocaecal valve limits backflow of colonic bacteria.",
+    body: [
+      "The small intestine is sparsely populated near the stomach and increasingly colonised toward its end. The terminal ileum takes up vitamin B12 bound to intrinsic factor ([[compound:vitamin-b12]], [[article:stabler-2013-vitamin-b12-deficiency]]) and reclaims most bile acids for the liver (the enterohepatic circulation, [[article:hofmann-2008-bile-acids-biology]], [[pathway:bile-acid-conjugation]]). The ileocaecal valve helps keep colonic bacteria out of the small bowel.",
+      "The conversation says that during acid suppression or slow digestion \"bacteria climb from the ileum to the duodenum and stomach\". Reduced acid and impaired motility are recognised risk factors for overgrowth in the small bowel, though how far bacteria actually move upward is not documented here ([[state:acid-suppression]], [[claim:ppis-cause-sibo]], [[disease:sibo]])."
+    ],
+    evidence: "established",
+    relations: [
+      { rel: "associated-with", to: "disease:sibo" },
+      { rel: "interacts-with", to: "system:bile", note: "Terminal ileum reabsorbs bile acids." },
+      { rel: "interacts-with", to: "compound:vitamin-b12", note: "Site of B12-intrinsic factor uptake." },
+      { rel: "associated-with", to: "system:duodenum" }
+    ],
+    refs: ["article:hofmann-2008-bile-acids-biology", "article:stabler-2013-vitamin-b12-deficiency"]
+  },
+  {
+    id: "system:colon",
+    type: "system",
+    name: "Colon (large intestine)",
+    aliases: ["cólon", "intestino grosso", "fermentação colônica", "colon e reto", "large bowel"],
+    summary: "Home of most gut bacteria, which ferment unabsorbed carbohydrate and protein into hydrogen, CO2, methane and short-chain fatty acids; the source of flatus rather than of belched gas.",
+    body: [
+      "Whatever escapes digestion and absorption in the small bowel meets the dense microbial community of the colon ([[system:gut-microbiota]]). Fermentation there yields gases that leave as flatus ([[outcome:flatulence]], [[article:tomlin-1991-normal-flatus]]) and, from amino acids, ammonia and other products ([[article:neis-2015-microbial-amino-acid-metabolism]]).",
+      "The conversation contrasts \"classic colonic fermentation\" with an upper-gut process to explain belching without flatulence. Gas made in the colon cannot come back to the mouth in meaningful amounts, so belched gas must come from the stomach or oesophagus; whether it is swallowed air, CO2 or fermentation gas is a separate question ([[outcome:belching]], [[claim:belching-mostly-swallowed-air]])."
+    ],
+    evidence: "established",
+    relations: [
+      { rel: "causes", to: "outcome:flatulence", note: "Fermentation gases are the main component of flatus." },
+      { rel: "interacts-with", to: "system:gut-microbiota" },
+      {
+        rel: "interacts-with",
+        to: "system:ileum",
+        note: "The ileocaecal valve separates the dense colonic population from the small bowel."
+      }
+    ],
+    refs: ["article:tomlin-1991-normal-flatus", "article:neis-2015-microbial-amino-acid-metabolism"]
   }
 ];

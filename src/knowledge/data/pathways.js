@@ -302,7 +302,7 @@ export default [
     id: "pathway:gastric-acid-secretion",
     type: "pathway",
     name: "Gastric acid secretion by the parietal cell",
-    aliases: ["secreção ácida gástrica", "secreção de HCl", "célula parietal", "gastrina-histamina-acetilcolina", "bomba de prótons"],
+    aliases: ["secreção ácida gástrica", "secreção de HCl", "célula parietal", "gastrina-histamina-acetilcolina", "bomba de prótons", "células G e parietais", "secreção de ácido"],
     summary: "Parietal cells make HCl from CO2 (carbonic anhydrase) and ATP (H+/K+-ATPase), driven by gastrin, histamine and vagal acetylcholine and restrained by somatostatin at low pH.",
     body: [
       "CO2 is hydrated to H+ and HCO3- by [[enzyme:carbonic-anhydrase]]; [[enzyme:h-k-atpase]] pumps H+ into the canaliculus and Cl- follows, giving [[compound:hydrochloric-acid]] at pH ~1, while bicarbonate leaves basolaterally (alkaline tide; [[reaction:gastric-hcl-secretion]]). Three stimuli converge: vagal [[compound:acetylcholine]] (M3), antral [[compound:gastrin]] (released by peptides, amino acids, distension and vagal GRP; acts largely through histamine from ECL cells) and [[compound:histamine]] (H2 receptor). Antral acidification (pH < 3) releases somatostatin and switches gastrin off, a negative feedback.",
@@ -319,14 +319,15 @@ export default [
       { rel: "associated-with", to: "system:gastric-physiology" },
       { rel: "associated-with", to: "system:vagal-tone", note: "acetylcholine via M3 receptors" },
       { rel: "associated-with", to: "disease:peptic-ulcer", note: "acid-peptic ulcer; PPIs and H. pylori eradication are standard therapy" },
-      { rel: "interacts-with", to: "pathway:acid-bicarbonate-neutralisation", note: "downstream neutralisation of the acid by bicarbonate" }
+      { rel: "interacts-with", to: "pathway:acid-bicarbonate-neutralisation", note: "downstream neutralisation of the acid by bicarbonate" },
+      { rel: "part-of", to: "system:gastric-parietal-cells" }
     ]
   },
   {
     id: "pathway:acid-bicarbonate-neutralisation",
     type: "pathway",
     name: "Acid-bicarbonate neutralisation and CO2 evolution",
-    aliases: ["neutralização do ácido por bicarbonato", "HCl + HCO3−", "liberação de CO2", "efervescência gástrica", "bicarbonato pancreático"],
+    aliases: ["neutralização do ácido por bicarbonato", "HCl + HCO3−", "liberação de CO2", "efervescência gástrica", "bicarbonato pancreático", "gás químico", "efervescência"],
     summary: "Gastric HCl meets pancreatic and biliary bicarbonate (or an antacid) and is converted via carbonic acid to water and dissolved CO2, catalysed by carbonic anhydrase.",
     body: [
       "H+ + HCO3- -> H2CO3 ([[reaction:proton-bicarbonate-protonation]]) and H2CO3 -> H2O + CO2 ([[reaction:carbonic-acid-dehydration]]), summarised as HCl + HCO3- -> CO2 + H2O + Cl- ([[reaction:hcl-bicarbonate-neutralisation]]). [[enzyme:carbonic-anhydrase]] (CA II, CA IV) speeds the interconversion at epithelial surfaces ([[reaction:carbonic-anhydrase-bicarbonate-dehydration]]). In the duodenum, pancreatic and biliary bicarbonate and Brunner-gland mucus neutralise acid chyme within centimetres of the pylorus. Dissolved CO2 is highly diffusible and mostly absorbed across the mucosa; a minor fraction is carried distally or released.",
@@ -537,5 +538,195 @@ export default [
       { rel: "associated-with", to: "state:hypochlorhydria", note: "chronic corpus-predominant infection can reduce acid output" }
     ],
     refs: ["article:weeks-2000-urei-h-pylori-urease", "article:kusters-2006-h-pylori-pathogenesis"]
+  },
+  {
+    id: "pathway:5-ht4-prokinetic-signalling",
+    type: "pathway",
+    name: "5-HT4 receptor prokinetic signalling",
+    aliases: [
+      "receptor 5-HT4",
+      "5-HT4",
+      "serotonina 5-HT4 e motilidade",
+      "procinético serotoninérgico",
+      "receptores 5-HT4 gástricos"
+    ],
+    summary: "Serotonin acting on 5-HT4 receptors of enteric neurons increases acetylcholine release and motility; drugs such as prucalopride and mosapride use it. A ginger action here is not shown.",
+    body: [
+      "Most of the body's serotonin is made by enterochromaffin cells of the gut ([[compound:serotonin]]). On enteric neurons, 5-HT4 receptors raise the release of acetylcholine, which strengthens peristalsis and speeds gastric emptying. Drugs that stimulate this receptor are therefore used as prokinetics ([[intervention:prokinetic-drugs]], [[article:gershon-2007-serotonin-gi]], [[article:futagami-2010-mosapride-omeprazole-nerd]]).",
+      "The conversation names standardised ginger as a prokinetic that stimulates gastric 5-HT4 receptors. Isolated-tissue work found no 5-HT4 agonism for gingerols and shogaol and instead showed weak 5-HT3 and M3 blockade ([[article:pertz-2011-ginger-constituents-receptors]], [[article:walstab-2013-ginger-5ht3]]). Ginger may still speed emptying in small trials, but not through this receptor as far as is known ([[claim:ginger-prokinetic-5ht4-mmc]]). In a shrew model 5-HT4 was involved in the fasting motor cycle ([[article:mondal-2017-duodenal-ph-mmc-motilin]], [[pathway:migrating-motor-complex]])."
+    ],
+    evidence: "established",
+    facts: {
+      receptor: "5-HT4 (Gs-coupled, raises cAMP)",
+      drugs: "prucalopride, mosapride (agonists); cisapride withdrawn in many countries for QT risk"
+    },
+    relations: [
+      {
+        rel: "mitigates",
+        to: "state:gastric-dysmotility",
+        note: "Receptor agonists speed emptying; evidence is drug-specific."
+      },
+      { rel: "interacts-with", to: "compound:serotonin" },
+      {
+        rel: "interacts-with",
+        to: "compound:acetylcholine",
+        note: "5-HT4 activation increases acetylcholine release from enteric neurons."
+      },
+      { rel: "interacts-with", to: "intervention:prokinetic-drugs" },
+      {
+        rel: "interacts-with",
+        to: "intervention:ginger-extract",
+        note: "A 5-HT4 mechanism for ginger was not found in isolated-tissue work."
+      },
+      { rel: "associated-with", to: "system:enteric-nervous-system" }
+    ],
+    refs: ["article:gershon-2007-serotonin-gi"]
+  },
+  {
+    id: "pathway:muscarinic-m2-vagal-brake",
+    type: "pathway",
+    name: "Vagal acetylcholine and M2 receptors (the cardiac vagal brake)",
+    aliases: [
+      "receptor muscarínico M2",
+      "freio vagal cardíaco",
+      "vagal brake",
+      "acetilcolina e nó sinoatrial",
+      "receptores M2"
+    ],
+    summary: "Vagal acetylcholine binds M2 muscarinic receptors on the sinoatrial node and slows the heart; this parasympathetic brake dominates at rest and in sleep. Extra choline is not shown to strengthen it.",
+    body: [
+      "The heart's pacemaker (the sinoatrial node) would fire faster than the resting rate if left alone. The vagus nerve holds it back: nerve endings release [[compound:acetylcholine]], which binds M2 muscarinic receptors in the node and slows depolarisation. At night parasympathetic activity rises and heart rate falls ([[system:cardiac-autonomic-control]], [[article:gordan-2015-autonomic-cardiovascular-control]]).",
+      "Acetylcholine is made from [[compound:choline]] by [[enzyme:chat]] ([[pathway:acetylcholine-synthesis]]). The conversation proposes that supplementary choline supplies the substrate for the nocturnal brake and so prevents a compensating adrenergic surge ([[claim:choline-supplies-nocturnal-vagal-brake]]). This is speculative: choline deficiency lowers acetylcholine synthesis, but no study shows that extra choline strengthens vagal cardiac tone in people with ordinary intakes."
+    ],
+    evidence: "established",
+    facts: { receptor: "M2 muscarinic (Gi-coupled); antagonists such as atropine raise heart rate" },
+    relations: [
+      { rel: "part-of", to: "system:cardiac-autonomic-control" },
+      { rel: "interacts-with", to: "compound:acetylcholine" },
+      {
+        rel: "mitigates",
+        to: "outcome:tachycardia",
+        note: "Vagal restraint of the pacemaker; strength depends on parasympathetic tone, not directly on choline intake."
+      },
+      { rel: "associated-with", to: "system:vagal-tone" }
+    ],
+    refs: ["article:gordan-2015-autonomic-cardiovascular-control"]
+  },
+  {
+    id: "pathway:histamine-receptor-signalling",
+    type: "pathway",
+    name: "Histamine H1/H2 receptor signalling (vascular, cardiac and gastric effects)",
+    aliases: [
+      "receptores H1 e H2",
+      "sinalização da histamina",
+      "receptor de histamina H1",
+      "receptor de histamina H2",
+      "H1 H2 cardíacos",
+      "histamine receptors"
+    ],
+    summary: "Histamine acts on H1 (vessels, nerves) and H2 (heart, stomach) receptors; large releases cause flushing and a faster heart rate, but histamine is not a routine heart regulator.",
+    body: [
+      "Histamine is a mast-cell and gut mediator as well as a brain neurotransmitter. When mast cells release it in quantity, as in allergy, inflammation or tissue injury, it binds H1 receptors on blood vessels and sensory nerves (vessel dilation, flushing, itch) and H2 receptors, which in the heart can quicken the rate and strengthen the beat and in the stomach drive acid secretion ([[pathway:gastric-acid-secretion]], [[article:hattori-2017-histamine-cardiovascular]]).",
+      "An important qualification from the cardiovascular review: histamine \"may not normally play a significant role\" in regulating the heart and vessels; the effects become noticeable when large amounts are released. The signal is ended by two clearance routes, DAO outside cells and HNMT inside them ([[pathway:histamine-degradation]]).",
+      "The source conversation attributes 2-3 am waking with a racing heart and flushing to a night-time histamine peak that is poorly cleared when SAM is low ([[claim:histamine-peaks-2-4am]], [[claim:hnmt-needs-sam]], [[claim:histamine-h1-h2-tachycardia-flushing]]). The receptor actions are established; whether this chain explains any individual case is not."
+    ],
+    evidence: "established",
+    facts: { receptors: "H1 (Gq-coupled), H2 (Gs-coupled); H3 and H4 have newer, smaller roles in the heart" },
+    relations: [
+      { rel: "causes", to: "outcome:flushing", note: "When histamine release is large." },
+      {
+        rel: "causes",
+        to: "outcome:tachycardia",
+        note: "Established in allergy and mast-cell settings; not shown to cause palpitations at normal levels."
+      },
+      { rel: "interacts-with", to: "compound:histamine" },
+      { rel: "interacts-with", to: "pathway:histamine-degradation", note: "Clearance ends receptor signalling." },
+      { rel: "associated-with", to: "system:cardiac-autonomic-control" }
+    ],
+    refs: ["article:hattori-2017-histamine-cardiovascular", "article:maintz-2007-histamine-intolerance"]
+  },
+  {
+    id: "pathway:migrating-motor-complex",
+    type: "pathway",
+    name: "Migrating motor complex (fasting motility cycle)",
+    aliases: [
+      "MMC",
+      "complexo motor migratório",
+      "complexo motor migrante",
+      "varredura interdigestiva",
+      "fase III do CMM",
+      "housekeeper wave"
+    ],
+    summary: "Recurring fasting wave of contractions of stomach and small bowel, strongest in phase III; triggered by motilin and stopped by eating. Thought to sweep residue onward; role incompletely understood.",
+    body: [
+      "Between meals the stomach and small intestine are not idle. In the fasted state a wave of contractions starts in the stomach or duodenum and travels down the gut: the migrating motor complex. It has four phases and phase III is the strong burst; eating cancels the cycle and switches the gut to its fed pattern ([[article:deloose-2012-migrating-motor-complex]]). Textbooks give a period of roughly 90-120 minutes between bursts.",
+      "In humans antral phase III can be triggered by [[compound:motilin]], erythromycin or ghrelin, while serotonin or somatostatin trigger phase III that starts in the duodenum. The vagus is needed for the stomach part only: vagotomy abolishes gastric activity but leaves the small-bowel cycle running ([[system:vagal-tone]]).",
+      "Why it matters here: the conversation says acid prompts secretin and motilin release, and so drives the MMC, and that acid-suppressing drugs make the upper gut \"lazy\" so that bacteria climb into the duodenum ([[claim:acid-drives-secretin-motilin-mmc]], [[claim:ppis-slow-gastric-emptying]], [[claim:ppis-cause-sibo]]). The MMC is indeed absent or disturbed in gastroparesis and small intestinal bacterial overgrowth, but the review calls its physiological role incompletely understood, so \"cleaning\" is an association, not a proven mechanism ([[disease:sibo]]). A prokinetic effect of ginger on the MMC is not established ([[claim:ginger-prokinetic-5ht4-mmc]])."
+    ],
+    evidence: "established",
+    facts: {
+      phases: "I quiescence; II irregular contractions; III burst; IV return to quiescence",
+      trigger: "motilin, ghrelin, erythromycin (antral origin); serotonin, somatostatin (duodenal origin)"
+    },
+    relations: [
+      {
+        rel: "associated-with",
+        to: "disease:sibo",
+        note: "Absence of the MMC is associated with overgrowth; causality not shown."
+      },
+      { rel: "associated-with", to: "state:gastric-dysmotility", note: "MMC is absent in gastroparesis." },
+      { rel: "associated-with", to: "system:enteric-nervous-system" },
+      { rel: "associated-with", to: "system:duodenum" },
+      {
+        rel: "interacts-with",
+        to: "intervention:prokinetic-drugs",
+        note: "Erythromycin triggers phase III through the motilin receptor."
+      }
+    ],
+    refs: ["article:deloose-2012-migrating-motor-complex", "article:mondal-2017-duodenal-ph-mmc-motilin"]
+  },
+  {
+    id: "pathway:nucleotide-synthesis",
+    type: "pathway",
+    name: "Purine and thymidylate synthesis (one-carbon-dependent DNA building blocks)",
+    aliases: [
+      "síntese de purinas",
+      "síntese de pirimidinas",
+      "síntese de timidilato",
+      "síntese de nucleotídeos",
+      "purinas e pirimidinas",
+      "DNA building blocks",
+      "purine synthesis"
+    ],
+    summary: "Folate-carried one-carbon units feed two branches: formyl steps of de novo purine synthesis (to IMP) and methylation of dUMP to dTMP; a main reason one-carbon supply matters for dividing cells.",
+    body: [
+      "DNA and RNA are built from purines (adenine, guanine) and pyrimidines, and DNA needs thymine. Making them from scratch depends on one-carbon units carried by tetrahydrofolate. De novo purine synthesis needs two formyl groups from [[compound:10-formyl-thf]] on the way to [[compound:imp]], which becomes [[compound:amp]] and GMP. Thymine nucleotides come from [[reaction:tyms-thymidylate-synthesis]], where [[enzyme:tyms]] moves a methylene group from [[compound:5-10-methylene-thf]] onto [[compound:dump]], leaving [[compound:dhf]] behind.",
+      "Where the one-carbon units come from: serine through [[enzyme:shmt]], glycine through the glycine cleavage system, and, in mitochondria, the choline-derived chain. [[enzyme:dmgdh]] and [[enzyme:sardh]] strip the second and third methyl groups of betaine as 5,10-methylene-THF, and mitochondrial folate reactions export the units to the cytosol ([[article:ducker-2017-one-carbon-metabolism]], [[pathway:choline-oxidation]]). The source conversation describes this as feeding \"purine and pyrimidine synthesis for DNA\"; that is correct in outline, but this site does not quantify how much of the flux comes from choline compared with serine.",
+      "When folate or B12 function is limited ([[state:folate-trap]]), thymidylate and purine synthesis slow, and rapidly dividing cells such as bone marrow develop the large immature cells of megaloblastic anaemia, the classical sign of B12 or folate deficiency ([[disease:vitamin-b12-deficiency]], [[article:stabler-2013-vitamin-b12-deficiency]]). Purine synthesis is also organised into dynamic enzyme clusters when demand is high ([[article:pedley-2017-purinosome]])."
+    ],
+    evidence: "established",
+    facts: {
+      reactome: "R-HSA-8956320; R-HSA-73817; R-HSA-500753",
+      compartment: "cytosol; mitochondria supply one-carbon units"
+    },
+    relations: [
+      {
+        rel: "interacts-with",
+        to: "pathway:folate-cycle",
+        note: "Consumes the one-carbon units the folate cycle carries."
+      },
+      {
+        rel: "associated-with",
+        to: "pathway:choline-oxidation",
+        note: "The DMG and sarcosine steps release one-carbon units."
+      },
+      { rel: "associated-with", to: "compound:serine", note: "Main one-carbon donor through SHMT." }
+    ],
+    refs: [
+      "article:ducker-2017-one-carbon-metabolism",
+      "article:pedley-2017-purinosome",
+      "article:carreras-1995-thymidylate-synthase",
+      "article:stabler-2013-vitamin-b12-deficiency"
+    ]
   }
 ]
