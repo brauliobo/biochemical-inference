@@ -1,7 +1,8 @@
-import { createHash, createPublicKey, verify as verifyCrypto } from 'node:crypto'
 import { gunzipSync } from 'node:zlib'
-import { TextDecoder } from 'node:util'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
+import { defineProblemError } from '../commons/errors.js'
+import { parseCanonicalBytes, verifyEd25519Signature } from '../commons/verification.js'
 import {
   SPATIAL_REGISTRATION_ARRAY_IDS,
   SPATIAL_REGISTRATION_PINS,
@@ -21,22 +22,14 @@ import {
 export const MAX_SPATIAL_REGISTRATION_METADATA_BYTES = 16 * 1024 * 1024
 export const MAX_SPATIAL_REGISTRATION_PAGE_BYTES = 2 * 1024 * 1024
 export const MAX_SPATIAL_REGISTRATION_CHUNK_BYTES = 1024 * 1024
-const utf8 = new TextDecoder('utf-8', { fatal: true })
 const RECORD_COUNTS = Object.freeze({ datasets: 1, acquisitions: 1, spaces: 2, arrays: 5, registrations: 1, 'residual-overlap': 4, limitations: 5, attribution: 1 })
 const FULL_INDEX_ZYX_TO_SPACE_XYZ = [[0, 0, 2, 0], [0, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 1]]
 const PREVIEW_INDEX_ZYX_TO_SPACE_XYZ = [[0, 0, 8, 4], [0, 8, 0, 4], [8, 0, 0, 4], [0, 0, 0, 1]]
 
-export class SpatialRegistrationVerificationError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'SpatialRegistrationVerificationError'
-    this.code = options.code ?? 'SPATIAL_REGISTRATION_VERIFICATION_FAILED'
-    this.statusCode = options.statusCode ?? 409
-  }
-}
+export const SpatialRegistrationVerificationError = defineProblemError('SpatialRegistrationVerificationError', { statusCode: 409, code: 'SPATIAL_REGISTRATION_VERIFICATION_FAILED' })
 
-export function spatialRegistrationSha256(value) { return createHash('sha256').update(value).digest('hex') }
-export function spatialRegistrationDigest(value) { return spatialRegistrationSha256(Buffer.from(canonicalJson(value))) }
+export const spatialRegistrationSha256 = sha256Hex
+export const spatialRegistrationDigest = canonicalSha256Hex
 
 function currentSpatialRegistrationTime(now) {
   if (typeof now !== 'function') throw new TypeError('Spatial-registration verification requires an injectable clock.')
@@ -51,22 +44,7 @@ function assertSpatialRegistrationTimes(current, entries) {
 }
 
 export function parseSpatialRegistrationCanonical(bytes, schema, label, expectedDigest) {
-  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_SPATIAL_REGISTRATION_METADATA_BYTES) throw new SpatialRegistrationVerificationError(`${label} exceeds its bounded canonical JSON contract.`)
-  if (expectedDigest && spatialRegistrationSha256(bytes) !== expectedDigest) throw new SpatialRegistrationVerificationError(`${label} does not match its independent SHA-256 pin.`)
-  let text
-  let value
-  try { text = utf8.decode(bytes); value = JSON.parse(text) } catch { throw new SpatialRegistrationVerificationError(`${label} is not strict UTF-8 JSON.`) }
-  if (canonicalJson(value) !== text) throw new SpatialRegistrationVerificationError(`${label} is not RFC 8785 canonical JSON.`)
-  const parsed = schema.safeParse(value)
-  if (!parsed.success) throw new SpatialRegistrationVerificationError(`${label} does not match the strict spatial-registration contract: ${parsed.error.issues[0].message}`)
-  return parsed.data
-}
-
-function strictBase64Url(value, bytes, label) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=')) throw new SpatialRegistrationVerificationError(`${label} is not strict unpadded base64url.`)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== bytes || decoded.toString('base64url') !== value) throw new SpatialRegistrationVerificationError(`${label} has an invalid canonical encoding.`)
-  return decoded
+  return parseCanonicalBytes(bytes, schema, label, { ErrorClass: SpatialRegistrationVerificationError, maxBytes: MAX_SPATIAL_REGISTRATION_METADATA_BYTES, expectedDigest, contract: 'spatial-registration', issue: true })
 }
 
 function verifySpatialRegistrationSignatureAt(payload, signature, trust, current) {
@@ -75,11 +53,14 @@ function verifySpatialRegistrationSignatureAt(payload, signature, trust, current
   const signedDate = signature.signed_at.slice(0, 10)
   if (signedDate < key.valid_from || signedDate > key.valid_until) throw new SpatialRegistrationVerificationError('Spatial-registration signature falls outside the publication key interval.')
   assertSpatialRegistrationTimes(current, [['signature time', signature.signed_at]])
-  const spki = Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), strictBase64Url(key.public_key, 32, 'Spatial-registration public key')])
-  const message = Buffer.from(canonicalJson({ payload, algorithm: signature.algorithm, key_id: signature.key_id, signed_at: signature.signed_at }))
-  let valid = false
-  try { valid = verifyCrypto(null, message, createPublicKey({ key: spki, format: 'der', type: 'spki' }), strictBase64Url(signature.value, 64, 'Spatial-registration signature')) } catch { valid = false }
-  if (!valid) throw new SpatialRegistrationVerificationError('Spatial-registration Ed25519 signature is invalid.')
+  verifyEd25519Signature({
+    payload,
+    signature,
+    publicKey: key.public_key,
+    ErrorClass: SpatialRegistrationVerificationError,
+    labels: { publicKey: 'Spatial-registration public key', signature: 'Spatial-registration signature' },
+    invalidMessage: 'Spatial-registration Ed25519 signature is invalid.'
+  })
 }
 
 export function verifySpatialRegistrationSignature(payload, signature, trust, now = () => new Date()) {

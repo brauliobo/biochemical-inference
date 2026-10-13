@@ -34,3 +34,19 @@ export async function readBoundedBody(response, { maximum, label, ErrorClass, al
   if (total !== Number(rawLength)) throw new ErrorClass(`${label} body length does not match Content-Length.`)
   return Buffer.concat(chunks, total)
 }
+
+// Accepts only an origin-only http://127.0.0.1 or http://[::1] URL and returns its origin.
+// Failures are `new ErrorClass(message, { statusCode: 500, code })` with codes
+// `${codePrefix}_URL_INVALID` / `${codePrefix}_URL_REJECTED`.
+export function validateLoopbackOrigin(value, { ErrorClass, subject, codePrefix, noun = 'origin' }) {
+  let url
+  try {
+    url = new URL(value)
+  } catch {
+    throw new ErrorClass(`${subject} URL must be an absolute loopback HTTP ${noun}.`, { statusCode: 500, code: `${codePrefix}_URL_INVALID` })
+  }
+  if (url.protocol !== 'http:' || !['127.0.0.1', '[::1]'].includes(url.hostname) || url.username || url.password || url.search || url.hash || !['', '/'].includes(url.pathname)) {
+    throw new ErrorClass(`${subject} is restricted to an origin-only 127.0.0.1 or [::1] HTTP URL.`, { statusCode: 500, code: `${codePrefix}_URL_REJECTED` })
+  }
+  return url.origin
+}

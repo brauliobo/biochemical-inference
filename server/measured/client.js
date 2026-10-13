@@ -1,4 +1,6 @@
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
+import { readBoundedBody, timeoutSignal } from '../commons/upstream.js'
 import {
   CommitmentResponseSchema,
   ConsumerCommitmentSchema,
@@ -19,7 +21,6 @@ import {
   MAX_MEASURED_PAGE_BYTES,
   MEASURED_PAGE_LIMIT,
   MeasuredVerificationError,
-  measuredSha256,
   parseMeasuredCanonical,
   verifyMeasuredCatalog,
   verifyMeasuredDiscovery,
@@ -67,36 +68,10 @@ export function validateMeasuredProtectedConfig(env) {
   return { origin, token }
 }
 
-function timeoutSignal(timeoutMs, signal) {
-  const timeout = AbortSignal.timeout(timeoutMs)
-  return signal ? AbortSignal.any([timeout, signal]) : timeout
-}
-
-async function boundedBody(response, maximum, label, ownership = () => {}) {
-  const rawLength = response.headers.get('content-length')
-  if (rawLength === null || !/^(?:0|[1-9][0-9]*)$/.test(rawLength) || Number(rawLength) > maximum) throw new MeasuredUpstreamError(`${label} has a missing, invalid, or excessive Content-Length.`)
-  if (!response.body) throw new MeasuredUpstreamError(`${label} has no body.`)
-  const chunks = []
-  let total = 0
-  const reader = response.body.getReader()
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      ownership()
-      if (done) break
-      total += value.byteLength
-      if (total > maximum || total > Number(rawLength)) throw new MeasuredUpstreamError(`${label} exceeded its declared byte boundary.`)
-      chunks.push(Buffer.from(value))
-    }
-  } finally {
-    reader.releaseLock()
-  }
-  if (total !== Number(rawLength)) throw new MeasuredUpstreamError(`${label} body length does not match Content-Length.`)
-  return Buffer.concat(chunks, total)
-}
+const boundedBody = (response, maximum, label, onRead) => readBoundedBody(response, { maximum, label, ErrorClass: MeasuredUpstreamError, onRead })
 
 function immutableHeaders(response, bytes, label, releaseBound) {
-  const digest = measuredSha256(bytes)
+  const digest = sha256Hex(bytes)
   if (response.headers.get('content-type') !== 'application/json' || response.headers.get('etag') !== `"sha256:${digest}"`) throw new MeasuredUpstreamError(`${label} returned incompatible canonical JSON headers.`)
   const expectedCache = releaseBound ? 'public, max-age=31536000, immutable' : 'public, max-age=60'
   if (response.headers.get('cache-control') !== expectedCache) throw new MeasuredUpstreamError(`${label} returned an incompatible cache policy.`)
@@ -124,7 +99,7 @@ const EXPECTED_DISCLOSURE = Object.freeze([
 })))
 
 export function verifyEvaluationReceipt(response, evaluation) {
-  const frozenDigest = measuredSha256(Buffer.from(canonicalJson(evaluation.frozen_request)))
+  const frozenDigest = canonicalSha256Hex(evaluation.frozen_request)
   if (frozenDigest !== evaluation.commitment_digest || response.commitment_digest !== evaluation.commitment_digest) throw new MeasuredVerificationError('Measured evaluation receipt does not bind the exact commitment.')
   if (response.release.id !== MEASURED_RELEASE_ID || response.release.digest !== MEASURED_RELEASE_DIGEST || response.partition.id !== MEASURED_HELDOUT_PARTITION_ID || response.partition.closure_digest !== MEASURED_HELDOUT_PARTITION_DIGEST || response.partition.role !== 'external-held-out') throw new MeasuredVerificationError('Measured evaluation receipt has an incompatible release or partition identity.')
   if (canonicalJson(response.partition.family_ids) !== canonicalJson(['family:zenodo:7648975']) || canonicalJson(response.partition.study_ids) !== canonicalJson(['study:zenodo:7648975'])) throw new MeasuredVerificationError('Measured evaluation receipt has incompatible family/study membership.')
@@ -224,7 +199,7 @@ export function createMeasuredClient(env = process.env, options = {}) {
       const trustResult = verifyMeasuredTrust(await get('/api/measured/v1/trust'))
       const catalogBytes = await get('/api/measured/v1/releases')
       const { catalog, entry, key } = verifyMeasuredCatalog(catalogBytes, trustResult.trust)
-      if (discovery.catalog_digest !== measuredSha256(catalogBytes)) throw new MeasuredVerificationError('Measured discovery and catalog bytes disagree.')
+      if (discovery.catalog_digest !== sha256Hex(catalogBytes)) throw new MeasuredVerificationError('Measured discovery and catalog bytes disagree.')
       const releasePath = `/api/measured/v1/releases/${encodeURIComponent(MEASURED_RELEASE_ID)}`
       const releaseResult = verifyMeasuredRelease(await get(releasePath), entry)
       const envelopeBytes = await get(`${releasePath}/envelope`)
@@ -269,7 +244,7 @@ export function createMeasuredClient(env = process.env, options = {}) {
         const bytes = await get(path, MAX_MEASURED_PAGE_BYTES)
         ownership()
         const response = verifyMeasuredLineage(bytes, measurement)
-        lineages.set(measurement.id, { value: response.lineage, digest: measuredSha256(Buffer.from(canonicalJson(response.lineage))) })
+        lineages.set(measurement.id, { value: response.lineage, digest: canonicalSha256Hex(response.lineage) })
       }
       const signedRoots = verifyMeasuredSignedViews(releaseResult.manifest, traversals, lineages)
 
@@ -279,7 +254,7 @@ export function createMeasuredClient(env = process.env, options = {}) {
         records: { families: datasets.items, studies: studies.items, partitions: partitions.items, applicability: applicability.items, sources: provenance.items, measurements, missingness, exclusions: exclusions.items },
         lineages, objects,
         transport: { cursorBindingProved: true, pageLimit: MEASURED_PAGE_LIMIT, signedRoots },
-        digests: { catalog: MEASURED_CATALOG_DIGEST, trust: trustResult.response.trust_digest, manifest: measuredSha256(releaseResult.manifestBytes), envelope: measuredSha256(envelopeBytes) }
+        digests: { catalog: MEASURED_CATALOG_DIGEST, trust: trustResult.response.trust_digest, manifest: sha256Hex(releaseResult.manifestBytes), envelope: sha256Hex(envelopeBytes) }
       }
     },
     async commit(input, signal) {
@@ -287,7 +262,7 @@ export function createMeasuredClient(env = process.env, options = {}) {
       const path = `/api/measured/v1/releases/${encodeURIComponent(MEASURED_RELEASE_ID)}/commitments`
       const artifact = await request(path, { method: 'POST', body: canonicalJson(commitment), headers: { 'content-type': 'application/json', origin: protectedConfig.origin, 'x-csrf-token': protectedConfig.token }, signal, privateResponse: true })
       const response = CommitmentResponseSchema.parse(parseMeasuredCanonical(artifact.bytes, CommitmentResponseSchema, 'Measured commitment response'))
-      const digest = measuredSha256(Buffer.from(canonicalJson(commitment)))
+      const digest = canonicalSha256Hex(commitment)
       if (response.commitment_digest !== digest || response.created_at !== commitment.created_at || response.target_partition_digest !== commitment.target_partition_digest) throw new MeasuredVerificationError('Measured commitment receipt does not bind the exact frozen request, timestamp, and partition.')
       return response
     },

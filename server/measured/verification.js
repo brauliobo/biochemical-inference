@@ -1,6 +1,7 @@
-import { createHash, createPublicKey, verify as verifyCrypto } from 'node:crypto'
-import { TextDecoder } from 'node:util'
 import { canonicalJson } from '../../shared/canonical-json.js'
+import { canonicalSha256Hex, sha256Hex } from '../commons/digest.js'
+import { defineProblemError } from '../commons/errors.js'
+import { parseCanonicalBytes, verifyEd25519Signature } from '../commons/verification.js'
 import {
   MEASURED_API_VIEW_SPECS,
   MEASURED_BASELINE_ENVELOPE_DIGEST,
@@ -32,49 +33,11 @@ import {
 export const MAX_MEASURED_METADATA_BYTES = 8 * 1024 * 1024
 export const MAX_MEASURED_PAGE_BYTES = 2 * 1024 * 1024
 export const MEASURED_PAGE_LIMIT = 100
-const utf8 = new TextDecoder('utf-8', { fatal: true })
 
-export class MeasuredVerificationError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'MeasuredVerificationError'
-    this.code = options.code ?? 'MEASURED_VERIFICATION_FAILED'
-    this.statusCode = options.statusCode ?? 409
-  }
-}
-
-export function measuredSha256(value) {
-  return createHash('sha256').update(value).digest('hex')
-}
+export const MeasuredVerificationError = defineProblemError('MeasuredVerificationError', { statusCode: 409, code: 'MEASURED_VERIFICATION_FAILED' })
 
 export function parseMeasuredCanonical(bytes, schema, label, expectedDigest) {
-  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_MEASURED_METADATA_BYTES) throw new MeasuredVerificationError(`${label} exceeds its bounded canonical JSON contract.`)
-  if (expectedDigest && measuredSha256(bytes) !== expectedDigest) throw new MeasuredVerificationError(`${label} does not match its independent SHA-256 pin.`)
-  let text
-  let value
-  try {
-    text = utf8.decode(bytes)
-    value = JSON.parse(text)
-  } catch {
-    throw new MeasuredVerificationError(`${label} is not strict UTF-8 JSON.`)
-  }
-  let canonical
-  try {
-    canonical = canonicalJson(value)
-  } catch {
-    throw new MeasuredVerificationError(`${label} cannot be RFC 8785 canonical JSON.`)
-  }
-  if (canonical !== text) throw new MeasuredVerificationError(`${label} is not RFC 8785 canonical JSON.`)
-  const parsed = schema.safeParse(value)
-  if (!parsed.success) throw new MeasuredVerificationError(`${label} does not match the strict measured contract.`)
-  return parsed.data
-}
-
-function strictBase64Url(value, bytes, label) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=')) throw new MeasuredVerificationError(`${label} is not strict unpadded base64url.`)
-  const decoded = Buffer.from(value, 'base64url')
-  if (decoded.length !== bytes || decoded.toString('base64url') !== value) throw new MeasuredVerificationError(`${label} has an invalid canonical encoding.`)
-  return decoded
+  return parseCanonicalBytes(bytes, schema, label, { ErrorClass: MeasuredVerificationError, maxBytes: MAX_MEASURED_METADATA_BYTES, expectedDigest, contract: 'measured' })
 }
 
 export function verifyMeasuredSignature(payload, signature, trust) {
@@ -83,24 +46,21 @@ export function verifyMeasuredSignature(payload, signature, trust) {
   if (key.status === 'revoked' || !['active', 'retired'].includes(key.status)) throw new MeasuredVerificationError(`Measured signing key is not trusted: ${signature.key_id}.`)
   const signedDate = signature.signed_at.slice(0, 10)
   if (signedDate < key.valid_from || (key.valid_until !== null && signedDate > key.valid_until)) throw new MeasuredVerificationError(`Measured signing key ${key.key_id} is outside its validity interval.`)
-  const publicKey = strictBase64Url(key.public_key, 32, `Measured public key ${key.key_id}`)
-  const signatureBytes = strictBase64Url(signature.value, 64, `Measured signature ${key.key_id}`)
-  const spki = Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), publicKey])
-  const message = Buffer.from(canonicalJson({ payload, algorithm: signature.algorithm, key_id: signature.key_id, signed_at: signature.signed_at }))
-  let valid = false
-  try {
-    valid = verifyCrypto(null, message, createPublicKey({ key: spki, format: 'der', type: 'spki' }), signatureBytes)
-  } catch {
-    valid = false
-  }
-  if (!valid) throw new MeasuredVerificationError(`Invalid measured Ed25519 signature for ${key.key_id}.`)
+  verifyEd25519Signature({
+    payload,
+    signature,
+    publicKey: key.public_key,
+    ErrorClass: MeasuredVerificationError,
+    labels: { publicKey: `Measured public key ${key.key_id}`, signature: `Measured signature ${key.key_id}` },
+    invalidMessage: `Invalid measured Ed25519 signature for ${key.key_id}.`
+  })
   return key
 }
 
 export function verifyMeasuredTrust(bytes) {
   const response = parseMeasuredCanonical(bytes, MeasuredTrustResponseSchema, 'Measured trust response')
   const trustBytes = Buffer.from(canonicalJson(response.trust))
-  if (response.trust_digest !== MEASURED_TRUST_DIGEST || measuredSha256(trustBytes) !== MEASURED_TRUST_DIGEST) throw new MeasuredVerificationError('Measured trust response does not match the independent trust pin.')
+  if (response.trust_digest !== MEASURED_TRUST_DIGEST || sha256Hex(trustBytes) !== MEASURED_TRUST_DIGEST) throw new MeasuredVerificationError('Measured trust response does not match the independent trust pin.')
   if (response.trust.keys.length !== 2) throw new MeasuredVerificationError('Measured trust store has an unexpected key closure.')
   const [baseline, key] = response.trust.keys
   if (baseline.key_id !== MEASURED_BASELINE_SIGNER_KEY_ID || baseline.public_key !== MEASURED_BASELINE_SIGNER_PUBLIC_KEY || baseline.algorithm !== 'Ed25519' || baseline.status !== 'retired' || baseline.valid_from !== '2026-07-14' || baseline.valid_until !== '2026-07-14') throw new MeasuredVerificationError('Measured trust store does not preserve the independently pinned v1.0.0 publication key.')
@@ -130,7 +90,7 @@ export function verifyMeasuredRelease(bytes, entry) {
   const manifest = parseMeasuredCanonical(manifestBytes, MeasuredManifestSchema, 'Measured manifest', MEASURED_MANIFEST_DIGEST)
   const digestValue = { ...manifest }
   delete digestValue.release_digest
-  if (measuredSha256(Buffer.from(canonicalJson(digestValue))) !== MEASURED_RELEASE_DIGEST) throw new MeasuredVerificationError('Measured manifest RFC 8785 release identity is invalid.')
+  if (canonicalSha256Hex(digestValue) !== MEASURED_RELEASE_DIGEST) throw new MeasuredVerificationError('Measured manifest RFC 8785 release identity is invalid.')
   if (response.release.id !== MEASURED_RELEASE_ID || response.release.digest !== MEASURED_RELEASE_DIGEST || manifest.release_id !== response.release.id || manifest.release_digest !== response.release.digest || canonicalJson(manifest.record_counts) !== canonicalJson(entry.record_counts)) throw new MeasuredVerificationError('Measured release, manifest, and signed catalog disagree.')
   const types = manifest.files.map((file) => file.record_type)
   if (new Set(types).size !== types.length || manifest.files.some((file) => file.path !== `records/${file.record_type}.ndjson` || manifest.record_counts[file.record_type] !== file.record_count)) throw new MeasuredVerificationError('Measured manifest file/count closure is invalid.')
@@ -189,7 +149,7 @@ export function verifyMeasuredSignedViews(manifest, traversals, lineages) {
     const items = traversals.get(spec.viewId)
     if (!items) throw new MeasuredVerificationError(`Measured signed API view is missing: ${spec.viewId}.`)
     const root = measuredApiViewRoot(spec, items)
-    const digest = measuredSha256(Buffer.from(canonicalJson(root)))
+    const digest = canonicalSha256Hex(root)
     const descriptor = manifest.api_views.find((item) => item.view_id === spec.viewId)
     if (!descriptor || digest !== spec.root || digest !== descriptor.root_sha256) throw new MeasuredVerificationError(`Measured signed API root failed for ${spec.viewId}.`)
   }
@@ -206,7 +166,7 @@ export function verifyMeasuredSignedViews(manifest, traversals, lineages) {
     measurement_ids: ids,
     items: ordered.map(([measurement_id, item]) => ({ measurement_id, lineage: item.value }))
   }
-  const digest = measuredSha256(Buffer.from(canonicalJson(root)))
+  const digest = canonicalSha256Hex(root)
   if (digest !== MEASURED_SELECTED_LINEAGE_ROOT || digest !== descriptor.root_sha256) throw new MeasuredVerificationError('Measured selected-lineage signed root failed.')
   return { apiViews: 10, selectedLineages: 35, selectedLineageRoot: digest }
 }

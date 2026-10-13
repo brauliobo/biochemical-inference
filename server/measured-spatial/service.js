@@ -1,6 +1,4 @@
-import { homedir } from 'node:os'
-import { isAbsolute, relative, resolve, sep } from 'node:path'
-import { mkdtemp, realpath, rm } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import {
   MEASURED_SPATIAL_ARRAY_PINS,
@@ -10,54 +8,24 @@ import {
   MeasuredSpatialChunkSchema
 } from '../../shared/measured-spatial-contracts.js'
 import { createDataPlaneObjectStore } from '../data-plane/object-store.js'
-import { assertNoSymlinkAncestors, ensurePrivateDirectory } from '../data-plane/safe-path.js'
+import { isoNow, isoSeconds as exactTimestamp } from '../commons/clock.js'
+import { defineRequestError } from '../commons/errors.js'
+import { transaction } from '../commons/sqlite.js'
+import { selectStorageRoot, testRootParent } from '../commons/storage.js'
 import { createMeasuredSpatialClient, encodeMeasuredSpatialBundle } from './client.js'
 import { openMeasuredSpatialDatabase } from './database.js'
 import { MeasuredSpatialVerificationError, verifyMeasuredSpatialBundle, verifyMeasuredSpatialChunkBytes } from './verification.js'
 
-export class MeasuredSpatialRequestError extends Error {
-  constructor(code, message, statusCode = 422) {
-    super(message)
-    this.name = 'MeasuredSpatialRequestError'
-    this.code = code
-    this.statusCode = statusCode
-  }
-}
+export const MeasuredSpatialRequestError = defineRequestError('MeasuredSpatialRequestError', 422)
 
-function inside(parent, child) {
-  const path = relative(parent, child)
-  return path === '' || (!path.startsWith(`..${sep}`) && path !== '..' && !isAbsolute(path))
-}
-
-async function selectRoot(options, env) {
-  const configured = options.root ?? env.BIOCHEMICAL_MEASURED_SPATIAL_ROOT
-  if (!configured && env.NODE_ENV === 'test') {
-    const parent = resolve(env.BIOCHEMICAL_TEST_MEASURED_SPATIAL_ROOT ?? resolve(process.cwd(), '..', '.biochemical-inference-test-workspaces'))
-    await assertNoSymlinkAncestors(parent)
-    await ensurePrivateDirectory(parent)
-    const root = await mkdtemp(resolve(parent, 'goal14-'))
-    await ensurePrivateDirectory(root)
-    return { root, ephemeral: true }
-  }
-  const root = resolve(configured ?? resolve(homedir(), '.local', 'share', 'biochemical-inference', 'goal14-measured-spatial-v1'))
-  if (inside(resolve(process.cwd()), root)) throw new MeasuredSpatialRequestError('MEASURED_SPATIAL_ROOT_IN_SOURCE', 'Goal 14 storage root must be outside the source tree.', 500)
-  await assertNoSymlinkAncestors(root)
-  await ensurePrivateDirectory(root)
-  const [sourceReal, rootReal] = await Promise.all([realpath(process.cwd()), realpath(root)])
-  if (inside(sourceReal, rootReal)) throw new MeasuredSpatialRequestError('MEASURED_SPATIAL_ROOT_IN_SOURCE', 'Goal 14 storage root must be outside the source tree.', 500)
-  return { root: rootReal, ephemeral: false }
-}
-
-function transaction(database, action) {
-  database.exec('BEGIN IMMEDIATE')
-  try {
-    const result = action()
-    database.exec('COMMIT')
-    return result
-  } catch (error) {
-    database.exec('ROLLBACK')
-    throw error
-  }
+function selectRoot(options, env) {
+  return selectStorageRoot({
+    configured: options.root ?? env.BIOCHEMICAL_MEASURED_SPATIAL_ROOT,
+    test: env.NODE_ENV === 'test' ? { parent: testRootParent(env.BIOCHEMICAL_TEST_MEASURED_SPATIAL_ROOT), prefix: 'goal14-' } : null,
+    defaultName: 'goal14-measured-spatial-v1',
+    secure: true,
+    inSourceError: () => new MeasuredSpatialRequestError('MEASURED_SPATIAL_ROOT_IN_SOURCE', 'Goal 14 storage root must be outside the source tree.', 500)
+  })
 }
 
 function parseStoredBundle(value) {
@@ -84,17 +52,13 @@ function semanticRecords(metadata) {
   })
 }
 
-function exactTimestamp(now) {
-  return new Date(now()).toISOString().replace(/\.\d{3}Z$/, 'Z')
-}
-
 export async function createMeasuredSpatialService(options = {}) {
   const env          = options.env ?? process.env
   const selectedRoot = await selectRoot(options, env)
   const database     = openMeasuredSpatialDatabase(selectedRoot.root)
   const objects      = await createDataPlaneObjectStore(selectedRoot.root, options.objectHooks)
   const client       = options.client ?? createMeasuredSpatialClient(env, options.clientOptions)
-  const now          = options.now ?? (() => new Date().toISOString())
+  const now          = options.now ?? isoNow
   let bundle         = null
   let records        = null
   let chunks         = null
