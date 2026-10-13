@@ -19,7 +19,10 @@ export default [
       { rel: "increases", to: "compound:sarcosine", note: "Via GNMT; extent in humans unmeasured" },
       { rel: "causes", to: "outcome:belching", note: "Anecdotal GI complaint in some users; mechanism unresolved" },
       { rel: "mitigates", to: "outcome:night-waking", note: "Sleep-quality trials at 3 g; modest evidence" },
-      { rel: "interacts-with", to: "enzyme:gnmt" }
+      { rel: "interacts-with", to: "enzyme:gnmt" },
+      { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Adds to an already pathological glycine load." },
+      { rel: "increases", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep quality in small trials from one research group." },
+      { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-nmda"]
   },
@@ -254,7 +257,8 @@ export default [
       { rel: "increases", to: "compound:5-mthf" },
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "interacts-with", to: "enzyme:mthfr", note: "Bypasses the step" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible when folate-limited" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible when folate-limited" },
+      { rel: "aggravates", to: "state:overmethylation", note: "Proposed within the Walsh framework (methyl donors worsen over-methylation); independent evidence is lacking." }
     ]
   },
   {
@@ -309,7 +313,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:methylcobalamin" },
       { rel: "decreases", to: "compound:homocysteine" },
-      { rel: "associated-with", to: "state:hypochlorhydria", note: "Crystalline B12 bypasses acid-dependent food-B12 release" }
+      { rel: "associated-with", to: "state:hypochlorhydria", note: "Crystalline B12 bypasses acid-dependent food-B12 release" },
+      { rel: "mitigates", to: "state:undermethylation", note: "Cofactor form for methionine synthase; benefit documented mainly when B12 is deficient." },
+      { rel: "aggravates", to: "state:overmethylation", note: "Proposed within the Walsh framework; independent evidence is lacking." }
     ],
     refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -401,7 +407,8 @@ export default [
       { rel: "mitigates", to: "disease:peptic-ulcer", note: "Approved in Japan; supportive RCTs" },
       { rel: "increases", to: "compound:gastric-mucus", note: "Proposed mucoprotective action" },
       { rel: "interacts-with", to: "intervention:h-pylori-eradication-therapy", note: "Adjunct; separate from tetracycline" },
-      { rel: "increases", to: "compound:zinc" }
+      { rel: "increases", to: "compound:zinc" },
+      { rel: "increases", to: "outcome:ulcer-healing", note: "Randomised trials in Japan and China support healing; effect sizes are modest and some trials are small." }
     ],
     refs: ["article:mahmood-2007-zinc-carnosine-gut-integrity"]
   },
@@ -592,7 +599,8 @@ export default [
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "aggravates", to: "disease:sibo", note: "Associated in meta-analysis; mechanism and causality debated" },
       { rel: "decreases", to: "compound:vitamin-b12", note: "Food-bound B12 absorption falls with long-term use" },
-      { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" }
+      { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" },
+      { rel: "mitigates", to: "disease:lpr", note: "Trial evidence is mixed; benefit is likeliest when typical reflux symptoms coexist." }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid"]
   },
@@ -610,7 +618,8 @@ export default [
     relations: [
       { rel: "decreases", to: "pathway:gastric-acid-secretion" },
       { rel: "mitigates", to: "disease:gerd" },
-      { rel: "interacts-with", to: "compound:histamine" }
+      { rel: "interacts-with", to: "compound:histamine" },
+      { rel: "mitigates", to: "disease:peptic-ulcer", note: "Healing agents in meta-analysis, less effective than PPIs." }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -761,7 +770,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:1-methylnicotinamide" },
       { rel: "decreases", to: "compound:sam", note: "Methyl sink at gram doses" },
-      { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses" }
+      { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses" },
+      { rel: "aggravates", to: "state:undermethylation", note: "Gram-dose use consumes SAM via NNMT; a moderate burden, more relevant when folate or methyl status is already low." },
+      { rel: "mitigates", to: "state:overmethylation", note: "Proposed methyl sink via NNMT at gram doses; unvalidated for this indication." }
     ],
     refs: ["article:boden-2011-aim-high-niacin", "article:chen-2015-nicotinamide-skin-cancer", "article:pissios-2017-nnmt-methyl-sink"]
   },

@@ -41,7 +41,8 @@ export default [
       { rel: "causes", to: "state:hypochlorhydria", note: "Via corpus atrophy; early infection may transiently reduce acid." },
       { rel: "increases", to: "compound:ammonia", note: "Urease product; neutralises acid around the bacterium." },
       { rel: "associated-with", to: "disease:functional-dyspepsia", note: "Eradication helps a minority (NNT about 15)." },
-      { rel: "measured-by", to: "outcome:h-pylori-test-result" }
+      { rel: "measured-by", to: "outcome:h-pylori-test-result" },
+      { rel: "associated-with", to: "disease:sibo", note: "Meta-analysis of observational studies: infection was associated with SIBO (OR 1.82); direction and mechanism are unclear." }
     ],
     refs: ["article:malfertheiner-2022-maastricht-vi", "article:chey-2024-acg-h-pylori-treatment", "article:kusters-2006-h-pylori-pathogenesis"]
   },
@@ -84,7 +85,8 @@ export default [
       { rel: "causes", to: "disease:lpr", note: "Extra-oesophageal reflux is one proposed cause; often unproven." },
       { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
       { rel: "associated-with", to: "state:gastric-dysmotility" },
-      { rel: "measured-by", to: "outcome:reflux-episodes" }
+      { rel: "measured-by", to: "outcome:reflux-episodes" },
+      { rel: "manifests-as", to: "outcome:belching", note: "Belching, often supragastric, accompanies reflux in many patients." }
     ],
     refs: ["article:katz-2022-acg-gerd-guideline", "article:leiman-2017-alginate-meta-analysis"]
   },
@@ -106,7 +108,8 @@ export default [
       { rel: "measured-by", to: "outcome:salivary-pepsin", note: "Controversial and not diagnostic on its own." },
       { rel: "associated-with", to: "system:larynx-pharynx" },
       { rel: "associated-with", to: "disease:gerd" },
-      { rel: "associated-with", to: "outcome:belching" }
+      { rel: "associated-with", to: "outcome:belching" },
+      { rel: "measured-by", to: "outcome:reflux-episodes", note: "Pharyngeal and oesophageal impedance-pH monitoring is the objective test." }
     ],
     refs: ["article:chen-2023-aga-extraesophageal-reflux", "article:johnston-2006-pepsin-laryngeal-epithelium", "article:pizzorni-2022-alginate-vs-ppi-lpr"]
   },

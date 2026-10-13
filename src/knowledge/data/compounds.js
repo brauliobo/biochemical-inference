@@ -32,7 +32,10 @@ export default [
       { rel: "precursor-of", to: "compound:guanidinoacetate" },
       { rel: "precursor-of", to: "compound:glycocholic-acid" },
       { rel: "precursor-of", to: "compound:hippuric-acid", note: "Glycine conjugation of benzoate" },
-      { rel: "precursor-of", to: "compound:oxalate", note: "Minor flux via glyoxylate" }
+      { rel: "precursor-of", to: "compound:oxalate", note: "Minor flux via glyoxylate" },
+      { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the glycine cleavage system is defective; supplements are avoided." },
+      { rel: "mitigates", to: "state:glycine-insufficiency", note: "Direct repletion; whether a shortfall exists in healthy adults is contested." },
+      { rel: "increases", to: "compound:glutathione", note: "Glycine is a substrate of glutathione synthetase; with cysteine it restored glutathione synthesis in older adults in one small study." }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:mudd-2007-methyl-balance", "article:bannai-2012-glycine-sleep"]
   },
@@ -120,7 +123,12 @@ export default [
       { rel: "substrate-of", to: "enzyme:bhmt", note: "Methyl donor to homocysteine" },
       { rel: "precursor-of", to: "compound:dimethylglycine" },
       { rel: "decreases", to: "compound:homocysteine" },
-      { rel: "part-of", to: "pathway:choline-oxidation" }
+      { rel: "part-of", to: "pathway:choline-oxidation" },
+      { rel: "mitigates", to: "state:undermethylation", note: "Methyl donor for BHMT; lowers homocysteine in trials, but an effect on tissue SAM:SAH in people classed as under-methylated has not been shown." },
+      { rel: "mitigates", to: "state:hyperhomocysteinemia", note: "Lowers plasma homocysteine, including at low doses; anhydrous betaine is a prescription treatment in classical homocystinuria." },
+      { rel: "decreases", to: "outcome:elevated-homocysteine", note: "Randomised studies show lowering of fasting and post-methionine-load homocysteine." },
+      { rel: "mitigates", to: "disease:cbs-deficiency", note: "Established treatment for classical homocystinuria; it raises methionine, which is monitored." },
+      { rel: "increases", to: "compound:methionine", note: "BHMT remethylates homocysteine to methionine." }
     ],
     refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
@@ -170,7 +178,14 @@ export default [
       { rel: "precursor-of", to: "compound:acetylcholine" },
       { rel: "precursor-of", to: "compound:trimethylamine", note: "Via gut microbial CutC/D" },
       { rel: "part-of", to: "pathway:kennedy-pathway" },
-      { rel: "precursor-of", to: "compound:phosphocholine", note: "Choline kinase step" }
+      { rel: "precursor-of", to: "compound:phosphocholine", note: "Choline kinase step" },
+      { rel: "mitigates", to: "state:undermethylation", note: "Supplies methyl groups through betaine and BHMT, mainly when folate-dependent remethylation is limited; indirect and unproven for the state as defined clinically." },
+      { rel: "contraindicated-in", to: "disease:trimethylaminuria", note: "Gut bacteria convert surplus choline to trimethylamine, which people with reduced FMO3 activity cannot oxidise; intake is usually restricted." },
+      { rel: "causes", to: "outcome:fishy-odor", note: "Dose-dependent: with intakes above the upper limit or reduced FMO3 activity, excess trimethylamine produces a fishy odour." },
+      { rel: "increases", to: "compound:tmao", note: "Via gut bacterial trimethylamine (CutC) and hepatic FMO3." },
+      { rel: "decreases", to: "compound:homocysteine", note: "Through betaine and BHMT; phosphatidylcholine lowered fasting homocysteine in a randomised study." },
+      { rel: "mitigates", to: "disease:choline-deficiency", note: "Repletion corrects the deficiency syndrome." },
+      { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri", "article:zeisel-2009-choline-essential-nutrient"]
   },
@@ -626,7 +641,8 @@ export default [
       { rel: "product-of", to: "enzyme:mthfr" },
       { rel: "substrate-of", to: "enzyme:mtr" },
       { rel: "decreases", to: "compound:homocysteine" },
-      { rel: "interacts-with", to: "enzyme:gnmt", note: "Polyglutamate form inhibits GNMT" }
+      { rel: "interacts-with", to: "enzyme:gnmt", note: "Polyglutamate form inhibits GNMT" },
+      { rel: "decreases", to: "enzyme:gnmt", note: "The polyglutamate form inhibits purified rat GNMT noncompetitively; human significance unverified." }
     ]
   },
   {
@@ -830,7 +846,8 @@ export default [
       { rel: "cofactor-of", to: "enzyme:mthfr", note: "As FAD" },
       { rel: "cofactor-of", to: "enzyme:dmgdh", note: "As covalent FAD" },
       { rel: "cofactor-of", to: "enzyme:sardh", note: "As covalent FAD" },
-      { rel: "associated-with", to: "compound:plp", note: "FMN needed in the PNPO activation step" }
+      { rel: "associated-with", to: "compound:plp", note: "FMN needed in the PNPO activation step" },
+      { rel: "mitigates", to: "state:hyperhomocysteinemia", note: "In MTHFR 677TT carriers, riboflavin supplementation lowered homocysteine by up to 22% in a randomised trial." }
     ],
     refs: ["article:mcnulty-2006-riboflavin-mthfr"]
   },
@@ -848,7 +865,9 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:nicotinamide" },
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses; methyl sink effect" },
-      { rel: "interacts-with", to: "compound:sam", note: "Via NNMT consumption of nicotinamide" }
+      { rel: "interacts-with", to: "compound:sam", note: "Via NNMT consumption of nicotinamide" },
+      { rel: "aggravates", to: "state:undermethylation", note: "NNMT uses SAM to methylate nicotinamide, so gram doses add a dose-dependent methyl load; relevance at ordinary doses is not established." },
+      { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." }
     ]
   },
   {

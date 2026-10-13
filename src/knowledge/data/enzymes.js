@@ -33,7 +33,11 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "transmethylation arm: SAM to SAH" },
       { rel: "interacts-with", to: "compound:5-mthf", note: "5-MTHF polyglutamate binds and inhibits GNMT (established)" },
       { rel: "mitigates", to: "state:overmethylation", note: "disposes of surplus SAM methyl groups" },
-      { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: bolus free glycine over-recruits GNMT and drains SAM; human evidence lacking" }
+      { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: bolus free glycine over-recruits GNMT and drains SAM; human evidence lacking" },
+      { rel: "decreases", to: "compound:sam", note: "Spends SAM on methylating glycine; the hepatic methyl-sink reaction." },
+      { rel: "decreases", to: "compound:glycine", note: "Glycine is its methyl acceptor." },
+      { rel: "increases", to: "compound:sah", note: "Co-product of every methylation." },
+      { rel: "measured-by", to: "outcome:sarcosine-elevation", note: "Sarcosine is the product; it is raised when GNMT flux is high or sarcosine clearance is impaired." }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link"]
   },

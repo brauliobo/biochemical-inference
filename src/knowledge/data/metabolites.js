@@ -155,7 +155,7 @@ export default [
     aliases: ["AMP", "adenosina monofosfato", "5'-AMP"],
     summary: "Product when ATP is split into AMP and pyrophosphate in ligase reactions such as bile-acid CoA activation.",
     body: [
-      "[[reaction:bacs-cholate-coa-ligation]] consumes [[compound:atp]] and [[compound:coa]] to form [[compound:choloyl-coa]], [[compound:amp]] and [[compound:pyrophosphate]], using an adenylate intermediate. AMP is later recycled to ADP and ATP; it also activates the energy sensor AMPK, which is outside this knowledge base.",
+      "[[reaction:bacs-cholate-coa-ligation]] consumes [[compound:atp]] and [[compound:coa]] to form [[compound:choloyl-coa]], AMP and [[compound:pyrophosphate]], using an adenylate intermediate. AMP is later recycled to ADP and ATP; it also activates the energy sensor AMPK, which is outside this knowledge base.",
       "AMP is the nucleotide part of the adenosine moiety found in coenzyme A, NAD and FAD."
     ],
     evidence: "established",

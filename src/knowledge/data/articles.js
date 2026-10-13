@@ -10333,7 +10333,7 @@ export default [
     "aliases": [
       "ACG GERD guideline 2022"
     ],
-    "summary": "ACG guideline for GERD: PPIs remain first-line drug therapy; recommends lifestyle measures, limits long-term PPI use to those with a clear indication, and covers testing and surgical options.",
+    "summary": "ACG guideline for GERD: PPIs remain the medical treatment of choice; graded recommendations on diagnosis, lifestyle, drug, surgical and endoscopic care amid concern about overprescribing.",
     "body": [
       "The guideline grades recommendations on diagnosis and treatment of [[disease:gerd]] and treats [[intervention:ppi-therapy]] as the medical treatment of choice while addressing concerns about long-term adverse events and overprescribing. It is the standard reference for [[outcome:heartburn]] management and for the role of [[intervention:reflux-lifestyle-measures]]."
     ],
@@ -11012,7 +11012,7 @@ export default [
     ],
     "summary": "Review of hydrogen peroxide as a redox signalling molecule: nanomolar levels signal (oxidative eustress), while supraphysiological levels damage biomolecules (oxidative distress).",
     "body": [
-      "The overview covers the metabolic sources and sinks of H2O2, including peroxisomal and flavoprotein oxidases such as diamine oxidase ([[enzyme:dao]]) and PNP oxidase ([[enzyme:pnpo]]), and the concentration windows at which it signals or damages."
+      "The overview covers metabolic sources and sinks of H2O2 and the concentration windows at which it signals or damages. Among the enzymes in this knowledge base, oxidases such as diamine oxidase ([[enzyme:dao]]) and PNP oxidase ([[enzyme:pnpo]]) release it as a by-product."
     ],
     "evidence": "established",
     "authors": [
