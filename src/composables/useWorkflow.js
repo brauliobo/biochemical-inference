@@ -3,8 +3,8 @@
 // `busy` while an operation is in flight.
 //
 //   const flow = useWorkflow()                       // starts 'loading'
-//   await flow.step('syncing', async ({ signal, guard }) => {
-//     status.value = await guard(syncChallenge(signal))
+//   await flow.step('syncing', async ({ signal, fresh }) => {
+//     status.value = fresh(await syncChallenge(signal))
 //   }, { announce: 'Synchronized.', failure: 'Synchronization failed.' })
 //
 // `step` sets the state, clears the message, runs the work as the latest

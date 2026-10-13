@@ -42,7 +42,7 @@ const apapRun = ref()
 
   template(v-if="release && model")
     .sidebar
-      ExperimentForm(v-model:taxon-id="taxonId" v-model:preset="preset" v-model:activity="activity" v-model:duration="duration" :model="model" :locked="locked" :state="state" :errors="errors" @run="run" @custom-activity="customActivity")
+      ExperimentForm(v-model:taxonId="taxonId" v-model:preset="preset" v-model:activity="activity" v-model:duration="duration" :model="model" :locked="locked" :state="state" :errors="errors" @run="run" @custom-activity="customActivity")
       TopologyPanel(:model="model" :network="network" :result="result" :selected-id="selectedId" @select="select")
     EntityDetails(v-if="network" :model="model" :network="network" :result="result" :selected-id="selectedId")
     AtlasExplorer(:taxon-id="taxonId")

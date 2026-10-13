@@ -100,12 +100,13 @@ describe('MeasuredSpatialLiverAtlas', () => {
 
     await fireEvent.click(screen.getByTestId('measured-spatial-complete'))
     await waitFor(() => expect(api.completeMeasuredSpatialOffline).toHaveBeenCalled())
+    await waitFor(() => expect(screen.getByTestId('measured-spatial-integrity').disabled).toBe(false))
     await fireEvent.click(screen.getByTestId('measured-spatial-integrity'))
     const result = await screen.findByTestId('measured-spatial-offline-result')
 
     expect(within(result).getByText('400 verified')).toBeTruthy()
-    expect(within(result).getByText('disabled')).toBeTruthy()
+    expect(await within(result).findByText('disabled')).toBeTruthy()
     expect(screen.getByRole('group', { name: 'liver-mask level 1, Z chunk 0' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Check local integrity without network' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Check local integrity without network' })).toBeTruthy()
   })
 })

@@ -61,8 +61,8 @@ export function useSimulation() {
     const releaseId = release.value.id
     network.value = undefined
     state.value = 'loading'
-    await knowledge.run(async ({ signal, guard }) => {
-      const loaded = await guard(loadNetwork(releaseId, value, signal))
+    await knowledge.run(async ({ signal, fresh }) => {
+      const loaded = fresh(await loadNetwork(releaseId, value, signal))
       if (value !== taxonId.value) return
       network.value = loaded
       state.value = 'ready'
@@ -74,8 +74,8 @@ export function useSimulation() {
     provenance.value = undefined
     provenanceState.value = 'loading'
     provenanceError.value = ''
-    await provenanceTask.run(async ({ signal, guard }) => {
-      const loaded = await guard(loadProvenance(verifiedRelease, signal))
+    await provenanceTask.run(async ({ signal, fresh }) => {
+      const loaded = fresh(await loadProvenance(verifiedRelease, signal))
       if (verifiedRelease.id !== release.value?.id) return
       provenance.value = loaded
       provenanceState.value = 'available'
@@ -95,8 +95,8 @@ export function useSimulation() {
     provenanceError.value = ''
     provenanceTask.cancel()
     state.value = 'loading'
-    await knowledge.run(async ({ signal, guard }) => {
-      const workspace = await guard(loadWorkspace(requestedTaxon, signal))
+    await knowledge.run(async ({ signal, fresh }) => {
+      const workspace = fresh(await loadWorkspace(requestedTaxon, signal))
       if (requestedTaxon !== taxonId.value) return
       release.value = workspace.release
       model.value = workspace.model

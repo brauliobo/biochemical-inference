@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it } from 'vitest'
 import ArticleBlock from '../../src/components/kb/ArticleBlock.vue'
-import Badge from '../../src/components/kb/Badge.vue'
+import Badge from '../../src/ui/Badge.vue'
 import BodyText from '../../src/components/kb/BodyText.vue'
 import Breadcrumbs from '../../src/components/kb/Breadcrumbs.vue'
 import ClaimBlock from '../../src/components/kb/ClaimBlock.vue'

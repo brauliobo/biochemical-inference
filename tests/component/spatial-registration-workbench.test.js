@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SPATIAL_REGISTRATION_PINS } from '../../shared/spatial-registration-contracts.js'
+import { pressWhenEnabled } from '../helpers/interactions.js'
 
 const api = vi.hoisted(() => ({
   completeSpatialRegistrationOffline: vi.fn(),
@@ -96,11 +97,11 @@ describe('SpatialRegistrationWorkbench', () => {
     render(SpatialRegistrationWorkbench)
     await screen.findByTestId('spatial-registration-summary')
 
-    await fireEvent.click(screen.getByTestId('spatial-registration-residual-overlap'))
+    await pressWhenEnabled('spatial-registration-residual-overlap')
     await waitFor(() => expect(api.recomputeSpatialRegistrationResidualOverlap).toHaveBeenCalled())
-    await fireEvent.click(screen.getByTestId('spatial-registration-chunk'))
+    await pressWhenEnabled('spatial-registration-chunk')
     await waitFor(() => expect(api.loadSpatialRegistrationChunk).toHaveBeenCalledWith(descriptor, expect.any(AbortSignal)))
-    await fireEvent.click(screen.getByTestId('spatial-registration-transform'))
+    await pressWhenEnabled('spatial-registration-transform')
     const result = await screen.findByTestId('spatial-registration-transform-result')
 
     expect(api.transformSpatialRegistrationPoint).toHaveBeenCalledWith({ sourceSpaceId: CT_SPACE, targetSpaceId: MR_SPACE, pointXyzMm: [192, 160, 192] }, expect.any(AbortSignal))
@@ -114,14 +115,14 @@ describe('SpatialRegistrationWorkbench', () => {
     render(SpatialRegistrationWorkbench)
     await screen.findByTestId('spatial-registration-summary')
 
-    await fireEvent.click(screen.getByTestId('spatial-registration-complete'))
+    await pressWhenEnabled('spatial-registration-complete')
     await waitFor(() => expect(api.completeSpatialRegistrationOffline).toHaveBeenCalled())
-    await fireEvent.click(screen.getByTestId('spatial-registration-integrity'))
+    await pressWhenEnabled('spatial-registration-integrity')
     const result = await screen.findByTestId('spatial-registration-offline-result')
 
     expect(within(result).getByText('304')).toBeTruthy()
-    expect(within(result).getByText('disabled')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Check integrity without network' })).toBeTruthy()
+    expect(await within(result).findByText('disabled')).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Check integrity without network' })).toBeTruthy()
   })
 
   it('reverses the UI direction and submits a fractional inverse point without treating ROI scope as validity', async () => {

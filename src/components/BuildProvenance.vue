@@ -21,12 +21,11 @@ const LABELS = { available: 'Available', unavailable: 'Unavailable' }
 const unique = (values) => [...new Set(values)].sort().join(', ')
 const pins = computed(() => {
   const { recipe, sourceLock, transformer, validation } = props.provenance
-  const digest = (text) => ({ text, mono: true })
   return [
-    { label: 'Recipe', value: [recipe.path, digest(recipe.digest)] },
-    { label: 'Source lock', value: [sourceLock.path, digest(sourceLock.digest)] },
-    { label: 'Transformer', value: [`${transformer.id} ${transformer.version}`, digest(transformer.digest)] },
-    { label: 'Validator', value: [`${validation.id} ${validation.version}`, digest(validation.digest)] }
+    { label: 'Recipe', value: recipe.path, code: recipe.digest },
+    { label: 'Source lock', value: sourceLock.path, code: sourceLock.digest },
+    { label: 'Transformer', value: `${transformer.id} ${transformer.version}`, code: transformer.digest },
+    { label: 'Validator', value: `${validation.id} ${validation.version}`, code: validation.digest }
   ]
 })
 const inventory = computed(() => {

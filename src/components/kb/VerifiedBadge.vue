@@ -1,5 +1,5 @@
 <script setup vapor>
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 
 // Whether an article's citation details have been checked.
 defineProps({ verified: { type: Boolean, required: true } })

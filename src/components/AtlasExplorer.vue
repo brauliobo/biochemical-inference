@@ -81,9 +81,9 @@ async function traverse() {
   subgraph.value = undefined
   state.value = 'traversing'
   message.value = ''
-  await task.run(async ({ signal, guard }) => {
-    await guard(loadAtlasEntity(workspace.value.release, selected.id, props.taxonId, signal))
-    subgraph.value = await guard(loadAtlasSubgraph(workspace.value.release, selected.id, props.taxonId, maxDepth.value, maxNodes.value, signal))
+  await task.run(async ({ signal, fresh }) => {
+    fresh(await loadAtlasEntity(workspace.value.release, selected.id, props.taxonId, signal))
+    subgraph.value = fresh(await loadAtlasSubgraph(workspace.value.release, selected.id, props.taxonId, maxDepth.value, maxNodes.value, signal))
     state.value = 'ready'
   }, { fail: fail('The bounded atlas traversal failed.') })
 }
@@ -94,8 +94,8 @@ async function initialize() {
   seed.value = defaultSeeds[props.taxonId]
   state.value = 'loading'
   message.value = ''
-  const loaded = await task.run(async ({ signal, guard }) => {
-    workspace.value = await guard(loadAtlasWorkspace(props.taxonId, signal))
+  const loaded = await task.run(async ({ signal, fresh }) => {
+    workspace.value = fresh(await loadAtlasWorkspace(props.taxonId, signal))
     return true
   }, { fail: fail('The contextual atlas could not be loaded.') })
   if (loaded) await traverse()

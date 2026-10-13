@@ -3,12 +3,13 @@
 // AbortController, out-of-order responses and unmount.
 //
 //   const load = useTask()
-//   await load.run(async ({ signal, guard }) => {
-//     workspace.value = await guard(loadWorkspace(signal))   // dropped if superseded
+//   await load.run(async ({ signal, fresh }) => {
+//     workspace.value = fresh(await loadWorkspace(signal))   // dropped if superseded
 //   }, { fail: (error) => { message.value = errorMessage(error, 'Could not load.') } })
 //
 // `run` aborts the previous run of the same task first. A superseded, aborted or
-// unmounted run never calls `done` or `fail` and never lets `guard` resolve.
+// unmounted run never calls `done` or `fail`, and `fresh(value)` after an await
+// ends it (it returns the value while the run is still the latest).
 import { onBeforeUnmount } from 'vue'
 
 const STALE = Symbol('stale')
@@ -31,29 +32,37 @@ export function useTask() {
     controller = undefined
   }
 
-  async function run(work, { done, fail, settled } = {}) {
+  function run(work, { done, fail, settled } = {}) {
     cancel()
     const mine = epoch
     const current = () => mine === epoch
     const request = new AbortController()
     controller = request
-    const guard = async (promise) => {
-      const value = await promise
+    const fresh = (value) => {
       if (!current()) throw STALE
       return value
     }
+    const finish = () => { if (current()) settled?.() }
+    let pending
     try {
-      const value = await work({ signal: request.signal, guard, current })
-      if (current()) done?.(value)
-      return value
+      pending = Promise.resolve(work({ signal: request.signal, fresh, current }))
     } catch (error) {
-      if (error === STALE || isAbort(error) || !current()) return undefined
-      if (!fail) throw error
-      fail(error)
-      return undefined
-    } finally {
-      if (current()) settled?.()
+      pending = Promise.reject(error)
     }
+    return pending.then(
+      (value) => {
+        if (current()) done?.(value)
+        finish()
+        return value
+      },
+      (error) => {
+        finish()
+        if (error === STALE || isAbort(error) || !current()) return undefined
+        if (!fail) throw error
+        fail(error)
+        return undefined
+      }
+    )
   }
 
   onBeforeUnmount(cancel)
