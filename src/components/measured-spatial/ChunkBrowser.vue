@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Facts from '../../ui/Facts.vue'
 import Panel from '../../ui/Panel.vue'
 import SelectField from '../../ui/SelectField.vue'
+import { dims } from '../../ui/format.js'
 
 // Choose an array, level and Z slab (descriptors only), then request exactly
 // one chunk. No chunk is preloaded and nothing falls back to another level.
@@ -24,7 +25,7 @@ const columns = computed(() => Math.max(1, ...visible.value.map((item) => item.g
 const verified = computed(() => [
   { label: 'Cache source', value: props.selectedChunk.cacheSource },
   { label: 'Voxel origin ZYX', value: props.selectedChunk.descriptor.voxel_origin_zyx.join(', ') },
-  { label: 'Valid voxel shape', value: props.selectedChunk.descriptor.voxel_shape_zyx.join(' × ') },
+  { label: 'Valid voxel shape', value: dims(props.selectedChunk.descriptor.voxel_shape_zyx) },
   { label: 'Encoded / decoded', value: `${props.selectedChunk.encodedBytes} / ${props.selectedChunk.decodedBytes} bytes` }
 ])
 </script>

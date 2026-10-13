@@ -1,5 +1,5 @@
 <script setup vapor>
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
 
 // A labelled <select> bound with v-model (string or number values). `options`
 // is a list of { value, label } or plain strings. Other attributes (disabled,
@@ -8,6 +8,8 @@ import { computed } from 'vue'
 //
 //   SelectField(id="taxon" label="Taxon" v-model="taxonId" :options="[{ value: 9606, label: 'Human' }]")
 defineOptions({ inheritAttrs: false })
+// `$attrs` is not defined in the production template: use this.
+const attrs = useAttrs()
 const model = defineModel({ type: [String, Number], default: '' })
 const props = defineProps({
   id: { type: String, required: true },
@@ -28,7 +30,7 @@ function valueOf({ target }) {
 <template lang="pug">
 .field
   label(:for="id") {{ label }}
-  select(v-bind="$attrs" :id="id" v-model="model" :aria-describedby="hint ? `${id}-hint` : undefined" @change="emit('change', valueOf($event))")
+  select(v-bind="attrs" :id="id" v-model="model" :aria-describedby="hint ? `${id}-hint` : undefined" @change="emit('change', valueOf($event))")
     option(v-for="entry in entries" :key="entry.value" :value="entry.value") {{ entry.label }}
   small.muted(v-if="hint" :id="`${id}-hint`") {{ hint }}
 </template>

@@ -22,3 +22,8 @@ export const yesNo = (flag) => (flag ? 'yes' : 'no')
 export function list(values, fallback = 'none', separator = ', ') {
   return values?.length ? values.join(separator) : fallback
 }
+
+// Array dimensions as "208 × 992 × 380"; a missing value reads as `fallback`.
+export function dims(values, fallback = 'unavailable') {
+  return values?.join(' × ') ?? fallback
+}

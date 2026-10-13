@@ -20,4 +20,15 @@ describe('SFC conventions', () => {
   it('has no per-component <style> block', () => {
     expect(files.filter((path) => /<style[\s>]/.test(read(path)))).toEqual([])
   })
+
+  // The production build compiles `<script setup>` templates inline, where
+  // `$slots` and `$attrs` are not defined (a ReferenceError at render time, which
+  // the test compile does not show). useSlots() and useAttrs() work in both.
+  it('reads slots and attributes with useSlots() and useAttrs(), never $slots or $attrs in a template', () => {
+    const offenders = files.flatMap((path) => {
+      const template = read(path).split('<template lang="pug">')[1] ?? ''
+      return [...template.matchAll(/\$(slots|attrs|props|emit|refs|parent|el)\b/g)].map((match) => `${path}: $${match[1]}`)
+    })
+    expect(offenders).toEqual([])
+  })
 })

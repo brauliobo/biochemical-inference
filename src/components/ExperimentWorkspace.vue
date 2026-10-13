@@ -10,11 +10,11 @@ import ExperimentForm from './experiments/ExperimentForm.vue'
 import RevisionLedger from './experiments/RevisionLedger.vue'
 
 const {
-  state, message, draft, filters, models, model, targets, isRegistry, experiments, profiles, detail, readOnly, history, modelIds,
-  selectedAttempt, events, artifacts, comparison, report, exportHref, exportName, successful,
-  chooseModel, selectExperiment, saveRevision, queueRun, cloneExperiment, exportExperiment, importExperiment,
-  refreshHistory, inspectAttempt, previousHistoryPage, nextHistoryPage, cancelAttempt, restartAttempt, generateReport, compareLatest
+  state, message, draft, models, model, targets, isRegistry, experiments, profiles, detail, readOnly, modelIds,
+  exportHref, exportName, chooseModel, selectExperiment, saveRevision, cloneExperiment, exportExperiment, importExperiment,
+  attempts
 } = useExperimentWorkspace()
+const { history, filters, selected, events, artifacts, comparison, report, successful } = attempts
 </script>
 
 <template lang="pug">
@@ -25,8 +25,8 @@ Panel(title="Durable local research runs" title-id="experiment-workspace-title" 
 
   .grid(v-if="models.length")
     ExperimentForm(:draft="draft" :models="models" :engine="model?.engine.type" :is-registry="isRegistry" :targets="targets" :experiments="experiments" :profiles="profiles" :selected-id="detail?.experiment.experimentId ?? ''" :read-only="readOnly" :saving="state === 'saving'" :revising="Boolean(detail)" @submit="saveRevision" @select="selectExperiment" @model="chooseModel")
-    RevisionLedger(:detail="detail" :read-only="readOnly" :export-href="exportHref" :export-name="exportName" @queue="queueRun" @clone="cloneExperiment" @export="exportExperiment" @import="importExperiment")
+    RevisionLedger(:detail="detail" :read-only="readOnly" :export-href="exportHref" :export-name="exportName" @queue="attempts.queue" @clone="cloneExperiment" @export="exportExperiment" @import="importExperiment")
 
-  AttemptHistory(:history="history" :filters="filters" :model-ids="modelIds" @refresh="refreshHistory" @inspect="inspectAttempt" @previous="previousHistoryPage" @next="nextHistoryPage")
-  AttemptInspector(v-if="selectedAttempt" :attempt="selectedAttempt" :events="events" :artifacts="artifacts" :comparison="comparison" :report="report" :can-compare="successful.length >= 2" @cancel="cancelAttempt" @restart="restartAttempt" @report="generateReport" @compare="compareLatest")
+  AttemptHistory(:history="history" :filters="filters" :model-ids="modelIds" @refresh="attempts.refresh" @inspect="attempts.inspect" @previous="attempts.previousPage" @next="attempts.nextPage")
+  AttemptInspector(v-if="selected" :attempt="selected" :events="events" :artifacts="artifacts" :comparison="comparison" :report="report" :can-compare="successful.length >= 2" @cancel="attempts.cancel" @restart="attempts.restart" @report="attempts.generateReport" @compare="attempts.compareLatest")
 </template>

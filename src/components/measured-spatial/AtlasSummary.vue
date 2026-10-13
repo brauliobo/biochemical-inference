@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Card from '../../ui/Card.vue'
 import DataTable from '../../ui/DataTable.vue'
 import Panel from '../../ui/Panel.vue'
+import { dims } from '../../ui/format.js'
 
 // What the verified release says about the specimen, the liver segmentation and
 // the coordinate limits, with the semantic inventory of every array.
@@ -12,7 +13,6 @@ const arrays = computed(() => props.records.arrays)
 const acquisition = computed(() => props.records.acquisitions[0])
 const space = computed(() => props.records.spaces[0])
 const liverVoxels = computed(() => arrays.value.find((item) => item.id === 'liver-mask:0')?.liver_voxels.toLocaleString())
-const shape = (values) => values?.join(' × ') ?? 'unavailable'
 const bounds = (box) => (box ? `${box[0].join(', ')} through ${box[1].join(', ')}` : 'not present')
 </script>
 
@@ -42,8 +42,8 @@ const bounds = (box) => (box ? `${box[0].join(', ')} through ${box[1].join(', ')
         th(scope="row")
           strong {{ array.kind }}
           code.digest {{ array.id }}
-        td {{ shape(array.shape_zyx) }}
-        td {{ shape(array.spacing_um) }} µm
+        td {{ dims(array.shape_zyx) }}
+        td {{ dims(array.spacing_um) }} µm
         td {{ array.liver_voxels.toLocaleString() }}
         td {{ bounds(array.liver_bounds_xyz) }}
 </template>

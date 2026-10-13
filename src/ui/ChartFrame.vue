@@ -1,4 +1,5 @@
 <script setup vapor>
+import { useSlots } from 'vue'
 import Disclosure from './Disclosure.vue'
 
 // A figure around one chart: a caption (title and optional current value), the
@@ -12,6 +13,8 @@ defineProps({
   summary: { type: String, default: '' },
   tableLabel: { type: String, default: 'Show data table' }
 })
+// `$slots` is not defined in the production template: use this.
+const slots = useSlots()
 </script>
 
 <template lang="pug">
@@ -21,9 +24,9 @@ figure.stack.stack--tight(:aria-labelledby="`${id}-caption`")
     span.muted(v-if="value") {{ value }}
   slot
   p.muted(v-if="summary") {{ summary }}
-  .cluster(v-if="$slots.legend")
+  .cluster(v-if="slots.legend")
     slot(name="legend")
-  Disclosure(v-if="$slots.table" :summary="tableLabel")
+  Disclosure(v-if="slots.table" :summary="tableLabel")
     .scroll-x(role="region" tabindex="0" :aria-label="`${title}: data table`")
       slot(name="table")
 </template>

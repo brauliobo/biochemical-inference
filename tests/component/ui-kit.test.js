@@ -13,7 +13,7 @@ import Notice from '../../src/ui/Notice.vue'
 import Pagination from '../../src/ui/Pagination.vue'
 import Panel from '../../src/ui/Panel.vue'
 import SyncCard from '../../src/ui/SyncCard.vue'
-import { fixed, humanize, list, plural, yesNo } from '../../src/ui/format.js'
+import { dims, fixed, humanize, list, plural, yesNo } from '../../src/ui/format.js'
 import { statusTone } from '../../src/ui/tone.js'
 import KitForm from '../fixtures/vapor/KitForm.vue'
 import { expectAccessible } from '../helpers/axe.js'
@@ -34,6 +34,7 @@ describe('statusTone and format', () => {
     expect(humanize('is_upregulated_by')).toBe('is upregulated by')
     expect([list(['a', 'b']), list([]), list(undefined, 'none declared'), list(['a', 'b'], '', ' ')]).toEqual(['a, b', 'none', 'none declared', 'a b'])
     expect([yesNo(true), yesNo(0)]).toEqual(['yes', 'no'])
+    expect([dims([208, 992, 380]), dims(undefined), dims(undefined, 'n/a')]).toEqual(['208 × 992 × 380', 'unavailable', 'n/a'])
   })
 })
 

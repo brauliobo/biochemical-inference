@@ -1,5 +1,5 @@
 <script setup vapor>
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
 
 // A labelled text, number, range, search or checkbox input bound with v-model.
 // Other attributes (min, max, step, disabled, required, maxlength, list,
@@ -13,6 +13,8 @@ import { computed } from 'vue'
 // new value: handlers use that argument, not the bound state, which may not have
 // been updated yet.
 defineOptions({ inheritAttrs: false })
+// `$attrs` is not defined in the production template: use this.
+const attrs = useAttrs()
 const model = defineModel({ type: [String, Number, Boolean], default: '' })
 const props = defineProps({
   id: { type: String, required: true },
@@ -37,9 +39,9 @@ function valueOf({ target }) {
 <template lang="pug">
 .field(:class="{ 'field--inline': kind === 'checkbox' }")
   label(v-if="kind !== 'checkbox'" :for="id") {{ label }}
-  input(v-if="kind === 'checkbox'" v-bind="$attrs" :id="id" type="checkbox" v-model="model" :aria-describedby="describedby" @change="emit('input', valueOf($event))")
-  input(v-else-if="kind === 'number'" v-bind="$attrs" :id="id" :type="type" v-model.number="model" :aria-invalid="error ? 'true' : undefined" :aria-describedby="describedby" @input="emit('input', valueOf($event))")
-  input(v-else v-bind="$attrs" :id="id" :type="type" v-model="model" :aria-invalid="error ? 'true' : undefined" :aria-describedby="describedby" @input="emit('input', valueOf($event))")
+  input(v-if="kind === 'checkbox'" v-bind="attrs" :id="id" type="checkbox" v-model="model" :aria-describedby="describedby" @change="emit('input', valueOf($event))")
+  input(v-else-if="kind === 'number'" v-bind="attrs" :id="id" :type="type" v-model.number="model" :aria-invalid="error ? 'true' : undefined" :aria-describedby="describedby" @input="emit('input', valueOf($event))")
+  input(v-else v-bind="attrs" :id="id" :type="type" v-model="model" :aria-invalid="error ? 'true' : undefined" :aria-describedby="describedby" @input="emit('input', valueOf($event))")
   label(v-if="kind === 'checkbox'" :for="id") {{ label }}
   small.muted(v-if="hint" :id="`${id}-hint`") {{ hint }}
   small.field__error(v-if="error" :id="`${id}-error`" role="alert") {{ error }}

@@ -1,5 +1,5 @@
 <script setup vapor>
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
 
 // One labelled value: a (dt, dd) pair in a div, for use inside <Facts>. The
 // value is the `value` prop or the default slot. Under it, `code` adds one or
@@ -13,6 +13,8 @@ const props = defineProps({
   mono: { type: Boolean, default: false },
   large: { type: Boolean, default: false }
 })
+// `$slots` and `$attrs` are not defined in the production template: use these.
+const slots = useSlots()
 
 const codes = computed(() => [props.code].flat())
 </script>
@@ -24,6 +26,6 @@ div
     slot
       template(v-if="value !== ''") {{ value }}
       code.digest(v-for="text in codes" :key="text") {{ text }}
-  dd(v-if="note || $slots.note")
+  dd(v-if="note || slots.note")
     slot(name="note") {{ note }}
 </template>

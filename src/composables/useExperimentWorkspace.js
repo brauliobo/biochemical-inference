@@ -1,38 +1,26 @@
 // State and operations of the durable experiment workspace: the experiment
-// form (a draft), immutable revisions, queued attempts and their polling,
-// history paging, comparison, reports and portable bundles. The components in
-// src/components/experiments/ only render it.
+// form (a draft), the immutable revisions of the selected experiment, clone,
+// portable bundles, and (through useAttempts) queued attempts and their history.
+// The components in src/components/experiments/ only render it.
 //
 // Every operation is one workflow step: it supersedes the previous one, and its
 // results appear together with the new state.
 import { computed, onMounted, reactive, ref } from 'vue'
 import {
-  cancelWorkspaceAttempt,
   cloneWorkspaceExperiment,
-  compareWorkspaceAttempts,
   createWorkspaceExperiment,
-  createWorkspaceReport,
   createWorkspaceRevision,
   exportWorkspaceExperiment,
   importWorkspaceExperiment,
   loadPortfolioModels,
-  loadWorkspaceArtifacts,
-  loadWorkspaceAttempt,
-  loadWorkspaceCheckpoints,
-  loadWorkspaceEvents,
   loadWorkspaceExperiment,
   loadWorkspaceExperiments,
   loadWorkspaceHistory,
-  loadWorkspaceResourceProfiles,
-  queueWorkspaceRun,
-  restartWorkspaceCheckpoint
+  loadWorkspaceResourceProfiles
 } from '../api.js'
 import { buildSpecification, draftFromRevision, exactModelKey, interventionTargets, newDraft } from '../experiment-draft.js'
-import { usePolling } from './usePolling.js'
+import { HISTORY_LIMIT, useAttempts } from './useAttempts.js'
 import { useWorkflow } from './useWorkflow.js'
-
-const HISTORY_LIMIT = 25
-const POLL_MS = 750
 
 export function useExperimentWorkspace() {
   const registryModels = ref([])
@@ -40,17 +28,9 @@ export function useExperimentWorkspace() {
   const profiles = ref([])
   const experiments = ref([])
   const detail = ref()
-  const history = ref({ items: [], total: 0, limit: 50, offset: 0 })
-  const selectedAttempt = ref()
-  const events = ref([])
-  const artifacts = ref([])
-  const report = ref()
-  const comparison = ref()
   const exportHref = ref('')
   const exportName = ref('experiment.zip')
   const draft = reactive(newDraft())
-  const filters = reactive({ status: '', release: '', model: '', taxon: '', tissue: '' })
-  const historyOffset = ref(0)
   const { state, message, step } = useWorkflow({ settled: ['ready', 'failed'] })
 
   const models = computed(() => {
@@ -62,8 +42,8 @@ export function useExperimentWorkspace() {
   const isRegistry = (item) => registryModels.value.some((candidate) => candidate.id === item.id && candidate.digest === item.digest)
   const latestRevision = computed(() => detail.value?.revisions.at(-1))
   const readOnly = computed(() => Boolean(latestRevision.value) && latestRevision.value.specification.entries.some((entry) => !isRegistry(entry.model)))
-  const successful = computed(() => history.value.items.filter((item) => item.attempt.outcome === 'successful' && item.attempt.resultArtifactId))
   const modelIds = computed(() => [...new Set(models.value.map((item) => item.id))])
+  const attempts = useAttempts({ step, message, draft, latestRevision, readOnly })
 
   // The first thing the chosen model lets the form assign (the bound model may not be updated yet).
   const chooseModel = (key = draft.modelKey) => {
@@ -93,50 +73,6 @@ export function useExperimentWorkspace() {
     exportHref.value = ''
   }
 
-  const historyQuery = (offset = historyOffset.value) => ({ ...filters, limit: HISTORY_LIMIT, offset })
-
-  async function attemptState(attemptId, { signal, fresh }) {
-    const [attempt, loadedEvents, loadedArtifacts] = fresh(await Promise.all([
-      loadWorkspaceAttempt(attemptId, signal),
-      loadWorkspaceEvents(attemptId, signal),
-      loadWorkspaceArtifacts(attemptId, signal)
-    ]))
-    return { attempt, events: loadedEvents, artifacts: loadedArtifacts }
-  }
-
-  // A selected attempt that is not terminal is re-read, whatever the history filters say.
-  const poll = usePolling(async (task) => {
-    const attemptId = selectedAttempt.value?.attempt.attemptId
-    const loaded = await attemptState(attemptId, task)
-    if (selectedAttempt.value?.attempt.attemptId !== attemptId) return false
-    selectedAttempt.value = loaded.attempt
-    events.value = loaded.events
-    artifacts.value = loaded.artifacts
-    if (loaded.attempt.attempt.state !== 'terminal') return true
-    history.value = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
-    return false
-  }, { interval: POLL_MS, onError: () => true })
-
-  function showAttempt(loaded) {
-    selectedAttempt.value = loaded.attempt
-    events.value = loaded.events
-    artifacts.value = loaded.artifacts
-    report.value = undefined
-    if (loaded.attempt.attempt.state === 'terminal') poll.stop()
-    else poll.start()
-  }
-
-  const refreshHistory = (reset = false) => {
-    if (reset) historyOffset.value = 0
-    return step('loading', async ({ signal, fresh }) => fresh(await loadWorkspaceHistory(historyQuery(), signal)), {
-      done: (loaded) => {
-        history.value = loaded
-        return 'ready'
-      },
-      failure: 'History could not be loaded.'
-    })
-  }
-
   const initialize = () => step('loading', async ({ signal, fresh }) => {
     const [loadedModels, loadedProfiles, loadedExperiments, loadedHistory] = fresh(await Promise.all([
       loadPortfolioModels(signal),
@@ -151,7 +87,7 @@ export function useExperimentWorkspace() {
       registryModels.value = loadedModels
       profiles.value = loadedProfiles
       experiments.value = loadedExperiments
-      history.value = loadedHistory
+      attempts.history.value = loadedHistory
       draft.modelKey ||= loadedModels[0] ? exactModelKey(loadedModels[0]) : ''
       chooseModel()
       if (first) showDetail(first)
@@ -213,86 +149,6 @@ export function useExperimentWorkspace() {
     failure: 'Experiment could not be cloned.'
   })
 
-  // Queue or restart: the new attempt, the refreshed history and its detail arrive together.
-  const startAttempt = (begin, text, failure) => step('saving', async (task) => {
-    const queued = task.fresh(await begin(task))
-    const loadedHistory = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
-    return { loadedHistory, loaded: await attemptState(queued.attemptId, task) }
-  }, {
-    done: ({ loadedHistory, loaded }) => {
-      history.value = loadedHistory
-      showAttempt(loaded)
-      message.value = text
-      return 'ready'
-    },
-    failure
-  })
-
-  const queueRun = () => latestRevision.value && !readOnly.value && startAttempt(
-    () => queueWorkspaceRun(latestRevision.value.revisionId, draft.resourceProfileId),
-    'Attempt queued. Its scientific identity is stable; this attempt identity is unique.',
-    'Run could not be queued.'
-  )
-
-  const restartAttempt = () => selectedAttempt.value && startAttempt(
-    async () => {
-      const checkpoints = await loadWorkspaceCheckpoints(selectedAttempt.value.attempt.attemptId)
-      return restartWorkspaceCheckpoint(checkpoints.at(-1).checkpointId, draft.resourceProfileId)
-    },
-    'Restart queued from the exact specification checkpoint. No engine state was continued.',
-    'Specification restart could not be queued.'
-  )
-
-  const inspectAttempt = (attemptId) => {
-    poll.stop()
-    return step('loading', (task) => attemptState(attemptId, task), {
-      done: (loaded) => {
-        showAttempt(loaded)
-        return 'ready'
-      },
-      failure: 'Attempt detail could not be loaded.'
-    })
-  }
-
-  const cancelAttempt = () => selectedAttempt.value && step('saving', async (task) => {
-    const attemptId = selectedAttempt.value.attempt.attemptId
-    task.fresh(await cancelWorkspaceAttempt(attemptId))
-    const loadedHistory = task.fresh(await loadWorkspaceHistory(historyQuery(), task.signal))
-    return { loadedHistory, loaded: await attemptState(attemptId, task) }
-  }, {
-    done: ({ loadedHistory, loaded }) => {
-      history.value = loadedHistory
-      showAttempt(loaded)
-      return 'ready'
-    },
-    failure: 'Attempt could not be cancelled.'
-  })
-
-  const compareLatest = () => successful.value.length >= 2 && step('loading', async ({ fresh }) => fresh(await compareWorkspaceAttempts({
-    leftAttemptId: successful.value[1].attempt.attemptId,
-    rightAttemptId: successful.value[0].attempt.attemptId,
-    contract: { kind: 'tolerance', absolute: draft.absoluteTolerance, relative: draft.relativeTolerance }
-  })), {
-    done: (compared) => {
-      comparison.value = compared
-      return 'ready'
-    },
-    failure: 'Attempts could not be compared.'
-  })
-
-  const generateReport = () => selectedAttempt.value && step('saving', async ({ signal, fresh }) => {
-    const attemptId = selectedAttempt.value.attempt.attemptId
-    const created = fresh(await createWorkspaceReport(attemptId))
-    return { created, files: fresh(await loadWorkspaceArtifacts(attemptId, signal)) }
-  }, {
-    done: ({ created, files }) => {
-      report.value = created
-      artifacts.value = files
-      return 'ready'
-    },
-    failure: 'Report could not be generated.'
-  })
-
   const exportExperiment = () => detail.value && step('saving', async ({ fresh }) => fresh(await exportWorkspaceExperiment(detail.value.experiment.experimentId)), {
     done: (exported) => {
       exportName.value = exported.fileName
@@ -326,23 +182,11 @@ export function useExperimentWorkspace() {
     input.value = ''
   }
 
-  function previousHistoryPage() {
-    historyOffset.value = Math.max(0, historyOffset.value - HISTORY_LIMIT)
-    return refreshHistory()
-  }
-
-  function nextHistoryPage() {
-    if (historyOffset.value + history.value.items.length >= history.value.total) return undefined
-    historyOffset.value += HISTORY_LIMIT
-    return refreshHistory()
-  }
-
   onMounted(initialize)
 
   return {
-    state, message, draft, filters, models, model, targets, isRegistry, experiments, profiles, detail, readOnly, history, modelIds,
-    selectedAttempt, events, artifacts, comparison, report, exportHref, exportName, successful,
-    chooseModel, selectExperiment, saveRevision, queueRun, cloneExperiment, exportExperiment, importExperiment,
-    refreshHistory, inspectAttempt, previousHistoryPage, nextHistoryPage, cancelAttempt, restartAttempt, generateReport, compareLatest
+    state, message, draft, models, model, targets, isRegistry, experiments, profiles, detail, readOnly, modelIds,
+    exportHref, exportName, chooseModel, selectExperiment, saveRevision, cloneExperiment, exportExperiment, importExperiment,
+    attempts
   }
 }

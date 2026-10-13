@@ -7,7 +7,7 @@ export const defaultMethod = (engineType) => METHODS[engineType]
 
 // Controls for the model's engine ('ode' | 'ssa' | 'fba').
 //   method (ode only), duration, outputInterval, fixedStep (ode), replicates (ssa)
-export function portfolioControls(engineType, { method = METHODS.ode, duration, outputInterval = 1, fixedStep = 0.1, replicates = 128 } = {}) {
+function portfolioControls(engineType, { method = METHODS.ode, duration, outputInterval = 1, fixedStep = 0.1, replicates = 128 } = {}) {
   if (engineType === 'ode') {
     return { method, timeUnit: 'second', duration, outputInterval, fixedStep, absoluteTolerance: 1e-9, relativeTolerance: 1e-7, maxInternalSteps: 100000 }
   }

@@ -1,8 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
 // Browser tests of the static (API-less) site, the edition published to GitHub Pages:
-// the shell and knowledge-site accessibility scan and the ISO 9241-11 task measures
-// (docs/USABILITY.md). It serves dist-static, so build it first:
+// the shell and knowledge-site accessibility scan (every route, the workbenches'
+// API-required notices included), the ISO 9241-11 task measures and the
+// accessibility of every populated workbench state (docs/USABILITY.md). It serves
+// dist-static, so build it first:
 //
 //   npm run build:static && npm run test:e2e:static
 //
@@ -11,7 +13,7 @@ const port = Number(process.env.E2E_STATIC_PORT ?? 4173)
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  testMatch: ['shell.spec.js', 'usability-tasks.spec.js'],
+  testMatch: ['shell.spec.js', 'usability-tasks.spec.js', 'populated-states.spec.js'],
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 2 : 0,
