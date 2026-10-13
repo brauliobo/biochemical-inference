@@ -26,6 +26,7 @@
     "supply-chain:generate": "node scripts/supply-chain.js generate",
     "supply-chain:verify": "node scripts/supply-chain.js verify",
     "check:syntax": "node tests/check-syntax.js",
+    "kb:validate": "node scripts/kb-validate.js",
     "check": "npm run check:syntax && npm run test:selection && npm test && npm run build",
     "test": "npm run test:routine",
     "test:routine": "nice -n 10 vitest run --maxWorkers=1 --no-file-parallelism --exclude='tests/e2e/**' --exclude='tests/acceptance/**' --exclude='tests/revalidation/scale-acceptance.test.js' --exclude='tests/revalidation/planning-performance.test.js' --exclude='tests/revalidation/cross-repo-scale-http.test.js'",
