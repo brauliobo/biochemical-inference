@@ -114,6 +114,10 @@ items marked "not exercised" were not tried here.
 - Custom directives take reactive getters, not binding objects. None exist.
 - Event listeners attach to the element, not the document (since 3.6.0-rc.2);
   use `.delegate` to opt in to delegation. Nothing here depends on it.
+- Root props passed through `mountVapor(Component, { props })` are read as getters, so a
+  function value (an `onSomething` listener) is called instead of passed. Pass it as
+  `() => listener`. `render().emitted()` is not available for Vapor components; assert on
+  a listener spy (`tests/component/apap-benchmark-workbench.test.js`).
 - Vapor slots cannot be called as `slots.default()` from inside a vdom
   component. When a legacy component needs slot content from a Vapor parent,
   migrate it rather than working around this.

@@ -77,6 +77,14 @@ Components: `.skip-link`, `.site-header`, `.site-title`, `.site-nav`, `.site-mai
 (`--warning`, `--danger`, `--success`; add `role="status"` or `role="alert"`),
 `.plain-list`.
 
+Workbench patterns (added while migrating the workbenches): `.panel` (a `.card` that
+spans a parent grid; used by `ui/Panel.vue`), `.field` / `.field--inline` (`ui/Field.vue`),
+`.data-table` (`ui/DataTable.vue`), `.facts` / `.facts--rows` (a `<dl>` as labelled value
+cells or label/value rows), `.heatmap` with `.heatmap__bar` (bins scaled by `--heat`, 0
+to 1), `.button--link`, and `button.card[aria-pressed]` for pick-one cards. A `<div
+role="status">` that is empty adds no gap inside a `.stack`, so keep one in the DOM and
+put the async message inside it.
+
 Breakpoints cannot be tokens. Prefer `.grid` and `.sidebar`, which need none; when a
 media query is unavoidable use `40rem` (narrow) and `64rem` (wide).
 
