@@ -86,13 +86,14 @@ describe('workbench routes', () => {
     expect(links).toHaveLength(workbenches.length)
   })
 
-  it('lazy-loads a legacy virtual-DOM workbench inside the Vapor shell', async () => {
+  it('lazy-loads a migrated workbench inside the Vapor shell without the legacy wrapper', async () => {
     api.loadPortfolioModels.mockResolvedValue([])
     navigate('/workbench/portfolio')
     mountVapor(App)
 
     expect(await screen.findByRole('heading', { level: 2, name: 'ODE · SSA · FBA workbench' })).toBeTruthy()
-    expect(document.querySelector('.legacy-workbench .portfolio-panel')).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'ODE · SSA · FBA workbench' })).toBeTruthy()
+    expect(document.querySelector('.legacy-workbench')).toBeNull()
     expect(api.loadPortfolioModels).toHaveBeenCalled()
   })
 

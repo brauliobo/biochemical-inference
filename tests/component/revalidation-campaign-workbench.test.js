@@ -65,7 +65,7 @@ describe('Goal 15 revalidation campaign workbench', () => {
     render(RevalidationCampaignWorkbench)
 
     expect(await screen.findByText('6 / 6 terminal')).toBeTruthy()
-    expect(screen.getByText('6 / 6', { selector: 'strong' })).toBeTruthy()
+    expect(screen.getByText('6 / 6', { selector: 'dd' })).toBeTruthy()
     expect(screen.getByText('0 local · acceptance disabled')).toBeTruthy()
     await fireEvent.click(screen.getByRole('button', { name: 'Verify full integrity' }))
     await waitFor(() => expect(screen.getByText(/Integrity valid/)).toBeTruthy())

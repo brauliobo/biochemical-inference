@@ -8,6 +8,7 @@
 // @vue/test-utils, plus one extra: `render` mounts Vapor components through
 // mountVapor().
 import { mount } from '@vue/test-utils'
+import { vaporInteropPlugin } from 'vue'
 import { fireEvent as domFireEvent, getQueriesForElement, prettyDOM, waitFor } from '@testing-library/dom'
 import { cleanupVapor, isVaporComponent, mountVapor } from './mount-vapor.js'
 
@@ -31,7 +32,10 @@ export function render(Component, { container: customContainer, baseElement: cus
     emitted = () => { throw new Error('emitted() is not available for Vapor components; assert on the DOM or a callback prop.') }
     rerender = () => { throw new Error('rerender() is not available for Vapor components; remount instead.') }
   } else {
-    const wrapper = mount(Component, { ...mountOptions, attachTo: container })
+    // A virtual-DOM component may host Vapor children (migrated components), which
+    // needs the same interop plugin as the application.
+    const plugins = [...(mountOptions.global?.plugins ?? []), vaporInteropPlugin]
+    const wrapper = mount(Component, { ...mountOptions, global: { ...mountOptions.global, plugins }, attachTo: container })
     // Remove the extra wrapping div VTU adds.
     wrapper.element.parentElement.replaceWith(...wrapper.element.parentElement.childNodes)
     mountedWrappers.add(wrapper)

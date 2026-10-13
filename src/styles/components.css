@@ -149,6 +149,232 @@ a.card:hover { border-color: var(--color-accent); }
 .badge--warning { border-color: var(--color-warning-border); color: var(--color-warning-text); }
 .badge--danger { border-color: var(--color-danger-border); color: var(--color-danger-text); }
 
+/* ---- Workbench section (ui/Section.vue): a card whose headings are demoted ---- */
+.card--section h3,
+.card--section h4 { font-size: var(--text-h4); }
+.card--flat {
+  padding: var(--space-inset);
+  background: var(--color-surface-sunken);
+  box-shadow: none;
+}
+
+/* ---- Metrics: labelled value cells (dl > div > dt + dd), see ui/Metric.vue ---- */
+.metrics {
+  --metric-min: calc(var(--target-min) * 4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--metric-min)), 1fr));
+  gap: var(--border-width);
+  padding: var(--border-width);
+}
+.metrics--wide { --metric-min: calc(var(--target-min) * 7); }
+.metrics--compact { --metric-min: calc(var(--target-min) * 2.5); }
+/* Cells are separated by a one-line gap that their outlines fill, so a short
+   last row leaves no coloured hole. */
+.metrics > * {
+  min-inline-size: 0;
+  padding: var(--space-inset);
+  outline: var(--border-width) solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+.metrics dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+.metrics dd {
+  margin: var(--space-cluster-tight) 0 0;
+  overflow-wrap: anywhere;
+}
+.metrics dd + dd {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+.metric__value {
+  font-size: var(--text-h4);
+  font-weight: var(--weight-heading);
+}
+
+/* Key/value rows: label left, value right (dl > div > dt + dd). */
+.facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-cluster);
+  padding-block: var(--space-cluster-tight);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+.facts dt { color: var(--color-text-muted); }
+.facts dd {
+  margin: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+
+.facts dd.digest {
+  flex-basis: 100%;
+  text-align: start;
+}
+
+/* Disclosure arrow. <summary> is a flex box (base.css), so the native marker is
+   not drawn; this puts one back and flips it when the details are open. */
+details > summary { gap: var(--space-cluster-tight); }
+details > summary::before {
+  content: "\25B8";
+  flex: none;
+}
+details[open] > summary::before { content: "\25BE"; }
+
+/* Long identifiers (hashes, digests, CURIEs). */
+.digest {
+  display: block;
+  overflow-wrap: anywhere;
+  font-family: var(--font-code);
+  font-size: var(--text-code);
+}
+
+/* ---- Form: label above control; controls fill the column ---- */
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-stack-tight);
+  align-content: start;
+  min-inline-size: 0;
+}
+/* A wide <select> or input in a wrapping row shrinks instead of overflowing. */
+.cluster > :is(select, input, textarea) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.form > label { margin-block-start: var(--space-stack-tight); }
+.form > label:first-child { margin-block-start: 0; }
+.form > :is(.button, button) {
+  margin-block-start: var(--space-stack);
+  justify-self: start;
+}
+.form small { color: var(--color-text-muted); }
+.form .field-error { color: var(--color-danger-text); }
+/* A checkbox or radio next to its text, in one 44 px target. */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-cluster);
+  min-block-size: var(--target-min);
+  font-weight: var(--weight-body);
+}
+
+/* ---- Tile: a full-width button that selects one item of a list ---- */
+.tile {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  inline-size: 100%;
+  min-block-size: var(--target-min);
+  padding: var(--space-inset-tight) var(--space-control-inline);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  text-align: start;
+}
+.tile:hover { border-color: var(--color-accent); }
+.tile[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-inline-start-width: var(--border-width-accent);
+  background: var(--color-surface-sunken);
+}
+/* A button whose action is destructive or cannot be undone. */
+.button--danger {
+  border-color: var(--color-danger-border);
+  background: transparent;
+  color: var(--color-danger-text);
+}
+.button--danger:hover { background: var(--color-danger-surface); }
+/* A toggle button that is on. */
+.button--secondary[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+/* ---- Progress (native <progress>) ---- */
+.progress {
+  inline-size: 100%;
+  block-size: var(--space-inset-tight);
+  accent-color: var(--color-accent);
+}
+
+/* ---- 3D scene host (three.js canvas, or the text fallback) ---- */
+.scene {
+  position: relative;
+  min-block-size: calc(var(--target-min) * 7.5);
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+.scene canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+.scene--unavailable {
+  display: grid;
+  place-items: center;
+  padding: var(--space-inset-loose);
+  text-align: center;
+}
+
+/* ---- Chart (inline SVG inside ui/ChartFrame.vue) ---- */
+.chart {
+  inline-size: 100%;
+  max-inline-size: calc(var(--target-min) * 17);
+  overflow: visible;
+}
+/* A chart drawn on a unit square that is stretched to the box (preserveAspectRatio="none"). */
+.chart--stretch {
+  max-inline-size: none;
+  block-size: calc(var(--target-min) * 6);
+}
+.chart__axis {
+  stroke: var(--color-border-strong);
+  vector-effect: non-scaling-stroke;
+}
+.chart__gridline {
+  stroke: var(--color-border);
+  stroke-dasharray: 4 5;
+  vector-effect: non-scaling-stroke;
+}
+.chart__tick {
+  fill: var(--color-text-muted);
+  font-family: var(--font-code);
+  font-size: var(--text-caption);
+}
+.chart__line {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: var(--border-width-accent);
+  vector-effect: non-scaling-stroke;
+}
+.chart__line--compare {
+  stroke: var(--color-warning-border);
+  stroke-width: var(--border-width-strong);
+  stroke-dasharray: 6 5;
+}
+/* Legend marker; set --swatch-color inline to pick a semantic colour. */
+.swatch {
+  --swatch-color: var(--color-accent);
+  display: inline-block;
+  inline-size: var(--icon-size);
+  block-size: var(--border-width-accent);
+  background: var(--swatch-color);
+}
+.swatch--dot {
+  inline-size: var(--space-inset-tight);
+  block-size: var(--space-inset-tight);
+  border-radius: var(--radius-pill);
+}
+.swatch--diamond {
+  inline-size: var(--space-inset-tight);
+  block-size: var(--space-inset-tight);
+  transform: rotate(45deg);
+}
+
 /* ---- Notice (inline status message). Add role="status" or role="alert". ---- */
 .notice {
   padding: var(--space-inset);

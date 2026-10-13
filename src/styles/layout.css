@@ -40,6 +40,8 @@
   gap: var(--cluster-space);
 }
 .cluster--end { justify-content: flex-end; }
+.cluster--bottom { align-items: flex-end; }
+.cluster--tight { --cluster-space: var(--space-cluster-tight); }
 
 /* Two ends of a row; wraps when narrow. */
 .repel {
@@ -59,6 +61,15 @@
   gap: var(--grid-space);
 }
 
+.grid--compact { --grid-min: calc(var(--target-min) * 3); }
+.grid--end { align-items: end; }
+/* Explicit column count for data that is a matrix (set --grid-columns). */
+.grid--fixed {
+  --grid-columns: 1;
+  align-content: start;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+}
+
 /* Fixed-width side column that drops below the content when narrow.
    Children: first is the sidebar, last is the main content. */
 .sidebar {
@@ -74,6 +85,19 @@
   flex: 999 1 0;
   min-inline-size: 50%;
 }
+/* Same, with the side column last in the source order (content first). */
+.sidebar--end > :first-child {
+  flex: 999 1 0;
+  min-inline-size: 50%;
+}
+.sidebar--end > :last-child {
+  flex: 1 1 var(--sidebar-width);
+  min-inline-size: 0;
+}
+
+/* Wide tables and maps scroll sideways inside their own box. Give it
+   tabindex="0", role="region" and an aria-label so keyboard users can scroll it. */
+.scroll-x { overflow-x: auto; }
 
 /* Padding inside a box. */
 .inset { padding: var(--space-inset); }

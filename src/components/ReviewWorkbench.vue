@@ -1,4 +1,4 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   appendDerivedReviewEvent,
@@ -10,6 +10,9 @@ import {
   reproduceDerivedAssertion,
   submitApapDerivedBundle
 } from '../api.js'
+import Section from './ui/Section.vue'
+import Toolbar from './ui/Toolbar.vue'
+import { statusTone } from './ui/tone.js'
 
 const props = defineProps({ apapRun: { type: Object, default: undefined } })
 
@@ -199,49 +202,47 @@ onBeforeUnmount(() => {
 </script>
 
 <template lang="pug">
-section.review-panel(aria-labelledby="review-title")
-  .section-heading
-    div
-      p.kicker Goal 8 · reviewed derived knowledge
-      h2#review-title Review workbench
-    span.status-chip(:class="state" aria-live="polite") {{ health ? `${health.assertions} assertions · ${health.events} events` : state }}
-  p.review-intro Simulation output remains a separate derived-review workspace. Only accepted assertions appear in the reviewed-derived layer; source APAP records are immutable and never overwritten.
-  p.measurement-note No eligible verified parameter measurement is available in the current synthetic parameter release. APAP protocol records are lineage inputs, not measurement-comparison inputs.
-  .alert.error(v-if="state === 'failed'" role="alert")
+Section.review-panel(title="Review workbench" title-id="review-title" eyebrow="Goal 8 · reviewed derived knowledge" lede="Simulation output remains a separate derived-review workspace. Only accepted assertions appear in the reviewed-derived layer; source APAP records are immutable and never overwritten." :status="health ? `${health.assertions} assertions · ${health.events} events` : state" :tone="statusTone(state)")
+  p.muted No eligible verified parameter measurement is available in the current synthetic parameter release. APAP protocol records are lineage inputs, not measurement-comparison inputs.
+  .notice.notice--danger.stack.stack--tight(v-if="state === 'failed'" role="alert")
     p {{ message }}
-    button.secondary(type="button" @click="refresh()") Retry derived workspace
-  .previous-note(v-else-if="message" role="status") {{ message }}
+    button.button.button--secondary(type="button" @click="refresh()") Retry derived workspace
+  .notice(v-else-if="message" role="status") {{ message }}
 
-  .review-linkage
-    article
-      span.assumption-label Completed APAP linkage
+  .grid
+    article.card.card--flat.stack.stack--tight
+      p.eyebrow Completed APAP linkage
       template(v-if="apapRun")
-        strong {{ apapRun.result.context.taxon_label }} · {{ apapRun.result.protocol.name }}
-        code {{ apapRun.runId }}
-        button.run-button(type="button" :disabled="state === 'submitting'" @click="submit") Submit immutable bundle
+        p
+          strong {{ apapRun.result.context.taxon_label }} · {{ apapRun.result.protocol.name }}
+        code.digest {{ apapRun.runId }}
+        button.button(type="button" :disabled="state === 'submitting'" @click="submit") Submit immutable bundle
       p(v-else) Run a successful APAP benchmark above before submitting a derived prediction.
-    article
-      span.assumption-label Explicit layers
-      strong Source vs reviewed-derived
-      p {{ layers?.source?.length ?? 0 }} exact source protocol record · {{ layers?.['reviewed-derived']?.length ?? 0 }} currently accepted prediction
-      code(v-if="layers?.source?.[0]") {{ layers.source[0].record_digest }}
+    article.card.card--flat.stack.stack--tight
+      p.eyebrow Explicit layers
+      p
+        strong Source vs reviewed-derived
+      p.muted {{ layers?.source?.length ?? 0 }} exact source protocol record · {{ layers?.['reviewed-derived']?.length ?? 0 }} currently accepted prediction
+      code.digest(v-if="layers?.source?.[0]") {{ layers.source[0].record_digest }}
 
-  .review-layout
-    aside.review-queue(aria-label="Derived review queue")
-      h3 Review queue
+  .sidebar
+    section.stack.stack--tight(aria-labelledby="review-queue-title")
+      h3#review-queue-title Review queue
       p(v-if="!assertions.length") No derived assertions have been submitted.
-      button.candidate-row(v-for="item in assertions" :key="item.digest" type="button" :class="{ selected: item.digest === selectedDigest }" :aria-pressed="item.digest === selectedDigest" :disabled="state === 'submitting'" @click="selectAssertion(item.digest)")
-        strong {{ item.state.review_status }} · {{ item.assertion.classification }}
-        span {{ item.assertion.property }}
-        code {{ item.digest }}
+      ul.plain-list.stack.stack--tight
+        li(v-for="item in assertions" :key="item.digest")
+          button.tile(type="button" :aria-pressed="item.digest === selectedDigest" :disabled="state === 'submitting'" @click="selectAssertion(item.digest)")
+            strong {{ item.state.review_status }} · {{ item.assertion.classification }}
+            span {{ item.assertion.property }}
+            code.digest {{ item.digest }}
 
-    article.review-detail(v-if="detail")
-      .review-claim
-        span.unsupported-badge Synthetic prediction
-        h3 Claim
+    article.stack(v-if="detail")
+      section.notice.notice--warning.stack.stack--tight(aria-labelledby="review-claim-title")
+        span.badge.badge--warning Synthetic prediction
+        h3#review-claim-title Claim
         p {{ detail.assertion.statement }}
-        code {{ detail.digest }}
-        dl.compact-list
+        code.digest {{ detail.digest }}
+        dl.facts
           div
             dt State
             dd {{ detail.state.review_status }}
@@ -252,16 +253,14 @@ section.review-panel(aria-labelledby="review-title")
             dt Reproduction
             dd {{ detail.state.reproduction_verified ? 'reviewer verified' : detail.assertion.reproduction.status }}
 
-      .review-columns
-        section
-          h3 Lineage
-          ul.lineage-list
-            li(v-for="dependency in detail.assertion.dependencies" :key="`${dependency.type}-${dependency.digest}`")
+      .grid
+        Section(title="Lineage" title-id="review-lineage-title" :level="3" flat)
+          ul.plain-list.stack.stack--tight
+            li.stack.stack--tight(v-for="dependency in detail.assertion.dependencies" :key="`${dependency.type}-${dependency.digest}`")
               strong {{ dependency.type }} · {{ dependency.family ?? dependency.model_id ?? dependency.artifact_id }}
-              code {{ dependency.digest }}
-        section
-          h3 Full scientific context
-          dl.compact-list
+              code.digest {{ dependency.digest }}
+        Section(title="Full scientific context" title-id="review-context-title" :level="3" flat)
+          dl.facts
             div
               dt Taxon
               dd {{ detail.assertion.context.taxon_id }}
@@ -278,59 +277,63 @@ section.review-panel(aria-labelledby="review-title")
               dt Scope
               dd {{ detail.assertion.context.model_scope }}
 
-      .review-columns
-        section
-          h3 Bounded applicability
+      .grid
+        Section(title="Bounded applicability" title-id="review-applicability-title" :level="3" flat)
           p {{ detail.assertion.applicability.rationale }}
           ul
             li(v-for="boundary in detail.assertion.applicability.boundaries" :key="boundary.variable") {{ boundary.variable }}: {{ boundary.lower ?? 'open' }}–{{ boundary.upper ?? 'open' }} {{ boundary.unit?.symbol ?? '' }}
-        section
-          h3 Qualitative uncertainty
-          ul
+        Section(title="Qualitative uncertainty" title-id="review-uncertainty-title" :level="3" flat)
+          ul.stack.stack--tight
             li(v-for="component in detail.assertion.uncertainty.components" :key="component.category")
               strong {{ component.category }}
-              span {{ component.description }}
+              p {{ component.description }}
 
-      h3 Unsupported limitations
-      ul.study-limitations
-        li(v-for="limitation in detail.assertion.limitations" :key="limitation") {{ limitation }}
+      section.stack.stack--tight(aria-labelledby="review-limitations-title")
+        h3#review-limitations-title Unsupported limitations
+        ul
+          li(v-for="limitation in detail.assertion.limitations" :key="limitation") {{ limitation }}
 
-      form.review-form(@submit.prevent)
-        h3 Append-only scientific review
-        .reviewer-grid
-          label Reviewer ID
-            input(v-model="reviewerId" required)
-          label Reviewer name
-            input(v-model="reviewerName" required)
-          label Organization
-            input(v-model="organization" required)
-          label Role
-            input(v-model="role" required)
+      form.form.card.card--flat(aria-labelledby="review-form-title" @submit.prevent)
+        h3#review-form-title Append-only scientific review
+        .grid
+          .form
+            label(for="review-reviewer-id") Reviewer ID
+            input#review-reviewer-id(v-model="reviewerId" required autocomplete="off")
+          .form
+            label(for="review-reviewer-name") Reviewer name
+            input#review-reviewer-name(v-model="reviewerName" required autocomplete="name")
+          .form
+            label(for="review-organization") Organization
+            input#review-organization(v-model="organization" required autocomplete="organization")
+          .form
+            label(for="review-role") Role
+            input#review-role(v-model="role" required autocomplete="organization-title")
         label(for="review-reason") Review reason
         textarea#review-reason(v-model="reason" rows="3" required)
-        .review-actions(v-if="reviewStatus === 'pending'")
-          button.run-button(type="button" :disabled="!canMutateDisplayed" @click="review('accepted')") Accept
-          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('rejected')") Reject
-        .review-actions(v-else-if="reviewStatus === 'accepted'")
-          button.run-button(v-if="!detail.state.reproduction_verified" type="button" :disabled="!apapRun || !canMutateDisplayed" @click="reproduce") Reproduce exact APAP run
-          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('recalculation-requested')") Request recalculation
-          button.secondary(type="button" :disabled="!canMutateDisplayed" @click="review('invalidated')") Invalidate
+        Toolbar(v-if="reviewStatus === 'pending'" label="Review decision")
+          button.button(type="button" :disabled="!canMutateDisplayed" @click="review('accepted')") Accept
+          button.button.button--secondary(type="button" :disabled="!canMutateDisplayed" @click="review('rejected')") Reject
+        Toolbar(v-else-if="reviewStatus === 'accepted'" label="Review actions on an accepted assertion")
+          button.button(v-if="!detail.state.reproduction_verified" type="button" :disabled="!apapRun || !canMutateDisplayed" @click="reproduce") Reproduce exact APAP run
+          button.button.button--secondary(type="button" :disabled="!canMutateDisplayed" @click="review('recalculation-requested')") Request recalculation
+          button.button.button--secondary(type="button" :disabled="!canMutateDisplayed" @click="review('invalidated')") Invalidate
           select(v-model="supersedingDigest" aria-label="Accepted superseding assertion")
             option(value="") Select accepted replacement
             option(v-for="target in acceptedTargets" :key="target.digest" :value="target.digest") {{ target.digest }}
-          button.secondary(type="button" :disabled="!supersedingDigest || !canMutateDisplayed" @click="review('superseded')") Supersede
+          button.button.button--secondary(type="button" :disabled="!supersedingDigest || !canMutateDisplayed" @click="review('superseded')") Supersede
         p(v-else) This terminal review state remains auditable and allows no further events.
 
-      h3 Signed event history
-      p(v-if="!events.length") No review events have been appended.
-      ol.event-history
-        li(v-for="event in events" :key="event.event_digest")
-          strong Event {{ event.sequence }} · {{ event.action }} · {{ event.reviewer.name }}
-          span {{ event.occurred_at }} · {{ event.reason }}
-          details
-            summary Signature and event chain
-            code event {{ event.event_digest }}
-            code key {{ event.key_id }}
-            code previous {{ event.previous_event_digest ?? 'genesis' }}
-            code signature {{ event.signature }}
+      section.stack.stack--tight(aria-labelledby="review-events-title")
+        h3#review-events-title Signed event history
+        p(v-if="!events.length") No review events have been appended.
+        ol.plain-list.stack.stack--tight
+          li.card.card--flat.stack.stack--tight(v-for="event in events" :key="event.event_digest")
+            strong Event {{ event.sequence }} · {{ event.action }} · {{ event.reviewer.name }}
+            span.muted {{ event.occurred_at }} · {{ event.reason }}
+            details.stack.stack--tight
+              summary Signature and event chain
+              code.digest event {{ event.event_digest }}
+              code.digest key {{ event.key_id }}
+              code.digest previous {{ event.previous_event_digest ?? 'genesis' }}
+              code.digest signature {{ event.signature }}
 </template>

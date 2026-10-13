@@ -1,6 +1,9 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { loadPortfolioModels, runPortfolioExperiment } from '../api.js'
+import ChartFrame from './ui/ChartFrame.vue'
+import Section from './ui/Section.vue'
+import { badgeClass, statusTone } from './ui/tone.js'
 
 const models = ref([])
 const modelId = ref('')
@@ -15,6 +18,7 @@ const message = ref('')
 const record = ref()
 let controller
 
+const sampleCount = 8
 const model = computed(() => models.value.find((item) => item.id === modelId.value))
 const result = computed(() => record.value?.result)
 const odeChart = computed(() => {
@@ -22,6 +26,22 @@ const odeChart = computed(() => {
   const series = result.value.data.trajectories[0]
   const maximum = Math.max(...series.values, 1)
   return series.values.map((value, index) => `${index * 100 / Math.max(1, series.values.length - 1)},${100 - value * 90 / maximum}`).join(' ')
+})
+// Text alternative for the trajectory: a sentence and a short sampled table.
+const odeSummary = computed(() => {
+  if (result.value?.data?.engine !== 'ode') return ''
+  const { time, trajectories: [series] } = result.value.data
+  const peak = Math.max(...series.values)
+  return `${series.name} starts at ${series.values[0].toPrecision(4)}, peaks at ${peak.toPrecision(4)} and ends at ${series.values.at(-1).toPrecision(4)} ${series.unit.symbol} over ${time.at(-1)} s.`
+})
+const odeSamples = computed(() => {
+  if (result.value?.data?.engine !== 'ode') return []
+  const { time, trajectories: [series] } = result.value.data
+  const last = series.values.length - 1
+  const step = Math.max(1, Math.ceil(last / sampleCount))
+  const indexes = []
+  for (let index = 0; index < last; index += step) indexes.push(index)
+  return [...indexes, last].map((index) => ({ time: time[index], value: series.values[index] }))
 })
 
 function selectModel() {
@@ -91,16 +111,10 @@ onBeforeUnmount(() => controller?.abort())
 </script>
 
 <template lang="pug">
-section.portfolio-panel(aria-labelledby="portfolio-title")
-  .section-heading
-    div
-      p.kicker Standards portfolio
-      h2#portfolio-title ODE · SSA · FBA workbench
-    span.status-chip(:class="state" aria-live="polite") {{ state }}
-  p.portfolio-intro Select a bounded declarative benchmark. Every run pins its model and release digests, algorithm version, units, seed, assumptions, and limitations.
-  .alert.error(v-if="state === 'failed'" role="alert") {{ message }}
-  .portfolio-layout(v-if="model")
-    form.portfolio-controls(@submit.prevent="run")
+Section.portfolio-panel(title="ODE · SSA · FBA workbench" title-id="portfolio-title" eyebrow="Standards portfolio" lede="Select a bounded declarative benchmark. Every run pins its model and release digests, algorithm version, units, seed, assumptions, and limitations." :status="state" :tone="statusTone(state)")
+  .notice.notice--danger(v-if="state === 'failed'" role="alert") {{ message }}
+  .sidebar(v-if="model")
+    form.form(@submit.prevent="run")
       label(for="portfolio-model") Model and engine
       select#portfolio-model(v-model="modelId" :disabled="state === 'running'" @change="selectModel")
         option(v-for="item in models" :key="item.id" :value="item.id") {{ item.name }}
@@ -122,12 +136,10 @@ section.portfolio-panel(aria-labelledby="portfolio-title")
         input#portfolio-replicates(v-model.number="replicates" type="number" min="1" max="10000" step="1" :disabled="state === 'running'")
       label(for="portfolio-seed") Seed (uint32)
       input#portfolio-seed(v-model.number="seed" type="number" min="0" max="4294967295" step="1" :disabled="state === 'running'")
-      button.run-button(type="submit" :disabled="state === 'running'")
-        span {{ state === 'running' ? 'Executing isolated worker…' : `Run ${model.engine.type.toUpperCase()} benchmark` }}
-        span.arrow(aria-hidden="true") →
-    .portfolio-contract
-      h3 Contract boundary
-      dl.compact-list
+      button.button(type="submit" :disabled="state === 'running'") {{ state === 'running' ? 'Executing isolated worker…' : `Run ${model.engine.type.toUpperCase()} benchmark` }}
+    section.stack.stack--tight(aria-labelledby="portfolio-contract-title")
+      h3#portfolio-contract-title Contract boundary
+      dl.facts
         div
           dt Model digest
           dd.digest {{ model.digest }}
@@ -146,18 +158,31 @@ section.portfolio-panel(aria-labelledby="portfolio-title")
       h3 Limitations
       ul
         li(v-for="item in model.limitations" :key="item") {{ item }}
-  article.portfolio-result(v-if="result" aria-labelledby="portfolio-result-title")
-    .run-header
+  article.card.card--flat.stack(v-if="result" aria-labelledby="portfolio-result-title")
+    .repel
       div
-        span.run-label#portfolio-result-title Terminal run identity
-        code {{ result.runId }}
-      span.status-chip(:class="result.outcome") {{ result.lifecycle }} · {{ result.outcome }}
+        h3#portfolio-result-title Terminal run identity
+        code.digest {{ result.runId }}
+      span(:class="badgeClass(result.outcome)") {{ result.lifecycle }} · {{ result.outcome }}
     template(v-if="result.data?.engine === 'ode'")
-      figure.portfolio-chart
-        figcaption Reactant trajectory ({{ result.data.trajectories[0].unit.symbol }})
-        svg(viewBox="0 0 100 100" role="img" :aria-label="`ODE reactant trajectory with ${result.data.time.length} points`")
-          polyline(:points="odeChart" fill="none" stroke="currentColor" stroke-width="2")
-      .series-table-wrap
+      ChartFrame(id="portfolio-chart" :title="`Reactant trajectory (${result.data.trajectories[0].unit.symbol})`" :summary="odeSummary" table-label="Show trajectory samples")
+        svg.chart.chart--stretch(viewBox="0 0 100 100" preserveAspectRatio="none" role="img" :aria-label="`ODE reactant trajectory with ${result.data.time.length} points`")
+          line.chart__axis(x1="0" y1="100" x2="100" y2="100")
+          line.chart__axis(x1="0" y1="0" x2="0" y2="100")
+          line.chart__gridline(x1="0" y1="50" x2="100" y2="50")
+          polyline.chart__line(:points="odeChart")
+        template(#table)
+          table
+            caption Sampled {{ result.data.trajectories[0].name }}
+            thead
+              tr
+                th(scope="col") Time (s)
+                th(scope="col") Value ({{ result.data.trajectories[0].unit.symbol }})
+            tbody
+              tr(v-for="sample in odeSamples" :key="sample.time")
+                th(scope="row") {{ sample.time }}
+                td {{ sample.value.toPrecision(5) }}
+      .scroll-x(role="region" tabindex="0" aria-label="ODE final state values")
         table
           caption ODE final state
           thead
@@ -170,7 +195,7 @@ section.portfolio-panel(aria-labelledby="portfolio-title")
               th(scope="row") {{ series.name }}
               td {{ series.values.at(-1).toPrecision(7) }}
               td {{ series.unit.symbol }}
-    .series-table-wrap(v-else-if="result.data?.engine === 'ssa'")
+    .scroll-x(v-else-if="result.data?.engine === 'ssa'" role="region" tabindex="0" aria-label="SSA replicate summaries")
       table
         caption SSA final replicate summaries (n={{ result.data.replicates }})
         thead
@@ -189,7 +214,7 @@ section.portfolio-panel(aria-labelledby="portfolio-title")
             td {{ summary.median }}
             td {{ summary.minimum }}–{{ summary.maximum }}
             td {{ summary.unit.symbol }}
-    .series-table-wrap(v-else-if="result.data?.engine === 'fba'")
+    .scroll-x(v-else-if="result.data?.engine === 'fba'" role="region" tabindex="0" aria-label="FBA flux values")
       table
         caption FBA optimum {{ result.data.objective.toFixed(6) }} {{ result.data.objectiveUnit.symbol }}
         thead
@@ -202,11 +227,13 @@ section.portfolio-panel(aria-labelledby="portfolio-title")
             th(scope="row") {{ flux.name }}
             td {{ flux.value.toFixed(6) }}
             td {{ flux.unit.symbol }}
-    .alert.error(v-else-if="result.failure" role="alert")
+    .notice.notice--danger.stack.stack--tight(v-else-if="result.failure" role="alert")
       strong {{ result.failure.code }}
       p {{ result.failure.message }}
-    .portfolio-diagnostics
-      strong {{ result.diagnostics.algorithm }} {{ result.diagnostics.algorithmVersion }}
-      span {{ result.diagnostics.iterations }} iterations/events · seed {{ result.provenance.seed }}
-      code {{ result.provenance.modelDigest }}
+    .notice.stack.stack--tight
+      p
+        strong {{ result.diagnostics.algorithm }} {{ result.diagnostics.algorithmVersion }}
+      p {{ result.diagnostics.iterations }} iterations/events · seed {{ result.provenance.seed }}
+      p
+        code {{ result.provenance.modelDigest }}
 </template>

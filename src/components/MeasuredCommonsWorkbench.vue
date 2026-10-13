@@ -1,4 +1,4 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   discloseMeasuredEvaluation,
@@ -10,6 +10,10 @@ import {
   runMeasuredCalibration,
   syncMeasured
 } from '../api.js'
+import Metric from './ui/Metric.vue'
+import Section from './ui/Section.vue'
+import Toolbar from './ui/Toolbar.vue'
+import { statusTone } from './ui/tone.js'
 
 const CALIBRATION_GROUPS = Object.freeze([
   'group:cebs0004:dose-0',
@@ -189,128 +193,145 @@ async function disclose() {
 onMounted(initialize)
 onBeforeUnmount(() => controller?.abort())
 </script>
+<template lang="pug">
+Section.measured-workbench(title="Qualified observations and isolated evaluation" title-id="measured-title" eyebrow="10 · Measured commons" :status="state" :tone="statusTone(state)")
+  .notice.notice--danger.stack.stack--tight(v-if="message" role="alert")
+    strong Measured workflow stopped
+    p {{ message }}
+  p.muted Measured values, derived normalizations, and fitted outputs retain separate labels. Local read routes never fall back upstream.
+  .notice.repel
+    div
+      p
+        strong {{ status?.state === 'ready' ? 'Verified local mirror ready' : 'Explicit synchronization required' }}
+      p(v-if="status?.release") {{ status.release.id }} · {{ status.integrity }}
+      p(v-else) Signed metadata and non-heldout records are absent locally.
+    button.button(type="button" :disabled="busy" data-testid="measured-sync" @click="synchronize") {{ state === 'syncing' ? 'Verifying all pages…' : 'Sync measured commons' }}
 
-<template>
-  <section class="measured-workbench" aria-labelledby="measured-title">
-    <div class="section-heading">
-      <div>
-        <p class="kicker">10 · Measured commons</p>
-        <h2 id="measured-title">Qualified observations and isolated evaluation</h2>
-      </div>
-      <span class="status-chip" :class="state">{{ state }}</span>
-    </div>
+  template(v-if="status?.state === 'ready' || state === 'ready'")
+    dl.metrics
+      Metric(label="Release digest" :value="discovery?.pins.releaseDigest" mono)
+      Metric(label="Catalog" :value="discovery?.pins.catalogDigest" mono)
+      Metric(label="Retired signer" :value="`${discovery?.pins.signerKeyId} verified at signed time`")
 
-    <div v-if="message" class="alert error" role="alert"><strong>Measured workflow stopped</strong><p>{{ message }}</p></div>
-    <p class="source-note">Measured values, derived normalizations, and fitted outputs retain separate labels. Local read routes never fall back upstream.</p>
-    <div class="measured-sync-strip">
-      <div>
-        <strong>{{ status?.state === 'ready' ? 'Verified local mirror ready' : 'Explicit synchronization required' }}</strong>
-        <span v-if="status?.release">{{ status.release.id }} · {{ status.integrity }}</span>
-        <span v-else>Signed metadata and non-heldout records are absent locally.</span>
-      </div>
-      <button type="button" :disabled="busy" data-testid="measured-sync" @click="synchronize">{{ state === 'syncing' ? 'Verifying all pages…' : 'Sync measured commons' }}</button>
-    </div>
+    .grid(data-testid="measured-families")
+      article.stack.stack--tight(v-for="family in families" :key="family.id" :class="family.role === 'external-held-out' ? 'notice notice--warning' : 'card card--flat'")
+        p.eyebrow {{ family.role }}
+        h3 {{ family.title }}
+        p
+          code {{ family.id }}
+        p(v-if="family.role === 'external-held-out'") Metadata visible; outcomes, uncertainties, summaries, defaults, and previews absent.
+        p.muted(v-else) Values eligible only through their declared {{ family.role }} dataflow.
 
-    <template v-if="status?.state === 'ready' || state === 'ready'">
-      <div class="measured-pins">
-        <code>{{ discovery?.pins.releaseDigest }}</code>
-        <span>catalog {{ discovery?.pins.catalogDigest }}</span>
-        <span>retired signer {{ discovery?.pins.signerKeyId }} verified at signed time</span>
-      </div>
+    .grid
+      article.card.card--flat.stack.stack--tight
+        p
+          strong CEBS / NTP policy
+        p.muted Official federal data under the pinned public-domain-default policy, retaining its third-party copyright caveat and exact attribution.
+      article.card.card--flat.stack.stack--tight
+        p
+          strong Zenodo record 7648975
+        p.muted Authors retain copyright; article and reviewed transcription are carried under CC BY 4.0 with attribution.
 
-      <div class="measured-family-grid" data-testid="measured-families">
-        <article v-for="family in families" :key="family.id" :class="`measured-family ${family.role}`">
-          <span>{{ family.role }}</span>
-          <h3>{{ family.title }}</h3>
-          <code>{{ family.id }}</code>
-          <p v-if="family.role === 'external-held-out'">Metadata visible; outcomes, uncertainties, summaries, defaults, and previews absent.</p>
-          <p v-else>Values eligible only through their declared {{ family.role }} dataflow.</p>
-        </article>
-      </div>
+    .sidebar.sidebar--end
+      Section(title="Calibration records" title-id="measured-records-title" :level="3" flat)
+        p #[strong measured] raw reports alongside #[strong derived-measurement] deterministic normalization.
+        .scroll-x(role="region" tabindex="0" aria-label="Calibration records table")
+          table(data-testid="measured-table")
+            caption Calibration records, raw and normalized
+            thead
+              tr
+                th(scope="col") ID
+                th(scope="col") Raw measured
+                th(scope="col") Normalized derived
+                th(scope="col") Locator
+            tbody
+              tr(v-for="item in measurements?.items" :key="item.id")
+                th(scope="row")
+                  code {{ item.id }}
+                td {{ item.reported_value }} {{ item.reported_unit }}
+                td {{ item.normalized.value }} {{ item.normalized.unit }}
+                td {{ item.locator.table }} · {{ item.locator.source_native_cell }}
+        button.button.button--secondary(type="button" :disabled="!measurements?.nextCursor || busy" data-testid="measured-next-page" @click="nextMeasurements") Next verified page
+        p.muted {{ missingness.length }} calibration missingness rows on the current complete role traversal; QNS/blank never become zero.
+      Section(title="Selected lineage" title-id="lineage-title" :level="3" flat)
+        button.button.button--secondary(type="button" :disabled="busy" data-testid="inspect-lineage" @click="inspectLineage") Inspect ALT 24 h lineage
+        dl.facts(v-if="lineage" data-testid="measured-lineage")
+          div
+            dt Identity
+            dd {{ lineage.lineage.measurement.id }}
+          div
+            dt Scientific label
+            dd {{ lineage.lineage.measurement.scientific_origin }} · {{ lineage.lineage.measurement.validation_state }}
+          div
+            dt Uncertainty
+            dd {{ lineage.lineage.uncertainty.kind }}
+          div
+            dt Control qualifier
+            dd {{ lineage.lineage.context.qualifiers[0]?.status }} “{{ lineage.lineage.context.qualifiers[0]?.raw_value }}”
+          div
+            dt Source locator
+            dd {{ lineage.lineage.measurement.locator.source_native_cell }} in {{ lineage.lineage.measurement.locator.table }}
+          div
+            dt Transformation
+            dd {{ lineage.lineage.normalized_transformation.expression }}
+          div
+            dt Source / license
+            dd {{ lineage.lineage.source.accession }} · {{ lineage.lineage.license.rights_basis }}
+          div
+            dt Lineage digest
+            dd.digest {{ lineage.lineageDigest }}
 
-      <div class="measured-rights">
-        <article><strong>CEBS / NTP policy</strong><p>Official federal data under the pinned public-domain-default policy, retaining its third-party copyright caveat and exact attribution.</p></article>
-        <article><strong>Zenodo record 7648975</strong><p>Authors retain copyright; article and reviewed transcription are carried under CC BY 4.0 with attribution.</p></article>
-      </div>
+    Section(title="C55801C · ALT · 24 h · five dose groups" title-id="calibration-title" eyebrow="Calibration-only analysis" :level="3" flat)
+      p The immutable calibration partition is selected within one study, observable, time, assay ID, protocol, unit, and declared group set. A fit is emitted only if scientific context is complete and identical.
+      div
+        button.button(type="button" :disabled="busy" data-testid="run-measured-calibration" @click="calibrate") Run deterministic calibration analysis
+      article.notice.notice--warning.stack.stack--tight(v-if="calibration" data-testid="calibration-artifact")
+        p
+          strong {{ calibration.status }}
+        code.digest {{ calibration.artifactDigest }}
+        p {{ calibration.measurements.length }} pinned measurement values and lineage digests · {{ calibration.missingness.length }} selected missingness records.
+        ul
+          li(v-for="reason in calibration.reasons" :key="reason") {{ reason }}
+        p Access proof: development {{ calibration.accessProof.developmentMeasurementsRead }}, validation {{ calibration.accessProof.validationMeasurementsRead }}, external-heldout {{ calibration.accessProof.externalHeldoutMeasurementsRead }}. Evaluation client available: {{ calibration.accessProof.evaluationClientAvailable ? 'yes' : 'no' }}.
+        p
+          strong No validation conclusion.
 
-      <div class="measured-grid">
-        <section aria-labelledby="measured-records-title">
-          <h3 id="measured-records-title">Calibration records</h3>
-          <p><strong>measured</strong> raw reports alongside <strong>derived-measurement</strong> deterministic normalization.</p>
-          <div class="series-table-wrap">
-            <table data-testid="measured-table">
-              <thead><tr><th>ID</th><th>Raw measured</th><th>Normalized derived</th><th>Locator</th></tr></thead>
-              <tbody>
-                <tr v-for="item in measurements?.items" :key="item.id">
-                  <th><code>{{ item.id }}</code></th>
-                  <td>{{ item.reported_value }} {{ item.reported_unit }}</td>
-                  <td>{{ item.normalized.value }} {{ item.normalized.unit }}</td>
-                  <td>{{ item.locator.table }} · {{ item.locator.source_native_cell }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <button type="button" :disabled="!measurements?.nextCursor || busy" data-testid="measured-next-page" @click="nextMeasurements">Next verified page</button>
-          <p>{{ missingness.length }} calibration missingness rows on the current complete role traversal; QNS/blank never become zero.</p>
-        </section>
-
-        <section aria-labelledby="lineage-title">
-          <h3 id="lineage-title">Selected lineage</h3>
-          <button type="button" :disabled="busy" data-testid="inspect-lineage" @click="inspectLineage">Inspect ALT 24 h lineage</button>
-          <dl v-if="lineage" class="compact-list" data-testid="measured-lineage">
-            <div><dt>Identity</dt><dd>{{ lineage.lineage.measurement.id }}</dd></div>
-            <div><dt>Scientific label</dt><dd>{{ lineage.lineage.measurement.scientific_origin }} · {{ lineage.lineage.measurement.validation_state }}</dd></div>
-            <div><dt>Uncertainty</dt><dd>{{ lineage.lineage.uncertainty.kind }}</dd></div>
-            <div><dt>Control qualifier</dt><dd>{{ lineage.lineage.context.qualifiers[0]?.status }} “{{ lineage.lineage.context.qualifiers[0]?.raw_value }}”</dd></div>
-            <div><dt>Source locator</dt><dd>{{ lineage.lineage.measurement.locator.source_native_cell }} in {{ lineage.lineage.measurement.locator.table }}</dd></div>
-            <div><dt>Transformation</dt><dd>{{ lineage.lineage.normalized_transformation.expression }}</dd></div>
-            <div><dt>Source / license</dt><dd>{{ lineage.lineage.source.accession }} · {{ lineage.lineage.license.rights_basis }}</dd></div>
-            <div><dt>Lineage digest</dt><dd class="digest">{{ lineage.lineageDigest }}</dd></div>
-          </dl>
-        </section>
-      </div>
-
-      <section class="measured-calibration" aria-labelledby="calibration-title">
-        <div><p class="kicker">Calibration-only analysis</p><h3 id="calibration-title">C55801C · ALT · 24 h · five dose groups</h3></div>
-        <p>The immutable calibration partition is selected within one study, observable, time, assay ID, protocol, unit, and declared group set. A fit is emitted only if scientific context is complete and identical.</p>
-        <button type="button" :disabled="busy" data-testid="run-measured-calibration" @click="calibrate">Run deterministic calibration analysis</button>
-        <article v-if="calibration" class="calibration-artifact" data-testid="calibration-artifact">
-          <strong>{{ calibration.status }}</strong>
-          <code>{{ calibration.artifactDigest }}</code>
-          <p>{{ calibration.measurements.length }} pinned measurement values and lineage digests · {{ calibration.missingness.length }} selected missingness records.</p>
-          <ul><li v-for="reason in calibration.reasons" :key="reason">{{ reason }}</li></ul>
-          <p>Access proof: development {{ calibration.accessProof.developmentMeasurementsRead }}, validation {{ calibration.accessProof.validationMeasurementsRead }}, external-heldout {{ calibration.accessProof.externalHeldoutMeasurementsRead }}. Evaluation client available: {{ calibration.accessProof.evaluationClientAvailable ? 'yes' : 'no' }}.</p>
-          <p><strong>No validation conclusion.</strong></p>
-        </article>
-      </section>
-
-      <section class="measured-disclosure" aria-labelledby="disclosure-title">
-        <p class="kicker">Explicit heldout boundary</p>
-        <h3 id="disclosure-title">Freeze first, disclose separately</h3>
-        <p>This is dataflow isolation, not secrecy, DRM, or authentication. Protected responses are <code>private, no-store</code>; a local repository holder can inspect licensed source material.</p>
-        <p v-if="!calibration"><strong>Run and persist the calibration analysis before freezing.</strong></p>
-        <button type="button" :disabled="busy || !heldoutPartition || !calibration" data-testid="freeze-measured" @click="freeze">{{ commitment ? 'Retry exact commitment' : 'Freeze from calibration artifact' }}</button>
-        <div v-if="commitment" class="commitment-receipt" data-testid="commitment-receipt">
-          <strong>Frozen before disclosure</strong>
-          <code>{{ commitment.receipt.commitment_digest }}</code>
-          <span>nonce {{ commitment.frozenRequest.nonce }} · {{ cacheControl }}</span>
-          <dl class="compact-list" data-testid="frozen-artifact-digests">
-            <div><dt>Model / calibration</dt><dd class="digest">{{ commitment.artifacts.model.digest }}</dd></div>
-            <div><dt>Parameter policy</dt><dd class="digest">{{ commitment.artifacts.parameterPolicy.digest }}</dd></div>
-            <div><dt>Endpoint mapping</dt><dd class="digest">{{ commitment.artifacts.endpointMapping.digest }}</dd></div>
-            <div><dt>No-score policy</dt><dd class="digest">{{ commitment.artifacts.metricThresholdPolicy.digest }}</dd></div>
-            <div><dt>Not-evaluable prediction</dt><dd class="digest">{{ commitment.artifacts.prediction.digest }}</dd></div>
-          </dl>
-        </div>
-        <button v-if="commitment" type="button" :disabled="busy" data-testid="disclose-measured" @click="disclose">Explicitly disclose heldout outcomes</button>
-        <div v-if="disclosure" class="disclosure-values" data-testid="disclosure-values">
-          <strong>{{ disclosure.items.length }} heldout renal GSH group values disclosed</strong>
-          <p>Immutable disclosure receipt {{ disclosure.disclosed_at }}.</p>
-          <ul><li v-for="item in disclosure.items" :key="item.measurement_id"><code>{{ item.group_id }}</code> {{ item.reported_value }} {{ item.reported_unit }} · SEM {{ item.uncertainty.value }} · n={{ item.uncertainty.n }}</li></ul>
-          <p>Labels remain external-held-out; disclosure does not produce a validation conclusion.</p>
-        </div>
-      </section>
-    </template>
-    <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-  </section>
+    Section(title="Freeze first, disclose separately" title-id="disclosure-title" eyebrow="Explicit heldout boundary" :level="3" flat)
+      p This is dataflow isolation, not secrecy, DRM, or authentication. Protected responses are #[code private, no-store]; a local repository holder can inspect licensed source material.
+      p(v-if="!calibration")
+        strong Run and persist the calibration analysis before freezing.
+      Toolbar(label="Heldout commitment and disclosure")
+        button.button(type="button" :disabled="busy || !heldoutPartition || !calibration" data-testid="freeze-measured" @click="freeze") {{ commitment ? 'Retry exact commitment' : 'Freeze from calibration artifact' }}
+        button.button.button--secondary(v-if="commitment" type="button" :disabled="busy" data-testid="disclose-measured" @click="disclose") Explicitly disclose heldout outcomes
+      .notice.notice--success.stack.stack--tight(v-if="commitment" data-testid="commitment-receipt")
+        p
+          strong Frozen before disclosure
+        code.digest {{ commitment.receipt.commitment_digest }}
+        p nonce {{ commitment.frozenRequest.nonce }} · {{ cacheControl }}
+        dl.facts(data-testid="frozen-artifact-digests")
+          div
+            dt Model / calibration
+            dd.digest {{ commitment.artifacts.model.digest }}
+          div
+            dt Parameter policy
+            dd.digest {{ commitment.artifacts.parameterPolicy.digest }}
+          div
+            dt Endpoint mapping
+            dd.digest {{ commitment.artifacts.endpointMapping.digest }}
+          div
+            dt No-score policy
+            dd.digest {{ commitment.artifacts.metricThresholdPolicy.digest }}
+          div
+            dt Not-evaluable prediction
+            dd.digest {{ commitment.artifacts.prediction.digest }}
+      .notice.notice--warning.stack.stack--tight(v-if="disclosure" data-testid="disclosure-values")
+        p
+          strong {{ disclosure.items.length }} heldout renal GSH group values disclosed
+        p Immutable disclosure receipt {{ disclosure.disclosed_at }}.
+        ul
+          li(v-for="item in disclosure.items" :key="item.measurement_id")
+            code {{ item.group_id }}
+            | {{ ` ${item.reported_value}` }} {{ item.reported_unit }} · SEM {{ item.uncertainty.value }} · n={{ item.uncertainty.n }}
+        p Labels remain external-held-out; disclosure does not produce a validation conclusion.
+  p.visually-hidden(role="status") {{ announcement }}
 </template>

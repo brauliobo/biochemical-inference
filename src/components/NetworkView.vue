@@ -1,6 +1,7 @@
-<script setup>
+<script setup vapor>
 import * as THREE from 'three'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { minimumHeight, onSchemeChange, readSceneColors } from './ui/scene-colors.js'
 
 const props = defineProps({
   model: { type: Object, required: true },
@@ -18,18 +19,26 @@ let scene
 let camera
 let frame = 0
 let resizeObserver
+let stopSchemeWatch
+let palette
 const objects = new Map()
+const arrows = []
 
-const colors = {
-  curated: 0x49b8a5,
-  'model-only': 0xf0a65a,
-  boundary: 0xa98bd4
+// Semantic design tokens, resolved at runtime for the active light/dark scheme.
+const PALETTE_TOKENS = {
+  curated: '--color-accent',
+  'model-only': '--color-warning-border',
+  boundary: '--color-info-border',
+  flux: '--color-success-border',
+  selected: '--color-focus-ring',
+  background: '--color-surface-sunken'
 }
 
 function updateSelection() {
   objects.forEach((mesh, id) => {
     const material = mesh.material
-    material.emissive.setHex(id === props.selectedId ? 0xffb547 : 0x000000)
+    if (id === props.selectedId) material.emissive.copy(palette.selected)
+    else material.emissive.setScalar(0)
     const baseScale = Number(mesh.userData.baseScale ?? 1)
     mesh.scale.setScalar(baseScale * (id === props.selectedId ? 1.35 : 1))
   })
@@ -56,10 +65,17 @@ function updateResultEncoding() {
     const mapped = !reaction.knowledgeReactionId || props.network.reactions.some((item) => item.id === reaction.knowledgeReactionId)
     const intensity = props.result && mapped ? reactionFluxes[index] / maxFlux : 0
     mesh.userData.baseScale = 0.85 + intensity * 0.7
-    const material = mesh.material
-    material.color.setHex(colors[reaction.kind]).lerp(new THREE.Color(0xc4d982), intensity * 0.55)
+    mesh.material.color.copy(palette[reaction.kind]).lerp(palette.flux, intensity * 0.55)
   })
   updateSelection()
+}
+
+// Re-colours everything from the current tokens (first paint and scheme change).
+function applyPalette() {
+  scene.background = palette.background
+  objects.forEach((mesh) => mesh.material.color.copy(palette[mesh.userData.kind]))
+  arrows.forEach(({ arrow, kind }) => arrow.setColor(palette[kind]))
+  updateResultEncoding()
 }
 
 function selectFromPointer(event) {
@@ -77,6 +93,8 @@ function teardown(forceContextLoss = true) {
   frame = 0
   resizeObserver?.disconnect()
   resizeObserver = undefined
+  stopSchemeWatch?.()
+  stopSchemeWatch = undefined
   const currentRenderer = renderer
   currentRenderer?.domElement.removeEventListener('pointerdown', selectFromPointer)
   currentRenderer?.domElement.removeEventListener('webglcontextlost', contextLost)
@@ -88,6 +106,7 @@ function teardown(forceContextLoss = true) {
   if (forceContextLoss) currentRenderer?.forceContextLoss()
   currentRenderer?.domElement.remove()
   objects.clear()
+  arrows.length = 0
   renderer = undefined
   scene = undefined
   camera = undefined
@@ -109,8 +128,8 @@ onMounted(() => {
     return
   }
   try {
+    palette = readSceneColors(host.value, PALETTE_TOKENS)
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x101b1a)
     camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
     camera.position.set(0, 1.5, 13)
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
@@ -121,8 +140,8 @@ onMounted(() => {
     renderer.domElement.addEventListener('webglcontextlost', contextLost, { once: true })
     host.value.append(renderer.domElement)
 
-    scene.add(new THREE.AmbientLight(0xa8d8cb, 1.8))
-    const light = new THREE.DirectionalLight(0xffffff, 2.4)
+    scene.add(new THREE.AmbientLight(undefined, 1.8))
+    const light = new THREE.DirectionalLight(undefined, 2.4)
     light.position.set(4, 7, 9)
     scene.add(light)
 
@@ -138,16 +157,16 @@ onMounted(() => {
       const radius = node.nodeType === 'entity' ? 4.4 : 2.4
       const position = new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.62, node.nodeType === 'entity' ? 0 : 0.7)
       positions.set(node.id, position)
-      const material = new THREE.MeshStandardMaterial({ color: colors[node.kind], roughness: 0.55 })
+      const material = new THREE.MeshStandardMaterial({ roughness: 0.55 })
       const mesh = new THREE.Mesh(node.nodeType === 'entity' ? compoundGeometry : reactionGeometry, material)
       mesh.position.copy(position)
       mesh.userData.baseScale = 1
       mesh.userData.id = node.id
+      mesh.userData.kind = node.kind
       scene.add(mesh)
       objects.set(node.id, mesh)
     })
     props.model.topology.reactions.forEach((reaction) => {
-      const reactionPosition = positions.get(reaction.id)
       const directedLinks = [
         ...reaction.reactantIds.map((id) => [id, reaction.id]),
         ...reaction.productIds.map((id) => [reaction.id, id])
@@ -158,15 +177,22 @@ onMounted(() => {
         if (!source || !target) continue
         const direction = target.clone().sub(source)
         const length = direction.length()
-        const arrow = new THREE.ArrowHelper(direction.normalize(), source, length, colors[reaction.kind], Math.min(0.28, length * 0.18), 0.16)
+        const arrow = new THREE.ArrowHelper(direction.normalize(), source, length, undefined, Math.min(0.28, length * 0.18), 0.16)
+        arrows.push({ arrow, kind: reaction.kind })
         scene.add(arrow)
       }
+    })
+    applyPalette()
+    stopSchemeWatch = onSchemeChange(() => {
+      if (!scene || !host.value) return
+      palette = readSceneColors(host.value, PALETTE_TOKENS)
+      applyPalette()
     })
 
     const resize = () => {
       if (!renderer || !camera || !host.value) return
       const width = host.value.clientWidth
-      const height = Math.max(290, host.value.clientHeight)
+      const height = Math.max(minimumHeight(host.value), host.value.clientHeight)
       renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
@@ -175,7 +201,6 @@ onMounted(() => {
     resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(host.value)
     resize()
-    updateResultEncoding()
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const animate = () => {
@@ -197,20 +222,20 @@ onBeforeUnmount(teardown)
 </script>
 
 <template lang="pug">
-.network-visual
-  .webgl-host(ref="host" :class="{ unavailable: fallback }")
-    .fallback(v-if="fallback" role="note")
+.stack.stack--tight
+  .scene(ref="host" :class="{ 'scene--unavailable': fallback }")
+    .stack.stack--tight(v-if="fallback" role="note")
       strong 3D view unavailable
       p {{ fallback }}
-  p.visual-key
-    span
-      i.node-key.curated
+  ul.cluster.plain-list(aria-label="Network key")
+    li.cluster.cluster--tight
+      i.swatch.swatch--dot
       | Curated mapping
-    span
-      i.node-key.model-only
+    li.cluster.cluster--tight
+      i.swatch.swatch--diamond(style="--swatch-color: var(--color-warning-border)")
       | Model-only equation
-    span
-      i.node-key.boundary
+    li.cluster.cluster--tight
+      i.swatch.swatch--dot(style="--swatch-color: var(--color-info-border)")
       | Boundary term
-    span Arrows show direction; state size and reaction intensity encode the latest mapped result values.
+  p.muted Arrows show direction; state size and reaction intensity encode the latest mapped result values.
 </template>
