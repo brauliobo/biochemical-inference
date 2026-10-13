@@ -235,7 +235,7 @@ Section.measured-workbench(title="Qualified observations and isolated evaluation
     .sidebar.sidebar--end
       Section(title="Calibration records" title-id="measured-records-title" :level="3" flat)
         p #[strong measured] raw reports alongside #[strong derived-measurement] deterministic normalization.
-        .scroll-x(role="region" tabindex="0" aria-label="Calibration records")
+        .scroll-x(role="region" tabindex="0" aria-label="Calibration records table")
           table(data-testid="measured-table")
             caption Calibration records, raw and normalized
             thead

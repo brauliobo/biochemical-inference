@@ -118,6 +118,21 @@ items marked "not exercised" were not tried here.
   component. When a legacy component needs slot content from a Vapor parent,
   migrate it rather than working around this.
 
+- Root props of `createVaporApp` (so `mountVapor(Component, { props })`) are read
+  as getters: a function value is called at mount and its return value used, so an
+  `onSomething` callback is invoked once with no arguments and never receives the
+  event, and the props cannot change after mount. Drive a component that emits
+  events or needs prop changes through a small host component with a shared
+  `reactive` store (`tests/fixtures/vapor/SpatialTissueHost.vue`, used by
+  `tests/component/spatial-tissue-workbench.test.js`); `render().emitted()` and
+  `rerender()` are not available for Vapor.
+- Whitespace at the start or end of an element's text is trimmed. A space between
+  inline elements, or after one, must come from an interpolation:
+  ``span {{ ` ${relation} ` }}``, not `span  text`.
+- A virtual-DOM component that hosts a migrated (Vapor) child needs
+  `vaporInteropPlugin` in its test mount; `tests/helpers/testing-library-vue.js`
+  installs it for every vdom `render()`.
+
 If you meet something that does not work, add it here with the failing snippet
 or test name and the narrowest workaround. Do not silently fall back to a
 non-Vapor component.

@@ -80,6 +80,44 @@ Components: `.skip-link`, `.site-header`, `.site-title`, `.site-nav`, `.site-mai
 Breakpoints cannot be tokens. Prefer `.grid` and `.sidebar`, which need none; when a
 media query is unavoidable use `40rem` (narrow) and `64rem` (wide).
 
+### Workbench patterns
+
+Added while migrating the workbenches; every migrated workbench is built from these.
+
+Layout modifiers: `.cluster--bottom` (align to the bottom edge), `.cluster--tight`,
+`.grid--compact` (narrower columns), `.grid--end`, `.grid--fixed` (matrix: set
+`--grid-columns`), `.sidebar--end` (side column last in the source order) and
+`.scroll-x` (a wide table or map that scrolls inside its own box; give it
+`tabindex="0"`, `role="region"` and an `aria-label`).
+
+Component classes: `.card--flat` (nested, sunken box), `.metrics` (`--wide`,
+`--compact`: a grid of labelled values, `dl > div > dt + dd`), `.facts` (label left,
+value right), `.digest` (long hashes and identifiers), `.form` (label above control,
+controls fill the column) and `.choice` (checkbox or radio with its text), `.tile` (a
+full-width button that selects one item; `aria-pressed` marks the selection),
+`.button--danger`, `.button--secondary[aria-pressed="true"]` (a toggle that is on),
+`.progress` (native `<progress>`), `.scene` (WebGL host or its text fallback),
+`.chart`, `.chart__axis`, `.chart__gridline`, `.chart__tick`, `.chart__line`
+(`--compare`) and `.swatch` (`--dot`, `--diamond`; set `--swatch-color` inline to a
+semantic colour). `details > summary` shows an arrow.
+
+Shared Vue components in `src/components/ui/` (`<script setup vapor>` + pug):
+
+| Component | Props and slots | Renders |
+|---|---|---|
+| `Section` | `title`, `titleId` (required), `eyebrow`, `lede`, `level` (2, 3 or 4), `status`, `tone`, `flat`; default slot | A labelled card (`section` with `aria-labelledby`): eyebrow, heading, state badge announced as `role="status"`, lede, content stacked |
+| `Metric` | `label` (required), `value`, `note`, `mono`, `large`; default and `note` slots | One `div > dt + dd` for `dl.metrics` or `dl.facts` |
+| `Toolbar` | `label` (required), `end`; default slot | A named `role="group"` row of controls that wraps |
+| `ChartFrame` | `id`, `title` (required), `value`, `summary`, `tableLabel`; default, `legend` and `table` slots | A `figure` with caption, the chart, a visible text summary and the data table behind a disclosure |
+
+`ui/tone.js` maps a state word to `success`, `warning` or `danger` (`statusTone`,
+`badgeClass`); the word is always printed, colour only reinforces it.
+`ui/scene-colors.js` reads semantic tokens as three.js colours at runtime
+(`readSceneColors`), so WebGL scenes follow the active light or dark scheme.
+
+Heading levels: the page `h1`, one `Section` (`h2`) per panel, `Section level="3"`
+or an `h3` inside it, `h4` below that. Never skip a level.
+
 ## Mapping guide: old pattern to system
 
 Use this when migrating a workbench off `legacy-workbench.css`.
