@@ -4,6 +4,7 @@ The educational ontology on methylation biochemistry is a graph of **entities** 
 
 ```text
 data/*.js (arrays) -> data/index.js -> buildGraph -> pageModel / hubModel / homeModel / search
+data/paths.js (guided paths) ---------------------> pathModel / pathsContaining (guided-paths.js)
                                            ^
                          validate.js + scripts/kb-validate.js (npm run kb:validate)
 ```
@@ -87,7 +88,7 @@ Grade the claim the entity makes, not how well-known the word is. When unsure, g
 
 ## Validation
 
-`npm run kb:validate` loads `src/knowledge/data/index.js` and prints a report grouped by severity then rule. Exit code 1 if there are errors; warnings never fail. `npm run kb:validate -- --json` prints `{ ok, counts, errors, warnings }` (each issue is `{ rule, severity, id, path, message }`). `-- --data <file>` validates another module whose default export is an entity array. Unit tests use the same code (`validateKnowledge` in `src/knowledge/validate.js`) on fixtures in `tests/fixtures/knowledge/`.
+`npm run kb:validate` loads `src/knowledge/data/index.js` (and `data/paths.js`) and prints a report grouped by severity then rule. Exit code 1 if there are errors; warnings never fail. `npm run kb:validate -- --json` prints `{ ok, counts, errors, warnings }` (each issue is `{ rule, severity, id, path, message }`). `-- --data <file>` validates another module whose default export is an entity array; add `-- --paths <file>` to check a guided-path module with it. In code, `validateKnowledge(entities, { paths })` does the same. Unit tests use the same code (`validateKnowledge` in `src/knowledge/validate.js`) on fixtures in `tests/fixtures/knowledge/`.
 
 Errors:
 
@@ -106,6 +107,15 @@ Errors:
 | `established-no-ref` | `evidence: 'established'` without any article support (articles are exempt) |
 | `type-coverage` | one of the types has no entities |
 
+Guided-path errors (see [Guided paths](#guided-paths)):
+
+| rule | meaning |
+| --- | --- |
+| `path-schema` | a path breaks the contract: unknown field, bad slug id, missing title/summary/`why`, fewer than 3 or more than 30 steps, summary over 300 or `why` over 400 characters, step id that is not an entity id |
+| `path-duplicate-id` | two paths with the same id |
+| `path-dangling-step` | a step names an entity that does not exist |
+| `path-duplicate-step` | a path visits one entity twice |
+
 Warnings: `unverified-article` (`verified: false`) and `claim-flagged-no-evidence` (a claim with no evidence that is explicitly flagged by `status: 'unsupported'` or `evidence: 'conversation-only'`).
 
 The graph builder itself never throws on bad data; it records problems (`graph.dangling`, `graph.duplicates`, `graph.malformedMentions`, `graph.unknownRelations`) and skips them, so the site keeps rendering while validation tells you what to fix.
@@ -121,6 +131,7 @@ The graph builder itself never throws on bad data; it records problems (`graph.d
 | `enzymes.js`, `reactions.js`, `pathways.js`, `states.js`, `diseases.js`, `outcomes.js`, `systems.js`, `interventions.js` | one type each |
 | `claims.js` | atomic statements from the source conversation, graded against the literature |
 | `articles.js` | verified papers, guidelines and database papers; bibliographic fields come from PubMed or Crossref |
+| `paths.js` | curated guided paths (reading lists through the graph); not entities, see [Guided paths](#guided-paths) |
 
 Conventions settled when the files were merged:
 
@@ -129,21 +140,91 @@ Conventions settled when the files were merged:
 - A compound made from another compound is written `precursor-of` on the parent. `product-of`/`substrate-of` link a compound to a reaction, enzyme or pathway only, and a microbial source is written `increases` from the system.
 - Generic placeholders used by databases (`compound:hydrogen-acceptor`, the ETF and thioredoxin redox pairs) are real entities graded `plausible` or tied to a review, and the body says they are bookkeeping.
 - Evidence edges carry the caveat: a weak, animal-only or second-hand source is attached with a note saying so, and counter-evidence is an `evidence-against` edge written on the article.
+- One article never both supports and contradicts the same target (the page would list it twice). Split the two stances across targets, for example "supports the product" and "contradicts the mechanism claim", or fold the caveat into the note of one edge. A data test enforces this.
+- Topic hubs open with a plain-language lead. The first body paragraph of the main topics (`state:undermethylation`, `state:overmethylation`, `compound:glycine`, `compound:choline`, `compound:betaine`, `enzyme:gnmt`, `enzyme:pemt`, `enzyme:bhmt`, `disease:peptic-ulcer`, `disease:sibo`, `disease:lpr`, `outcome:belching`, `pathway:choline-oxidation`, `pathway:methyl-budget`) starts with "In plain words:" and says what it is, why it matters and how it connects, in under 1,200 characters and without links. The technical detail follows in the next paragraphs.
+- Portuguese comes in as aliases, never as separate entities: the Portuguese name, the common unaccented or colloquial phrasing, and for claims a short Portuguese statement. Search ignores case and accents, so `eructacao` and `eructação` find the same page. Where an abbreviation is shared (`PPI` the drug class, `PPi` pyrophosphate) the abbreviation belongs to the entity people search for and the other one is found by its full name.
+- Retail listings named in the source conversation (BulkSupplements, Extreme Suplementos, Elysx, Cognizin, BodyBio) are recorded in the body of the matching intervention as a neutral note, not as endorsements, and are also aliases so that searching the brand finds the page.
+- Reactions are written in the ionisation states of Rhea/ChEBI at pH 7.3 (`compound:proton` appears where Rhea has H+). Compound `formula` facts are the neutral or PubChem form, with the charge written when the species is an ion (`C5H14NO+`, `C15H23N6O5S+`). Tests therefore require every heavy atom to balance in every reaction whose participants have plain formulas, and require atoms, hydrogens and charge to balance for a hand-checked list.
+
+## Guided paths
+
+`src/knowledge/data/paths.js` holds short, ordered reading lists through the graph. A path is a curated story over existing entities, not new data:
+
+```js
+export default [
+  {
+    id: 'glycine-belching-question',       // kebab-case slug, permanent
+    title: 'The glycine-belching question',
+    summary: 'One or two sentences, at most 300 characters.',
+    steps: [                                // 3 to 30 steps
+      { id: 'outcome:belching', why: 'One or two sentences on why this step comes next (at most 400 characters).' }
+      // ...
+    ]
+  }
+]
+```
+
+Current paths: the glycine-belching question; methyl budget (who spends the methyl groups); choline to glycine; gut, acid and ulcers; the throat burn; the 2-3 am question (histamine, choline and the vagal brake); B6, GABA and the anxious mind; forms that are easy to confuse (betaine HCl and TMG, folic acid and methylfolate, P5P and pyridoxine, choline salts and phospholipids); reading the evidence (one example of each grade and claim status). `npm run kb:validate` fails when a step does not resolve, an id repeats or a path visits an entity twice (rules above). Engine API from `src/knowledge/index.js`:
+
+```js
+import { paths, pathList, getPath, pathsFor } from './knowledge/index.js'
+
+paths                         // the raw array above
+pathList()                    // [{ id, title, summary, length }]
+getPath('choline-to-glycine') // { id, title, summary, length, types, steps: [{ position, id, why, entity: { id, type, typeLabel, name, summary, evidence } }] } or null
+pathsFor('enzyme:gnmt')       // paths that visit the entity: [{ id, title, summary, length, position, why }]
+```
+
+There is no UI for paths yet; the models are shaped for one (an entity page can say "appears in 2 guided paths" from `pathsFor`).
+
+## Coverage of the source conversation
+
+`tmp/coverage.md` is the line-by-line checklist of `tmp/base-talk.txt`: 315 items (substances, enzymes, reactions, pathways, states and diseases, symptoms and outcomes, interventions and products, systems, mechanisms and numeric claims, studies), each with the phrase used in the conversation, a short search term and the entity that holds it. 280 items mapped to entities that already existed, 35 needed new entities (32 distinct ids, listed in the file), and about 20 existing entities received extra aliases so that the conversation's own phrasing resolves. All 315 search terms find their entity in the top three results. The test table `CONVERSATION_TERMS` in `tests/unit/knowledge-data.test.js` keeps 173 of them under test.
 
 ## Current coverage
 
-Output of `npm run kb:validate` (0 errors, 4 warnings):
+Output of `npm run kb:validate` (0 errors, 6 warnings):
 
 | type | entities | | type | entities |
 | --- | ---: | --- | --- | ---: |
-| compound | 137 | | intervention | 48 |
-| enzyme | 63 | | claim | 54 |
-| reaction | 59 | | system | 16 |
-| pathway | 22 | | outcome | 35 |
-| state | 13 | | disease | 23 |
-| article | 239 | | **total** | **709** |
+| compound | 144 | | intervention | 48 |
+| enzyme | 65 | | claim | 65 |
+| reaction | 61 | | system | 20 |
+| pathway | 27 | | outcome | 37 |
+| state | 14 | | disease | 25 |
+| article | 253 | | **total** | **759** |
 
-2,997 relations (2,039 declared, 958 derived from `refs` and reaction blocks) and 3,333 body mentions. Evidence grades: 499 established, 176 plausible, 33 speculative, 1 conversation-only. The four warnings are conversation claims flagged `unsupported` for which no literature was found for or against (`claim:higher-ph-delays-les-closure-and-pylorus`, `claim:undermethylated-have-functional-b6-deficiency`, `claim:undermethylated-hypochlorhydria`, `claim:undermethylation-causes-subclinical-vagal-dysfunction`).
+3,336 relations (2,324 declared, 1,012 derived from `refs` and reaction blocks), 3,602 body mentions, about 2,000 aliases and 9 guided paths (104 steps). Evidence grades: 533 established, 188 plausible, 36 speculative, 2 conversation-only. Every non-article entity is linked to at least five others (at least three non-article), every article to at least two. The six warnings are conversation claims flagged `unsupported` for which no literature was found for or against (`claim:glycine-powder-low-dose-belching-reports` and `claim:glycine-with-meals-reduces-gastric-irritation` are new; `claim:higher-ph-delays-les-closure-and-pylorus`, `claim:undermethylated-have-functional-b6-deficiency`, `claim:undermethylated-hypochlorhydria` and `claim:undermethylation-causes-subclinical-vagal-dysfunction` were already there).
+
+## Content QA log
+
+An audit of the dataset against primary sources, with the checks that are now repeatable.
+
+Checked programmatically against the source databases (scripts were run once; the format and consistency parts live on as tests):
+
+- all 231 PMIDs resolve in PubMed and agree with the stored year, first author, journal and title; the 4 DOI-only articles resolve in Crossref; none of the cited records is retracted or carries an expression of concern; the 4 Reactome database pages have no PMID or DOI and were opened by URL, and 2 IOM book chapters have a PMID whose PubMed record carries no title (so the title could not be compared).
+- 128 Rhea references: 126 resolve and every equation was compared with the stored participants and coefficients; the other 2 distinct ids (RHEA:19819 for MTHFR and RHEA:11173 for MTR) are directional ids that the search endpoint does not return, and are documented next to their master ids RHEA:19817 and RHEA:11172. 109 Reactome references resolve to the right reaction or pathway; 61 UniProt entries match the stated gene, organism and EC; 120 ChEBI ids and 111 PubChem CIDs resolve and agree with the stored formula and molar mass.
+- molar masses recomputed from the formulas (108 compounds), heavy-atom balance of the 53 reactions with plain formulas, and hydrogen and charge balance of 25 of them.
+- identifier formats, reaction-versus-enzyme EC consistency and duplicate PMID/DOI checks now run in `tests/unit/knowledge-data.test.js`.
+
+Read and fact-checked by hand (about 70 entities across all eleven types: the 14 hub topics, 12 interventions, 11 compounds, 7 enzymes, 8 pathways and states, 6 diseases, 5 outcomes and systems, 12 claims and 15 articles against their PubMed abstracts, plus the status and evidence edges of all 54 original claims), including the conversation's numbers: IOM and EFSA choline values (EFSA set an adequate intake of 400 mg/day and no upper level), 3 g/day endogenous glycine and about 10 g/day deficit (Meléndez-Hevia 2009 abstract), 41 % choline in the bitartrate and the 13.88 g stoichiometry, vitamin and mineral upper limits, SIBO breath-test thresholds, trimethylaminuria prevalence, the glycine-gastrin human studies.
+
+Errors found and fixed:
+
+| category | what | fix |
+| --- | --- | --- |
+| identifier | `reaction:mthfd1-methylene-thf-oxidation` and `enzyme:mthfd1` cited Reactome R-HSA-200661, which is the cyclohydrolase step | the dehydrogenase step R-HSA-200718 now on the reaction; both ids on the enzyme |
+| chemistry | SAM was stored as `C15H22N6O5S (cation)`, which is the neutral zwitterion; the cation is `C15H23N6O5S+` (399.45 g/mol). The error made `reaction:gnmt-glycine-methylation` fail hydrogen and charge balance | formula and masses corrected; the reaction now balances |
+| number | the gastrin claim and `outcome:elevated-gastrin` said glycine did not raise gastrin "even at 200 mM"; the Taylor 1982 abstract does not give that figure and Wald 1982 used 100 mM glycine | wording reduced to what the abstracts state |
+| study metadata | Da Costa 2006 was labelled RCT and graded established, but it is a single-arm controlled depletion study with genetic association (n=57) | design corrected, grade plausible |
+| structure | two articles (Zeisel 2017 on TMAO, Hu 2011 on ginger) both supported and contradicted the same target, so entity pages listed them twice (a duplicate-key warning in the UI) | contradiction moved to the claim it concerns, or folded into one note; test added |
+| completeness | 19 compounds had no ChEBI id and S-methylmethionine had no formula | ids, formula and mass added (verified against ChEBI and PubChem) |
+| wording | `compound:glycerophosphocholine` stated acid-independent absorption as fact; the sources used here do not cover alpha-GPC | wording softened and linked to `claim:alpha-gpc-pc-absorbed-without-acid` |
+| search | the alias `PPi` on pyrophosphate outranked the drug class `PPI`; `IBP` and `omeprazol` on the proton pump enzyme outranked the intervention; `H. pylori` and `vago` found articles first | aliases moved or added; tests lock the ranking |
+| coverage | 32 concepts of the conversation had no page (nucleotide synthesis, migrating motor complex, H1/H2, M2 and 5-HT4 receptor signalling, TLESR, flatulence, colon, ileum, parietal and G cells, gastritis and duodenitis, oesophagitis, duodenogastric reflux, carnosine synthase, thymidylate synthase, thymol, elastin, tannins and flavonoids, 11 claims) | created at full quality with 14 verified articles |
+| semantics | converse edges missing: contraindicated without aggravates (betaine HCl, choline in trimethylaminuria, glycine in NKH), and 13 diseases or states without any helps, causes or aggravates group | 31 typed edges added, with notes stating the evidence level, plus about 70 further links so that every entity has at least five neighbours |
+
+No errors were found in the remaining spot-checks of formulas, EC numbers, UniProt, Rhea, Reactome, PubChem, DOIs and PMIDs. The "reaction balance" difference between formula conventions (neutral PubChem forms against Rhea ionisation states) is a documented convention, not an error.
 
 ## Using the engine
 
@@ -156,6 +237,8 @@ home()                // landing page model
 find('arroto')        // search: name, aliases, id, summary; accent/case-insensitive
 pathBetween('state:hypochlorhydria', 'compound:sam', { avoidTypes: ['article'] })
 ```
+
+Guided paths use the same entry point: `import { paths, pathList, getPath, pathsFor } from './knowledge/index.js'` (see [Guided paths](#guided-paths)).
 
 `page(id)` returns `{ id, type, typeLabel, typeIcon, name, aliases, summary, evidence: {grade,label,tone,rank,description}, facts: [{key,label,value,url}], body: Segment[][], relationGroups: [{rel,label,direction,items}], references, mentionedBy, seeAlso, breadcrumbs, reaction, article, claim, entity }` where a body `Segment` is `{ text }` or `{ link: { id, label, type } }`. Breadcrumb entries are `{ kind: 'home' | 'hub' | 'entity', ... }`; the router decides URLs. `src/knowledge/index.js` deliberately does not import zod; validation is a build/test-time concern.
 
