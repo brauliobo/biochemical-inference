@@ -180,3 +180,69 @@ a.card:hover { border-color: var(--color-accent); }
   padding: 0;
   list-style: none;
 }
+
+/* ---- Knowledge base ---- */
+.badge--info { border-color: var(--color-info-border); color: var(--color-info-text); }
+
+/* Form controls placed in a stack fill its width; in a cluster, .grow lets one stretch. */
+.stack > :is(input, select, textarea) { inline-size: 100%; }
+.cluster > .grow { flex: 1 1 var(--sidebar-width); }
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-cluster-tight);
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  list-style: none;
+}
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--target-min);
+}
+.breadcrumbs li + li::before {
+  content: "/";
+  margin-inline-end: var(--space-cluster-tight);
+}
+
+/* A reaction equation: terms, "+" and the arrow wrap as one line of inline items. */
+.equation {
+  padding: var(--space-inset);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sunken);
+  font-size: var(--text-lead);
+  line-height: var(--leading-prose);
+}
+
+/* Radial neighbourhood picture: wide screens only; the text lists are the primary view. */
+.graph { display: none; }
+@media (min-width: 40rem) {
+  .graph { display: block; }
+}
+.graph svg {
+  inline-size: 100%;
+  block-size: auto;
+}
+.graph-edge {
+  stroke: var(--color-border-strong);
+  stroke-width: var(--border-width);
+}
+.graph-node {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-accent);
+  stroke-width: var(--border-width-strong);
+}
+.graph-node--center { fill: var(--color-accent); }
+.graph a:hover .graph-node:not(.graph-node--center) { fill: var(--color-surface-sunken); }
+.graph-label {
+  fill: var(--color-text);
+  font-size: var(--text-body);
+  paint-order: stroke;
+  stroke: var(--color-surface);
+  stroke-width: var(--border-width-accent);
+  stroke-linejoin: round;
+}
