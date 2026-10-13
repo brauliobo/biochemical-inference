@@ -1,14 +1,12 @@
 import { z } from 'zod'
+import { Sha256DigestSchema, SemverSchema, ShortIdentifierSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema } from './commons/schemas.js'
 
 export const PORTFOLIO_CONTRACT_VERSION = '2.0.0'
 export const PORTFOLIO_MAX_ARCHIVE_BYTES = 2_000_000
 export const PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH = Math.ceil(PORTFOLIO_MAX_ARCHIVE_BYTES / 3) * 4
 export const PORTFOLIO_ARCHIVE_REQUEST_BODY_LIMIT = PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH + 64
-export const Sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
+export const Sha256Schema = Sha256DigestSchema
 
-const IdentifierSchema = z.string().regex(/^[A-Za-z][A-Za-z0-9_.-]{0,63}$/)
-const VersionSchema = z.string().regex(/^[0-9]+\.[0-9]+\.[0-9]+$/)
-const FiniteNumberSchema = z.number().finite()
 
 export const DimensionSchema = z.object({
   amount: z.number().int().min(-4).max(4),
@@ -21,46 +19,46 @@ export const DimensionSchema = z.object({
 }).strict()
 
 export const UnitSchema = z.object({
-  id: IdentifierSchema,
-  symbol: z.string().min(1).max(32),
+  id: ShortIdentifierSchema,
+  symbol: NonEmptyStringSchema.max(32),
   scaleToSI: z.number().positive().finite(),
   dimension: DimensionSchema
 }).strict()
 
 const EngineSchema = z.object({
   type: z.enum(['ode', 'ssa', 'fba']),
-  id: IdentifierSchema,
-  version: VersionSchema,
-  algorithm: IdentifierSchema,
-  algorithmVersion: VersionSchema
+  id: ShortIdentifierSchema,
+  version: SemverSchema,
+  algorithm: ShortIdentifierSchema,
+  algorithmVersion: SemverSchema
 }).strict()
 
 const ReleaseReferenceSchema = z.object({
-  id: z.string().min(1).max(160),
+  id: NonEmptyStringSchema.max(160),
   digest: Sha256Schema
 }).strict()
 
 const SpeciesSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
   initial: FiniteNumberSchema.nonnegative(),
   unit: UnitSchema
 }).strict()
 
 const ParameterSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
   value: FiniteNumberSchema.nonnegative(),
   unit: UnitSchema,
-  evidence: z.array(z.string().min(1).max(500)).max(20)
+  evidence: z.array(NonEmptyStringSchema.max(500)).max(20)
 }).strict()
 
 const ReactionSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
-  reactant: IdentifierSchema,
-  products: z.array(z.object({ speciesId: IdentifierSchema, stoichiometry: z.number().int().positive().max(16) }).strict()).min(1).max(16),
-  rateConstantId: IdentifierSchema
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
+  reactant: ShortIdentifierSchema,
+  products: z.array(z.object({ speciesId: ShortIdentifierSchema, stoichiometry: PositiveIntSchema.max(16) }).strict()).min(1).max(16),
+  rateConstantId: ShortIdentifierSchema
 }).strict()
 
 const DynamicDefinitionSchema = z.object({
@@ -71,9 +69,9 @@ const DynamicDefinitionSchema = z.object({
 
 const FluxUnitSchema = UnitSchema
 const FbaReactionSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
-  stoichiometry: z.record(IdentifierSchema, FiniteNumberSchema).refine((value) => Object.keys(value).length > 0 && Object.values(value).every((coefficient) => coefficient !== 0), 'stoichiometry cannot be empty or contain zero coefficients'),
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
+  stoichiometry: z.record(ShortIdentifierSchema, FiniteNumberSchema).refine((value) => Object.keys(value).length > 0 && Object.values(value).every((coefficient) => coefficient !== 0), 'stoichiometry cannot be empty or contain zero coefficients'),
   lowerBound: FiniteNumberSchema,
   upperBound: FiniteNumberSchema.nullable(),
   unit: FluxUnitSchema
@@ -83,28 +81,28 @@ const FbaReactionSchema = z.object({
 })
 
 const FbaDefinitionSchema = z.object({
-  metabolites: z.array(z.object({ id: IdentifierSchema, name: z.string().min(1).max(160) }).strict()).min(1).max(32),
+  metabolites: z.array(z.object({ id: ShortIdentifierSchema, name: NonEmptyStringSchema.max(160) }).strict()).min(1).max(32),
   reactions: z.array(FbaReactionSchema).min(1).max(64),
-  objective: z.object({ reactionId: IdentifierSchema, direction: z.literal('maximize'), unit: FluxUnitSchema }).strict()
+  objective: z.object({ reactionId: ShortIdentifierSchema, direction: z.literal('maximize'), unit: FluxUnitSchema }).strict()
 }).strict()
 
 const ObservableSchema = z.object({
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
-  targetId: IdentifierSchema,
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
+  targetId: ShortIdentifierSchema,
   unit: UnitSchema
 }).strict()
 
 const ModelBaseSchema = z.object({
   contractVersion: z.literal(PORTFOLIO_CONTRACT_VERSION),
-  id: IdentifierSchema,
-  name: z.string().min(1).max(160),
-  version: VersionSchema,
+  id: ShortIdentifierSchema,
+  name: NonEmptyStringSchema.max(160),
+  version: SemverSchema,
   digest: Sha256Schema,
   knowledgeRelease: ReleaseReferenceSchema,
   engine: EngineSchema,
-  assumptions: z.array(z.string().min(1).max(1000)).min(1).max(50),
-  limitations: z.array(z.string().min(1).max(1000)).min(1).max(50),
+  assumptions: z.array(NonEmptyStringSchema.max(1000)).min(1).max(50),
+  limitations: z.array(NonEmptyStringSchema.max(1000)).min(1).max(50),
   observables: z.array(ObservableSchema).min(1).max(64)
 })
 
@@ -197,7 +195,7 @@ export const StrictPortfolioModelSchema = z.union([OdeModelSchema, SsaModelSchem
 export const PortfolioModelSchema = StrictPortfolioModelSchema
 
 const InterventionSchema = z.object({
-  targetId: IdentifierSchema,
+  targetId: ShortIdentifierSchema,
   time: FiniteNumberSchema.nonnegative(),
   value: FiniteNumberSchema,
   unit: UnitSchema
@@ -205,13 +203,13 @@ const InterventionSchema = z.object({
 
 const ExperimentBaseSchema = z.object({
   contractVersion: z.literal(PORTFOLIO_CONTRACT_VERSION),
-  modelId: IdentifierSchema,
+  modelId: ShortIdentifierSchema,
   modelDigest: Sha256Schema,
   knowledgeRelease: ReleaseReferenceSchema,
   engine: EngineSchema,
   seed: z.number().int().min(0).max(0xffffffff),
-  assumptions: z.array(z.string().min(1).max(1000)).min(1).max(50),
-  limitations: z.array(z.string().min(1).max(1000)).min(1).max(50),
+  assumptions: z.array(NonEmptyStringSchema.max(1000)).min(1).max(50),
+  limitations: z.array(NonEmptyStringSchema.max(1000)).min(1).max(50),
   interventions: z.array(InterventionSchema).max(16)
 })
 
@@ -223,7 +221,7 @@ const OdeControlsSchema = z.object({
   fixedStep: z.number().positive().max(10000),
   absoluteTolerance: z.number().positive().max(1),
   relativeTolerance: z.number().positive().max(1),
-  maxInternalSteps: z.number().int().positive().max(1000000)
+  maxInternalSteps: PositiveIntSchema.max(1000000)
 }).strict().refine((value) => value.outputInterval <= value.duration, { message: 'outputInterval cannot exceed duration', path: ['outputInterval'] })
 
 const SsaControlsSchema = z.object({
@@ -232,13 +230,13 @@ const SsaControlsSchema = z.object({
   duration: z.number().positive().max(100000),
   outputInterval: z.number().positive().max(10000),
   replicates: z.number().int().min(1).max(10000),
-  maxEventsPerReplicate: z.number().int().positive().max(10000000)
+  maxEventsPerReplicate: PositiveIntSchema.max(10000000)
 }).strict().refine((value) => value.outputInterval <= value.duration, { message: 'outputInterval cannot exceed duration', path: ['outputInterval'] })
 
 const FbaControlsSchema = z.object({
   method: z.literal('two-phase-simplex'),
   feasibilityTolerance: z.number().positive().max(0.01),
-  maxIterations: z.number().int().positive().max(1000000)
+  maxIterations: PositiveIntSchema.max(1000000)
 }).strict()
 
 export const ExperimentSchema = z.union([
@@ -257,31 +255,31 @@ export const ExperimentSchema = z.union([
 export const RunLifecycleSchema = z.enum(['queued', 'running', 'terminal'])
 export const RunOutcomeSchema = z.enum(['successful', 'failed', 'non-converged', 'infeasible', 'unbounded', 'resource-exhausted', 'cancelled'])
 
-const QuantitySeriesSchema = z.object({ id: IdentifierSchema, name: z.string().min(1), unit: UnitSchema, values: z.array(FiniteNumberSchema).min(1) }).strict()
+const QuantitySeriesSchema = z.object({ id: ShortIdentifierSchema, name: NonEmptyStringSchema, unit: UnitSchema, values: z.array(FiniteNumberSchema).min(1) }).strict()
 const OdeDataSchema = z.object({ engine: z.literal('ode'), time: z.array(FiniteNumberSchema).min(1), timeUnit: UnitSchema, trajectories: z.array(QuantitySeriesSchema).min(1) }).strict()
-const SsaSummarySchema = z.object({ id: IdentifierSchema, name: z.string().min(1), unit: UnitSchema, mean: FiniteNumberSchema, variance: FiniteNumberSchema.nonnegative(), minimum: FiniteNumberSchema, median: FiniteNumberSchema, maximum: FiniteNumberSchema }).strict()
-const SsaDataSchema = z.object({ engine: z.literal('ssa'), finalTime: FiniteNumberSchema.nonnegative(), timeUnit: UnitSchema, replicates: z.number().int().positive(), summaries: z.array(SsaSummarySchema).min(1), representative: z.array(QuantitySeriesSchema).min(1), sampleTimes: z.array(FiniteNumberSchema).min(1) }).strict()
-const FbaDataSchema = z.object({ engine: z.literal('fba'), objective: FiniteNumberSchema, objectiveUnit: UnitSchema, fluxes: z.array(z.object({ id: IdentifierSchema, name: z.string().min(1), value: FiniteNumberSchema, unit: UnitSchema }).strict()).min(1) }).strict()
+const SsaSummarySchema = z.object({ id: ShortIdentifierSchema, name: NonEmptyStringSchema, unit: UnitSchema, mean: FiniteNumberSchema, variance: FiniteNumberSchema.nonnegative(), minimum: FiniteNumberSchema, median: FiniteNumberSchema, maximum: FiniteNumberSchema }).strict()
+const SsaDataSchema = z.object({ engine: z.literal('ssa'), finalTime: FiniteNumberSchema.nonnegative(), timeUnit: UnitSchema, replicates: PositiveIntSchema, summaries: z.array(SsaSummarySchema).min(1), representative: z.array(QuantitySeriesSchema).min(1), sampleTimes: z.array(FiniteNumberSchema).min(1) }).strict()
+const FbaDataSchema = z.object({ engine: z.literal('fba'), objective: FiniteNumberSchema, objectiveUnit: UnitSchema, fluxes: z.array(z.object({ id: ShortIdentifierSchema, name: NonEmptyStringSchema, value: FiniteNumberSchema, unit: UnitSchema }).strict()).min(1) }).strict()
 
 export const PortfolioResultSchema = z.object({
   contractVersion: z.literal(PORTFOLIO_CONTRACT_VERSION),
   runId: Sha256Schema,
   lifecycle: z.literal('terminal'),
   outcome: RunOutcomeSchema,
-  provenance: z.object({ modelId: IdentifierSchema, modelVersion: VersionSchema, modelDigest: Sha256Schema, knowledgeRelease: ReleaseReferenceSchema, engine: EngineSchema, seed: z.number().int().min(0).max(0xffffffff) }).strict(),
+  provenance: z.object({ modelId: ShortIdentifierSchema, modelVersion: SemverSchema, modelDigest: Sha256Schema, knowledgeRelease: ReleaseReferenceSchema, engine: EngineSchema, seed: z.number().int().min(0).max(0xffffffff) }).strict(),
   experiment: ExperimentSchema,
-  assumptions: z.array(z.string().min(1)).min(1),
-  limitations: z.array(z.string().min(1)).min(1),
+  assumptions: z.array(NonEmptyStringSchema).min(1),
+  limitations: z.array(NonEmptyStringSchema).min(1),
   data: z.union([OdeDataSchema, SsaDataSchema, FbaDataSchema]).nullable(),
   diagnostics: z.object({
-    algorithm: IdentifierSchema,
-    algorithmVersion: VersionSchema,
-    iterations: z.number().int().nonnegative(),
+    algorithm: ShortIdentifierSchema,
+    algorithmVersion: SemverSchema,
+    iterations: NonNegativeIntSchema,
     residuals: z.record(FiniteNumberSchema),
     deterministic: z.boolean(),
     warnings: z.array(z.string())
   }).strict(),
-  failure: z.object({ code: IdentifierSchema, message: z.string().min(1) }).strict().nullable()
+  failure: z.object({ code: ShortIdentifierSchema, message: NonEmptyStringSchema }).strict().nullable()
 }).strict().superRefine((result, context) => {
   if (result.outcome === 'successful' && result.data === null) context.addIssue({ code: z.ZodIssueCode.custom, path: ['data'], message: 'successful results require data' })
   if (result.outcome !== 'successful' && result.failure === null) context.addIssue({ code: z.ZodIssueCode.custom, path: ['failure'], message: 'non-success outcomes require a failure finding' })
@@ -294,11 +292,11 @@ export const RunRecordSchema = z.object({
   result: PortfolioResultSchema.nullable()
 }).strict()
 
-export const ArchiveValidationRequestSchema = z.object({ archiveBase64: z.string().min(1).max(PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
+export const ArchiveValidationRequestSchema = z.object({ archiveBase64: NonEmptyStringSchema.max(PORTFOLIO_ARCHIVE_BASE64_MAX_LENGTH).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()
 export const ArchiveValidationResponseSchema = z.object({
   valid: z.boolean(),
   profile: z.literal('portfolio-combine-1.0'),
-  findings: z.array(z.object({ code: IdentifierSchema, path: z.string(), message: z.string() }).strict()),
+  findings: z.array(z.object({ code: ShortIdentifierSchema, path: z.string(), message: z.string() }).strict()),
   model: StrictPortfolioModelSchema.nullable(),
   experiment: ExperimentSchema.nullable()
 }).strict()

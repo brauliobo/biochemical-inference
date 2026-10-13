@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Sha256DigestSchema, OffsetDatetimeSchema, SemverSchema, FiniteNumberSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, PageLimitSchema, pageLimitQuerySchema, JsonValueSchema } from './commons/schemas.js'
 
 export const REVALIDATION_CONTRACT_VERSION = '1.0.0'
 export const MAX_MATERIALIZED_IMPACT_REASONS = 100_000
@@ -13,23 +14,15 @@ export const REVALIDATION_DEPENDENCY_ROLES = Object.freeze([
 ])
 export const REVALIDATION_ACTIONS = Object.freeze(['verify', 'recompute', 'reproduce', 'review'])
 
-export const RevalidationDigestSchema = z.string().regex(/^sha256:[a-f0-9]{64}$/)
+export const RevalidationDigestSchema = Sha256DigestSchema
 export const RevalidationChangeClassSchema = z.enum(REVALIDATION_CHANGE_CLASSES)
 export const RevalidationNodeKindSchema = z.enum(REVALIDATION_NODE_KINDS)
 export const RevalidationDependencyRoleSchema = z.enum(REVALIDATION_DEPENDENCY_ROLES)
 export const RevalidationActionSchema = z.enum(REVALIDATION_ACTIONS)
-export const RevalidationLocatorSchema = z.string().min(1).max(500).regex(/^[A-Za-z0-9][A-Za-z0-9._:%/-]*$/)
-export const RevalidationSlugSchema = z.string().min(1).max(100).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/)
+export const RevalidationLocatorSchema = NonEmptyStringSchema.max(500).regex(/^[A-Za-z0-9][A-Za-z0-9._:%/-]*$/)
+export const RevalidationSlugSchema = NonEmptyStringSchema.max(100).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/)
 
-const FiniteNumberSchema = z.number().finite()
-export const RevalidationJsonValueSchema = z.lazy(() => z.union([
-  z.null(),
-  z.boolean(),
-  z.string(),
-  FiniteNumberSchema,
-  z.array(RevalidationJsonValueSchema),
-  z.record(RevalidationJsonValueSchema)
-]))
+export const RevalidationJsonValueSchema = JsonValueSchema
 
 export const DependencyNodeSchema = z.object({
   node_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
@@ -60,8 +53,8 @@ export const DependencySnapshotSchema = z.object({
 
 export const RevalidationReleaseReferenceSchema = z.object({
   family: RevalidationSlugSchema,
-  release_id: z.string().min(1).max(200),
-  schema_version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  release_id: NonEmptyStringSchema.max(200),
+  schema_version: SemverSchema,
   digest: RevalidationDigestSchema
 }).strict()
 
@@ -70,10 +63,10 @@ export const NormalizedChangeSchema = z.object({
   change_id: RevalidationDigestSchema,
   class: RevalidationChangeClassSchema,
   subject: RevalidationLocatorSchema,
-  path: z.string().min(1).max(1000),
+  path: NonEmptyStringSchema.max(1000),
   before: RevalidationJsonValueSchema,
   after: RevalidationJsonValueSchema,
-  reasons: z.array(z.string().min(1).max(1000)).min(1).max(100)
+  reasons: z.array(NonEmptyStringSchema.max(1000)).min(1).max(100)
 }).strict()
 
 export const NormalizedChangeSetSchema = z.object({
@@ -87,10 +80,10 @@ export const NormalizedChangeSetSchema = z.object({
 
 export const RevalidationResourceProfileSchema = z.object({
   profile_id: RevalidationSlugSchema,
-  cpu_cores: z.number().int().positive().max(1024),
-  memory_mib: z.number().int().positive().max(1048576),
-  scratch_mib: z.number().int().nonnegative().max(10485760),
-  maximum_runtime_seconds: z.number().int().positive().max(31536000)
+  cpu_cores: PositiveIntSchema.max(1024),
+  memory_mib: PositiveIntSchema.max(1048576),
+  scratch_mib: NonNegativeIntSchema.max(10485760),
+  maximum_runtime_seconds: PositiveIntSchema.max(31536000)
 }).strict()
 
 export const RevalidationWorkRuleSchema = z.object({
@@ -114,8 +107,8 @@ export const ImpactReasonSchema = z.object({
   change_id: RevalidationDigestSchema,
   change_class: RevalidationChangeClassSchema,
   subject: RevalidationLocatorSchema,
-  path: z.string().min(1).max(1000),
-  distance: z.number().int().positive().max(32),
+  path: NonEmptyStringSchema.max(1000),
+  distance: PositiveIntSchema.max(32),
   edge_ids: z.array(RevalidationDigestSchema).min(1).max(32)
 }).strict()
 
@@ -125,7 +118,7 @@ export const RevalidationImpactSchema = z.object({
   node_kind: RevalidationNodeKindSchema,
   locator: RevalidationLocatorSchema,
   relation: z.enum(['direct', 'transitive']),
-  distance: z.number().int().positive().max(32),
+  distance: PositiveIntSchema.max(32),
   classes: z.array(RevalidationChangeClassSchema).min(1).max(REVALIDATION_CHANGE_CLASSES.length),
   reasons: z.array(ImpactReasonSchema).min(1).max(10000)
 }).strict()
@@ -139,7 +132,7 @@ export const UnrelatedChangeClosureSchema = z.object({
     snapshot_closure_complete: z.literal(true),
     matching_node_ids: z.array(RevalidationDigestSchema).length(0)
   }).strict(),
-  reason: z.string().min(1).max(1000)
+  reason: NonEmptyStringSchema.max(1000)
 }).strict()
 
 export const RevalidationWorkItemSchema = z.object({
@@ -173,9 +166,9 @@ export const ImpactPlanSchema = z.object({
 }).strict()
 
 export const CampaignRetryPolicySchema = z.object({
-  maximum_attempts: z.number().int().positive().max(100),
-  initial_backoff_seconds: z.number().int().nonnegative().max(86400),
-  maximum_backoff_seconds: z.number().int().nonnegative().max(604800),
+  maximum_attempts: PositiveIntSchema.max(100),
+  initial_backoff_seconds: NonNegativeIntSchema.max(86400),
+  maximum_backoff_seconds: NonNegativeIntSchema.max(604800),
   backoff_multiplier: FiniteNumberSchema.min(1).max(100),
   retryable_failure_codes: z.array(RevalidationSlugSchema).min(1).max(32)
 }).strict().superRefine((value, context) => {
@@ -188,23 +181,23 @@ export const CampaignRetryPolicySchema = z.object({
 })
 
 export const CampaignArtifactDescriptorSchema = z.object({
-  name: z.string().min(1).max(200).regex(/^[a-z][a-z0-9.-]*$/),
+  name: NonEmptyStringSchema.max(200).regex(/^[a-z][a-z0-9.-]*$/),
   digest: RevalidationDigestSchema,
-  bytes: z.number().int().nonnegative().max(1073741824),
-  media_type: z.string().min(1).max(200)
+  bytes: NonNegativeIntSchema.max(1073741824),
+  media_type: NonEmptyStringSchema.max(200)
 }).strict()
 
 export const CampaignExecutorBindingSchema = z.object({
   expected_artifact_class: RevalidationSlugSchema,
   executor_id: RevalidationSlugSchema,
-  executor_version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  executor_version: SemverSchema,
   checkpoint_mode: z.enum(['none', 'exact-input-closure'])
 }).strict()
 
 export const CampaignExecutionLimitsSchema = z.object({
-  maximum_concurrency: z.number().int().positive().max(64),
-  maximum_output_bytes: z.number().int().positive().max(1073741824),
-  lease_duration_seconds: z.number().int().positive().max(86400)
+  maximum_concurrency: PositiveIntSchema.max(64),
+  maximum_output_bytes: PositiveIntSchema.max(1073741824),
+  lease_duration_seconds: PositiveIntSchema.max(86400)
 }).strict()
 
 export const CampaignSpecificationSchema = z.object({
@@ -214,7 +207,7 @@ export const CampaignSpecificationSchema = z.object({
   producer_campaign: z.object({
     campaign_id: RevalidationDigestSchema,
     name: RevalidationSlugSchema,
-    reason: z.string().min(1).max(4000)
+    reason: NonEmptyStringSchema.max(4000)
   }).strict(),
   resource_profile: RevalidationResourceProfileSchema,
   retry_policy: CampaignRetryPolicySchema,
@@ -233,7 +226,7 @@ export const ScientificConclusionSchema = z.enum(['not-evaluated', 'review-requi
 
 export const CampaignFailureSchema = z.object({
   code: RevalidationSlugSchema,
-  message: z.string().min(1).max(2000),
+  message: NonEmptyStringSchema.max(2000),
   retryable: z.boolean()
 }).strict()
 
@@ -241,16 +234,16 @@ export const CampaignAttemptSchema = z.object({
   attempt_id: RevalidationDigestSchema,
   campaign_id: RevalidationDigestSchema,
   work_id: RevalidationDigestSchema,
-  attempt_number: z.number().int().positive(),
+  attempt_number: PositiveIntSchema,
   state: CampaignAttemptStateSchema,
   execution_mode: CampaignExecutionModeSchema,
   lease_owner: RevalidationSlugSchema,
-  lease_expires_at: z.string().datetime({ offset: true }),
-  created_at: z.string().datetime({ offset: true }),
-  started_at: z.string().datetime({ offset: true }).nullable(),
-  completed_at: z.string().datetime({ offset: true }).nullable(),
-  peak_rss_bytes: z.number().int().nonnegative().nullable(),
-  runtime_ms: z.number().int().nonnegative().nullable(),
+  lease_expires_at: OffsetDatetimeSchema,
+  created_at: OffsetDatetimeSchema,
+  started_at: OffsetDatetimeSchema.nullable(),
+  completed_at: OffsetDatetimeSchema.nullable(),
+  peak_rss_bytes: NonNegativeIntSchema.nullable(),
+  runtime_ms: NonNegativeIntSchema.nullable(),
   outcome: CampaignTerminalOutcomeSchema.nullable(),
   failure: CampaignFailureSchema.nullable()
 }).strict()
@@ -260,7 +253,7 @@ export const CampaignResultSchema = z.object({
   result_id: RevalidationDigestSchema,
   campaign_id: RevalidationDigestSchema,
   work_id: RevalidationDigestSchema,
-  executor: z.object({ id: RevalidationSlugSchema, version: z.string().regex(/^\d+\.\d+\.\d+$/) }).strict(),
+  executor: z.object({ id: RevalidationSlugSchema, version: SemverSchema }).strict(),
   execution_status: z.literal('succeeded'),
   scientific_conclusion: ScientificConclusionSchema,
   input_artifact_digests: z.array(RevalidationDigestSchema).min(4).max(1000),
@@ -286,7 +279,7 @@ export const CampaignWorkerResultSchema = z.object({
 
 export const CampaignWorkerFailureSchema = z.object({
   code: RevalidationSlugSchema,
-  message: z.string().min(1).max(2000),
+  message: NonEmptyStringSchema.max(2000),
   checkpoint: RevalidationJsonValueSchema.nullable()
 }).strict()
 
@@ -308,7 +301,7 @@ export const REVALIDATION_CSRF_VALUE = 'revalidation-campaign-v1'
 export const ProducerRevalidationActorSchema = z.object({
   id: z.string().min(3).max(200).regex(/^[A-Za-z0-9][A-Za-z0-9_.:@/-]*$/),
   role: z.enum(['campaign-author', 'key-administrator', 'inference-executor', 'scientific-reviewer']),
-  organization: z.string().min(1).max(200)
+  organization: NonEmptyStringSchema.max(200)
 }).strict()
 
 export const ProducerRevalidationKeySchema = z.object({
@@ -328,7 +321,7 @@ export const ProducerCampaignSpecificationSchema = z.object({
   impact_policy_id: RevalidationDigestSchema,
   work_ids: z.array(RevalidationDigestSchema).min(1).max(10000),
   requested_by: ProducerRevalidationActorSchema,
-  reason: z.string().min(1).max(4000)
+  reason: NonEmptyStringSchema.max(4000)
 }).strict()
 
 export const ProducerCampaignSubmissionSchema = z.object({
@@ -355,10 +348,10 @@ export const ProducerExecutionOutcomeSchema = ProducerExecutionOutcomeBaseSchema
   if (value.executor.role !== 'inference-executor') context.addIssue({ code: z.ZodIssueCode.custom, path: ['executor'], message: 'outcome executor role is invalid' })
 })
 
-const ProducerKeyActivationPayloadSchema = z.object({ action: z.literal('key-activated'), key: ProducerRevalidationKeySchema, effective_sequence: z.number().int().positive() }).strict()
-const ProducerKeyRotationPayloadSchema = z.object({ action: z.literal('key-rotated'), key: ProducerRevalidationKeySchema, retiring_key_id: RevalidationDigestSchema, effective_sequence: z.number().int().positive() }).strict()
-const ProducerKeyRetirementPayloadSchema = z.object({ action: z.literal('key-retired'), key_id: RevalidationDigestSchema, effective_sequence: z.number().int().positive() }).strict()
-const ProducerKeyRevocationPayloadSchema = z.object({ action: z.literal('key-revoked'), key_id: RevalidationDigestSchema, effective_sequence: z.number().int().positive() }).strict()
+const ProducerKeyActivationPayloadSchema = z.object({ action: z.literal('key-activated'), key: ProducerRevalidationKeySchema, effective_sequence: PositiveIntSchema }).strict()
+const ProducerKeyRotationPayloadSchema = z.object({ action: z.literal('key-rotated'), key: ProducerRevalidationKeySchema, retiring_key_id: RevalidationDigestSchema, effective_sequence: PositiveIntSchema }).strict()
+const ProducerKeyRetirementPayloadSchema = z.object({ action: z.literal('key-retired'), key_id: RevalidationDigestSchema, effective_sequence: PositiveIntSchema }).strict()
+const ProducerKeyRevocationPayloadSchema = z.object({ action: z.literal('key-revoked'), key_id: RevalidationDigestSchema, effective_sequence: PositiveIntSchema }).strict()
 const ProducerCampaignEventPayloadSchema = z.object({ action: z.literal('campaign-created'), campaign_id: RevalidationDigestSchema, plan_id: RevalidationDigestSchema }).strict()
 const ProducerOutcomeEventPayloadSchema = z.object({ action: z.literal('outcome-recorded'), campaign_id: RevalidationDigestSchema, work_id: RevalidationDigestSchema, outcome_id: RevalidationDigestSchema }).strict()
 const ProducerOutcomeLabelPayloadSchema = z.object({
@@ -381,11 +374,11 @@ export const ProducerRevalidationEventPayloadSchema = z.discriminatedUnion('acti
 
 export const ProducerSignedEventSchema = z.object({
   event_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
-  sequence: z.number().int().positive(),
+  sequence: PositiveIntSchema,
   previous_event_digest: RevalidationDigestSchema.nullable(),
-  occurred_at: z.string().datetime({ offset: true }),
+  occurred_at: OffsetDatetimeSchema,
   actor: ProducerRevalidationActorSchema,
-  reason: z.string().min(1).max(4000),
+  reason: NonEmptyStringSchema.max(4000),
   role_policy_id: RevalidationDigestSchema,
   signing_key_id: RevalidationDigestSchema,
   algorithm: z.literal('Ed25519'),
@@ -396,9 +389,9 @@ export const ProducerSignedEventSchema = z.object({
 
 export const ProducerEventPageSchema = z.object({
   page_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
-  head_sequence: z.number().int().nonnegative(),
+  head_sequence: NonNegativeIntSchema,
   head_digest: RevalidationDigestSchema.nullable(),
-  limit: z.number().int().min(1).max(100),
+  limit: PageLimitSchema,
   items: z.array(ProducerSignedEventSchema).max(100),
   next_cursor: z.string().nullable()
 }).strict()
@@ -409,15 +402,15 @@ export const ProducerPlanManifestSchema = z.object({
   change_set: NormalizedChangeSetSchema,
   impact_policy: ImpactPolicySchema,
   plan: ImpactPlanSchema.omit({ impacts: true, work_items: true }).extend({
-    impact_count: z.number().int().nonnegative().max(10000),
-    work_item_count: z.number().int().nonnegative().max(10000)
+    impact_count: NonNegativeIntSchema.max(10000),
+    work_item_count: NonNegativeIntSchema.max(10000)
   }).strict()
 }).strict()
 const ProducerPlanPageBaseSchema = z.object({
   page_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
   plan_id: RevalidationDigestSchema,
-  total: z.number().int().nonnegative().max(10000),
-  limit: z.number().int().min(1).max(100),
+  total: NonNegativeIntSchema.max(10000),
+  limit: PageLimitSchema,
   next_cursor: z.string().nullable()
 })
 export const ProducerPlanPageSchema = z.discriminatedUnion('collection', [
@@ -428,9 +421,9 @@ export const ProducerPlanPageSchema = z.discriminatedUnion('collection', [
 const ProducerStateKeySchema = z.object({
   key_id: RevalidationDigestSchema,
   algorithm: z.literal('Ed25519'),
-  active_from: z.number().int().positive(),
-  retired_from: z.number().int().positive().nullable(),
-  revoked_from: z.number().int().positive().nullable(),
+  active_from: PositiveIntSchema,
+  retired_from: PositiveIntSchema.nullable(),
+  revoked_from: PositiveIntSchema.nullable(),
   status: z.enum(['pending', 'active', 'retired', 'revoked'])
 }).strict()
 const ProducerStateOutcomeSchema = z.object({
@@ -447,7 +440,7 @@ const ProducerStateCampaignSchema = z.object({
 }).strict()
 export const ProducerStateSchema = z.object({
   state_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
-  head_sequence: z.number().int().nonnegative(),
+  head_sequence: NonNegativeIntSchema,
   head_digest: RevalidationDigestSchema.nullable(),
   keys: z.array(ProducerStateKeySchema).min(1),
   campaigns: z.array(ProducerStateCampaignSchema)
@@ -455,41 +448,41 @@ export const ProducerStateSchema = z.object({
 
 export const ProducerEventMetadataSchema = z.object({
   actor: ProducerRevalidationActorSchema,
-  reason: z.string().min(1).max(4000),
+  reason: NonEmptyStringSchema.max(4000),
   signing_key_id: RevalidationDigestSchema
 }).strict()
 export const ProducerCampaignWriteRequestSchema = z.object({ campaign: ProducerCampaignSubmissionSchema, event: ProducerEventMetadataSchema }).strict()
 export const ProducerOutcomeWriteRequestSchema = z.object({ outcome: ProducerExecutionOutcomeBaseSchema.omit({ outcome_id: true, outcome_schema_version: true }), event: ProducerEventMetadataSchema }).strict()
 export const ProducerOutcomeBatchWriteRequestSchema = z.object({ outcomes: z.array(ProducerExecutionOutcomeBaseSchema.omit({ outcome_id: true, outcome_schema_version: true })).min(1).max(100), event: ProducerEventMetadataSchema }).strict()
-export const ProducerCampaignReceiptSchema = z.object({ created: z.boolean(), campaign_id: RevalidationDigestSchema, event_sequence: z.number().int().positive(), event: ProducerSignedEventSchema }).strict()
-export const ProducerOutcomeReceiptSchema = z.object({ created: z.boolean(), outcome: ProducerExecutionOutcomeSchema, event_sequence: z.number().int().positive(), event: ProducerSignedEventSchema }).strict()
+export const ProducerCampaignReceiptSchema = z.object({ created: z.boolean(), campaign_id: RevalidationDigestSchema, event_sequence: PositiveIntSchema, event: ProducerSignedEventSchema }).strict()
+export const ProducerOutcomeReceiptSchema = z.object({ created: z.boolean(), outcome: ProducerExecutionOutcomeSchema, event_sequence: PositiveIntSchema, event: ProducerSignedEventSchema }).strict()
 export const ProducerOutcomeBatchReceiptSchema = z.array(ProducerOutcomeReceiptSchema).min(1).max(100)
-export const ProducerCampaignResponseSchema = ProducerCampaignSubmissionSchema.extend({ event_sequence: z.number().int().positive() }).strict()
+export const ProducerCampaignResponseSchema = ProducerCampaignSubmissionSchema.extend({ event_sequence: PositiveIntSchema }).strict()
 export const ProducerOutcomeResponseSchema = z.object({
   outcome: ProducerExecutionOutcomeSchema,
-  event_sequence: z.number().int().positive(),
+  event_sequence: PositiveIntSchema,
   scientific_label: z.enum(['supported-within-boundary', 'unsupported', 'not-evaluable', 'inconclusive']).nullable(),
-  label_sequence: z.number().int().positive().nullable()
+  label_sequence: PositiveIntSchema.nullable()
 }).strict()
 export const ProducerOutcomePageSchema = z.object({
   page_schema_version: z.literal(REVALIDATION_CONTRACT_VERSION),
   campaign_id: RevalidationDigestSchema,
-  head_sequence: z.number().int().nonnegative(),
+  head_sequence: NonNegativeIntSchema,
   head_digest: RevalidationDigestSchema.nullable(),
-  total: z.number().int().nonnegative().max(10000),
-  limit: z.number().int().min(1).max(100),
+  total: NonNegativeIntSchema.max(10000),
+  limit: PageLimitSchema,
   items: z.array(ProducerOutcomeResponseSchema).max(100),
   next_cursor: z.string().nullable()
 }).strict()
 
 export const RevalidationSyncRequestSchema = z.object({
   name: RevalidationSlugSchema.default('goal15-local-revalidation'),
-  reason: z.string().min(1).max(4000).default('Execute the pinned Goal 11 revalidation impact plan locally.')
+  reason: NonEmptyStringSchema.max(4000).default('Execute the pinned Goal 11 revalidation impact plan locally.')
 }).strict()
 export const RevalidationCampaignParamSchema = z.object({ campaignId: RevalidationDigestSchema }).strict()
 export const RevalidationWorkParamSchema = z.object({ campaignId: RevalidationDigestSchema, workId: RevalidationDigestSchema }).strict()
 
-export const RevalidationEventHeadSchema = z.object({ sequence: z.number().int().positive(), digest: RevalidationDigestSchema }).strict()
+export const RevalidationEventHeadSchema = z.object({ sequence: PositiveIntSchema, digest: RevalidationDigestSchema }).strict()
 export const RevalidationProducerBindingSchema = z.object({
   local_campaign_id: RevalidationDigestSchema,
   producer_campaign_id: RevalidationDigestSchema,
@@ -497,52 +490,52 @@ export const RevalidationProducerBindingSchema = z.object({
   campaign: ProducerCampaignResponseSchema,
   receipt: ProducerCampaignReceiptSchema,
   event_head: RevalidationEventHeadSchema,
-  submitted_outcomes: z.number().int().nonnegative()
+  submitted_outcomes: NonNegativeIntSchema
 }).strict()
 export const RevalidationProducerStoredReceiptSchema = z.object({
   request: ProducerOutcomeWriteRequestSchema,
   receipt: ProducerOutcomeReceiptSchema,
-  event_sequence: z.number().int().positive(),
+  event_sequence: PositiveIntSchema,
   event_digest: RevalidationDigestSchema
 }).strict()
 export const RevalidationCampaignSummarySchema = z.object({
-  total: z.number().int().nonnegative(),
-  queued: z.number().int().nonnegative(),
-  running: z.number().int().nonnegative(),
-  succeeded: z.number().int().nonnegative(),
-  failed: z.number().int().nonnegative(),
-  resource_exhausted: z.number().int().nonnegative(),
-  skipped: z.number().int().nonnegative(),
-  submitted: z.number().int().nonnegative()
+  total: NonNegativeIntSchema,
+  queued: NonNegativeIntSchema,
+  running: NonNegativeIntSchema,
+  succeeded: NonNegativeIntSchema,
+  failed: NonNegativeIntSchema,
+  resource_exhausted: NonNegativeIntSchema,
+  skipped: NonNegativeIntSchema,
+  submitted: NonNegativeIntSchema
 }).strict()
 export const RevalidationCampaignWorkViewSchema = z.object({
   work_id: RevalidationDigestSchema,
   campaign_id: RevalidationDigestSchema,
-  ordinal: z.number().int().nonnegative(),
+  ordinal: NonNegativeIntSchema,
   state: CampaignWorkStateSchema,
-  attempt_count: z.number().int().nonnegative(),
+  attempt_count: NonNegativeIntSchema,
   cancellation_requested: z.boolean(),
-  available_at: z.string().datetime({ offset: true }),
+  available_at: OffsetDatetimeSchema,
   current_attempt_id: RevalidationDigestSchema.nullable(),
   outcome: CampaignTerminalOutcomeSchema.nullable(),
   failure: CampaignFailureSchema.nullable(),
   accepted_result_id: RevalidationDigestSchema.nullable(),
-  completed_at: z.string().datetime({ offset: true }).nullable(),
+  completed_at: OffsetDatetimeSchema.nullable(),
   work: RevalidationWorkItemSchema,
   attempts: z.array(CampaignAttemptSchema),
-  checkpoint_count: z.number().int().nonnegative(),
+  checkpoint_count: NonNegativeIntSchema,
   impact: RevalidationImpactSchema,
   producer_receipt: RevalidationProducerStoredReceiptSchema.nullable()
 }).strict()
 export const RevalidationProjectionQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(50),
-  cursor: z.string().min(1).max(8192).optional()
+  limit: pageLimitQuerySchema(50),
+  cursor: NonEmptyStringSchema.max(8192).optional()
 }).strict()
 export const RevalidationCampaignProjectionSchema = z.object({
   projection_schema_version: z.literal('1.0.0'),
   snapshot_id: RevalidationDigestSchema,
-  total: z.number().int().nonnegative(),
-  limit: z.number().int().min(1).max(100),
+  total: NonNegativeIntSchema,
+  limit: PageLimitSchema,
   next_cursor: z.string().nullable()
 }).strict()
 export const RevalidationCampaignDetailSchema = z.object({
@@ -550,7 +543,7 @@ export const RevalidationCampaignDetailSchema = z.object({
   state: CampaignStateSchema,
   cancellation_requested: z.boolean(),
   producer: RevalidationProducerBindingSchema,
-  review: z.object({ required: z.boolean(), automatically_accepted: z.literal(false), labeled_outcomes: z.number().int().nonnegative() }).strict(),
+  review: z.object({ required: z.boolean(), automatically_accepted: z.literal(false), labeled_outcomes: NonNegativeIntSchema }).strict(),
   summary: RevalidationCampaignSummarySchema,
   projection: RevalidationCampaignProjectionSchema,
   work: z.array(RevalidationCampaignWorkViewSchema),
@@ -565,18 +558,18 @@ export const RevalidationIntegrationStatusSchema = z.object({
   mode: z.literal('producer-bound-local-revalidation'),
   producer_origin: z.string().url(),
   bootstrap_key_id: RevalidationDigestSchema,
-  campaigns: z.number().int().nonnegative(),
+  campaigns: NonNegativeIntSchema,
   last_error: z.string().nullable(),
   review_automatic_acceptance: z.literal(false)
 }).strict()
 export const RevalidationIntegritySchema = z.object({
   status: z.literal('valid'),
-  campaigns: z.number().int().nonnegative(),
-  accepted_results: z.number().int().nonnegative(),
+  campaigns: NonNegativeIntSchema,
+  accepted_results: NonNegativeIntSchema,
   producer: z.literal('valid'),
   event_heads: z.array(RevalidationEventHeadSchema)
 }).strict()
-const RevalidationCountRecordSchema = z.record(z.number().int().nonnegative())
+const RevalidationCountRecordSchema = z.record(NonNegativeIntSchema)
 export const RevalidationCampaignReportSchema = z.object({
   report_schema_version: z.literal('goal15-scale-acceptance-v1'),
   campaign_id: RevalidationDigestSchema,
@@ -584,12 +577,12 @@ export const RevalidationCampaignReportSchema = z.object({
     state: CampaignStateSchema,
     progress: RevalidationCampaignSummarySchema,
     selection: z.object({
-      direct: z.number().int().nonnegative(),
-      transitive: z.number().int().nonnegative(),
+      direct: NonNegativeIntSchema,
+      transitive: NonNegativeIntSchema,
       by_node_kind: RevalidationCountRecordSchema,
       by_action: RevalidationCountRecordSchema,
-      registration_negative_controls: z.number().int().nonnegative(),
-      registration_controls_selected: z.number().int().nonnegative(),
+      registration_negative_controls: NonNegativeIntSchema,
+      registration_controls_selected: NonNegativeIntSchema,
       all_and_only_verified: z.literal(true)
     }).strict(),
     resources: z.object({
@@ -598,35 +591,35 @@ export const RevalidationCampaignReportSchema = z.object({
       acceptance: z.object({ mode: z.enum(['isolated-worker', 'inline-evidence-only', 'mixed-or-unrecorded-evidence']), evidence_only: z.boolean() }).strict(),
       enforcement: z.object({
         cpu: z.object({ mode: z.literal('concurrency-ceiling'), cpu_time_limit_enforced: z.literal(false) }).strict(),
-        process_rss: z.object({ limit_bytes: z.number().int().positive(), enforced: z.boolean(), observed_peak_bytes: z.number().int().nonnegative() }).strict(),
-        runtime: z.object({ limit_ms: z.number().int().positive(), enforced: z.boolean(), observed_max_ms: z.number().int().nonnegative() }).strict(),
-        output: z.object({ limit_bytes: z.number().int().positive(), enforced: z.literal(true) }).strict(),
-        storage: z.object({ limit_bytes: z.number().int().nonnegative(), enforced: z.literal(true) }).strict()
+        process_rss: z.object({ limit_bytes: PositiveIntSchema, enforced: z.boolean(), observed_peak_bytes: NonNegativeIntSchema }).strict(),
+        runtime: z.object({ limit_ms: PositiveIntSchema, enforced: z.boolean(), observed_max_ms: NonNegativeIntSchema }).strict(),
+        output: z.object({ limit_bytes: PositiveIntSchema, enforced: z.literal(true) }).strict(),
+        storage: z.object({ limit_bytes: NonNegativeIntSchema, enforced: z.literal(true) }).strict()
       }).strict()
     }).strict(),
-    recovery: z.object({ attempts: z.number().int().nonnegative(), retries: z.number().int().nonnegative(), by_failure_code: RevalidationCountRecordSchema }).strict(),
+    recovery: z.object({ attempts: NonNegativeIntSchema, retries: NonNegativeIntSchema, by_failure_code: RevalidationCountRecordSchema }).strict(),
     accepted_results: z.object({
-      count: z.number().int().nonnegative(),
-      unique_work_ids: z.number().int().nonnegative(),
-      duplicate_work_ids: z.number().int().nonnegative(),
-      missing_successful_work_ids: z.number().int().nonnegative(),
-      unexpected_non_success_results: z.number().int().nonnegative(),
+      count: NonNegativeIntSchema,
+      unique_work_ids: NonNegativeIntSchema,
+      duplicate_work_ids: NonNegativeIntSchema,
+      missing_successful_work_ids: NonNegativeIntSchema,
+      unexpected_non_success_results: NonNegativeIntSchema,
       exactly_once: z.boolean()
     }).strict(),
     storage: z.object({
-      object_count: z.number().int().nonnegative(),
-      object_bytes: z.number().int().nonnegative(),
-      campaign_logical_bytes: z.number().int().nonnegative(),
-      campaign_limit_bytes: z.number().int().nonnegative(),
-      sqlite_bytes: z.number().int().nonnegative(),
-      wal_bytes: z.number().int().nonnegative()
+      object_count: NonNegativeIntSchema,
+      object_bytes: NonNegativeIntSchema,
+      campaign_logical_bytes: NonNegativeIntSchema,
+      campaign_limit_bytes: NonNegativeIntSchema,
+      sqlite_bytes: NonNegativeIntSchema,
+      wal_bytes: NonNegativeIntSchema
     }).strict(),
-    projection: z.object({ snapshot_id: RevalidationDigestSchema, total: z.number().int().nonnegative() }).strict()
+    projection: z.object({ snapshot_id: RevalidationDigestSchema, total: NonNegativeIntSchema }).strict()
   }).strict(),
   scientific_review: z.object({
     support: z.enum(['pending-technical-execution', 'unsupported']),
     review_required: z.boolean(),
     automatically_accepted: z.literal(false),
-    producer_labeled_outcomes: z.number().int().nonnegative()
+    producer_labeled_outcomes: NonNegativeIntSchema
   }).strict()
 }).strict()
