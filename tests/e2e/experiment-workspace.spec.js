@@ -6,7 +6,7 @@ import { workspaceSpecification } from '../fixtures/workspace.js'
 test('persists, runs, reports, and exports a controlled experiment', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Desktop workflow is covered separately from the mobile layout check')
   await page.goto('/#/workbench/full')
-  const workspace = page.locator('.experiment-workspace')
+  const workspace = page.getByRole('region', { name: 'Durable local research runs' })
   await expect(workspace.getByRole('heading', { name: 'Durable local research runs' })).toBeVisible()
   await workspace.getByLabel('Existing experiment').selectOption('')
   await workspace.getByLabel('Name').fill(`E2E workspace ${Date.now()}`)
@@ -18,7 +18,7 @@ test('persists, runs, reports, and exports a controlled experiment', async ({ pa
   const runResponse = page.waitForResponse((response) => response.url().endsWith('/api/v7/workspace/runs') && response.request().method() === 'POST')
   await workspace.getByRole('button', { name: 'Queue latest revision' }).click()
   expect((await runResponse).status()).toBe(202)
-  await expect(workspace.locator('.attempt-inspector .status-chip')).toHaveText('successful', { timeout: 20_000 })
+  await expect(workspace.getByRole('region', { name: 'Attempt inspector' }).getByText('successful', { exact: true })).toBeVisible({ timeout: 20_000 })
   await workspace.getByRole('button', { name: 'Generate offline report' }).click()
   await expect(workspace.getByText('Static offline report')).toBeVisible()
   await workspace.getByRole('button', { name: 'Export portable ZIP' }).click()
@@ -28,7 +28,7 @@ test('persists, runs, reports, and exports a controlled experiment', async ({ pa
 test('keeps the controlled experiment workflow within a mobile viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific workspace workflow')
   await page.goto('/#/workbench/full')
-  const workspace = page.locator('.experiment-workspace')
+  const workspace = page.getByRole('region', { name: 'Durable local research runs' })
   await expect(workspace.getByLabel('Portfolio design')).toBeVisible()
   await workspace.getByLabel('Existing experiment').selectOption('')
   await workspace.getByLabel('Portfolio design').selectOption('intervention-schedule')
@@ -49,7 +49,7 @@ test('imports an exact external model as inspectable, exportable, read-only stat
   const exported = await exportedResponse.json()
 
   await page.goto('/#/workbench/full')
-  const workspace = page.locator('.experiment-workspace')
+  const workspace = page.getByRole('region', { name: 'Durable local research runs' })
   await expect(workspace.getByText(/not in the exact local registry/)).toBeVisible()
   await workspace.locator('#workspace-import').setInputFiles({ name: exported.fileName, mimeType: 'application/zip', buffer: Buffer.from(exported.bundleBase64, 'base64') })
 

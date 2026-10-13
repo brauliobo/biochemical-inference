@@ -1,4 +1,4 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   cancelWorkspaceAttempt,
@@ -21,6 +21,13 @@ import {
   queueWorkspaceRun,
   restartWorkspaceCheckpoint
 } from '../api.js'
+import DataTable from './ui/DataTable.vue'
+import Field from './ui/Field.vue'
+import Panel from './ui/Panel.vue'
+
+const TONES = { ready: 'success', successful: 'success', failed: 'danger', 'resource-exhausted': 'danger', cancelled: 'warning' }
+const statusTone = (value) => TONES[value] ?? ''
+const statusClass = (value) => (statusTone(value) ? `badge--${statusTone(value)}` : '')
 
 const registryModels = ref([])
 const embeddedModels = ref([])
@@ -73,6 +80,7 @@ const latestRevision = computed(() => detail.value?.revisions.at(-1))
 const isReadOnly = computed(() => Boolean(latestRevision.value) && latestRevision.value.specification.entries.some((entry) => !isRegistryModel(entry.model)))
 const successfulAttempts = computed(() => history.value.items.filter((item) => item.attempt.outcome === 'successful' && item.attempt.resultArtifactId))
 const modelFilterIds = computed(() => [...new Set(models.value.map((item) => item.id))])
+const attemptStatus = computed(() => selectedAttempt.value?.attempt.outcome ?? selectedAttempt.value?.attempt.state ?? '')
 const historyStart = computed(() => history.value.total === 0 ? 0 : history.value.offset + 1)
 const historyEnd = computed(() => Math.min(history.value.offset + history.value.items.length, history.value.total))
 const interventionTargets = computed(() => {
@@ -426,197 +434,175 @@ onBeforeUnmount(() => {
 </script>
 
 <template lang="pug">
-section.experiment-workspace(aria-labelledby="experiment-workspace-title")
-  .section-heading
-    div
-      p.kicker Controlled experiment workspace
-      h2#experiment-workspace-title Durable local research runs
-    span.status-chip(:class="state" aria-live="polite") {{ state }}
-  p.workspace-intro Immutable specifications, distinct scientific and attempt identities, bounded child workers, exact specification restarts, content-addressed artifacts, and offline portable bundles.
-  .alert.error(v-if="state === 'failed'" role="alert") {{ message }}
-  .workspace-notice(v-else-if="message" role="status") {{ message }}
+Panel(title-id="experiment-workspace-title" title="Durable local research runs" eyebrow="Controlled experiment workspace" :status="state" :tone="statusTone(state)")
+  p.lede Immutable specifications, distinct scientific and attempt identities, bounded child workers, exact specification restarts, content-addressed artifacts, and offline portable bundles.
+  .notice.notice--danger(v-if="state === 'failed'" role="alert") {{ message }}
+  div(role="status")
+    p.notice(v-if="state !== 'failed' && message") {{ message }}
 
-  .experiment-grid(v-if="models.length")
-    form.experiment-editor(@submit.prevent="detail ? saveRevision() : createExperiment()")
-      h3 {{ detail ? 'Edit as a new revision' : 'Create experiment' }}
-      .workspace-notice(v-if="isReadOnly" role="note") This revision embeds a model that is not in the exact local registry. Its ID and digest remain inspectable and exportable, but revision and execution controls are read-only.
-      label(for="workspace-existing") Existing experiment
-      select#workspace-existing(:value="detail?.experiment.experimentId ?? ''" @change="selectExperiment($event.target.value)")
-        option(value="") New experiment
-        option(v-for="item in experiments" :key="item.experimentId" :value="item.experimentId") {{ item.name }}
-      label(for="workspace-name") Name
-      input#workspace-name(v-model="name" maxlength="160" required :disabled="isReadOnly")
-      label(for="workspace-description") Description
-      textarea#workspace-description(v-model="description" rows="3" maxlength="2000" :disabled="isReadOnly")
-      label(for="workspace-model") Portfolio model
-      select#workspace-model(v-model="modelKey" :disabled="isReadOnly" @change="chooseModel")
-        option(v-for="item in models" :key="exactModelKey(item)" :value="exactModelKey(item)") {{ item.name }} · {{ item.id }} · {{ item.digest }}{{ isRegistryModel(item) ? '' : ' · embedded external' }}
-      .experiment-inline
-        div
-          label(for="workspace-taxon") Taxon
-          select#workspace-taxon(v-model="taxonId" :disabled="isReadOnly")
-            option(value="NCBITaxon:9606") Human · NCBITaxon:9606
-            option(value="NCBITaxon:10090") Mouse · NCBITaxon:10090
-        div
-          label(for="workspace-tissue") Tissue CURIE (optional)
-          input#workspace-tissue(v-model="tissueId" placeholder="UBERON:0002107" :disabled="isReadOnly")
-      label(for="workspace-design") Portfolio design
-      select#workspace-design(v-model="design" :disabled="isReadOnly")
-        option(value="single") Single specification
-        option(value="ensemble") Seeded ensemble
-        option(value="intervention-schedule") Intervention schedule
-      template(v-if="design === 'ensemble'")
-        label(for="workspace-members") Ensemble members
-        input#workspace-members(v-model.number="ensembleMembers" type="number" min="2" max="8" :disabled="isReadOnly")
-      template(v-if="design === 'intervention-schedule'")
-        label(for="workspace-intervention-target") Assignment target
-        select#workspace-intervention-target(v-model="interventionTarget" :disabled="isReadOnly")
-          option(v-for="target in interventionTargets" :key="target.id" :value="target.id") {{ target.id }} · {{ target.unit.symbol }}
-        .experiment-inline
-          div
-            label(for="workspace-intervention-time") Time
-            input#workspace-intervention-time(v-model.number="interventionTime" type="number" min="0" :disabled="isReadOnly || model.engine.type === 'fba'")
-          div
-            label(for="workspace-intervention-value") Assigned value
-            input#workspace-intervention-value(v-model.number="interventionValue" type="number" min="0" :disabled="isReadOnly")
-      .experiment-inline
-        div(v-if="model.engine.type !== 'fba'")
-          label(for="workspace-duration") Duration (s)
-          input#workspace-duration(v-model.number="duration" type="number" min="1" max="100000" :disabled="isReadOnly")
-        div
-          label(for="workspace-seed") Seed
-          input#workspace-seed(v-model.number="seed" type="number" min="0" max="4294967295" :disabled="isReadOnly")
-      label(for="workspace-contract") Rerun contract
-      select#workspace-contract(v-model="numericalKind" :disabled="isReadOnly")
-        option(value="exact") Exact canonical result
-        option(value="tolerance") Absolute + relative tolerance
-      .experiment-inline(v-if="numericalKind === 'tolerance'")
-        div
-          label(for="workspace-absolute") Absolute tolerance
-          input#workspace-absolute(v-model.number="absoluteTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
-        div
-          label(for="workspace-relative") Relative tolerance
-          input#workspace-relative(v-model.number="relativeTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
-      label(for="workspace-profile") Resource profile
-      select#workspace-profile(v-model="resourceProfileId" :disabled="isReadOnly")
-        option(v-for="item in profiles" :key="item.id" :value="item.id") {{ item.name }} · {{ item.concurrency }} workers · {{ item.memoryMb }} MB
-      button.run-button(type="submit" :disabled="state === 'saving' || isReadOnly")
-        span {{ detail ? 'Create immutable revision' : 'Create experiment' }}
-        span.arrow(aria-hidden="true") →
+  .grid(v-if="models.length")
+    Panel(title-id="workspace-editor-title" :title="detail ? 'Edit as a new revision' : 'Create experiment'" :level="3")
+      form.stack(@submit.prevent="detail ? saveRevision() : createExperiment()")
+        p.notice.notice--warning(v-if="isReadOnly" role="note") This revision embeds a model that is not in the exact local registry. Its ID and digest remain inspectable and exportable, but revision and execution controls are read-only.
+        Field(id="workspace-existing" label="Existing experiment")
+          select#workspace-existing(:value="detail?.experiment.experimentId ?? ''" @change="selectExperiment($event.target.value)")
+            option(value="") New experiment
+            option(v-for="item in experiments" :key="item.experimentId" :value="item.experimentId") {{ item.name }}
+        Field(id="workspace-name" label="Name")
+          input#workspace-name(v-model="name" maxlength="160" required :disabled="isReadOnly")
+        Field(id="workspace-description" label="Description")
+          textarea#workspace-description(v-model="description" rows="3" maxlength="2000" :disabled="isReadOnly")
+        Field(id="workspace-model" label="Portfolio model")
+          select#workspace-model(v-model="modelKey" :disabled="isReadOnly" @change="chooseModel")
+            option(v-for="item in models" :key="exactModelKey(item)" :value="exactModelKey(item)") {{ item.name }} · {{ item.id }} · {{ item.digest }}{{ isRegistryModel(item) ? '' : ' · embedded external' }}
+        .grid
+          Field(id="workspace-taxon" label="Taxon")
+            select#workspace-taxon(v-model="taxonId" :disabled="isReadOnly")
+              option(value="NCBITaxon:9606") Human · NCBITaxon:9606
+              option(value="NCBITaxon:10090") Mouse · NCBITaxon:10090
+          Field(id="workspace-tissue" label="Tissue CURIE (optional)")
+            input#workspace-tissue(v-model="tissueId" placeholder="UBERON:0002107" :disabled="isReadOnly")
+        Field(id="workspace-design" label="Portfolio design")
+          select#workspace-design(v-model="design" :disabled="isReadOnly")
+            option(value="single") Single specification
+            option(value="ensemble") Seeded ensemble
+            option(value="intervention-schedule") Intervention schedule
+        Field(v-if="design === 'ensemble'" id="workspace-members" label="Ensemble members")
+          input#workspace-members(v-model.number="ensembleMembers" type="number" min="2" max="8" :disabled="isReadOnly")
+        template(v-if="design === 'intervention-schedule'")
+          Field(id="workspace-intervention-target" label="Assignment target")
+            select#workspace-intervention-target(v-model="interventionTarget" :disabled="isReadOnly")
+              option(v-for="target in interventionTargets" :key="target.id" :value="target.id") {{ target.id }} · {{ target.unit.symbol }}
+          .grid
+            Field(id="workspace-intervention-time" label="Time")
+              input#workspace-intervention-time(v-model.number="interventionTime" type="number" min="0" :disabled="isReadOnly || model.engine.type === 'fba'")
+            Field(id="workspace-intervention-value" label="Assigned value")
+              input#workspace-intervention-value(v-model.number="interventionValue" type="number" min="0" :disabled="isReadOnly")
+        .grid
+          Field(v-if="model.engine.type !== 'fba'" id="workspace-duration" label="Duration (s)")
+            input#workspace-duration(v-model.number="duration" type="number" min="1" max="100000" :disabled="isReadOnly")
+          Field(id="workspace-seed" label="Seed")
+            input#workspace-seed(v-model.number="seed" type="number" min="0" max="4294967295" :disabled="isReadOnly")
+        Field(id="workspace-contract" label="Rerun contract")
+          select#workspace-contract(v-model="numericalKind" :disabled="isReadOnly")
+            option(value="exact") Exact canonical result
+            option(value="tolerance") Absolute + relative tolerance
+        .grid(v-if="numericalKind === 'tolerance'")
+          Field(id="workspace-absolute" label="Absolute tolerance")
+            input#workspace-absolute(v-model.number="absoluteTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
+          Field(id="workspace-relative" label="Relative tolerance")
+            input#workspace-relative(v-model.number="relativeTolerance" type="number" min="0" step="any" :disabled="isReadOnly")
+        Field(id="workspace-profile" label="Resource profile")
+          select#workspace-profile(v-model="resourceProfileId" :disabled="isReadOnly")
+            option(v-for="item in profiles" :key="item.id" :value="item.id") {{ item.name }} · {{ item.concurrency }} workers · {{ item.memoryMb }} MB
+        button.button(type="submit" :disabled="state === 'saving' || isReadOnly") {{ detail ? 'Create immutable revision' : 'Create experiment' }}
 
-    .experiment-ledger
-      h3 Revision ledger
+    Panel(title-id="workspace-ledger-title" title="Revision ledger" :level="3")
       template(v-if="detail")
         p {{ detail.experiment.name }} · {{ detail.revisions.length }} immutable revision{{ detail.revisions.length === 1 ? '' : 's' }}
-        ol.revision-list
-          li(v-for="revision in detail.revisions" :key="revision.revisionId")
+        ol.plain-list.stack.stack--tight
+          li.card.stack.stack--tight(v-for="revision in detail.revisions" :key="revision.revisionId")
             strong Revision {{ revision.ordinal }} · {{ revision.source }}
-            code {{ revision.specificationDigest }}
-            span Snapshot {{ revision.snapshotDigest }}
-            span(v-for="entry in revision.specification.entries" :key="`${entry.model.id}-${entry.model.digest}`") Model {{ entry.model.id }} · {{ entry.model.digest }}
-        .experiment-actions
-          button.run-button(type="button" :disabled="isReadOnly" @click="queueRun") Queue latest revision
-          button.secondary(type="button" :disabled="isReadOnly" @click="cloneExperiment") Clone experiment
-          button.secondary(type="button" @click="exportExperiment") Export portable ZIP
-          label.import-button(for="workspace-import") Import portable ZIP
-          input#workspace-import.visually-hidden(type="file" accept=".zip,application/zip" @change="importExperiment")
-          a.secondary(v-if="exportHref" :href="exportHref" :download="exportName") Download {{ exportName }}
-      .workspace-empty(v-else)
-        strong No persisted experiment selected
-        p Configure the form to create the first immutable revision, or import a verified portable ZIP.
-        label.import-button(for="workspace-import-empty") Import portable ZIP
-        input#workspace-import-empty.visually-hidden(type="file" accept=".zip,application/zip" @change="importExperiment")
+            p
+              code {{ revision.specificationDigest }}
+            p Snapshot {{ revision.snapshotDigest }}
+            p(v-for="entry in revision.specification.entries" :key="`${entry.model.id}-${entry.model.digest}`") Model {{ entry.model.id }} · {{ entry.model.digest }}
+        .cluster
+          button.button(type="button" :disabled="isReadOnly" @click="queueRun") Queue latest revision
+          button.button.button--secondary(type="button" :disabled="isReadOnly" @click="cloneExperiment") Clone experiment
+          button.button.button--secondary(type="button" @click="exportExperiment") Export portable ZIP
+          a.button.button--secondary(v-if="exportHref" :href="exportHref" :download="exportName") Download {{ exportName }}
+        Field(id="workspace-import" label="Import portable ZIP")
+          input#workspace-import(type="file" accept=".zip,application/zip" @change="importExperiment")
+      template(v-else)
+        .stack.stack--tight
+          strong No persisted experiment selected
+          p Configure the form to create the first immutable revision, or import a verified portable ZIP.
+        Field(id="workspace-import-empty" label="Import portable ZIP")
+          input#workspace-import-empty(type="file" accept=".zip,application/zip" @change="importExperiment")
 
-  .history-panel
-    .history-heading
+  Panel(title-id="workspace-history-title" title="Queue and searchable history" :level="3")
+    template(v-slot:actions)
+      button.button.button--secondary(type="button" @click="refreshHistory(true)") Refresh
+    p.muted {{ history.total }} attempt{{ history.total === 1 ? '' : 's' }}. Filters apply to immutable revision metadata.
+    form.stack(aria-label="History filters" @submit.prevent="refreshHistory(true)")
+      .grid
+        Field(id="history-status" label="Status")
+          select#history-status(v-model="filters.status")
+            option(value="") All
+            option(value="queued") Queued
+            option(value="running") Running
+            option(value="successful") Successful
+            option(value="failed") Failed
+            option(value="resource-exhausted") Resource exhausted
+            option(value="cancelled") Cancelled
+        Field(id="history-model" label="Model")
+          select#history-model(v-model="filters.model")
+            option(value="") All
+            option(v-for="id in modelFilterIds" :key="id" :value="id") {{ id }}
+        Field(id="history-taxon" label="Taxon")
+          select#history-taxon(v-model="filters.taxon")
+            option(value="") All
+            option(value="NCBITaxon:9606") Human
+            option(value="NCBITaxon:10090") Mouse
+        Field(id="history-tissue" label="Tissue")
+          input#history-tissue(v-model="filters.tissue" placeholder="UBERON:...")
+        Field(id="history-release" label="Release")
+          input#history-release(v-model="filters.release" placeholder="release id")
       div
-        h3 Queue and searchable history
-        p {{ history.total }} attempt{{ history.total === 1 ? '' : 's' }}. Filters apply to immutable revision metadata.
-      button.secondary(type="button" @click="refreshHistory") Refresh
-    form.history-filters(@submit.prevent="refreshHistory(true)")
-      label(for="history-status") Status
-      select#history-status(v-model="filters.status")
-        option(value="") All
-        option(value="queued") Queued
-        option(value="running") Running
-        option(value="successful") Successful
-        option(value="failed") Failed
-        option(value="resource-exhausted") Resource exhausted
-        option(value="cancelled") Cancelled
-      label(for="history-model") Model
-      select#history-model(v-model="filters.model")
-        option(value="") All
-        option(v-for="id in modelFilterIds" :key="id" :value="id") {{ id }}
-      label(for="history-taxon") Taxon
-      select#history-taxon(v-model="filters.taxon")
-        option(value="") All
-        option(value="NCBITaxon:9606") Human
-        option(value="NCBITaxon:10090") Mouse
-      label(for="history-tissue") Tissue
-      input#history-tissue(v-model="filters.tissue" placeholder="UBERON:...")
-      label(for="history-release") Release
-      input#history-release(v-model="filters.release" placeholder="release id")
-      button.secondary(type="submit") Apply filters
-    .history-table-wrap
-      table
-        caption Durable run attempts
-        thead
-          tr
-            th(scope="col") Experiment
-            th(scope="col") Attempt
-            th(scope="col") Kind
-            th(scope="col") State / outcome
-            th(scope="col") Context
-        tbody
-          tr(v-for="item in history.items" :key="item.attempt.attemptId")
-            th(scope="row")
-              button.table-select(type="button" @click="inspectAttempt(item.attempt.attemptId)") {{ item.experimentName }}
-            td
-              code {{ item.attempt.attemptId }}
-            td {{ item.attempt.kind }}{{ item.attempt.restartMode ? ' · from specification' : '' }}
-            td
-              span.status-chip(:class="item.attempt.outcome ?? item.attempt.state") {{ item.attempt.outcome ?? item.attempt.state }}
-            td {{ item.taxonId }}{{ item.tissueId ? ` · ${item.tissueId}` : '' }}
-          tr(v-if="history.items.length === 0")
-            td(colspan="5") No attempts match these filters.
-    .history-heading(aria-label="History pagination")
-      p Showing {{ historyStart }}–{{ historyEnd }} of {{ history.total }}
-      .experiment-actions
-        button.secondary(type="button" :disabled="history.offset === 0" @click="previousHistoryPage") Previous page
-        button.secondary(type="button" :disabled="history.offset + history.items.length >= history.total" @click="nextHistoryPage") Next page
+        button.button.button--secondary(type="submit") Apply filters
+    DataTable(caption="Durable run attempts" :columns="['Experiment', 'Attempt', 'Kind', 'State / outcome', 'Context']" :count="history.items.length" empty-text="No attempts match these filters.")
+      tr(v-for="item in history.items" :key="item.attempt.attemptId")
+        th(scope="row")
+          button.button.button--link(type="button" @click="inspectAttempt(item.attempt.attemptId)") {{ item.experimentName }}
+        td
+          code {{ item.attempt.attemptId }}
+        td {{ item.attempt.kind }}{{ item.attempt.restartMode ? ' · from specification' : '' }}
+        td
+          span.badge(:class="statusClass(item.attempt.outcome ?? item.attempt.state)") {{ item.attempt.outcome ?? item.attempt.state }}
+        td {{ item.taxonId }}{{ item.tissueId ? ` · ${item.tissueId}` : '' }}
+    nav.repel(aria-label="History pagination")
+      p {{ `Showing ${historyStart}–${historyEnd} of ${history.total}` }}
+      .cluster
+        button.button.button--secondary(type="button" :disabled="history.offset === 0" @click="previousHistoryPage") Previous page
+        button.button.button--secondary(type="button" :disabled="history.offset + history.items.length >= history.total" @click="nextHistoryPage") Next page
 
-  article.attempt-inspector(v-if="selectedAttempt" aria-labelledby="attempt-title")
-    .run-header
+  Panel(v-if="selectedAttempt" title-id="attempt-title" title="Attempt inspector" :level="3" :status="attemptStatus" :tone="statusTone(attemptStatus)")
+    dl.facts
       div
-        span.run-label#attempt-title Attempt identity
-        code {{ selectedAttempt.attempt.attemptId }}
-        span.run-label Scientific identity
-        code {{ selectedAttempt.attempt.runId }}
-      span.status-chip(:class="selectedAttempt.attempt.outcome ?? selectedAttempt.attempt.state") {{ selectedAttempt.attempt.outcome ?? selectedAttempt.attempt.state }}
-    p.restart-boundary(v-if="selectedAttempt.attempt.kind === 'restart'") Restarted from the exact specification. This is not stateful continuation.
-    .attempt-actions
-      button.secondary(v-if="selectedAttempt.attempt.state !== 'terminal'" type="button" @click="cancelAttempt") Cancel attempt
-      button.secondary(v-else type="button" @click="restartAttempt") Restart from specification
-      button.secondary(v-if="selectedAttempt.attempt.resultArtifactId" type="button" @click="generateReport") Generate offline report
-      button.secondary(v-if="successfulAttempts.length >= 2" type="button" @click="compareLatest") Compare latest successful attempts
-    .attempt-columns
-      section
-        h3 Events
-        ol.event-list
+        dt Attempt identity
+        dd
+          code {{ selectedAttempt.attempt.attemptId }}
+      div
+        dt Scientific identity
+        dd
+          code {{ selectedAttempt.attempt.runId }}
+    p.notice.notice--warning(v-if="selectedAttempt.attempt.kind === 'restart'" role="note") Restarted from the exact specification. This is not stateful continuation.
+    .cluster
+      button.button.button--secondary(v-if="selectedAttempt.attempt.state !== 'terminal'" type="button" @click="cancelAttempt") Cancel attempt
+      button.button.button--secondary(v-else type="button" @click="restartAttempt") Restart from specification
+      button.button.button--secondary(v-if="selectedAttempt.attempt.resultArtifactId" type="button" @click="generateReport") Generate offline report
+      button.button.button--secondary(v-if="successfulAttempts.length >= 2" type="button" @click="compareLatest") Compare latest successful attempts
+    .grid
+      .stack.stack--tight
+        h4 Events
+        ol.plain-list.stack.stack--tight
           li(v-for="event in events" :key="event.eventId")
             strong {{ event.sequence }} · {{ event.type }}
-            time {{ event.at }}
-      section
-        h3 Artifacts
-        ul.artifact-list
+            |
+            time(:datetime="event.at") {{ event.at }}
+      .stack.stack--tight
+        h4 Artifacts
+        ul.plain-list.stack.stack--tight
           li(v-for="artifact in artifacts" :key="artifact.artifactId")
             a(:href="`/api/v7/workspace/artifacts/${encodeURIComponent(artifact.artifactId)}`") {{ artifact.name }}
+            |
             span {{ artifact.bytes }} bytes · {{ artifact.digest }}
         p(v-if="artifacts.length === 0") No artifact has been atomically published.
-    .comparison-result(v-if="comparison")
+    .notice(v-if="comparison" role="status")
       strong Comparison {{ comparison.status }}
       p {{ comparison.specificationChanged ? 'Specifications changed.' : 'Specifications are identical.' }} {{ comparison.differences.length }} numeric difference{{ comparison.differences.length === 1 ? '' : 's' }} recorded.
-    .report-links(v-if="report")
+    .cluster(v-if="report")
       strong Static offline report
       a(v-for="format in ['html', 'json', 'csv', 'svg']" :key="format" :href="`/api/v7/workspace/reports/${encodeURIComponent(report.reportId)}/files/${format}`" target="_blank" rel="noreferrer") {{ format.toUpperCase() }}
 </template>

@@ -180,3 +180,134 @@ a.card:hover { border-color: var(--color-accent); }
   padding: 0;
   list-style: none;
 }
+
+/* ---- Button link: a button that reads as a link (table rows, result titles) ---- */
+.button--link {
+  justify-content: flex-start;
+  padding-inline: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-link);
+  text-align: start;
+  text-decoration: underline;
+}
+.button--link:hover { background: transparent; color: var(--color-link-hover); }
+
+/* ---- Toggle card: a <button class="card" aria-pressed> that selects one option ---- */
+button.card {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  justify-items: start;
+  inline-size: 100%;
+  text-align: start;
+  cursor: pointer;
+}
+button.card:hover:not(:disabled) { border-color: var(--color-accent); }
+button.card[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-inline-start-width: var(--border-width-accent);
+}
+
+/* Nested cards sit flat inside a card and use smaller headings. */
+.card .card {
+  background: var(--color-surface);
+  box-shadow: none;
+  overflow-wrap: anywhere; /* digests and identifiers in plain text */
+}
+.card .card :is(h2, h3) { font-size: var(--text-h4); }
+
+/* ---- Panel (ui/Panel.vue): a titled card that spans the full row of a parent grid ---- */
+.panel { grid-column: 1 / -1; min-inline-size: 0; }
+.panel .panel { grid-column: auto; block-size: auto; }
+
+/* A persistent live region (role="status") that is empty must not add a gap. */
+.stack > [role="status"]:empty { margin-block-start: 0; }
+
+/* ---- Field (ui/Field.vue): label, control, hint ---- */
+.field {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  align-content: start;
+  min-inline-size: 0;
+}
+.field :is(input:not([type="checkbox"], [type="radio"]), select, textarea) { inline-size: 100%; }
+.field--inline {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-cluster);
+  min-block-size: var(--target-min);
+}
+.field--inline small { grid-column: 2; }
+fieldset { min-inline-size: 0; }
+
+/* ---- Data table (ui/DataTable.vue): a scrollable, keyboard-reachable table ---- */
+.data-table {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+/* Narrower than this the wrapper scrolls instead of crushing the columns. */
+.data-table table { min-inline-size: calc(var(--grid-min) * 2); }
+.data-table caption { padding-inline: var(--space-inset); color: var(--color-text-muted); }
+.data-table thead th {
+  background: var(--color-surface-sunken);
+  font-size: var(--text-small);
+}
+.data-table tbody tr:last-child :is(th, td) { border-block-end: 0; }
+.data-table tr[aria-current="true"] { background: var(--color-selection); }
+
+/* ---- Facts: a definition list as a grid of labelled values ---- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min)), 1fr));
+  gap: var(--space-cluster);
+}
+.facts > div {
+  min-inline-size: 0;
+  padding: var(--space-inset-tight) var(--space-inset);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-sunken);
+}
+.facts dt { color: var(--color-text-muted); font-size: var(--text-small); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.facts dd code { display: block; color: var(--color-text-muted); }
+/* One label/value pair per row, value at the end. */
+.facts--rows { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.facts--rows > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  padding-inline: 0;
+  border: 0;
+  border-block-end: var(--border-width) solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+.facts--rows dd { text-align: end; }
+
+/* ---- Heatmap: a row of selectable bins, each with a bar scaled by --heat (0 to 1) ---- */
+.heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--target-min), 1fr));
+  gap: var(--space-cluster-tight);
+}
+.heatmap > button {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  justify-items: center;
+  padding-inline: var(--space-cluster-tight);
+}
+.heatmap > button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-width: var(--border-width-accent);
+}
+.heatmap__bar {
+  --heat: 0;
+  display: block;
+  inline-size: calc(var(--heat) * 100%);
+  block-size: var(--space-inset-tight);
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-border);
+}

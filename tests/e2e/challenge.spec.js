@@ -43,7 +43,7 @@ test('accepts the real isolated Goal 13 workflow on desktop and mobile', async (
   }))
   await page.goto('/#/workbench/full')
 
-  const workbench = page.locator('.challenge-workbench')
+  const workbench = page.getByRole('region', { name: 'Frozen APAP challenge workbench' })
   await expect(workbench.getByRole('heading', { name: 'Frozen APAP challenge workbench' })).toBeVisible()
   await expect(page.getByText('Goal 1 intentionally unavailable during Goal 13 acceptance.')).toBeVisible()
 

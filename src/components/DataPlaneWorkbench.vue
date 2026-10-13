@@ -1,4 +1,4 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   loadAuthorityClosureAudit,
@@ -12,6 +12,12 @@ import {
   runAuthorityClosureAudit,
   syncDataPlane
 } from '../api.js'
+import DataTable from './ui/DataTable.vue'
+import Field from './ui/Field.vue'
+import Panel from './ui/Panel.vue'
+
+const TONES = { ready: 'success', valid: 'success', failed: 'danger' }
+const statusTone = (value) => TONES[value] ?? ''
 
 const RECORD_TYPES = ['taxa', 'compounds', 'reactions', 'proteins', 'references', 'catalysis', 'limitations']
 const discovery = ref()
@@ -227,199 +233,183 @@ onBeforeUnmount(() => {
 </script>
 
 <template lang="pug">
-section.data-plane-panel(aria-labelledby="data-plane-title")
-  .section-heading
-    div
-      p.kicker 11 · Authoritative local data
-      h2#data-plane-title Data plane workbench
-    .data-plane-state
-      span.offline-badge Local / offline reads
-      span.status-chip(:class="status?.state ?? 'empty'") {{ status?.state ?? 'empty' }}
+Panel(title-id="data-plane-title" title="Data plane workbench" eyebrow="11 · Authoritative local data" :status="status?.state ?? 'empty'" :tone="statusTone(status?.state)")
+  template(v-slot:actions)
+    span.badge Local / offline reads
+  p.lede Explicit sync is the only upstream operation. Publication atomically binds both signed releases and their pinned cross-release difference; all subsequent records and audits are read from the verified local closure.
+  p.visually-hidden(role="status" aria-atomic="true") {{ liveMessage }}
 
-  p.data-plane-intro Explicit sync is the only upstream operation. Publication atomically binds both signed releases and their pinned cross-release difference; all subsequent records and audits are read from the verified local closure.
-  p.sr-only(aria-live="polite" aria-atomic="true") {{ liveMessage }}
+  .cluster
+    button.button(type="button" :disabled="status?.state === 'syncing' || pageBusy || auditBusy" @click="synchronize") {{ status?.state === 'syncing' ? 'Verifying release pair…' : status?.release ? 'Re-verify release pair' : 'Sync release pair' }}
+    span.muted(v-if="status?.lastSyncAt") Last verified {{ status.lastSyncAt }}
 
-  .data-plane-actions
-    button.run-button(type="button" :disabled="status?.state === 'syncing' || pageBusy || auditBusy" @click="synchronize")
-      span {{ status?.state === 'syncing' ? 'Verifying release pair…' : status?.release ? 'Re-verify release pair' : 'Sync release pair' }}
-      span.arrow(aria-hidden="true") →
-    span(v-if="status?.lastSyncAt") Last verified {{ status.lastSyncAt }}
-
-  .data-plane-empty(v-if="status?.state === 'empty' && !status.release" role="status")
-    strong Empty local mirror
-    p No release is readable yet. Sync explicitly to stage and verify both signed snapshots, every partition and cursor page, and their semantic difference before publication.
-  .data-plane-loading(v-if="status?.state === 'syncing'" aria-live="polite") Staging trust, signed metadata, exact partitions, producer pages, and cross-release difference. No partial generation is visible.
-  .alert.error(v-if="error || status?.state === 'failed'" role="alert")
+  div(role="status")
+    .notice.stack.stack--tight(v-if="status?.state === 'empty' && !status.release")
+      strong Empty local mirror
+      p No release is readable yet. Sync explicitly to stage and verify both signed snapshots, every partition and cursor page, and their semantic difference before publication.
+    p.notice(v-if="status?.state === 'syncing'") Staging trust, signed metadata, exact partitions, producer pages, and cross-release difference. No partial generation is visible.
+  .notice.notice--danger.stack.stack--tight(v-if="error || status?.state === 'failed'" role="alert")
     strong Sync, audit, or integrity verification failed
     p {{ error || status?.lastError }}
     p(v-if="status?.release") The previously published immutable release pair remains identified below; no unverified replacement was published.
 
   template(v-if="discovery")
-    .pin-ledger(aria-label="Independent data-plane pins")
-      article
-        span Baseline release
-        strong {{ discovery.pins.baseline.releaseId }}
-        code {{ discovery.pins.baseline.releaseDigest }}
-        small {{ discovery.pins.baseline.signerKeyId }}
-      article
-        span Candidate / active release
-        strong {{ discovery.pins.candidate.releaseId }}
-        code {{ discovery.pins.candidate.releaseDigest }}
-        small {{ discovery.pins.candidate.signerKeyId }}
-      article
-        span Signed catalog / trust
-        code {{ discovery.pins.catalogDigest }}
-        code {{ discovery.pins.trustDigest }}
-      article
-        span Rotated Ed25519 keys
-        strong {{ discovery.pins.historicalKey.keyId }} · {{ discovery.pins.historicalKey.status }}
-        code {{ discovery.pins.historicalKey.publicKey }}
-        strong {{ discovery.pins.activeKey.keyId }} · {{ discovery.pins.activeKey.status }}
-        code {{ discovery.pins.activeKey.publicKey }}
+    Panel(title-id="data-plane-pins-title" title="Independent data-plane pins" :level="3")
+      dl.facts
+        div
+          dt Baseline release
+          dd
+            strong {{ discovery.pins.baseline.releaseId }}
+            code {{ discovery.pins.baseline.releaseDigest }}
+            small.muted {{ discovery.pins.baseline.signerKeyId }}
+        div
+          dt Candidate / active release
+          dd
+            strong {{ discovery.pins.candidate.releaseId }}
+            code {{ discovery.pins.candidate.releaseDigest }}
+            small.muted {{ discovery.pins.candidate.signerKeyId }}
+        div
+          dt Signed catalog / trust
+          dd
+            code {{ discovery.pins.catalogDigest }}
+            code {{ discovery.pins.trustDigest }}
+        div
+          dt Rotated Ed25519 keys
+          dd
+            strong {{ discovery.pins.historicalKey.keyId }} · {{ discovery.pins.historicalKey.status }}
+            code {{ discovery.pins.historicalKey.publicKey }}
+            strong {{ discovery.pins.activeKey.keyId }} · {{ discovery.pins.activeKey.status }}
+            code {{ discovery.pins.activeKey.publicKey }}
 
   template(v-if="detail")
-    .release-ledger(aria-label="Locally published releases")
-      article(v-for="item in releases" :key="item.release.id" :class="{ active: item.active }")
-        span {{ item.active ? 'Active candidate' : 'Readable baseline' }}
-        strong {{ item.release.id }}
-        code {{ item.release.digest }}
-        small {{ item.signerKeyId }} · signed {{ item.signedAt }}
+    Panel(title-id="data-plane-releases-title" title="Locally published releases" :level="3")
+      dl.facts
+        div(v-for="item in releases" :key="item.release.id")
+          dt {{ item.active ? 'Active candidate' : 'Readable baseline' }}
+          dd
+            strong {{ item.release.id }}
+            code {{ item.release.digest }}
+            small.muted {{ item.signerKeyId }} · signed {{ item.signedAt }}
 
-    .local-generation
-      .generation-heading
-        div
-          p.kicker Active immutable generation
-          h3 {{ detail.release.id }}
-        span.integrity-badge(:class="integrity?.status") Integrity {{ integrity?.status ?? status?.integrity }}
-      dl.provenance-grid
+    Panel(title-id="data-plane-generation-title" :title="detail.release.id" eyebrow="Active immutable generation" :level="3" :status="`Integrity ${integrity?.status ?? status?.integrity ?? 'unchecked'}`" :tone="statusTone(integrity?.status ?? status?.integrity)")
+      dl.facts
         div
           dt Release / schema
-          dd.digest {{ detail.release.digest }}
-          span {{ detail.manifest.manifest_schema_version }} manifest · {{ detail.envelope.envelope_schema_version }} envelope
+          dd {{ detail.release.digest }}
+          dd {{ detail.manifest.manifest_schema_version }} manifest · {{ detail.envelope.envelope_schema_version }} envelope
         div
           dt Verified signer / time
           dd {{ detail.signer.keyId }} · {{ detail.signer.status }}
-          span {{ detail.signer.algorithm }} · {{ detail.signer.signedAt }}
+          dd {{ detail.signer.algorithm }} · {{ detail.signer.signedAt }}
         div
           dt Manifest / envelope bytes
-          dd.digest {{ detail.manifestDigest }}
-          span.digest {{ detail.envelopeDigest }}
+          dd {{ detail.manifestDigest }}
+          dd {{ detail.envelopeDigest }}
         div
           dt Recipe / source lock
           dd {{ detail.envelope.payload.recipe_path }}
-          span.digest {{ detail.envelope.payload.recipe_sha256 }}
+          dd {{ detail.envelope.payload.recipe_sha256 }}
           dd {{ detail.envelope.payload.source_lock_path }}
-          span.digest {{ detail.envelope.payload.source_lock_sha256 }}
+          dd {{ detail.envelope.payload.source_lock_sha256 }}
 
-    .partition-ledger
-      .source-ledger-heading
-        div
-          p.kicker Exact partition closure
-          h3 Digest, count, bytes, and ID bounds
-        span {{ partitions.length }} immutable partitions
-      article(v-for="partition in partitions" :key="partition.path")
-        strong {{ partition.path }}
-        code {{ partition.sha256 }}
-        small {{ partition.record_count }} records · {{ partition.bytes }} bytes · {{ partition.first_id }} → {{ partition.last_id }}
+    Panel(title-id="data-plane-partitions-title" title="Digest, count, bytes, and ID bounds" eyebrow="Exact partition closure" :level="3")
+      template(v-slot:actions)
+        span.muted {{ partitions.length }} immutable partitions
+      dl.facts
+        div(v-for="partition in partitions" :key="partition.path")
+          dt {{ partition.path }}
+          dd
+            code {{ partition.sha256 }}
+          dd {{ partition.record_count }} records · {{ partition.bytes }} bytes · {{ partition.first_id }} → {{ partition.last_id }}
 
-    .source-ledger
-      .source-ledger-heading
-        div
-          p.kicker Source / adapter / rights closure
-          h3 Authority and curation remain distinct
-        span {{ sourceInputs.length }} pinned source objects
-      article.source-input(v-for="input in sourceInputs" :key="input.name" :class="{ curation: input.source === 'REPOSITORY' }")
-        .source-input-heading
-          strong {{ input.name }}
-          span {{ sourceOrigin(input) }}
-        p {{ input.source }} → {{ input.record_type }} · {{ input.source_object_bytes }} bytes
-        code source {{ input.source_object_sha256 }}
-        code adapter {{ input.adapter.id }}@{{ input.adapter.version }}
-        code implementation {{ input.adapter.implementation_sha256 }}
-        code package {{ input.adapter.package_sha256 }}
-        small {{ input.license.id }} · {{ input.license.name }} · {{ input.license.redistribution }}
-        small {{ input.license.url }} · {{ input.license.attribution }}
-      p.nlm-courtesy Courtesy of the U.S. National Library of Medicine.
+    Panel(title-id="data-plane-sources-title" title="Authority and curation remain distinct" eyebrow="Source / adapter / rights closure" :level="3")
+      template(v-slot:actions)
+        span.muted {{ sourceInputs.length }} pinned source objects
+      dl.facts
+        div(v-for="input in sourceInputs" :key="input.name")
+          dt {{ input.name }}
+          dd.stack.stack--tight
+            p
+              span.badge(:class="input.source === 'REPOSITORY' ? 'badge--warning' : ''") {{ sourceOrigin(input) }}
+            p {{ input.source }} → {{ input.record_type }} · {{ input.source_object_bytes }} bytes
+            code source {{ input.source_object_sha256 }}
+            code adapter {{ input.adapter.id }}@{{ input.adapter.version }}
+            code implementation {{ input.adapter.implementation_sha256 }}
+            code package {{ input.adapter.package_sha256 }}
+            p.muted {{ input.license.id }} · {{ input.license.name }} · {{ input.license.redistribution }}
+            p.muted {{ input.license.url }} · {{ input.license.attribution }}
+      p.muted Courtesy of the U.S. National Library of Medicine.
 
-    .data-records
-      .records-toolbar
-        div
-          label(for="data-plane-record-type") Local record collection
+    Panel(title-id="data-plane-records-title" title="Local records" :level="3")
+      .repel
+        Field(id="data-plane-record-type" label="Local record collection")
           select#data-plane-record-type(v-model="recordType" :disabled="controlsBusy")
             option(v-for="type in RECORD_TYPES" :key="type" :value="type") {{ type }} · {{ detail.manifest.record_counts[type] }}
-        .page-controls(role="navigation" aria-label="Record pagination")
-          button.secondary(type="button" :disabled="controlsBusy || pageNumber === 1" @click="previousPage") Previous
+        nav.cluster(aria-label="Record pagination")
+          button.button.button--secondary(type="button" :disabled="controlsBusy || pageNumber === 1" @click="previousPage") Previous
           span {{ pageBusy ? 'Loading…' : `Page ${pageNumber}` }}
-          button.secondary(type="button" :disabled="controlsBusy || !page?.nextCursor" @click="nextPage") Next
-      .table-wrap
-        table(v-if="page" :aria-busy="pageBusy")
-          caption {{ page.recordType }} from the local verified mirror, sorted by ID
-          thead
-            tr
-              th(scope="col") Identifier
-              th(scope="col") Local record
-          tbody
-            tr(v-for="item in page.items" :key="item.id")
-              th(scope="row")
-                code {{ item.id }}
-              td
-                strong {{ item.name ?? item.scientific_name ?? item.recommended_name ?? item.statement ?? item.citation ?? item.gene_symbol ?? item.evidence_class }}
-                span(v-if="item.formula") {{ item.formula }} · charge {{ item.charge }}
-                span(v-if="item.taxon_id") taxon {{ item.taxon_id }}
-                span(v-if="item.reaction_id") reaction {{ item.reaction_id }}
-                span(v-if="item.protein_id") protein {{ item.protein_id }}
+          button.button.button--secondary(type="button" :disabled="controlsBusy || !page?.nextCursor" @click="nextPage") Next
+      DataTable(v-if="page" :caption="`${page.recordType} from the local verified mirror, sorted by ID`" :columns="['Identifier', 'Local record']" :busy="pageBusy")
+        tr(v-for="item in page.items" :key="item.id")
+          th(scope="row")
+            code {{ item.id }}
+          td
+            .cluster
+              strong {{ item.name ?? item.scientific_name ?? item.recommended_name ?? item.statement ?? item.citation ?? item.gene_symbol ?? item.evidence_class }}
+              span(v-if="item.formula") {{ item.formula }} · charge {{ item.charge }}
+              span(v-if="item.taxon_id") taxon {{ item.taxon_id }}
+              span(v-if="item.reaction_id") reaction {{ item.reaction_id }}
+              span(v-if="item.protein_id") protein {{ item.protein_id }}
 
-    .scientific-links
-      p.kicker Taxon / reaction / protein closure
-      h3 Linked catalysis assertions
-      .link-grid
-        article(v-for="link in links" :key="link.assertion.id")
-          span(:class="`evidence-${link.assertion.evidence_class}`") {{ link.assertion.evidence_class }} curation
-          strong {{ link.protein?.gene_symbol }} · {{ link.protein?.recommended_name }}
-          code {{ link.protein?.id }}
+    Panel(title-id="data-plane-links-title" title="Linked catalysis assertions" eyebrow="Taxon / reaction / protein closure" :level="3")
+      ul.plain-list.grid
+        li.card.stack.stack--tight(v-for="link in links" :key="link.assertion.id")
+          div
+            span.badge {{ link.assertion.evidence_class }} curation
+          p
+            strong {{ link.protein?.gene_symbol }} · {{ link.protein?.recommended_name }}
+          p
+            code {{ link.protein?.id }}
           p {{ link.taxon?.scientific_name }} → {{ link.reaction?.id }}
-          small {{ link.assertion.evidence_code }} · {{ link.assertion.reference_ids.join(', ') }}
+          p.muted {{ link.assertion.evidence_code }} · {{ link.assertion.reference_ids.join(', ') }}
 
-    .semantic-diff(v-if="difference")
-      .source-ledger-heading
-        div
-          p.kicker Baseline → candidate semantic proof
-          h3 {{ difference.baseline.id }} → {{ difference.candidate.id }}
+    Panel(v-if="difference" title-id="data-plane-diff-title" :title="`${difference.baseline.id} → ${difference.candidate.id}`" eyebrow="Baseline → candidate semantic proof" :level="3")
+      template(v-slot:actions)
         code {{ difference.diff_digest }}
-      .diff-grid
-        article(v-for="item in diffClasses" :key="item.name" :class="item.name.toLowerCase()")
-          span {{ item.name }}
-          strong {{ item.count }} changes
-          p {{ item.description }}
-      p.diff-summary {{ difference.counts.unchanged }} records are unchanged; additions {{ difference.counts.added }}, removals {{ difference.counts.removed }}, changed {{ difference.counts.changed }}.
-      article.diff-attribution(v-for="change in difference.record_changes" :key="`${change.record_type}:${change.id}`")
-        strong {{ change.record_type }}/{{ change.id }}
-        span {{ change.status }} · {{ change.classification }} · {{ change.attribution.join(', ') }}
+      dl.facts
+        div(v-for="item in diffClasses" :key="item.name")
+          dt {{ item.name }}
+          dd
+            strong {{ item.count }} changes
+          dd {{ item.description }}
+      p {{ difference.counts.unchanged }} records are unchanged; additions {{ difference.counts.added }}, removals {{ difference.counts.removed }}, changed {{ difference.counts.changed }}.
+      ul.plain-list.stack.stack--tight
+        li.cluster(v-for="change in difference.record_changes" :key="`${change.record_type}:${change.id}`")
+          strong {{ change.record_type }}/{{ change.id }}
+          span {{ change.status }} · {{ change.classification }} · {{ change.attribution.join(', ') }}
 
-    .authority-audit
-      .source-ledger-heading
-        div
-          p.kicker Persisted deterministic audit
-          h3 Authority closure audit
-        button.secondary(type="button" :disabled="auditBusy || status?.state !== 'ready' || pageBusy" @click="runAudit") {{ auditBusy ? 'Auditing…' : auditReport ? 'Re-run idempotent audit' : 'Run offline audit' }}
+    Panel(title-id="data-plane-audit-title" title="Authority closure audit" eyebrow="Persisted deterministic audit" :level="3")
+      template(v-slot:actions)
+        button.button.button--secondary(type="button" :disabled="auditBusy || status?.state !== 'ready' || pageBusy" @click="runAudit") {{ auditBusy ? 'Auditing…' : auditReport ? 'Re-run idempotent audit' : 'Run offline audit' }}
       p Audit reads only already verified local records. It checks record counts, reaction balance, taxon/catalysis closure, and references; scientific validation remains unsupported.
       template(v-if="auditReport")
-        code.audit-digest {{ auditReport.reportDigest }}
-        dl.provenance-grid
+        p
+          code {{ auditReport.reportDigest }}
+        dl.facts
           div
             dt Algorithm / reports
             dd {{ auditReport.algorithmVersion }}
-            span {{ audits.length }} immutable report{{ audits.length === 1 ? '' : 's' }}
+            dd {{ audits.length }} immutable report{{ audits.length === 1 ? '' : 's' }}
           div
             dt Release pair
             dd {{ auditReport.baseline.id }}
-            span {{ auditReport.release.id }}
+            dd {{ auditReport.release.id }}
           div
             dt Closure result
             dd {{ auditReport.results.totalRecords }} records · {{ auditReport.results.partitionCount }} partitions
-            span {{ auditReport.results.sourceObjectCount }} source objects · all checks passed
+            dd {{ auditReport.results.sourceObjectCount }} source objects · all checks passed
           div
             dt Scientific validation
             dd {{ auditReport.scientificValidation }}
-            span Distribution and authority closure only
+            dd Distribution and authority closure only
 </template>

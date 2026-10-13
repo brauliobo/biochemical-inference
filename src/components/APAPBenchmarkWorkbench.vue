@@ -1,8 +1,11 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { APAP_RELEASE_ID, APAP_WARNING } from '../../shared/apap-contracts.js'
 import { loadApapWorkspace, runApapBenchmark } from '../api.js'
 import SpatialTissueWorkbench from './SpatialTissueWorkbench.vue'
+import DataTable from './ui/DataTable.vue'
+import Field from './ui/Field.vue'
+import Panel from './ui/Panel.vue'
 
 const emit = defineEmits(['completed'])
 
@@ -98,10 +101,10 @@ async function run() {
   }
 }
 
-function heatStyle(value, values) {
+// Share of the largest value in the snapshot, 0 to 1; drives the bar under each bin.
+function heatRatio(value, values) {
   const maximum = Math.max(...values)
-  const ratio = maximum === 0 ? 0 : Math.min(1, value / maximum)
-  return { backgroundColor: `color-mix(in srgb, var(--amber) ${Math.round(12 + ratio * 78)}%, #10201c)` }
+  return maximum === 0 ? 0 : Math.min(1, value / maximum)
 }
 
 onMounted(initialize)
@@ -112,184 +115,149 @@ onBeforeUnmount(() => {
 </script>
 
 <template lang="pug">
-section.apap-panel(aria-labelledby="apap-title")
-  .apap-warning(role="note" aria-label="Persistent APAP scientific warning")
+Panel(title-id="apap-title" title="APAP benchmark workbench" eyebrow="Goal 6 · deterministic liver toxicity benchmark" :status="result ? result.outcome : state" :tone="state === 'failed' ? 'danger' : state === 'ready' ? 'success' : ''")
+  .notice.notice--warning.stack.stack--tight(role="note" aria-label="Persistent APAP scientific warning")
     strong Synthetic · non-clinical · unsupported
-    span {{ APAP_WARNING }}
-  .section-heading
-    div
-      p.kicker Goal 6 · deterministic liver toxicity benchmark
-      h2#apap-title APAP benchmark workbench
-    span.status-chip(:class="state" aria-live="polite") {{ result ? result.outcome : state }}
-  .alert.error(v-if="state === 'failed'" role="alert")
+    p {{ APAP_WARNING }}
+  div(role="status")
+    p.notice(v-if="state === 'loading'") Verifying the pinned APAP benchmark…
+    p.notice(v-else-if="state === 'running'") Integrating the bounded model. Context, protocol and scale controls are locked until it finishes.
+  .notice.notice--danger.stack.stack--tight(v-if="state === 'failed'" role="alert")
     p {{ message }}
-    button.secondary(v-if="!workspace" type="button" @click="initialize") Retry APAP compatibility check
+    div(v-if="!workspace")
+      button.button.button--secondary(type="button" @click="initialize") Retry APAP compatibility check
+
   template(v-if="workspace")
-    .apap-provenance
-      dl.provenance-grid
-        div
-          dt Pinned release
-          dd {{ workspace.detail.release.id }}
-        div
-          dt Trusted digest
-          dd.digest {{ workspace.detail.release.digest }}
-        div
-          dt Equation set
-          dd {{ workspace.discovery.equationSetId }}
-        div
-          dt Evidence boundary
-          dd Illustrative assumptions · synthetic observations
-
-    h3 Human and mouse contexts
-    .apap-contexts
-      button.apap-context(v-for="context in workspace.contexts" :key="context.id" type="button" :class="{ selected: selectedContext?.id === context.id }" :aria-pressed="selectedContext?.id === context.id" :disabled="state === 'running'" @click="chooseContext(context.id)")
-        span {{ context.taxon_label }}
-        strong {{ context.id }}
-        small {{ context.challenge_route }} · {{ context.strain ?? 'no cohort/strain asserted' }} · {{ context.sex }} · {{ context.fasting_status }}
-
-    h3 Bounded synthetic protocols
-    .protocol-cards
-      button.protocol-card(v-for="protocol in workspace.protocols" :key="protocol.id" type="button" :class="{ selected: selectedProtocolId === protocol.id }" :aria-pressed="selectedProtocolId === protocol.id" :disabled="state === 'running'" @click="chooseProtocol(protocol)")
-        span.assumption-label {{ protocol.protocol_class }} · unsupported
-        strong {{ protocol.name }}
-        small {{ protocol.observation_window.lower }}–{{ protocol.observation_window.upper }} h · {{ protocol.interventions.map(item => `${item.role} ${item.dose.lower} ${item.dose.unit} at ${item.start_time.lower} h`).join(' · ') }}
-        p {{ protocol.exclusion }}
-
-    .apap-run-layout
-      form.apap-controls(@submit.prevent="run")
-        h3 Explicit mechanism scales
-        label(for="apap-cyp") CYP activity
-        input#apap-cyp(v-model.number="cypActivity" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
-        label(for="apap-binding") NAPQI adduct binding
-        input#apap-binding(v-model.number="adductBinding" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
-        label(for="apap-zonation") Zonation amplitude
-        input#apap-zonation(v-model.number="zonation" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
-        label(for="apap-nac-gsh") NAC-to-GSH term
-        input#apap-nac-gsh(v-model.number="nacGsh" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
-        button.run-button(type="submit" :disabled="state === 'running'")
-          span {{ state === 'running' ? 'Integrating bounded model…' : 'Run APAP benchmark' }}
-          span.arrow(aria-hidden="true") →
-      .parameter-diff
-        h3 Upstream species parameter records
-        p Values remain separate by context; absence is shown rather than filled by taxon logic.
-        .series-table-wrap
-          table
-            caption Human/mouse source parameter difference
-            thead
-              tr
-                th(scope="col") Human
-                th(scope="col") Mouse
-            tbody
-              tr(v-for="index in Math.max(humanParameters.length, mouseParameters.length)" :key="index")
-                td
-                  template(v-if="humanParameters[index - 1]")
-                    code {{ humanParameters[index - 1].id }}
-                    span {{ humanParameters[index - 1].quantity.value }} {{ humanParameters[index - 1].quantity.unit }}
-                  span(v-else) Not supplied
-                td
-                  template(v-if="mouseParameters[index - 1]")
-                    code {{ mouseParameters[index - 1].id }}
-                    span {{ mouseParameters[index - 1].quantity.value }} {{ mouseParameters[index - 1].quantity.unit }}
-                  span(v-else) Not supplied
-
-    h3 Validation coverage
-    .validation-grid
-      article(v-for="row in workspace.validationMatrix" :key="row.id")
-        span.unsupported-badge Unsupported
-        strong {{ row.claim_type }}
-        p {{ row.rationale }}
-
-  article.apap-result(v-if="result" aria-labelledby="apap-result-title")
-    .run-header
+    dl.facts
       div
-        span.run-label#apap-result-title Canonical APAP run identity
-        code {{ result.runId }}
-      span.prediction {{ result.warning }}
-    dl.study-metrics
+        dt Pinned release
+        dd {{ workspace.detail.release.id }}
       div
-        span Peak central APAP
-        strong {{ result.summary.peakCentralApap.toFixed(4) }}
-        small model-unit
+        dt Trusted digest
+        dd {{ workspace.detail.release.digest }}
       div
-        span NAPQI formed
-        strong {{ result.summary.totalNapqiFormed.toFixed(4) }}
-        small model-unit
+        dt Equation set
+        dd {{ workspace.discovery.equationSetId }}
       div
-        span Final adduct
-        strong {{ result.summary.finalAdductBurden.toFixed(5) }}
-        small model-unit
-      div
-        span Peak injured fraction
-        strong {{ result.summary.peakInjuredFraction.toFixed(5) }}
-        small dimensionless · unsupported
+        dt Evidence boundary
+        dd Illustrative assumptions · synthetic observations
 
-    .apap-time-control
-      label(for="apap-time") Lobule time: {{ snapshot?.timeHours }} h
-      input#apap-time(v-model.number="timeIndex" type="range" min="0" :max="result.lobule.snapshots.length - 1" step="1")
-      label(for="apap-field") Heatmap field
-      select#apap-field(v-model="heatmapVariable")
-        option(value="apap") APAP
-        option(value="napqi") NAPQI
-        option(value="gsh") GSH
-        option(value="adduct") Adduct
-        option(value="oxygen") Oxygen
-        option(value="injured") Injured fraction
+    section.stack.stack--tight
+      h3 Human and mouse contexts
+      .grid
+        button.card(v-for="context in workspace.contexts" :key="context.id" type="button" :aria-pressed="selectedContext?.id === context.id" :disabled="state === 'running'" @click="chooseContext(context.id)")
+          span {{ context.taxon_label }}
+          strong {{ context.id }}
+          small.muted {{ context.challenge_route }} · {{ context.strain ?? 'no cohort/strain asserted' }} · {{ context.sex }} · {{ context.fasting_status }}
+
+    section.stack.stack--tight
+      h3 Bounded synthetic protocols
+      .grid
+        button.card(v-for="protocol in workspace.protocols" :key="protocol.id" type="button" :aria-pressed="selectedProtocolId === protocol.id" :disabled="state === 'running'" @click="chooseProtocol(protocol)")
+          span.eyebrow {{ protocol.protocol_class }} · unsupported
+          strong {{ protocol.name }}
+          small.muted {{ protocol.observation_window.lower }}–{{ protocol.observation_window.upper }} h · {{ protocol.interventions.map(item => `${item.role} ${item.dose.lower} ${item.dose.unit} at ${item.start_time.lower} h`).join(' · ') }}
+          span {{ protocol.exclusion }}
+
+    .grid
+      Panel(title-id="apap-controls-title" title="Explicit mechanism scales" :level="3")
+        form.stack(@submit.prevent="run")
+          Field(id="apap-cyp" label="CYP activity")
+            input#apap-cyp(v-model.number="cypActivity" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
+          Field(id="apap-binding" label="NAPQI adduct binding")
+            input#apap-binding(v-model.number="adductBinding" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
+          Field(id="apap-zonation" label="Zonation amplitude")
+            input#apap-zonation(v-model.number="zonation" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
+          Field(id="apap-nac-gsh" label="NAC-to-GSH term")
+            input#apap-nac-gsh(v-model.number="nacGsh" type="number" min="0" max="2" step="0.1" :disabled="state === 'running'")
+          div
+            button.button(type="submit" :disabled="state === 'running'") {{ state === 'running' ? 'Integrating bounded model…' : 'Run APAP benchmark' }}
+      Panel(title-id="apap-species-title" title="Upstream species parameter records" :level="3")
+        p.muted Values remain separate by context; absence is shown rather than filled by taxon logic.
+        DataTable(caption="Human/mouse source parameter difference" :columns="['Human', 'Mouse']")
+          tr(v-for="index in Math.max(humanParameters.length, mouseParameters.length)" :key="index")
+            td
+              .cluster(v-if="humanParameters[index - 1]")
+                code {{ humanParameters[index - 1].id }}
+                span {{ humanParameters[index - 1].quantity.value }} {{ humanParameters[index - 1].quantity.unit }}
+              span.muted(v-else) Not supplied
+            td
+              .cluster(v-if="mouseParameters[index - 1]")
+                code {{ mouseParameters[index - 1].id }}
+                span {{ mouseParameters[index - 1].quantity.value }} {{ mouseParameters[index - 1].quantity.unit }}
+              span.muted(v-else) Not supplied
+
+    section.stack.stack--tight
+      h3 Validation coverage
+      .grid
+        article.card.stack.stack--tight(v-for="row in workspace.validationMatrix" :key="row.id")
+          div
+            span.badge.badge--warning Unsupported
+          strong {{ row.claim_type }}
+          p {{ row.rationale }}
+
+  Panel(v-if="result" title-id="apap-result-title" title="Canonical APAP run identity" :level="3")
+    p
+      code {{ result.runId }}
+    p.notice.notice--warning {{ result.warning }}
+    dl.facts
+      div
+        dt Peak central APAP
+        dd #[strong {{ result.summary.peakCentralApap.toFixed(4) }}] #[small.muted model-unit]
+      div
+        dt NAPQI formed
+        dd #[strong {{ result.summary.totalNapqiFormed.toFixed(4) }}] #[small.muted model-unit]
+      div
+        dt Final adduct
+        dd #[strong {{ result.summary.finalAdductBurden.toFixed(5) }}] #[small.muted model-unit]
+      div
+        dt Peak injured fraction
+        dd #[strong {{ result.summary.peakInjuredFraction.toFixed(5) }}] #[small.muted dimensionless · unsupported]
+
+    .grid
+      Field(id="apap-time" :label="`Lobule time: ${snapshot?.timeHours} h`")
+        input#apap-time(v-model.number="timeIndex" type="range" min="0" :max="result.lobule.snapshots.length - 1" step="1")
+      Field(id="apap-field" label="Heatmap field")
+        select#apap-field(v-model="heatmapVariable")
+          option(value="apap") APAP
+          option(value="napqi") NAPQI
+          option(value="gsh") GSH
+          option(value="adduct") Adduct
+          option(value="oxygen") Oxygen
+          option(value="injured") Injured fraction
 
     template(v-if="snapshot")
       SpatialTissueWorkbench(:taxon-id="selectedContext.taxon_id" :snapshot="snapshot" :time-index="timeIndex" :field="heatmapVariable" :selected-bin="selectedBin" @select-bin="selectedBin = $event")
-      .lobule-heatmap(role="group" :aria-label="`${heatmapVariable} across 12 portal-to-central lobule bins at ${snapshot.timeHours} hours`")
-        button(v-for="(value, index) in snapshot[heatmapVariable]" :key="index" type="button" :class="{ selected: selectedBin === index }" :style="heatStyle(value, snapshot[heatmapVariable])" :aria-label="`Bin ${index + 1}: ${value}`" :aria-pressed="selectedBin === index" @click="selectedBin = index")
+      .heatmap(role="group" :aria-label="`${heatmapVariable} across 12 portal-to-central lobule bins at ${snapshot.timeHours} hours`")
+        button(v-for="(value, index) in snapshot[heatmapVariable]" :key="index" type="button" :aria-label="`Bin ${index + 1}: ${value}`" :aria-pressed="selectedBin === index" @click="selectedBin = index")
           span {{ index + 1 }}
           strong {{ value.toFixed(4) }}
-      .lobule-axis(aria-hidden="true")
+          span.heatmap__bar(:style="{ '--heat': heatRatio(value, snapshot[heatmapVariable]) }")
+      p.repel.muted(aria-hidden="true")
         span Portal
         span Central
-      .series-table-wrap
-        table
-          caption Accessible lobule state at {{ snapshot.timeHours }} h; no interpolation
-          thead
-            tr
-              th(scope="col") Bin
-              th(scope="col") APAP
-              th(scope="col") NAPQI
-              th(scope="col") GSH
-              th(scope="col") Adduct
-              th(scope="col") O₂
-              th(scope="col") Healthy
-              th(scope="col") Stressed
-              th(scope="col") Injured
-              th(scope="col") Recovering
-          tbody
-            tr(v-for="(_, index) in snapshot.apap" :key="index" :class="{ emphasized: selectedBin === index }")
-              th(scope="row") {{ index + 1 }}
-              td {{ snapshot.apap[index].toFixed(4) }}
-              td {{ snapshot.napqi[index].toFixed(4) }}
-              td {{ snapshot.gsh[index].toFixed(4) }}
-              td {{ snapshot.adduct[index].toFixed(4) }}
-              td {{ snapshot.oxygen[index].toFixed(4) }}
-              td {{ snapshot.healthy[index].toFixed(4) }}
-              td {{ snapshot.stressed[index].toFixed(4) }}
-              td {{ snapshot.injured[index].toFixed(4) }}
-              td {{ snapshot.recovering[index].toFixed(4) }}
+      DataTable(:caption="`Accessible lobule state at ${snapshot.timeHours} h; no interpolation`" :columns="['Bin', 'APAP', 'NAPQI', 'GSH', 'Adduct', 'O₂', 'Healthy', 'Stressed', 'Injured', 'Recovering']")
+        tr(v-for="(_, index) in snapshot.apap" :key="index" :aria-current="selectedBin === index ? 'true' : undefined")
+          th(scope="row") {{ index + 1 }}
+          td {{ snapshot.apap[index].toFixed(4) }}
+          td {{ snapshot.napqi[index].toFixed(4) }}
+          td {{ snapshot.gsh[index].toFixed(4) }}
+          td {{ snapshot.adduct[index].toFixed(4) }}
+          td {{ snapshot.oxygen[index].toFixed(4) }}
+          td {{ snapshot.healthy[index].toFixed(4) }}
+          td {{ snapshot.stressed[index].toFixed(4) }}
+          td {{ snapshot.injured[index].toFixed(4) }}
+          td {{ snapshot.recovering[index].toFixed(4) }}
 
-    .study-grid
-      section.study-card
-        h3 Systemic time series
-        table
-          caption Exact output at {{ result.timeHours[timeIndex] }} h
-          thead
-            tr
-              th(scope="col") Output
-              th(scope="col") Value
-              th(scope="col") Unit
-          tbody
-            tr(v-for="series in result.systemicOutputs" :key="series.id")
-              th(scope="row") {{ series.name }}
-              td {{ series.values[timeIndex].toFixed(5) }}
-              td {{ series.unit }}
-      section.study-card
-        h3 Conservation diagnostics
-        dl.compact-list
+    .grid
+      Panel(title-id="apap-series-title" title="Systemic time series" :level="4")
+        DataTable(:caption="`Exact output at ${result.timeHours[timeIndex]} h`" :columns="['Output', 'Value', 'Unit']")
+          tr(v-for="series in result.systemicOutputs" :key="series.id")
+            th(scope="row") {{ series.name }}
+            td {{ series.values[timeIndex].toFixed(5) }}
+            td {{ series.unit }}
+      Panel(title-id="apap-diagnostics-title" title="Conservation diagnostics" :level="4")
+        dl.facts.facts--rows
           div
             dt APAP mass residual
             dd {{ result.diagnostics.mass.residual }} / {{ result.diagnostics.mass.tolerance }}
@@ -305,68 +273,42 @@ section.apap-panel(aria-labelledby="apap-title")
           div
             dt 1x/2x/4x timestep refinement
             dd {{ result.diagnostics.timestepRefinement.passed ? 'Pass' : 'Fail' }} · max {{ Math.max(...result.diagnostics.timestepRefinement.comparisons.map(item => item.maximumAbsoluteDifference)).toExponential(3) }} / {{ result.diagnostics.timestepRefinement.tolerance }}
-        h3 Limiting cases
-        ul.limiting-cases
-          li(v-for="item in result.diagnostics.limitingCases" :key="item.id")
-            strong {{ item.passed ? 'Pass' : 'Fail' }} · {{ item.id }}
-            span {{ item.expectation }} Maximum signal {{ item.maximumSignal }}.
+    Panel(title-id="apap-limiting-title" title="Limiting cases" :level="4")
+      ul.plain-list.stack.stack--tight
+        li.cluster(v-for="item in result.diagnostics.limitingCases" :key="item.id")
+          strong {{ item.passed ? 'Pass' : 'Fail' }} · {{ item.id }}
+          span {{ item.expectation }} Maximum signal {{ item.maximumSignal }}.
 
-    .parameter-diff(v-if="modelParameterDiff.length")
-      h3 Exact effective human/mouse parameter differences
-      table
-        caption Differences arise from visible context bindings, not taxon branches
-        thead
-          tr
-            th(scope="col") Symbol
-            th(scope="col") Human
-            th(scope="col") Mouse
-            th(scope="col") Provenance
-        tbody
-          tr(v-for="item in modelParameterDiff" :key="item.symbol")
-            th(scope="row") {{ item.symbol }}
-            td {{ item.human.value }} {{ item.human.unit }}
-            td {{ item.mouse.value }} {{ item.mouse.unit }}
-            td {{ item.human.origin }} / {{ item.mouse.origin }}
+    Panel(v-if="modelParameterDiff.length" title-id="apap-diff-title" title="Exact effective human/mouse parameter differences" :level="4")
+      DataTable(caption="Differences arise from visible context bindings, not taxon branches" :columns="['Symbol', 'Human', 'Mouse', 'Provenance']")
+        tr(v-for="item in modelParameterDiff" :key="item.symbol")
+          th(scope="row") {{ item.symbol }}
+          td {{ item.human.value }} {{ item.human.unit }}
+          td {{ item.mouse.value }} {{ item.mouse.unit }}
+          td {{ item.human.origin }} / {{ item.mouse.origin }}
 
-    details.apap-audit
+    details.card.stack
       summary Effective parameters, assumptions, synthetic comparison, and limitations
-      h3 Exact effective parameters
-      table
-        caption Context-bound values used by this run
-        thead
-          tr
-            th(scope="col") Parameter
-            th(scope="col") Value
-            th(scope="col") Origin
-            th(scope="col") Assumption
-        tbody
-          tr(v-for="item in result.effectiveParameters" :key="item.symbol")
-            th(scope="row") {{ item.symbol }}
-            td {{ item.value }} {{ item.unit }}
-            td {{ item.origin }}
-            td
-              code {{ item.assumptionId }}
-      h3 Synthetic observations (not biological validation)
-      table
-        caption Calibration and validation partitions remain unsupported
-        thead
-          tr
-            th(scope="col") Observation
-            th(scope="col") Partition
-            th(scope="col") Observed
-            th(scope="col") Model output
-            th(scope="col") Status
-        tbody
-          tr(v-for="item in result.syntheticComparisons" :key="item.observationId")
-            th(scope="row") {{ item.observationId }}
-            td {{ item.partition }}
-            td {{ item.observed }} {{ item.unit }}
-            td {{ item.predicted }} {{ item.unit }}
-            td
-              span.unsupported-badge {{ item.validationStatus }}
-      h3 Assumptions and limitations
-      ul.study-limitations
-        li(v-for="item in result.limitations" :key="item.id")
+      h4 Exact effective parameters
+      DataTable(caption="Context-bound values used by this run" :columns="['Parameter', 'Value', 'Origin', 'Assumption']")
+        tr(v-for="item in result.effectiveParameters" :key="item.symbol")
+          th(scope="row") {{ item.symbol }}
+          td {{ item.value }} {{ item.unit }}
+          td {{ item.origin }}
+          td
+            code {{ item.assumptionId }}
+      h4 Synthetic observations (not biological validation)
+      DataTable(caption="Calibration and validation partitions remain unsupported" :columns="['Observation', 'Partition', 'Observed', 'Model output', 'Status']")
+        tr(v-for="item in result.syntheticComparisons" :key="item.observationId")
+          th(scope="row") {{ item.observationId }}
+          td {{ item.partition }}
+          td {{ item.observed }} {{ item.unit }}
+          td {{ item.predicted }} {{ item.unit }}
+          td
+            span.badge.badge--warning {{ item.validationStatus }}
+      h4 Assumptions and limitations
+      ul.plain-list.stack.stack--tight
+        li.cluster(v-for="item in result.limitations" :key="item.id")
           strong {{ item.id }}
           span {{ item.statement }}
 </template>
