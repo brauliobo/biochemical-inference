@@ -2,13 +2,13 @@ import { expect, test } from '@playwright/test'
 
 test('runs APAP with inspectable outputs, unsupported validation, and limiting diagnostics', async ({ page }) => {
   await page.goto('/#/workbench/full')
-  const workbench = page.locator('.apap-panel')
+  const workbench = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await expect(workbench.getByRole('heading', { name: 'APAP benchmark workbench' })).toBeVisible()
   await expect(workbench.getByLabel('Persistent APAP scientific warning')).toContainText('Synthetic')
   await expect(workbench.getByText('Bounded synthetic human PK demonstration')).toBeVisible()
   await expect(workbench.getByText('Bounded synthetic mouse toxic-dose demonstration')).toBeVisible()
   await expect(workbench.getByText('Bounded synthetic delayed NAC demonstration')).toBeVisible()
-  await expect(workbench.locator('.unsupported-badge')).toHaveCount(4)
+  await expect(workbench.getByText('Unsupported', { exact: true })).toHaveCount(4)
 
   const responsePromise = page.waitForResponse((response) => response.url().endsWith('/api/v4/apap/runs') && response.request().method() === 'POST')
   await workbench.getByRole('button', { name: 'Run APAP benchmark' }).click()
@@ -25,7 +25,7 @@ test('runs APAP with inspectable outputs, unsupported validation, and limiting d
 test('compares visible human and mouse bindings without taxon equation branches', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Covered by the desktop context-comparison workflow')
   await page.goto('/#/workbench/full')
-  const workbench = page.locator('.apap-panel')
+  const workbench = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await workbench.getByRole('button', { name: 'Run APAP benchmark' }).click()
   await expect(workbench.getByText('Canonical APAP run identity')).toBeVisible()
   await workbench.getByRole('button', { name: /Mus musculus/ }).click()
@@ -38,7 +38,7 @@ test('compares visible human and mouse bindings without taxon equation branches'
 test('keeps the complete APAP semantic workflow usable at 360px', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific APAP workflow')
   await page.goto('/#/workbench/full')
-  const workbench = page.locator('.apap-panel')
+  const workbench = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await workbench.getByRole('button', { name: 'Run APAP benchmark' }).click()
   await expect(workbench.getByText(/Accessible lobule state/)).toBeVisible()
   await expect(workbench.getByText('Systemic time series')).toBeVisible()

@@ -1,10 +1,8 @@
 {
   "comment": "Files with raw colour/px/rem/font literals that the per-workbench CSS migration will convert to design tokens. This list may only shrink; the migration phase ends when it is empty. See docs/DESIGN_SYSTEM.md.",
   "files": [
-    "src/components/ChallengeWorkbench.vue",
     "src/components/MeasuredSpatialLiverAtlas.vue",
     "src/components/RevalidationCampaignWorkbench.vue",
-    "src/components/SpatialRegistrationWorkbench.vue",
     "src/styles/legacy-workbench.css"
   ]
 }

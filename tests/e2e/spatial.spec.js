@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('links spatial bin, time, field, values, and provenance on desktop and mobile', async ({ page }) => {
   await page.goto('/#/workbench/full')
-  const apap = page.locator('.apap-panel')
+  const apap = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')
   await expect(spatial.getByRole('heading', { name: 'Synthetic lobule spatial view' })).toBeVisible()
@@ -12,7 +12,7 @@ test('links spatial bin, time, field, values, and provenance on desktop and mobi
 
   await spatial.locator('.spatial-bin-controls').getByRole('button', { name: 'Bin 6' }).click()
   await expect(spatial.getByRole('heading', { name: /Bin 6/ })).toBeVisible()
-  await expect(apap.locator('.lobule-heatmap').getByRole('button', { name: /^Bin 6:/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(apap.getByRole('group', { name: /across 12 portal-to-central lobule bins/ }).getByRole('button', { name: /^Bin 6:/ })).toHaveAttribute('aria-pressed', 'true')
   await apap.locator('#apap-time').fill('2')
   await expect(spatial.getByRole('heading', { name: /Bin 6 · 1 h/ })).toBeVisible()
   await apap.locator('#apap-field').selectOption('gsh')
@@ -26,7 +26,7 @@ test('links spatial bin, time, field, values, and provenance on desktop and mobi
 test('retains the complete numeric workflow when WebGL is unavailable', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(window, 'WebGLRenderingContext', { configurable: true, value: undefined }))
   await page.goto('/#/workbench/full')
-  const apap = page.locator('.apap-panel')
+  const apap = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')
   await expect(spatial.getByText('3D tissue view unavailable')).toBeVisible()
@@ -39,7 +39,7 @@ test('retains the complete numeric workflow when WebGL is unavailable', async ({
 test('handles WebGL context loss without losing semantic results', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Context-loss behavior is viewport-independent')
   await page.goto('/#/workbench/full')
-  const apap = page.locator('.apap-panel')
+  const apap = page.getByRole('region', { name: 'APAP benchmark workbench' })
   await apap.getByRole('button', { name: 'Run APAP benchmark' }).click()
   const spatial = apap.locator('.spatial-workbench')
   const canvas = spatial.locator('canvas')
