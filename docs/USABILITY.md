@@ -158,6 +158,7 @@ per measure) and `tests/e2e/shell.spec.js`.
 | T6 deep link (`?to=`) reopened in a fresh browser | same page and result | passes |
 | T9 follow the glycine-belching guided path from Home to its last step, keyboard only (no pointer) | operable | passes: 10 Tab presses from page load to the path link on Home, Enter, then 3 Tab presses and Enter per step (Read the page, Previous, Next) for 10 steps; 42 Tab presses in all for the 11 steps. Focus lands on the step heading after each step, the URL carries `?step=N`, the progress bar reads "Step N of 11", and the last step has no Next link |
 | T9 a step link (`?step=5`) reopened in a fresh browser; the entity page's "Part of guided paths" link back to its step | same step | passes (a link from the GNMT page opens step 5 of the glycine-belching path) |
+| E5 sub-path build (`VITE_BASE=/biochemical-inference/ npm run build:static`, `vite preview --base /biochemical-inference/`), 2026-10-13: Home, `#/kb/state/undermethylation` (also after reload), Glycine, a reaction, the path list, a path step, the map, a workbench notice page, search to GNMT and a Home-to-path click-through, light and 360 px mobile (dark for three pages) | 0 console errors or warnings, 0 failed or 4xx requests | 0 of each |
 | T8 "not medical advice" notice fully inside the first screen | visible without scrolling | passes at 1280 x 720 (bottom edge 352 px) and 360 x 740 (591 px of 740) |
 | Keyboard only: Tab presses to the search box on Home | n/a | 8 |
 | Keyboard only: search, Down/Up/Escape through results, Enter | operable | passes |
