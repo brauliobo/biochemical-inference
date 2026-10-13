@@ -298,10 +298,14 @@ a.card:hover { border-color: var(--color-accent); }
   max-block-size: calc(var(--target-min) * 7);
   overflow: visible;
 }
-.chart__axis { stroke: var(--color-border-strong); }
+.chart__axis {
+  stroke: var(--color-border-strong);
+  vector-effect: non-scaling-stroke;
+}
 .chart__gridline {
   stroke: var(--color-border);
   stroke-dasharray: 4 5;
+  vector-effect: non-scaling-stroke;
 }
 .chart__tick {
   fill: var(--color-text-muted);

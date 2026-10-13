@@ -1,6 +1,9 @@
-<script setup>
+<script setup vapor>
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { loadAtlasEntity, loadAtlasSubgraph, loadAtlasWorkspace } from '../api.js'
+import Metric from './ui/Metric.vue'
+import Section from './ui/Section.vue'
+import { statusTone } from './ui/tone.js'
 
 const props = defineProps({ taxonId: { type: Number, required: true } })
 
@@ -15,6 +18,7 @@ const message = ref('')
 let generation = 0
 let controller
 
+const statusLabel = computed(() => state.value === 'loading' ? 'Verifying' : state.value === 'traversing' ? 'Traversing' : state.value === 'ready' ? 'Atlas pinned' : state.value === 'unknown' ? 'Unknown seed' : 'Unavailable')
 const taxonName = computed(() => props.taxonId === 9606 ? 'Human · Homo sapiens' : 'Mouse · Mus musculus')
 const seedOptions = computed(() => (workspace.value?.includedEntities ?? workspace.value?.network.entities ?? []).filter((entity) => !['compound', 'compartment', 'tissue'].includes(entity.entityType)))
 const entityById = computed(() => new Map((subgraph.value?.entities ?? []).map((entity) => [entity.id, entity])))
@@ -47,6 +51,15 @@ function displayEntity(id) {
 
 function transformationFor(id) {
   return transformationById.value.get(id)
+}
+
+// The claim badges print a derivation or a polarity; the tone only reinforces
+// it. The `derivation-*` and `polarity-*` classes are stable test hooks.
+function claimBadge(kind, value) {
+  const tone = kind === 'derivation'
+    ? { direct: 'success', 'orthology-transferred': 'warning' }[value]
+    : { contradicting: 'danger' }[value]
+  return ['badge', `${kind}-${value}`, tone ? `badge--${tone}` : '']
 }
 
 function resolveSeed() {
@@ -113,39 +126,25 @@ onBeforeUnmount(() => controller?.abort())
 </script>
 
 <template lang="pug">
-section.atlas-panel(aria-labelledby="atlas-title")
-  .section-heading
-    div
-      p.kicker 05 · Context atlas
-      h2#atlas-title MTHFR evidence atlas
-    span.status-chip(:class="state") {{ state === 'loading' ? 'Verifying' : state === 'traversing' ? 'Traversing' : state === 'ready' ? 'Atlas pinned' : state === 'unknown' ? 'Unknown seed' : 'Unavailable' }}
-
-  .atlas-loading(v-if="state === 'loading'" aria-live="polite") Verifying the independent atlas v2 release and loading {{ taxonName }} context…
-  .alert.error(v-else-if="state === 'failed' && !workspace" role="alert")
+Section.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow="05 · Context atlas" :status="statusLabel" :tone="statusTone(state)")
+  p.muted(v-if="state === 'loading'" role="status") Verifying the independent atlas v2 release and loading {{ taxonName }} context…
+  .notice.notice--danger.stack.stack--tight(v-else-if="state === 'failed' && !workspace" role="alert")
     strong Context atlas unavailable
     p {{ message }}
     p The simulation release remains separate; no atlas facts are inferred from simulation data.
-    button.secondary(type="button" @click="initialize") Retry atlas verification
+    button.button.button--secondary(type="button" @click="initialize") Retry atlas verification
 
   template(v-else-if="workspace")
-    .atlas-provenance
-      dl.provenance-grid
-        div
-          dt Atlas release
-          dd {{ workspace.release.id }}
-        div
-          dt Independent SHA-256
-          dd.digest {{ workspace.release.digest }}
-        div
-          dt Taxon context
-          dd {{ taxonName }}
-        div
-          dt Verified inventory
-          dd {{ workspace.detail.recordCounts.entities }} entities · {{ workspace.detail.recordCounts.claims }} claims
-      p.source-note {{ workspace.detail.scientificScope }}
+    .atlas-provenance.stack.stack--tight
+      dl.metrics
+        Metric(label="Atlas release" :value="workspace.release.id")
+        Metric(label="Independent SHA-256" :value="workspace.release.digest" mono)
+        Metric(label="Taxon context" :value="taxonName")
+        Metric(label="Verified inventory" :value="`${workspace.detail.recordCounts.entities} entities · ${workspace.detail.recordCounts.claims} claims`")
+      p.muted {{ workspace.detail.scientificScope }}
 
-    form.atlas-controls(@submit.prevent="traverse")
-      .atlas-seed
+    form.grid.grid--end(@submit.prevent="traverse")
+      .form
         label(for="atlas-seed") Seed CURIE or unique label
         input#atlas-seed(v-model="seed" list="atlas-seeds" autocomplete="off" aria-describedby="atlas-seed-help")
         datalist#atlas-seeds
@@ -153,98 +152,98 @@ section.atlas-panel(aria-labelledby="atlas-title")
             option(:value="entity.id" :label="entity.name")
             option(:value="entity.name" :label="entity.id")
         small#atlas-seed-help Species-specific and taxon-neutral entities in the verified projection. Press Enter to traverse.
-      div
+      .form
         label(for="atlas-depth") Maximum depth
         input#atlas-depth(v-model.number="maxDepth" type="number" min="0" max="6" step="1")
-      div
+      .form
         label(for="atlas-nodes") Node limit
         input#atlas-nodes(v-model.number="maxNodes" type="number" min="1" max="100" step="1")
-      button.run-button(type="submit" :disabled="state === 'traversing'") {{ state === 'traversing' ? 'Traversing…' : 'Traverse bounded graph' }}
+      button.button(type="submit" :disabled="state === 'traversing'") {{ state === 'traversing' ? 'Traversing…' : 'Traverse bounded graph' }}
 
-    .atlas-state(v-if="state === 'traversing'" aria-live="polite") Loading a species-isolated bounded traversal; previous graph content is hidden.
-    .alert.error(v-else-if="state === 'failed'" role="alert")
+    p.muted(v-if="state === 'traversing'" role="status") Loading a species-isolated bounded traversal; previous graph content is hidden.
+    .notice.notice--danger.stack.stack--tight(v-else-if="state === 'failed'" role="alert")
       strong Atlas traversal failed
       p {{ message }}
-      button.secondary(type="button" @click="traverse") Retry traversal
-    .atlas-unknown(v-else-if="state === 'unknown'" role="status")
+      button.button.button--secondary(type="button" @click="traverse") Retry traversal
+    .notice.notice--warning.stack.stack--tight(v-else-if="state === 'unknown'" role="status")
       strong Unknown is not absent
       p {{ message }}
 
-    .atlas-results(v-else-if="subgraph")
-      .atlas-summary(role="status")
+    .stack(v-else-if="subgraph")
+      .notice.repel(role="status")
         strong {{ subgraph.entities.length }} typed entities · {{ subgraph.claims.length }} qualified claims
         span {{ subgraph.truncated ? `Traversal stopped at the ${subgraph.maxNodes}-node bound.` : `Complete within depth ${subgraph.maxDepth} and the ${subgraph.maxNodes}-node bound.` }}
 
-      .atlas-columns
-        section.atlas-card(aria-labelledby="atlas-entities-title")
-          h3#atlas-entities-title Typed entities
-          ul.atlas-entity-list
-            li(v-for="entity in subgraph.entities" :key="entity.id")
-              span.entity-kind {{ entity.entityType }} · {{ entity.taxonId ?? 'taxon-neutral' }}
-              strong {{ entity.name }}
-              code {{ entity.id }}
+      .sidebar
+        Section(title="Typed entities" title-id="atlas-entities-title" :level="3" flat)
+          ul.atlas-entity-list.plain-list.stack
+            li.stack.stack--tight(v-for="entity in subgraph.entities" :key="entity.id")
+              p.eyebrow {{ entity.entityType }} · {{ entity.taxonId ?? 'taxon-neutral' }}
+              p
+                strong {{ entity.name }}
+              p
+                code {{ entity.id }}
 
-        section.atlas-card(aria-labelledby="atlas-claims-title")
-          h3#atlas-claims-title Qualified claims
-          p.atlas-empty(v-if="!subgraph.claims.length") No claims occur within this traversal bound. This is unknown beyond the bound, not evidence of absence.
-          article.atlas-claim(v-for="claim in subgraph.claims" :key="claim.id")
-            .claim-badges
-              span(:class="`derivation-${claim.derivation}`") {{ claim.derivation }}
-              span(:class="`polarity-${claim.polarity}`") {{ claim.polarity }}
+        Section(title="Qualified claims" title-id="atlas-claims-title" :level="3" flat)
+          p.muted(v-if="!subgraph.claims.length") No claims occur within this traversal bound. This is unknown beyond the bound, not evidence of absence.
+          article.card.stack.stack--tight(v-for="claim in subgraph.claims" :key="claim.id")
+            .cluster
+              span(:class="claimBadge('derivation', claim.derivation)") {{ claim.derivation }}
+              span(:class="claimBadge('polarity', claim.polarity)") {{ claim.polarity }}
             p
               strong {{ displayEntity(claim.subjectId) }}
               span.relation  {{ claim.relation.replaceAll('_', ' ') }}
               strong  {{ displayEntity(claim.objectId) }}
-            small Taxon {{ claim.context.taxonId }} · tissue {{ claim.context.tissueId ?? 'unknown' }} · compartment {{ claim.context.compartmentId ?? 'unknown' }} · cell {{ claim.context.cellId ?? 'unknown' }}
-            details.evidence-details
+            small.muted Taxon {{ claim.context.taxonId }} · tissue {{ claim.context.tissueId ?? 'unknown' }} · compartment {{ claim.context.compartmentId ?? 'unknown' }} · cell {{ claim.context.cellId ?? 'unknown' }}
+            details.stack.stack--tight
               summary Evidence lineage ({{ claim.evidenceIds.length }})
               ul
                 li(v-for="evidenceId in claim.evidenceIds" :key="evidenceId")
                   a(v-if="evidenceById.get(evidenceId)" :href="evidenceById.get(evidenceId).url" target="_blank" rel="noreferrer") {{ evidenceById.get(evidenceId).citation }}
                   span(v-else) {{ evidenceId }} · unresolved in this bounded response
-              p.evidence-classification This claim is {{ claim.derivation }} and {{ claim.polarity }}. Evidence records do not override that derivation.
-            details.transformation-details(v-if="claim.transformationId && transformationById.get(claim.transformationId)")
+              p.muted This claim is {{ claim.derivation }} and {{ claim.polarity }}. Evidence records do not override that derivation.
+            details.transformation-details.stack.stack--tight(v-if="claim.transformationId && transformationById.get(claim.transformationId)")
               summary Inspect orthology transformation
               p
                 code {{ transformationFor(claim.transformationId).id }}
               p {{ transformationFor(claim.transformationId).method }}
               ul
                 li(v-for="pair in transformationFor(claim.transformationId).entityPairs" :key="`${pair.sourceId}-${pair.targetId}`") {{ pair.sourceId }} → {{ pair.targetId }}
-              p.transformation-warning {{ transformationFor(claim.transformationId).limitations }}
+              p.notice.notice--warning {{ transformationFor(claim.transformationId).limitations }}
 
-      .atlas-columns.atlas-lower
-        section.atlas-card(aria-labelledby="atlas-mappings-title")
-          h3#atlas-mappings-title Identity mappings and ambiguity
-          p.atlas-empty(v-if="!workspace.network.mappings.length") No identity mapping is asserted for this taxon projection; this is not evidence that identifiers are equivalent or absent.
-          article.mapping-record(v-for="mapping in workspace.network.mappings" :key="mapping.id")
-            .mapping-heading
+      .grid
+        Section(title="Identity mappings and ambiguity" title-id="atlas-mappings-title" :level="3" flat)
+          p.muted(v-if="!workspace.network.mappings.length") No identity mapping is asserted for this taxon projection; this is not evidence that identifiers are equivalent or absent.
+          article.card.stack.stack--tight(v-for="mapping in workspace.network.mappings" :key="mapping.id")
+            .repel
               strong {{ mapping.status }} · {{ mapping.relation.replaceAll('_', ' ') }}
               code {{ mapping.id }}
             p {{ mapping.sourceId }} → {{ mapping.targetId ?? 'no selected target' }}
             p(v-if="mapping.candidateIds.length") Ambiguous candidates: {{ mapping.candidateIds.join(', ') }}
-            small {{ mapping.rationale }}
-          article.mapping-record(v-for="ambiguity in structuralAmbiguities" :key="ambiguity.sourceId")
-            .mapping-heading
+            small.muted {{ mapping.rationale }}
+          article.card.stack.stack--tight(v-for="ambiguity in structuralAmbiguities" :key="ambiguity.sourceId")
+            .repel
               strong unresolved · structural ambiguity
               code Typed entity structure
             p {{ ambiguity.sourceId }} → no selected isoform
             p Ambiguous candidates: {{ ambiguity.candidateIds.join(', ') }}
-            small Multiple typed isoforms resolve in this verified release, while the taxon network projection supplies no selected identity target. This is not presented as an asserted mapping record.
+            small.muted Multiple typed isoforms resolve in this verified release, while the taxon network projection supplies no selected identity target. This is not presented as an asserted mapping record.
 
-        section.atlas-card(aria-labelledby="atlas-coverage-title")
-          h3#atlas-coverage-title Coverage and measured gaps
-          p.coverage-total {{ coverageCovered }} / {{ coverageTotal }} denominator targets covered across {{ coverage.length }} partitions.
-          article.coverage-gap(v-for="gap in gaps" :key="gap.id")
-            strong Unknown / measured gap · {{ gap.entityType }}
-            span {{ gap.numerator }} / {{ gap.denominator }} covered
+        Section(title="Coverage and measured gaps" title-id="atlas-coverage-title" :level="3" flat)
+          p
+            strong {{ coverageCovered }} / {{ coverageTotal }} denominator targets covered across {{ coverage.length }} partitions.
+          article.notice.notice--warning.stack.stack--tight(v-for="gap in gaps" :key="gap.id")
+            p
+              strong Unknown / measured gap · {{ gap.entityType }}
+            p {{ gap.numerator }} / {{ gap.denominator }} covered
             p {{ gap.denominatorDefinition }}
-            code {{ gap.gapIds.join(', ') }}
-          p.atlas-empty(v-if="!gaps.length") No measured gaps are listed for this projection. Unmeasured scope remains unknown.
+            p
+              code {{ gap.gapIds.join(', ') }}
+          p.muted(v-if="!gaps.length") No measured gaps are listed for this projection. Unmeasured scope remains unknown.
 
-      section.atlas-card.atlas-limitations(aria-labelledby="atlas-limitations-title")
-        h3#atlas-limitations-title Atlas limitations
-        ul
+      Section(title="Atlas limitations" title-id="atlas-limitations-title" :level="3" flat)
+        ul.stack.stack--tight
           li(v-for="limitation in workspace.network.limitations" :key="limitation.id")
             strong {{ limitation.category }}
-            span {{ limitation.statement }}
+            p {{ limitation.statement }}
 </template>
