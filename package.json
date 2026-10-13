@@ -42,7 +42,8 @@
     "test:acceptance:e2e:built": "E2E_SKIP_BUILD=true nice -n 10 playwright test --workers=1",
     "test:selection": "nice -n 10 node scripts/test-selection.js",
     "test:watch": "nice -n 10 vitest --maxWorkers=1 --no-file-parallelism --exclude='tests/e2e/**' --exclude='tests/acceptance/**' --exclude='tests/revalidation/scale-acceptance.test.js' --exclude='tests/revalidation/planning-performance.test.js' --exclude='tests/revalidation/cross-repo-scale-http.test.js'",
-    "test:e2e": "npm run test:acceptance:e2e --"
+    "test:e2e": "npm run test:acceptance:e2e --",
+    "test:e2e:static": "playwright test -c playwright.static.config.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",

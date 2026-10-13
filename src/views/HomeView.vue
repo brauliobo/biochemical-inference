@@ -19,6 +19,9 @@ const staticMode = isStaticMode()
   header.stack
     p.eyebrow Educational resource
     h1 Methylation biochemistry, explained and cross-linked
+    p.notice.notice--warning(role="note")
+      strong Educational, not medical advice.
+      |  This site explains biochemistry and shows how well each statement is supported. It cannot diagnose anything or tell you what to take. Talk to a qualified clinician about your health.
     p.lede.
       Glycine, choline and betaine, under- and over-methylation, the enzymes and
       reactions behind them, the pathways they form, related conditions and the
@@ -26,10 +29,6 @@ const staticMode = isStaticMode()
     .cluster
       RouterLink.button(:to="KB_PATH") Browse the knowledge base
       RouterLink.button.button--secondary(:to="MAP_PATH") Explore the map
-
-  p.notice.notice--warning(role="note")
-    strong Educational, not medical advice.
-    |  This site explains biochemistry and shows how well each statement is supported. It cannot diagnose anything or tell you what to take. Talk to a qualified clinician about your health.
 
   SearchBox
 

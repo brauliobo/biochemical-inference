@@ -3,7 +3,25 @@ import { expect, test } from '@playwright/test'
 
 // Keyboard-only operability, landmarks and automated WCAG checks of the app
 // shell (docs/USABILITY.md). Add every new knowledge-site route to ROUTES.
-const ROUTES = ['/#/', '/#/kb', '/#/kb/enzymes/mthfr', '/#/workbench', '/#/no/such/page']
+const ROUTES = [
+  '/#/',
+  '/#/kb',
+  '/#/kb/compound',
+  '/#/kb/claim',
+  '/#/kb/claim?status=unsupported',
+  '/#/kb/reaction',
+  '/#/kb/enzyme/gnmt',
+  '/#/kb/reaction/gnmt-glycine-methylation',
+  '/#/kb/state/undermethylation',
+  '/#/kb/claim/belching-mostly-swallowed-air',
+  '/#/kb/compound/glycine?to=outcome%3Abelching',
+  '/#/kb/map',
+  '/#/kb/map?id=compound%3Aglycine',
+  '/#/kb/state/no-such-entry',
+  '/#/kb/not-a-type',
+  '/#/workbench',
+  '/#/no/such/page'
+]
 
 for (const colorScheme of ['light', 'dark']) {
   test(`has no WCAG 2.2 AA violations on any shell route (${colorScheme})`, async ({ page }) => {
@@ -11,11 +29,32 @@ for (const colorScheme of ['light', 'dark']) {
     for (const route of ROUTES) {
       await page.goto(route)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      await page.waitForLoadState('networkidle') // lazy chunks (knowledge data) have rendered
       const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
       expect(violations.map((violation) => `${route}: ${violation.id} (${violation.nodes.length})`)).toEqual([])
     }
   })
 }
+
+test('has no WCAG 2.2 AA violations with search results, expanded lists and filters open', async ({ page }) => {
+  const scan = async (label) => {
+    const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
+    expect(violations.map((violation) => `${label}: ${violation.id} (${violation.nodes.length})`)).toEqual([])
+  }
+  await page.goto('/#/')
+  await page.getByRole('searchbox').fill('glycine')
+  await expect(page.getByRole('main').getByRole('link', { name: 'Glycine', exact: true }).first()).toBeVisible()
+  await scan('home search results')
+
+  await page.goto('/#/kb/compound/glycine')
+  await expect(page.getByRole('heading', { level: 1, name: 'Glycine' })).toBeVisible()
+  for (const summary of await page.locator('main details > summary').all()) await summary.click()
+  await scan('entity page, every disclosure open')
+
+  await page.goto('/#/kb/claim?grade=plausible&sort=evidence')
+  await expect(page.getByRole('heading', { level: 1, name: 'Claims' })).toBeVisible()
+  await scan('claim listing, filtered and sorted')
+})
 
 test('skip link and primary navigation work from the keyboard alone', async ({ page }) => {
   await page.goto('/')
@@ -35,9 +74,9 @@ test('skip link and primary navigation work from the keyboard alone', async ({ p
 })
 
 test('deep links survive a reload and unknown routes show a way out', async ({ page }) => {
-  await page.goto('/#/kb/enzymes/mthfr')
+  await page.goto('/#/kb/enzyme/gnmt')
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1, name: 'mthfr' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ })).toBeVisible()
 
   await page.goto('/#/no/such/page')
   await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()

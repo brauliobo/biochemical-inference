@@ -69,6 +69,23 @@ one line in `src/routes.js` plus the view file:
 `src/runtime-mode.js`; render `ui/ApiRequired.vue` instead of anything that calls
 `src/api.js`. Knowledge pages must never need the API.
 
+## Knowledge pages
+
+Views in `src/views/kb/` only lay out what the engine's models return
+(`docs/KNOWLEDGE_MODEL.md`); presentational pieces are small components in
+`src/components/kb/` and pure logic is in `src/kb/` (URL scheme `paths.js`, list
+filtering `listing.js`, map `neighbourhood.js`, the home "start here" path).
+
+- Build every URL with `entityPath(id)`, `typePath(type)`, `mapPath(id)` or
+  `connectionPath(from, to)`; never concatenate. Types are singular ids
+  (`/kb/enzyme/gnmt`); the plural spelling is accepted when reading.
+- Link to entities with `EntityLink`. A target missing from the data renders as plain
+  text, never a dead link; body text is rendered as text nodes, never `v-html`.
+- Filters live in the URL query so a filtered list can be shared (`?q=&grade=&status=&sort=`).
+- The entity data is about 182 kB gzipped. Views that always need it import
+  `knowledge/index.js` directly; the home page and `SearchBox` load it lazily through
+  `kb/knowledge-lazy.js` to keep the home route under the F4 budget.
+
 ## Tests
 
 - Vapor components: `mountVapor()` from `tests/helpers/mount-vapor.js`, or
@@ -76,5 +93,7 @@ one line in `src/routes.js` plus the view file:
 - Navigate in tests with `navigate('/path')` before mounting `App.vue`.
 - Add every new knowledge route to `ROUTES` in `tests/e2e/shell.spec.js`
   (axe, keyboard, 44 px targets).
+- Browser specs also run against the static build, with no API:
+  `npm run build:static && npm run test:e2e:static` (`shell.spec.js`, `usability-tasks.spec.js`).
 - `npm test`, `npm run check:syntax`, `npm run build`, `npm run build:static`
   must stay green.
