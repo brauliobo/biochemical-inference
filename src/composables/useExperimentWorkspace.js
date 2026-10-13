@@ -65,7 +65,10 @@ export function useExperimentWorkspace() {
   const successful = computed(() => history.value.items.filter((item) => item.attempt.outcome === 'successful' && item.attempt.resultArtifactId))
   const modelIds = computed(() => [...new Set(models.value.map((item) => item.id))])
 
-  const chooseModel = () => { draft.interventionTarget = targets.value[0]?.id ?? '' }
+  // The first thing the chosen model lets the form assign (the bound model may not be updated yet).
+  const chooseModel = (key = draft.modelKey) => {
+    draft.interventionTarget = interventionTargets(models.value.find((item) => exactModelKey(item) === key))[0]?.id ?? ''
+  }
 
   function applyRevision(revision) {
     for (const entry of revision.specification.entries) {

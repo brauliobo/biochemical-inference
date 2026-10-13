@@ -1,8 +1,12 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { workbenches } from '../../src/workbenches.js'
 
 // Keyboard-only operability, landmarks and automated WCAG checks of the app
-// shell (docs/USABILITY.md). Add every new knowledge-site route to ROUTES.
+// shell (docs/USABILITY.md). Add every new knowledge-site route to ROUTES;
+// every registered workbench is included automatically (in this static build
+// each shows its API-required notice; their working states are audited in
+// tests/component/*workbench*.test.js).
 const ROUTES = [
   '/#/',
   '/#/kb',
@@ -20,6 +24,8 @@ const ROUTES = [
   '/#/kb/state/no-such-entry',
   '/#/kb/not-a-type',
   '/#/workbench',
+  ...workbenches.map((item) => `/#/workbench/${item.name}`),
+  '/#/workbench/no-such-workbench',
   '/#/no/such/page'
 ]
 

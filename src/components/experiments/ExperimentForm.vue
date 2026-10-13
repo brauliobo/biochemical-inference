@@ -39,11 +39,11 @@ const profileOptions = computed(() => props.profiles.map((item) => ({ value: ite
 Panel(:title="revising ? 'Edit as a new revision' : 'Create experiment'" title-id="workspace-editor-title" :level="3")
   form.stack(@submit.prevent="emit('submit')")
     Notice(v-if="readOnly" tone="warning" role="note") This revision embeds a model that is not in the exact local registry. Its ID and digest remain inspectable and exportable, but revision and execution controls are read-only.
-    SelectField(id="workspace-existing" label="Existing experiment" :model-value="selectedId" :options="existingOptions" @change="emit('select', $event.target.value)")
+    SelectField(id="workspace-existing" label="Existing experiment" :model-value="selectedId" :options="existingOptions" @change="emit('select', $event)")
     InputField(id="workspace-name" label="Name" v-model="draft.name" maxlength="160" required :disabled="readOnly")
     Field(id="workspace-description" label="Description")
       textarea#workspace-description(v-model="draft.description" rows="3" maxlength="2000" :disabled="readOnly")
-    SelectField(id="workspace-model" label="Portfolio model" v-model="draft.modelKey" :options="modelOptions" :disabled="readOnly" @change="emit('model')")
+    SelectField(id="workspace-model" label="Portfolio model" v-model="draft.modelKey" :options="modelOptions" :disabled="readOnly" @change="emit('model', $event)")
     .grid
       SelectField(id="workspace-taxon" label="Taxon" v-model="draft.taxonId" :options="TAXA" :disabled="readOnly")
       InputField(id="workspace-tissue" label="Tissue CURIE (optional)" v-model="draft.tissueId" placeholder="UBERON:0002107" :disabled="readOnly")
