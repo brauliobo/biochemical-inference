@@ -422,6 +422,4 @@ export const ConsumerArtifactContentSchema = z.discriminatedUnion('artifactKind'
   z.object({ artifactKind: z.literal('prediction'), artifactSchemaVersion: z.literal('1.0.0'), calibrationArtifactDigest: Sha256Schema, release: MeasuredReleaseRefSchema, targetPartition: PartitionSchema, status: z.literal('not-evaluable'), predictionCount: z.literal(0), predictions: z.tuple([]), reason: z.literal('Calibration was not evaluable; no predictions were generated.') }).strict()
 ])
 
-export const MeasuredIntegritySchema = z.object({ findings: z.array(z.string()), objects: NonNegativeIntSchema, records: NonNegativeIntSchema, status: z.enum(['valid', 'failed']) }).strict()
-
-export { CursorSchema, IdentifierSchema, ReleaseIdSchema, RoleSchema, UtcInstantSchema as TimestampSchema }
+export { CursorSchema, IdentifierSchema, ReleaseIdSchema, RoleSchema }

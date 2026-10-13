@@ -554,4 +554,4 @@ export const AuthorityClosureAuditListSchema = z.array(z.object({
   createdAt: z.string()
 }).strict())
 
-export { FactoryRecordTypeSchema, JsonValueSchema, KebabIdSchema as KeyIdSchema, ReleaseIdSchema, Sha256HexSchema as Sha256Schema }
+export { FactoryRecordTypeSchema, JsonValueSchema, ReleaseIdSchema, Sha256HexSchema as Sha256Schema }

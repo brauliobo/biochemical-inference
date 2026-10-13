@@ -46,7 +46,6 @@ export const NUTRIENT_REACTION_I2_RECONCILIATION = Object.freeze({
   manifestDigest: '1ed8768d47500800dacee93f88ce8fdad387d843150e64e05dc94721578f4014'
 })
 
-const RecordIdSchema = z.string().regex(/^(?:SOURCE|NUTRIENT|FORM_CLASS|EVENT_KIND|POLICY|REACTION_CANDIDATE|HYPOTHESIS):[A-Z0-9][A-Z0-9_.-]*$/)
 const OriginSchema = z.enum(['measured', 'curated', 'submitted', 'model-derived', 'text-mined', 'computed', 'assumption', 'hypothetical'])
 const ContextStatusSchema = z.enum(['known', 'unknown', 'not-reported', 'not-assessed', 'not-applicable'])
 
@@ -348,7 +347,3 @@ export function verifyNutrientReactionHypothesis(value) {
   return NutrientReactionHypothesisSchema.parse(value)
 }
 
-export function collectNutrientReactionRecordIds(value) {
-  const records = [value, ...(value.participants ?? [])]
-  return records.flatMap((record) => Object.values(record).filter((item) => typeof item === 'string' && RecordIdSchema.safeParse(item).success))
-}

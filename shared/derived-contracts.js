@@ -308,7 +308,6 @@ export const DerivedHealthUpstreamSchema = z.object({
   events: NonNegativeIntSchema
 }).strict()
 export const DerivedHealthSchema = DerivedHealthUpstreamSchema.omit({ signing_key_id: true, signing_public_key: true })
-export const ReplayResponseSchema = z.object({ status: z.literal('valid'), bundles: NonNegativeIntSchema, assertions: NonNegativeIntSchema, content_objects: NonNegativeIntSchema, events: NonNegativeIntSchema }).strict()
 export const BundleSubmitResponseSchema = z.object({ created: z.boolean(), bundle_digest: DerivedDigestSchema, assertion_digests: z.array(DerivedDigestSchema).min(1) }).strict()
 export const BundleDetailSchema = z.object({ digest: DerivedDigestSchema, submitted_at: OffsetDatetimeSchema, bundle: SubmissionBundleSchema }).strict()
 export const ReproduceRequestSchema = z.object({ run_id: DerivedDigestSchema, reviewer: ReviewerSchema, reason: NonEmptyStringSchema.max(4000) }).strict()

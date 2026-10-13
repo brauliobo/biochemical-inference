@@ -1,7 +1,3 @@
-export function multiplyAffine(left, right) {
-  return left.map((row) => row.map((_value, column) => row.reduce((total, item, index) => total + item * right[index][column], 0)))
-}
-
 export function applyAffine(matrix, pointXyz) {
   const point = [...pointXyz, 1]
   const output = matrix.map((row) => row.reduce((total, item, index) => total + item * point[index], 0))

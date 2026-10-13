@@ -197,4 +197,3 @@ export const KnowledgeSnapshotSchema = z.object({
   snapshot_digest: Sha256HexSchema
 }).strict()
 
-export const SnapshotDigestSchema = Sha256HexSchema

@@ -29,7 +29,7 @@ import {
 } from './verification.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_FACTORY_URL = 'http://127.0.0.1:8000'
+const DEFAULT_FACTORY_URL = 'http://127.0.0.1:8000'
 
 export const DataPlaneUpstreamError = defineProblemError('DataPlaneUpstreamError', { statusCode: 503, code: 'DATA_PLANE_UPSTREAM_FAILED', parent: DataPlaneVerificationError })
 

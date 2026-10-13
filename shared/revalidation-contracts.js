@@ -480,7 +480,6 @@ export const RevalidationSyncRequestSchema = z.object({
   reason: NonEmptyStringSchema.max(4000).default('Execute the pinned Goal 11 revalidation impact plan locally.')
 }).strict()
 export const RevalidationCampaignParamSchema = z.object({ campaignId: RevalidationDigestSchema }).strict()
-export const RevalidationWorkParamSchema = z.object({ campaignId: RevalidationDigestSchema, workId: RevalidationDigestSchema }).strict()
 
 export const RevalidationEventHeadSchema = z.object({ sequence: PositiveIntSchema, digest: RevalidationDigestSchema }).strict()
 export const RevalidationProducerBindingSchema = z.object({

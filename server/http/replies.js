@@ -19,7 +19,6 @@ const statusProblem = (statusCode) => (reply, code, message, extra) => sendProbl
 export const badRequest = statusProblem(400)
 export const notFound = statusProblem(404)
 export const conflict = statusProblem(409)
-export const unprocessable = statusProblem(422)
 
 // Sets no-store headers. `privateCache` selects "private, no-store"; `dropEtag` also removes any etag already set.
 export function noStore(reply, { privateCache = false, dropEtag = true } = {}) {

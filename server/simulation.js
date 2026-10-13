@@ -13,7 +13,7 @@ const initial = {
   [METABOLITE_IDS.homocysteine]: 8
 }
 
-export function canonicalize(value) {
+function canonicalize(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`
   if (value && typeof value === 'object') {
     return `{${Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([key, item]) => `${JSON.stringify(key)}:${canonicalize(item)}`).join(',')}}`

@@ -266,9 +266,3 @@ export function createRevalidationWorkerPool(options = {}) {
   return { execute, close }
 }
 
-export function executeRevalidationWorker(request, options = {}) {
-  const pool = createRevalidationWorkerPool({ maximumWorkers: 1 })
-  const execution = pool.execute(request, options)
-  execution.promise.finally(() => pool.close())
-  return execution
-}

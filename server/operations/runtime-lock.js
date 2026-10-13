@@ -26,7 +26,7 @@ async function readOwner(lockPath) {
   return owner
 }
 
-export async function acquireInferenceOperationLock(stateRoot, role, { processTarget = process } = {}) {
+async function acquireInferenceOperationLock(stateRoot, role, { processTarget = process } = {}) {
   if (!LOCK_ROLES.has(role)) throw new TypeError('Inference operation lock role is invalid.')
   const inspected = await inspectNoSymlinkPath(stateRoot, 'Inference state root', { allowMissing: true })
   await mkdir(inspected.path, { recursive: true, mode: 0o700 })
@@ -86,6 +86,6 @@ export async function assertInferenceOperationLock(lock, stateRoot, role) {
   if (owner.token !== lock.token || owner.role !== role) throw new Error(`inference ${role} operation lock token is not the published owner`)
 }
 
-export function inferenceOperationLockPath(stateRoot) {
+function inferenceOperationLockPath(stateRoot) {
   return resolve(stateRoot, LOCK_NAME)
 }

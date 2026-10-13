@@ -43,7 +43,7 @@ function assertSpatialRegistrationTimes(current, entries) {
   for (const [label, value] of entries) if (Date.parse(value) > current.valueOf()) throw new SpatialRegistrationVerificationError(`Spatial-registration ${label} is in the future.`)
 }
 
-export function parseSpatialRegistrationCanonical(bytes, schema, label, expectedDigest) {
+function parseSpatialRegistrationCanonical(bytes, schema, label, expectedDigest) {
   return parseCanonicalBytes(bytes, schema, label, { ErrorClass: SpatialRegistrationVerificationError, maxBytes: MAX_SPATIAL_REGISTRATION_METADATA_BYTES, expectedDigest, contract: 'spatial-registration', issue: true })
 }
 

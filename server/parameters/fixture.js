@@ -8,7 +8,7 @@ import {
   UpstreamParameterDatasetsResponseSchema
 } from '../../shared/parameter-contracts.js'
 
-export const FIXTURE_PARAMETER_RELEASE = Object.freeze({ id: PARAMETER_RELEASE_ID, schema_version: PARAMETER_CONTRACT_VERSION, digest: PARAMETER_RELEASE_DIGEST })
+const FIXTURE_PARAMETER_RELEASE = Object.freeze({ id: PARAMETER_RELEASE_ID, schema_version: PARAMETER_CONTRACT_VERSION, digest: PARAMETER_RELEASE_DIGEST })
 
 const parameters = [
   { id: 'PARAMETER:DECAY-K', name: 'Synthetic first-order decay constant', model_symbol: 'k_decay', dimension: 'first_order_rate', canonical_unit: 's^-1', reference_context_id: 'CONTEXT:SYNTHETIC-DECAY', description: 'Algorithm-validation parameter for x(t) = x0 exp(-k t); it is not a biological estimate.' },

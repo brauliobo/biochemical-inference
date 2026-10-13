@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Sha256HexSchema, UtcInstantSchema, IsoDateSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, StrictEmptyObjectSchema, PageLimitSchema, CoercedNonNegativeIntSchema, pageLimitQuerySchema } from './commons/schemas.js'
+import { Sha256HexSchema, UtcInstantSchema, NonNegativeIntSchema, PositiveIntSchema, NonEmptyStringSchema, StrictEmptyObjectSchema, PageLimitSchema, CoercedNonNegativeIntSchema, pageLimitQuerySchema } from './commons/schemas.js'
 
 export const MEASURED_SPATIAL_CONTRACT = 'measured-spatial/1.0.0'
 export const MEASURED_SPATIAL_RELEASE_ID = 'digimouse-measured-liver-atlas-v1.0.0'
@@ -445,4 +445,3 @@ export const MEASURED_SPATIAL_RECORD_SCHEMAS = Object.freeze({
   attribution: MeasuredSpatialAttributionSchema.extend({ id: z.literal('attribution:digimouse') }).strict()
 })
 
-export { IsoDateSchema as DateSchema, UtcInstantSchema as InstantSchema }

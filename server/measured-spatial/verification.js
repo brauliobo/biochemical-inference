@@ -30,7 +30,7 @@ export const MeasuredSpatialVerificationError = defineProblemError('MeasuredSpat
 export const measuredSpatialSha256 = sha256Hex
 export const measuredSpatialDigest = canonicalSha256Hex
 
-export function parseMeasuredSpatialCanonical(bytes, schema, label, expectedDigest) {
+function parseMeasuredSpatialCanonical(bytes, schema, label, expectedDigest) {
   return parseCanonicalBytes(bytes, schema, label, { ErrorClass: MeasuredSpatialVerificationError, maxBytes: MAX_MEASURED_SPATIAL_METADATA_BYTES, expectedDigest, contract: 'measured-spatial', issue: true })
 }
 

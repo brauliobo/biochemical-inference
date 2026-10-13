@@ -4,7 +4,7 @@ import { canonicalJson } from '../../shared/canonical-json.js'
 import { canonicalSha256Hex, compareUtf8, sha256Hex } from '../../server/commons/digest.js'
 import { inside } from '../../server/commons/paths.js'
 
-export function deploymentClosure(root, repository) {
+function deploymentClosure(root, repository) {
   if (repository === 'biochemical-db') return [
     { name: 'service-js/package.json', path: resolve(root, 'service-js', 'package.json') },
     { name: 'service-js/src', path: resolve(root, 'service-js', 'src') },

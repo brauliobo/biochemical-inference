@@ -11,7 +11,7 @@ import { compareUtf8 } from '../commons/digest.js'
 import { defineProblemError } from '../commons/errors.js'
 import { assertRevalidationIdentity, identityPayload, immutable } from './identity.js'
 
-export const MAX_REVALIDATION_WIRE_BYTES = 16 * 1024 * 1024
+const MAX_REVALIDATION_WIRE_BYTES = 16 * 1024 * 1024
 const utf8 = new TextDecoder('utf-8', { fatal: true })
 const classOrder = new Map(REVALIDATION_CHANGE_CLASSES.map((value, index) => [value, index]))
 const kindOrder = new Map(REVALIDATION_NODE_KINDS.map((value, index) => [value, index]))

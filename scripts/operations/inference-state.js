@@ -9,7 +9,7 @@ import { inside } from '../../server/commons/paths.js'
 import { acquireInferenceBackupLock, assertInferenceOperationLock } from '../../server/operations/runtime-lock.js'
 import { assertSafeLocalFilesystem, inspectNoSymlinkPath, publishDirectoryAnchored, removeAnchored, syncPath, syncTree, withDirectoryAnchor } from '../../server/operations/path-safety.js'
 
-export const INFERENCE_BACKUP_VERSION = 'biochemical-inference-state-backup-v1'
+const INFERENCE_BACKUP_VERSION = 'biochemical-inference-state-backup-v1'
 export const INFERENCE_STATE_ROOTS = Object.freeze([
   ['challenge', 'sqlite-cas', 'goal13.sqlite3'],
   ['data-plane', 'sqlite-cas', 'data-plane.sqlite3'],

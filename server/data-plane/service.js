@@ -59,7 +59,7 @@ function selectRoot(options, env) {
   })
 }
 
-export function decodeCursorSecret(value) {
+function decodeCursorSecret(value) {
   return decodeSecret(value, (reason) => {
     throw new DataPlaneRequestError('data_plane_cursor_secret_invalid', reason === 'shape' ? 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET must be unpadded base64url for exactly 32 bytes.' : 'BIOCHEMICAL_DATA_PLANE_CURSOR_SECRET is not canonical base64url.', 500)
   })

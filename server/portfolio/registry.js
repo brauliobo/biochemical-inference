@@ -7,7 +7,7 @@ const COUNT = Object.freeze({ ...ZERO, amount: 1 })
 const INVERSE_SECOND = Object.freeze({ ...ZERO, time: -1 })
 const FLUX = Object.freeze({ ...ZERO, amount: 1, mass: -1, time: -1 })
 
-export const UNITS = Object.freeze({
+const UNITS = Object.freeze({
   second: Object.freeze({ id: 'second', symbol: 's', scaleToSI: 1, dimension: Object.freeze({ ...ZERO, time: 1 }) }),
   molar: Object.freeze({ id: 'molar', symbol: 'mol/L', scaleToSI: 1000, dimension: CONCENTRATION }),
   molecule: Object.freeze({ id: 'molecule', symbol: 'molecule', scaleToSI: 1 / 6.02214076e23, dimension: COUNT }),

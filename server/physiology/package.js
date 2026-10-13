@@ -156,7 +156,7 @@ function verifyPublisher(manifest, signature, trustKey) {
   if (!verify(null, Buffer.from(signature.signedDigest), publicKey, Buffer.from(signature.signature, 'base64'))) invalid('signature_invalid', 'signature.json', 'Ed25519 publisher signature verification failed.')
 }
 
-export async function inspectBppPackage(buffer, options) {
+async function inspectBppPackage(buffer, options) {
   const files = await readArchive(buffer)
   for (const required of REQUIRED_FILES) if (!files.has(required)) invalid('missing_entry', required, `${required} is required.`)
   const manifest = parseCanonicalJson(files.get('manifest.json'), BppManifestSchema, 'manifest.json')

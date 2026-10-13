@@ -23,7 +23,7 @@ import { verifyDerivedBundle } from './bundle.js'
 import { createDerivedFixtureClient } from './fixture.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8000'
+const DEFAULT_DERIVED_URL = 'http://127.0.0.1:8000'
 
 export const DerivedCompatibilityError = defineProblemError('DerivedCompatibilityError', { statusCode: 409, code: 'DERIVED_INCOMPATIBLE' })
 

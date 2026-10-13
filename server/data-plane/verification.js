@@ -27,7 +27,7 @@ import {
 
 export const MAX_METADATA_BYTES = 8 * 1024 * 1024
 export const MAX_PARTITION_BYTES = 8 * 1024 * 1024
-export const MAX_RECORD_BYTES = 1024 * 1024
+const MAX_RECORD_BYTES = 1024 * 1024
 export const PRODUCER_PAGE_LIMIT = 2
 
 const RECORD_TYPES = Object.freeze(Object.keys(FACTORY_RECORD_SCHEMAS))
@@ -255,7 +255,7 @@ export function verifyRecordClosure(manifest, partitions) {
   return records
 }
 
-export function scientificClosureResults(manifest, records) {
+function scientificClosureResults(manifest, records) {
   const citedAssertions = records.catalysis.filter((assertion) => assertion.reference_ids.length > 0).length
   return {
     recordCounts: manifest.record_counts,

@@ -14,7 +14,7 @@ const UNIT_DEFINITIONS = Object.freeze({
 
 export const ParameterSelectionError = defineProblemError('ParameterSelectionError', { statusCode: 422, code: 'PARAMETER_SELECTION_FAILED' })
 
-export function convertParameterValue(value, sourceUnit, targetUnit) {
+function convertParameterValue(value, sourceUnit, targetUnit) {
   const source = UNIT_DEFINITIONS[sourceUnit]
   const target = UNIT_DEFINITIONS[targetUnit]
   if (!source || !target || source.dimension !== target.dimension) throw new ParameterSelectionError(`Cannot convert ${sourceUnit} to ${targetUnit}`, { code: 'INCOMPATIBLE_PARAMETER_UNIT' })
@@ -67,7 +67,7 @@ function matchingTransform(candidate, candidateContext, targetContext, transform
   return transforms.find((item) => item.candidateId === candidate.id && item.sourceTaxonId === candidateContext.taxon_id && item.targetTaxonId === targetContext.taxon_id)
 }
 
-export function selectParameterCandidates({ candidateResponse, contextResponse, datasetResponse, parameterId, targetContextId, transforms = [] }) {
+function selectParameterCandidates({ candidateResponse, contextResponse, datasetResponse, parameterId, targetContextId, transforms = [] }) {
   const parsedTransforms = transforms.map((item) => TaxonTransformSchema.parse(item))
   const parameter = candidateResponse.parameters.find((item) => item.id === parameterId)
   const targetContext = contextResponse.items.find((item) => item.id === targetContextId)

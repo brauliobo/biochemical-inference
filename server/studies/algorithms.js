@@ -1,6 +1,6 @@
 const EPSILON = 1e-14
 
-export function createSeededRandom(seed) {
+function createSeededRandom(seed) {
   let state = seed >>> 0
   return () => {
     state = (state + 0x6d2b79f5) >>> 0
@@ -198,7 +198,7 @@ export function assessIdentifiability(jacobian, noiseVariance, parameterIds) {
   return { identifiable: rank === columns && conditionNumber !== 'infinite' && conditionNumber < 1e8, parameterIds, rank, columns, conditionNumber, fisherInformation: fisher }
 }
 
-export function gelmanRubin(chains) {
+function gelmanRubin(chains) {
   const chainLength = Math.min(...chains.map((chain) => chain.length))
   const means = chains.map((chain) => chain.slice(0, chainLength).reduce((sum, item) => sum + item, 0) / chainLength)
   const grandMean = means.reduce((sum, item) => sum + item, 0) / means.length
@@ -256,7 +256,7 @@ export function randomWalkMetropolis({ logDensity, bounds, initial, priorStandar
   return { chains: allChains, acceptanceRates, rHat, converged, diagnostics }
 }
 
-export function quantile(values, probability) {
+function quantile(values, probability) {
   const sorted = [...values].sort((left, right) => left - right)
   const position = (sorted.length - 1) * probability
   const lower = Math.floor(position)

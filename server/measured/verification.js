@@ -40,7 +40,7 @@ export function parseMeasuredCanonical(bytes, schema, label, expectedDigest) {
   return parseCanonicalBytes(bytes, schema, label, { ErrorClass: MeasuredVerificationError, maxBytes: MAX_MEASURED_METADATA_BYTES, expectedDigest, contract: 'measured' })
 }
 
-export function verifyMeasuredSignature(payload, signature, trust) {
+function verifyMeasuredSignature(payload, signature, trust) {
   const key = trust.keys.find((candidate) => candidate.key_id === signature.key_id)
   if (!key) throw new MeasuredVerificationError(`Unknown measured signing key: ${signature.key_id}.`)
   if (key.status === 'revoked' || !['active', 'retired'].includes(key.status)) throw new MeasuredVerificationError(`Measured signing key is not trusted: ${signature.key_id}.`)
@@ -129,7 +129,7 @@ export function verifyMeasuredLineage(bytes, measurement) {
   return response
 }
 
-export function measuredApiViewRoot(spec, items) {
+function measuredApiViewRoot(spec, items) {
   const identifiers = items.map((item) => item.id)
   if (identifiers.length !== spec.count || identifiers.some((id, index) => index > 0 && id <= identifiers[index - 1])) throw new MeasuredVerificationError(`Signed measured view ${spec.viewId} has an invalid count, duplicate, or order.`)
   return {

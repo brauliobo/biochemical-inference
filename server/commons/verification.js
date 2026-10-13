@@ -10,7 +10,7 @@ const utf8 = new TextDecoder('utf-8', { fatal: true })
 const ED25519_SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex')
 
 // Unpadded base64url that decodes to exactly `bytes` bytes and re-encodes identically.
-export function strictBase64Url(value, bytes, label, ErrorClass, { lengthMessage = 'has an invalid canonical encoding.' } = {}) {
+function strictBase64Url(value, bytes, label, ErrorClass, { lengthMessage = 'has an invalid canonical encoding.' } = {}) {
   if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value) || value.includes('=')) throw new ErrorClass(`${label} is not strict unpadded base64url.`)
   const decoded = Buffer.from(value, 'base64url')
   if (decoded.length !== bytes || decoded.toString('base64url') !== value) throw new ErrorClass(`${label} ${lengthMessage}`)

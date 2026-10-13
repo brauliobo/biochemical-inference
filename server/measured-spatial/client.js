@@ -24,7 +24,7 @@ import {
 } from './verification.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_MEASURED_SPATIAL_URL = 'http://127.0.0.1:8000'
+const DEFAULT_MEASURED_SPATIAL_URL = 'http://127.0.0.1:8000'
 
 export const MeasuredSpatialUpstreamError = defineProblemError('MeasuredSpatialUpstreamError', { statusCode: 503, code: 'MEASURED_SPATIAL_UPSTREAM_FAILED', parent: MeasuredSpatialVerificationError })
 

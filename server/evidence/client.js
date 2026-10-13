@@ -15,7 +15,7 @@ import {
 import { createEvidenceFixtureClient, EVIDENCE_LICENSES } from './fixture.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_EVIDENCE_URL = 'http://127.0.0.1:8000'
+const DEFAULT_EVIDENCE_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_EVIDENCE_RELEASE_ID = 'mthfr-evidence-v1.0.0'
 export const DEFAULT_EVIDENCE_RELEASE_DIGEST = '93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701'
 

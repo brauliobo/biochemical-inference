@@ -32,7 +32,7 @@ function parseJournal(value) {
   return parsed
 }
 
-export function measuredJournalPath(root) {
+function measuredJournalPath(root) {
   return join(root, 'publication-journal.json')
 }
 
@@ -60,7 +60,7 @@ export async function writeMeasuredJournal(root, publication) {
   return value
 }
 
-export async function readMeasuredJournal(root) {
+async function readMeasuredJournal(root) {
   const path = measuredJournalPath(root)
   let handle
   try {

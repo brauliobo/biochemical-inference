@@ -16,7 +16,7 @@ import {
 import { createSpatialFixtureClient, FIXTURE_SPATIAL_RELEASE, PINNED_SPATIAL_TRANSFORMS } from './fixture.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_SPATIAL_URL = 'http://127.0.0.1:8000'
+const DEFAULT_SPATIAL_URL = 'http://127.0.0.1:8000'
 const TRANSFORMS_FILE_DIGEST = 'adf0a71f8469f3878523150749fd1aff3e80189ead6e0142ae7a6dfcb0fb9159'
 
 export const SpatialCompatibilityError = defineProblemError('SpatialCompatibilityError', { statusCode: 409, code: 'SPATIAL_INCOMPATIBLE' })

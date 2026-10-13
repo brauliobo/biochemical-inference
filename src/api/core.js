@@ -12,7 +12,7 @@ export class ApiError extends Error {
 }
 
 export const IMMUTABLE_CACHE = 'public, max-age=31536000, immutable'
-export const JSON_HEADERS = { 'content-type': 'application/json' }
+const JSON_HEADERS = { 'content-type': 'application/json' }
 
 export const csrfHeaders = (name, value) => ({ ...JSON_HEADERS, [name]: value })
 export const withSignal = (signal) => (signal ? { signal } : {})

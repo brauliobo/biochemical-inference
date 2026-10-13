@@ -8,13 +8,11 @@ import {
   EvaluationResponseSchema,
   MEASURED_API_VIEW_SPECS,
   MEASURED_CATALOG_DIGEST,
-  MEASURED_ENVELOPE_DIGEST,
   MEASURED_RELEASE_DIGEST,
   MEASURED_RELEASE_ID,
   MEASURED_HELDOUT_PARTITION_DIGEST,
   MEASURED_HELDOUT_PARTITION_ID,
-  MEASURED_SELECTED_LINEAGE_IDS,
-  MeasuredCatalogSchema
+  MEASURED_SELECTED_LINEAGE_IDS
 } from '../../shared/measured-contracts.js'
 import {
   MAX_MEASURED_METADATA_BYTES,
@@ -33,11 +31,11 @@ import {
 } from './verification.js'
 import { defineProblemError } from '../commons/errors.js'
 
-export const DEFAULT_MEASURED_URL = 'http://127.0.0.1:8000'
+const DEFAULT_MEASURED_URL = 'http://127.0.0.1:8000'
 
 export const MeasuredUpstreamError = defineProblemError('MeasuredUpstreamError', { statusCode: 503, code: 'MEASURED_UPSTREAM_FAILED', parent: MeasuredVerificationError })
 
-export function validateMeasuredLoopbackUrl(value) {
+function validateMeasuredLoopbackUrl(value) {
   let url
   try {
     url = new URL(value)
@@ -272,9 +270,3 @@ export function createMeasuredClient(env = process.env, options = {}) {
     }
   }
 }
-
-export function verifyCatalogFixture(bytes) {
-  return parseMeasuredCanonical(bytes, MeasuredCatalogSchema, 'Measured fixture catalog', MEASURED_CATALOG_DIGEST)
-}
-
-export { MEASURED_ENVELOPE_DIGEST, MEASURED_RELEASE_DIGEST, MEASURED_RELEASE_ID }

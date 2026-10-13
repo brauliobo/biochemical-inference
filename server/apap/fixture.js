@@ -13,7 +13,7 @@ import {
   UpstreamApapValidationSchema
 } from '../../shared/apap-contracts.js'
 
-export const FIXTURE_APAP_RELEASE = Object.freeze({ id: APAP_RELEASE_ID, schema_version: APAP_CONTRACT_VERSION, digest: APAP_RELEASE_DIGEST })
+const FIXTURE_APAP_RELEASE = Object.freeze({ id: APAP_RELEASE_ID, schema_version: APAP_CONTRACT_VERSION, digest: APAP_RELEASE_DIGEST })
 
 const contexts = [
   { id: 'CONTEXT:APAP-HUMAN-LIVER', name: 'Human liver and hepatocyte algorithm-demonstration context', taxon_id: 'NCBITaxon:9606', taxon_label: 'Homo sapiens', organ_id: 'UBERON:0002107', organ_label: 'liver', cell_type_id: 'CL:0000182', cell_type_label: 'hepatocyte', strain: null, sex: 'not-specified', challenge_route: 'oral', fasting_status: 'not-specified', fasting_detail: 'Fasting and sex are intentionally unspecified; this synthetic context does not represent a clinical cohort.', source_ids: ['NCBI_TAXONOMY', 'UBERON', 'CELL_ONTOLOGY'] },

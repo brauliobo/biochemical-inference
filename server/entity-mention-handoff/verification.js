@@ -38,7 +38,7 @@ const ENTITY_RECORD_FAMILIES = Object.freeze([
   'slice_summary', 'source_coverage', 'source_lineage', 'source_mappings', 'sources', 'text_assertions', 'transformations'
 ])
 
-export const ENTITY_MENTION_IMPORT_LIMITS = Object.freeze({
+const ENTITY_MENTION_IMPORT_LIMITS = Object.freeze({
   files: 1_700,
   depth: 3,
   manifestBytes: 1024 * 1024,
@@ -203,7 +203,7 @@ function exactSet(values, expected, label) {
   if (canonicalJson(actual) !== canonicalJson(wanted)) fail(`${label} closure is incomplete or excessive.`)
 }
 
-export function verifyEntityMentionSemanticClosure(documents, handoff) {
+function verifyEntityMentionSemanticClosure(documents, handoff) {
   const entities = DocumentSchema.parse(documents.get('entity-records/entities.json')).records
   const candidate = CandidateEntitySchema.safeParse(entities.find((record) => record?.id === CANDIDATE_ID))
   const reaction = ReactionEntitySchema.safeParse(entities.find((record) => record?.id === REACTION_ID))
