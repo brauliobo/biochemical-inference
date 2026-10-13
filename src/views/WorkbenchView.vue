@@ -28,6 +28,6 @@ NotFoundView(v-if="!item")
       strong Demonstration, not diagnosis.
       |  Illustrative kinetics and a bounded pathway. Not for clinical use.
   ApiRequired(v-if="blocked" :title="item.title")
-  .legacy-workbench(v-else)
+  div(v-else :class="{ 'legacy-workbench': item.legacy !== false }")
     component(:is="workbench" v-bind="item.props")
 </template>

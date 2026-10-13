@@ -144,11 +144,16 @@ a.card:hover { border-color: var(--color-accent); }
   font-weight: var(--weight-strong);
 }
 
+/* Status variants, same palette as notices. */
+.badge--success { border-color: var(--color-success-border); color: var(--color-success-text); }
+.badge--warning { border-color: var(--color-warning-border); color: var(--color-warning-text); }
+.badge--danger { border-color: var(--color-danger-border); color: var(--color-danger-text); }
+
 /* ---- Notice (inline status message). Add role="status" or role="alert". ---- */
 .notice {
   padding: var(--space-inset);
   border: var(--border-width) solid var(--color-info-border);
-  border-inline-start-width: var(--focus-ring-width);
+  border-inline-start-width: var(--border-width-accent);
   border-radius: var(--radius-control);
   background: var(--color-info-surface);
   color: var(--color-info-text);

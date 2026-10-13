@@ -35,10 +35,9 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: Build static site
         env:
-          VITE_STATIC_MODE: "true"
-          # base_path is "/<repository>" for project pages and "" for user pages.
+          # build:static sets VITE_STATIC_MODE. base_path is "/<repository>" for project pages and "" for user pages.
           VITE_BASE: ${{ steps.pages.outputs.base_path }}/
-        run: npx vite build --outDir dist-static
+        run: npm run build:static
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
           path: dist-static

@@ -88,6 +88,7 @@
   --radius-pill: var(--radius-round);
   --border-width: var(--border-1);
   --border-width-strong: var(--border-2);
+  --border-width-accent: var(--border-3);
   --shadow-card: var(--shadow-1);
   --shadow-raised: var(--shadow-2);
   --shadow-overlay: var(--shadow-3);

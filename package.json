@@ -13,6 +13,7 @@
     "dev:web": "vite",
     "build": "vite build && npm run build:server",
     "build:server": "node server/build.js",
+    "build:static": "VITE_STATIC_MODE=true vite build --outDir dist-static",
     "start": "node server-dist/server/index.js",
     "ops": "node scripts/operations.js",
     "ops:bootstrap": "node scripts/operations.js bootstrap",
@@ -54,6 +55,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.51.0",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "6.0.10",

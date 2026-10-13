@@ -1,6 +1,21 @@
+import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-// Keyboard-only operability and landmarks of the app shell (docs/USABILITY.md).
+// Keyboard-only operability, landmarks and automated WCAG checks of the app
+// shell (docs/USABILITY.md). Add every new knowledge-site route to ROUTES.
+const ROUTES = ['/#/', '/#/kb', '/#/kb/enzymes/mthfr', '/#/workbench', '/#/no/such/page']
+
+for (const colorScheme of ['light', 'dark']) {
+  test(`has no WCAG 2.2 AA violations on any shell route (${colorScheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme })
+    for (const route of ROUTES) {
+      await page.goto(route)
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
+      expect(violations.map((violation) => `${route}: ${violation.id} (${violation.nodes.length})`)).toEqual([])
+    }
+  })
+}
 
 test('skip link and primary navigation work from the keyboard alone', async ({ page }) => {
   await page.goto('/')

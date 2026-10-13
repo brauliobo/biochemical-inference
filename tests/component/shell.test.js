@@ -5,6 +5,9 @@ import { navigate } from '../../src/router.js'
 import { workbenches } from '../../src/workbenches.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
 
+const api = vi.hoisted(() => ({ loadPortfolioModels: vi.fn(), runPortfolioExperiment: vi.fn() }))
+vi.mock('../../src/api.js', () => api)
+
 beforeEach(() => {
   window.scrollTo = vi.fn()
   navigate('/')
@@ -24,6 +27,8 @@ describe('app shell', () => {
     expect(screen.getByRole('link', { name: 'Skip to main content' }).getAttribute('href')).toBe('#main')
     expect(await screen.findByRole('heading', { level: 1, name: /Methylation biochemistry/ })).toBeTruthy()
     expect(document.title).toBe('Home · Biochemical Inference')
+    // class on <RouterLink> falls through to its root <a>
+    expect(screen.getByRole('link', { name: 'Browse the knowledge base' }).classList.contains('button')).toBe(true)
   })
 
   it('moves focus to main from the skip link without changing the route', async () => {
@@ -79,6 +84,16 @@ describe('workbench routes', () => {
     await screen.findByRole('heading', { level: 1, name: 'Workbenches' })
     const links = within(screen.getByRole('main')).getAllByRole('link').filter((link) => link.getAttribute('href').startsWith('#/workbench/'))
     expect(links).toHaveLength(workbenches.length)
+  })
+
+  it('lazy-loads a legacy virtual-DOM workbench inside the Vapor shell', async () => {
+    api.loadPortfolioModels.mockResolvedValue([])
+    navigate('/workbench/portfolio')
+    mountVapor(App)
+
+    expect(await screen.findByRole('heading', { level: 2, name: 'ODE · SSA · FBA workbench' })).toBeTruthy()
+    expect(document.querySelector('.legacy-workbench .portfolio-panel')).toBeTruthy()
+    expect(api.loadPortfolioModels).toHaveBeenCalled()
   })
 
   it('shows one notice instead of the workbench in static mode', async () => {

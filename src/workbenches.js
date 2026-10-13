@@ -3,7 +3,8 @@
 // migrated to run client-side can set needsApi: false and then also works in
 // the static build.
 //
-//   props   passed to the component (some legacy components require them)
+//   props    passed to the component (some legacy components require them)
+//   legacy   false once the workbench no longer needs legacy-workbench.css
 export const workbenches = [
   { name: 'full', title: 'Full workbench (single page)', summary: 'The original single-page workbench: simulation, evidence, atlas and every module below on one page.', needsApi: true, load: () => import('./views/workbench/FullWorkbench.vue') },
   { name: 'challenge', title: 'Frozen APAP challenge', summary: 'Independent frozen-release inference and scoring.', needsApi: true, load: () => import('./components/ChallengeWorkbench.vue') },
