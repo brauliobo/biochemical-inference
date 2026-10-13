@@ -9,7 +9,7 @@ export default [
     summary: "Reduced methylation capacity (low SAM or SAM:SAH). Biochemically measurable; as a clinical diagnosis ('undermethylator' biotype) it is contested and not mainstream.",
     body: [
       "The word 'under-methylation' is used in two quite different ways. In biochemistry it means a lowered capacity to transfer methyl groups: a low [[compound:sam]] supply, a low [[compound:sam]]:[[compound:sah]] ratio (the so-called methylation index), impaired remethylation of [[compound:homocysteine]], or reduced DNA/protein methylation. These are measurable quantities. In the Pfeiffer/Walsh nutrient-therapy tradition it is also a 'biotype' of patients (said to be identified mainly by high whole-blood histamine and a low SAM:SAH ratio) who are linked to anxiety, OCD-type traits, depression and seasonal allergy, and treated with SAMe, methionine and other agents. That second usage is contested: the evidence is largely the proponents' own patient database and clinical observation, there are no validated diagnostic criteria, no randomized trials of the biotype-directed approach, and whole-blood histamine is non-specific (it depends on basophil count). Mainstream guidelines do not recognise it. Everything below is educational, not a diagnosis.",
-      "Mechanism: the body runs a 'methyl budget'. Methyl groups enter as dietary methionine (activated to SAM by MAT, which needs magnesium) or are recycled by remethylating homocysteine through methionine synthase ([[compound:5-methyl-thf]] plus vitamin B12, see [[pathway:folate-cycle]]) or through [[enzyme:bhmt]] using [[compound:betaine]] made from [[compound:choline]] (see [[pathway:methionine-cycle]]). They are spent by dozens of SAM-dependent methyltransferases. Quantitatively the big sinks are [[enzyme:pemt]] (three SAM per phosphatidylcholine) and creatine synthesis (GAMT), which together account for most SAM-derived methyl use in humans (see [[state:methyl-donor-depletion]]); [[enzyme:gnmt]] acts as a regulated 'valve' using [[compound:glycine]] to dump surplus methyl as sarcosine; NNMT methylates nicotinamide/[[compound:niacin]] metabolites. Every transfer yields [[compound:sah]], which inhibits methyltransferases, so the ratio, not SAM alone, matters. B6, B12, folate, riboflavin (for [[enzyme:mthfr]]), choline and betaine are all supply-side dependencies; a B12 shortfall can trap folate as 5-methyl-THF ([[state:folate-trap]]).",
+      "Mechanism: the body runs a 'methyl budget'. Methyl groups enter as dietary methionine (activated to SAM by MAT, which needs magnesium) or are recycled by remethylating homocysteine through methionine synthase ([[compound:5-mthf|5-methyl-THF]] plus vitamin B12, see [[pathway:folate-cycle]]) or through [[enzyme:bhmt]] using [[compound:betaine]] made from [[compound:choline]] (see [[pathway:methionine-cycle]]). They are spent by dozens of SAM-dependent methyltransferases. Quantitatively the big sinks are [[enzyme:pemt]] (three SAM per phosphatidylcholine) and creatine synthesis (GAMT), which together account for most SAM-derived methyl use in humans (see [[state:methyl-donor-depletion]]); [[enzyme:gnmt]] acts as a regulated 'valve' using [[compound:glycine]] to dump surplus methyl as sarcosine; NNMT methylates nicotinamide/[[compound:niacin]] metabolites. Every transfer yields [[compound:sah]], which inhibits methyltransferases, so the ratio, not SAM alone, matters. B6, B12, folate, riboflavin (for [[enzyme:mthfr]]), choline and betaine are all supply-side dependencies; a B12 shortfall can trap folate as 5-methyl-THF ([[state:folate-trap]]).",
       "Reported manifestations in the Walsh literature include anxiety, obsessive or perfectionist traits, low histamine-clearance symptoms (flushing, allergy-like complaints, night waking), and a tendency to respond to SAMe, methionine, calcium/magnesium and B6, and to react badly to folic acid or niacin. These are associations from clinic series, not proven causal links. Better-documented correlates of a poor methylation supply are raised homocysteine ([[state:hyperhomocysteinemia]]), a lowered SAM:SAH ratio ([[outcome:low-sam-sah-ratio]]), and, in severe genetic disorders, neurological and vascular disease. The proposed chain in the source conversation, where glycine drains scarce methyl groups through GNMT, lowers PEMT-derived choline and acetylcholine, and so slows gastric emptying, is mechanistically imaginable but unproven; see [[claim:glycine-gnmt-depletes-sam-in-undermethylated]] and [[claim:undermethylation-causes-subclinical-vagal-dysfunction]].",
       "How it is (not) measured: plasma or blood SAM and SAH can be quantified by LC-MS/MS, but they are unstable and sensitive to sampling, and their relation to tissue methylation is imperfect. Total homocysteine ([[outcome:elevated-homocysteine]]) is the best-validated functional marker but is also raised by renal impairment, B12/folate/B6 deficiency, hypothyroidism, drugs and age. Global or locus-specific DNA methylation ([[outcome:global-dna-methylation]]) is tissue- and assay-specific and not a clinical test. Whole-blood histamine ([[outcome:blood-histamine-level]]) and genotyping such as the common MTHFR C677T variant do not establish 'undermethylation'. Differential diagnosis of the complaints attributed to it includes B12 or folate deficiency (pernicious anaemia, atrophic gastritis, metformin or PPI use), hypothyroidism, kidney disease, primary anxiety or mood disorders, histamine intolerance ([[disease:histamine-intolerance]]) and, for gut symptoms, functional dyspepsia or reflux disease.",
       "Interventions in context: correcting a demonstrated deficiency of folate, B12, B6, riboflavin, choline or betaine restores the supply side. SAMe, methyl-donor combinations and methyl-consuming compounds such as niacin should be personalised by a clinician, because the net effect depends on the underlying state; the idea that methyl donors help in one 'biotype' and harm in another is the contested part of the Walsh model ([[claim:walsh-under-over-methylation-categories-valid]]). See also [[state:overmethylation]] for the opposite pole."
@@ -32,7 +32,7 @@ export default [
       { rel: "associated-with", to: "state:methyl-donor-depletion" },
       { rel: "associated-with", to: "state:overmethylation", note: "Opposite pole of the Walsh classification." }
     ],
-    refs: ["article:stead-2006-methyl-balance", "article:luka-2009-gnmt-sam-regulation", "article:ueland-2011-choline-betaine"]
+    refs: ["article:stead-2006-methyl-balance-reevaluation", "article:luka-2009-gnmt-sam-regulation", "article:ueland-2011-choline-betaine"]
   },
   {
     id: "state:overmethylation",
@@ -68,7 +68,7 @@ export default [
     aliases: ["Hipocloridria", "Low stomach acid", "Achlorhydria (absent acid)", "Baixa acidez gástrica"],
     summary: "Reduced gastric acid output (raised pH), usually from PPIs, H. pylori, autoimmune gastritis or ageing; it weakens the bacterial barrier and impairs B12 and iron absorption.",
     body: [
-      "Gastric acid, produced by parietal cells through [[pathway:gastric-acid-secretion]], keeps the stomach near pH 1-3, activates [[compound:pepsin]] and kills most swallowed bacteria. Established causes of low output are acid-suppressive drugs ([[state:acid-suppression]], [[intervention:ppi]]), chronic [[disease:h-pylori-infection]] with corpus atrophy, autoimmune gastritis ([[disease:atrophic-gastritis]]), advanced age, and previous gastric surgery. Consequences include impaired absorption of vitamin B12, iron and some minerals, reduced protein digestion, and a higher risk of upper-gut bacterial colonisation ([[disease:sibo]]), though the size of that last effect is debated.",
+      "Gastric acid, produced by parietal cells through [[pathway:gastric-acid-secretion]], keeps the stomach near pH 1-3, activates [[compound:pepsin]] and kills most swallowed bacteria. Established causes of low output are acid-suppressive drugs ([[state:acid-suppression]], [[intervention:ppi-therapy|PPIs]]), chronic [[disease:h-pylori-infection]] with corpus atrophy, autoimmune gastritis ([[disease:atrophic-gastritis]]), advanced age, and previous gastric surgery. Consequences include impaired absorption of vitamin B12, iron and some minerals, reduced protein digestion, and a higher risk of upper-gut bacterial colonisation ([[disease:sibo]]), though the size of that last effect is debated.",
       "Popular wellness sources describe 'functional hypochlorhydria' as common and as a driver of bloating and belching, and recommend [[intervention:betaine-hcl]]. There is no validated bedside test; symptoms do not reliably discriminate low from normal acid; and trials of acid replacement are few and small. In the source conversation hypochlorhydria is also linked to under-methylation through low cholinergic tone; that link is not documented ([[claim:undermethylated-hypochlorhydria]]). Educational context only; not diagnostic."
     ],
     evidence: "established",
@@ -83,7 +83,7 @@ export default [
       { rel: "aggravates", to: "disease:atrophic-gastritis", note: "Atrophy is both cause and consequence of low acid; included to show the loop." },
       { rel: "interacts-with", to: "compound:gastrin", note: "Low acid removes feedback inhibition, so gastrin rises." }
     ],
-    refs: ["article:lenti-2020-autoimmune-gastritis", "article:schubert-2008-gastric-acid-control", "article:guilliams-2020-betaine-hcl-evidence"]
+    refs: ["article:lenti-2020-autoimmune-gastritis", "article:schubert-2008-gastric-acid-secretion-control", "article:guilliams-2020-betaine-hcl-evidence"]
   },
   {
     id: "state:b6-functional-deficiency",
@@ -126,7 +126,7 @@ export default [
       { rel: "measured-by", to: "outcome:delayed-gastric-emptying" },
       { rel: "associated-with", to: "disease:functional-dyspepsia" }
     ],
-    refs: ["article:camilleri-2013-acg-gastroparesis-guideline", "article:stanghellini-2016-rome-iv-gastroduodenal", "article:browning-2014-vagal-control-gi"]
+    refs: ["article:camilleri-2022-acg-gastroparesis", "article:stanghellini-2016-rome-iv-gastroduodenal", "article:browning-2014-vagal-control-gi"]
   },
   {
     id: "state:methyl-donor-depletion",
@@ -147,7 +147,7 @@ export default [
       { rel: "measured-by", to: "outcome:elevated-homocysteine" },
       { rel: "measured-by", to: "outcome:low-sam-sah-ratio" }
     ],
-    refs: ["article:zeisel-1991-choline-essential-nutrient", "article:stead-2006-methyl-balance", "article:ueland-2011-choline-betaine"]
+    refs: ["article:zeisel-1991-choline-essential-nutrient", "article:stead-2006-methyl-balance-reevaluation", "article:ueland-2011-choline-betaine"]
   },
   {
     id: "state:folate-trap",
@@ -156,13 +156,13 @@ export default [
     aliases: ["Armadilha do folato", "Folate trap", "Methylfolate trap", "Functional folate deficiency"],
     summary: "Folate accumulates as 5-methyl-THF because methionine synthase, which needs B12, cannot use it. Folate-dependent synthesis suffers despite normal total folate; B12 deficiency is the classic cause.",
     body: [
-      "The [[enzyme:mthfr]] step that produces [[compound:5-methyl-thf]] is effectively irreversible in cells, and the only way back to the THF pool is via methionine synthase, which needs vitamin B12. If B12 is lacking, 5-methyl-THF piles up, other folate forms are depleted, and DNA synthesis is impaired (megaloblastic anaemia) while [[compound:homocysteine]] rises ([[state:hyperhomocysteinemia]]). This 'methyl-trap hypothesis' is a textbook explanation for why B12 deficiency mimics folate deficiency, and why large doses of folic acid can correct the anaemia but not the neurological damage.",
+      "The [[enzyme:mthfr]] step that produces [[compound:5-mthf|5-methyl-THF]] is effectively irreversible in cells, and the only way back to the THF pool is via methionine synthase, which needs vitamin B12. If B12 is lacking, 5-methyl-THF piles up, other folate forms are depleted, and DNA synthesis is impaired (megaloblastic anaemia) while [[compound:homocysteine]] rises ([[state:hyperhomocysteinemia]]). This 'methyl-trap hypothesis' is a textbook explanation for why B12 deficiency mimics folate deficiency, and why large doses of folic acid can correct the anaemia but not the neurological damage.",
       "In the wider methylation discourse the trap is sometimes invoked loosely for people with common MTHFR variants. Evidence for a clinically relevant trap outside B12 deficiency or severe enzyme defects is limited. The same pathway links to the question of folic acid versus methylfolate ([[claim:folic-acid-competes-with-methylfolate]]). Educational information; not diagnostic."
     ],
     evidence: "established",
     relations: [
       { rel: "decreases", to: "pathway:folate-cycle", note: "Non-methyl folates are depleted; thymidylate and purine synthesis suffer." },
-      { rel: "increases", to: "compound:5-methyl-thf", note: "Accumulates in the trapped pool." },
+      { rel: "increases", to: "compound:5-mthf", note: "Accumulates in the trapped pool." },
       { rel: "causes", to: "state:hyperhomocysteinemia" },
       { rel: "measured-by", to: "outcome:elevated-homocysteine" },
       { rel: "associated-with", to: "disease:vitamin-b12-deficiency" }
@@ -216,7 +216,7 @@ export default [
     aliases: ["Supressão ácida", "PPI therapy state", "Uso de IBP", "Acid-suppressed stomach"],
     summary: "Gastric acid reduced by PPIs, potassium-competitive blockers or H2 blockers; it heals ulcers and GERD but is associated with SIBO, B12 deficiency and slower solid-meal emptying.",
     body: [
-      "[[intervention:ppi]] therapy lifts gastric pH for most of the day and is first-line for ulcers and erosive reflux. Long-term acid suppression is a recognised cause of [[state:hypochlorhydria]]. Meta-analyses report a moderate association between PPI use and small-intestinal bacterial overgrowth (odds ratio about 1.7-2.3), with heterogeneity and test-dependence, and reviews show that PPIs delay emptying of solid meals ([[claim:ppis-cause-sibo]], [[claim:ppis-slow-gastric-emptying]]). Rebound acid hypersecretion after withdrawal is also described.",
+      "[[intervention:ppi-therapy|PPIs]] therapy lifts gastric pH for most of the day and is first-line for ulcers and erosive reflux. Long-term acid suppression is a recognised cause of [[state:hypochlorhydria]]. Meta-analyses report a moderate association between PPI use and small-intestinal bacterial overgrowth (odds ratio about 1.7-2.3), with heterogeneity and test-dependence, and reviews show that PPIs delay emptying of solid meals ([[claim:ppis-cause-sibo]], [[claim:ppis-slow-gastric-emptying]]). Rebound acid hypersecretion after withdrawal is also described.",
       "Anyone who has used PPIs should discuss tapering and any alternative therapy with the prescriber; abrupt self-discontinuation can worsen symptoms. Eradication of [[disease:h-pylori-infection]] normally uses a PPI plus antibiotics, and the ACG 2024 guideline asks for PPIs to be held for at least two weeks before test-of-cure ([[claim:confirm-h-pylori-eradication]]). Educational only."
     ],
     evidence: "established",
@@ -268,7 +268,7 @@ export default [
       { rel: "increases", to: "outcome:elevated-tmao" },
       { rel: "associated-with", to: "disease:trimethylaminuria" }
     ],
-    refs: ["article:iom-1998-choline-reference-intakes", "article:efsa-2016-choline-reference-values"]
+    refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"]
   },
   {
     id: "state:histamine-excess",

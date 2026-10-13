@@ -40,7 +40,7 @@ export default [
       { rel: "associated-with", to: "system:pylorus" },
       { rel: "associated-with", to: "outcome:delayed-gastric-emptying" }
     ],
-    refs: ["article:schubert-2008-gastric-acid-control", "article:browning-2014-vagal-control-gi"]
+    refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:browning-2014-vagal-control-gi"]
   },
   {
     id: "system:gut-microbiota",
@@ -80,7 +80,7 @@ export default [
       { rel: "associated-with", to: "system:liver" },
       { rel: "associated-with", to: "system:duodenum" }
     ],
-    refs: ["article:sjovall-1959-bile-acid-conjugation", "article:ridlon-2014-bile-acids-microbiome"]
+    refs: ["article:sjovall-1959-glycine-taurine-bile-conjugation", "article:ridlon-2014-bile-acids-microbiome"]
   },
   {
     id: "system:lower-esophageal-sphincter",
@@ -138,7 +138,7 @@ export default [
       { rel: "associated-with", to: "pathway:methionine-cycle" },
       { rel: "associated-with", to: "disease:fatty-liver-nafld" }
     ],
-    refs: ["article:lu-2008-methionine-metabolism-liver", "article:ueland-2011-choline-betaine"]
+    refs: ["article:mato-2008-methionine-metabolism-liver", "article:ueland-2011-choline-betaine"]
   },
   {
     id: "system:duodenum",
@@ -158,7 +158,7 @@ export default [
       { rel: "associated-with", to: "system:bile" },
       { rel: "associated-with", to: "disease:functional-dyspepsia" }
     ],
-    refs: ["article:allen-2005-gastroduodenal-mucus-bicarbonate"]
+    refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "system:pancreas-bicarbonate",
@@ -177,7 +177,7 @@ export default [
       { rel: "associated-with", to: "system:duodenum" },
       { rel: "associated-with", to: "outcome:co2-gastric-distension" }
     ],
-    refs: ["article:allen-2005-gastroduodenal-mucus-bicarbonate"]
+    refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "system:larynx-pharynx",
@@ -196,7 +196,7 @@ export default [
       { rel: "interacts-with", to: "compound:pepsin" },
       { rel: "associated-with", to: "outcome:salivary-pepsin" }
     ],
-    refs: ["article:johnston-2009-pepsin-hypopharyngeal-cells"]
+    refs: ["article:johnston-2006-pepsin-laryngeal-epithelium"]
   },
   {
     id: "system:brain-gaba-glutamate",
@@ -254,7 +254,7 @@ export default [
       { rel: "associated-with", to: "outcome:ulcer-healing" },
       { rel: "interacts-with", to: "intervention:zinc-carnosine" }
     ],
-    refs: ["article:allen-2005-gastroduodenal-mucus-bicarbonate"]
+    refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },
   {
     id: "system:pylorus",

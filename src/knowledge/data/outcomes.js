@@ -18,7 +18,7 @@ export default [
       { rel: "aggravates", to: "disease:lpr", note: "Hypothesised route for refluxate/pepsin to reach the larynx; untested." },
       { rel: "measured-by", to: "outcome:reflux-episodes", note: "Impedance-pH classifies gastric versus supragastric belching." }
     ],
-    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:halland-2018-diaphragmatic-breathing-belching"]
+    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:ong-2018-diaphragmatic-breathing-belching"]
   },
   {
     id: "outcome:night-waking",
@@ -137,7 +137,7 @@ export default [
     aliases: ["Esvaziamento gástrico lentificado", "Slow gastric emptying", "Gastric stasis"],
     summary: "Retention of food in the stomach beyond reference times on scintigraphy or breath tests. Causes include diabetes, drugs, surgery and vagal injury; symptoms correlate poorly with measured delay.",
     body: [
-      "Standard testing is a four-hour scintigraphic solid meal study. Delay slows nutrient delivery and may promote bloating, nausea and bacterial stasis. [[intervention:ppi]] therapy delays solid-meal emptying modestly in some studies ([[claim:ppis-slow-gastric-emptying]]), and ginger may accelerate emptying in small trials ([[claim:ginger-prokinetic-5ht4-mmc]]). The conversation proposes undermethylation-linked cholinergic failure as a cause, which is unproven ([[claim:undermethylation-causes-subclinical-vagal-dysfunction]]). Educational only."
+      "Standard testing is a four-hour scintigraphic solid meal study. Delay slows nutrient delivery and may promote bloating, nausea and bacterial stasis. [[intervention:ppi-therapy|PPIs]] therapy delays solid-meal emptying modestly in some studies ([[claim:ppis-slow-gastric-emptying]]), and ginger may accelerate emptying in small trials ([[claim:ginger-prokinetic-5ht4-mmc]]). The conversation proposes undermethylation-linked cholinergic failure as a cause, which is unproven ([[claim:undermethylation-causes-subclinical-vagal-dysfunction]]). Educational only."
     ],
     evidence: "established",
     relations: [
@@ -146,7 +146,7 @@ export default [
       { rel: "associated-with", to: "disease:gastroparesis" },
       { rel: "aggravates", to: "disease:sibo", note: "Stasis is a predisposing factor." }
     ],
-    refs: ["article:camilleri-2013-acg-gastroparesis-guideline", "article:sanaka-2010-ppi-gastric-emptying"]
+    refs: ["article:camilleri-2022-acg-gastroparesis", "article:sanaka-2010-ppi-gastric-emptying"]
   },
   {
     id: "outcome:elevated-gastric-ph",
@@ -164,7 +164,7 @@ export default [
       { rel: "decreases", to: "compound:pepsin", note: "Pepsin is activated by acid and reversibly inactive near pH 6.5." },
       { rel: "associated-with", to: "pathway:gastric-acid-secretion" }
     ],
-    refs: ["article:schubert-2008-gastric-acid-control"]
+    refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "outcome:co2-gastric-distension",
@@ -235,7 +235,7 @@ export default [
       { rel: "associated-with", to: "disease:trimethylaminuria" },
       { rel: "associated-with", to: "state:choline-excess" }
     ],
-    refs: ["article:iom-1998-choline-reference-intakes", "article:mackay-2011-trimethylaminuria"]
+    refs: ["article:iom-1998-choline-dri", "article:mackay-2011-trimethylaminuria"]
   },
   {
     id: "outcome:ulcer-healing",
@@ -279,16 +279,16 @@ export default [
     aliases: ["Intolerância à glicina", "Gas and belching on glycine powder", "Glycine powder GI upset"],
     summary: "Upper-GI symptoms such as belching, nausea or soft stool after taking glycine powder, reported at high doses and anecdotally at 2-3 g; mechanisms and prevalence are unmeasured.",
     body: [
-      "Trials of glycine at 3 g before bed for sleep reported no major problems ([[outcome:improved-sleep-quality]]), and schizophrenia trials used 15-60 g/day with mild upper-GI discomfort in some. No study has characterised belching on 2-3 g, so possible causes (swallowed air while dissolving a sweet powder, hyperosmolar drinking, taste, nausea, sensitivity) cannot be ranked, and the conversation's specific chain through gastrin, bicarbonate and SIBO is not supported ([[claim:free-glycine-stimulates-gastrin]], [[claim:sibo-bacteria-metabolize-glycine-co2-nh3]]). Taking glycine with food is a common suggestion without controlled data ([[intervention:glycine-with-meals]]). Educational only."
+      "Trials of glycine at 3 g before bed for sleep reported no major problems ([[outcome:improved-sleep-quality]]), and schizophrenia trials used 15-60 g/day with mild upper-GI discomfort in some. No study has characterised belching on 2-3 g, so possible causes (swallowed air while dissolving a sweet powder, hyperosmolar drinking, taste, nausea, sensitivity) cannot be ranked, and the conversation's specific chain through gastrin, bicarbonate and SIBO is not supported ([[claim:free-glycine-stimulates-gastrin]], [[claim:sibo-bacteria-metabolize-glycine-co2-nh3]]). Taking glycine with food is a common suggestion without controlled data ([[intervention:amino-acids-with-meals|glycine with meals]]). Educational only."
     ],
     evidence: "plausible",
     relations: [
       { rel: "associated-with", to: "compound:glycine" },
       { rel: "associated-with", to: "intervention:glycine-powder" },
-      { rel: "associated-with", to: "intervention:glycine-with-meals" },
+      { rel: "associated-with", to: "intervention:amino-acids-with-meals" },
       { rel: "associated-with", to: "outcome:belching" }
     ],
-    refs: ["article:yamadera-2007-glycine-sleep", "article:bannai-2012-glycine-sleep"]
+    refs: ["article:yamadera-2007-glycine-sleep-psg", "article:bannai-2012-glycine-sleep"]
   },
   {
     id: "outcome:global-dna-methylation",
@@ -408,7 +408,7 @@ export default [
       { rel: "associated-with", to: "intervention:glycine-powder" },
       { rel: "associated-with", to: "outcome:night-waking" }
     ],
-    refs: ["article:yamadera-2007-glycine-sleep", "article:bannai-2012-glycine-sleep"]
+    refs: ["article:yamadera-2007-glycine-sleep-psg", "article:bannai-2012-glycine-sleep"]
   },
   {
     id: "outcome:heartburn",
@@ -442,7 +442,7 @@ export default [
       { rel: "associated-with", to: "compound:choline" },
       { rel: "associated-with", to: "state:choline-excess" }
     ],
-    refs: ["article:iom-1998-choline-reference-intakes"]
+    refs: ["article:iom-1998-choline-dri"]
   },
   {
     id: "outcome:elevated-tmao",
@@ -460,7 +460,7 @@ export default [
       { rel: "associated-with", to: "disease:cardiovascular-disease" },
       { rel: "associated-with", to: "state:choline-excess" }
     ],
-    refs: ["article:wang-2011-tmao-atherosclerosis"]
+    refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd"]
   },
   {
     id: "outcome:h-pylori-test-result",
@@ -474,7 +474,7 @@ export default [
     evidence: "established",
     relations: [
       { rel: "associated-with", to: "disease:h-pylori-infection" },
-      { rel: "associated-with", to: "intervention:h-pylori-eradication" },
+      { rel: "associated-with", to: "intervention:h-pylori-eradication-therapy" },
       { rel: "associated-with", to: "state:acid-suppression" }
     ],
     refs: ["article:chey-2024-acg-h-pylori-treatment", "article:malfertheiner-2022-maastricht-vi"]
@@ -494,7 +494,7 @@ export default [
       { rel: "associated-with", to: "intervention:sibo-breath-test" },
       { rel: "associated-with", to: "system:gut-microbiota" }
     ],
-    refs: ["article:rezaie-2017-breath-testing-consensus", "article:pimentel-2020-acg-sibo-guideline"]
+    refs: ["article:rezaie-2017-breath-test-consensus", "article:pimentel-2020-acg-sibo-guideline"]
   },
   {
     id: "outcome:reflux-episodes",
@@ -528,7 +528,7 @@ export default [
       { rel: "associated-with", to: "disease:lpr" },
       { rel: "associated-with", to: "system:larynx-pharynx" }
     ],
-    refs: ["article:johnston-2009-pepsin-hypopharyngeal-cells", "article:chen-2023-aga-extraesophageal-reflux"]
+    refs: ["article:johnston-2006-pepsin-laryngeal-epithelium", "article:chen-2023-aga-extraesophageal-reflux"]
   },
   {
     id: "outcome:urinary-tma-tmao-ratio",
@@ -595,7 +595,7 @@ export default [
       { rel: "associated-with", to: "disease:atrophic-gastritis" },
       { rel: "associated-with", to: "claim:free-glycine-stimulates-gastrin" }
     ],
-    refs: ["article:taylor-1982-amino-acids-gastrin-acid", "article:schubert-2008-gastric-acid-control"]
+    refs: ["article:taylor-1982-amino-acids-gastric-acid", "article:schubert-2008-gastric-acid-secretion-control"]
   },
   {
     id: "outcome:increased-gastric-acid-output",
@@ -612,6 +612,6 @@ export default [
       { rel: "associated-with", to: "compound:hydrochloric-acid" },
       { rel: "associated-with", to: "compound:gastrin" }
     ],
-    refs: ["article:schubert-2008-gastric-acid-control", "article:taylor-1982-amino-acids-gastrin-acid", "article:wald-1982-glycine-gastric-acid"]
+    refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:taylor-1982-amino-acids-gastric-acid", "article:wald-1982-glycine-gastric-acid"]
   }
 ];

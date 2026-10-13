@@ -21,7 +21,7 @@ export default [
       { rel: "mitigates", to: "outcome:night-waking", note: "Sleep-quality trials at 3 g; modest evidence" },
       { rel: "interacts-with", to: "enzyme:gnmt" }
     ],
-    refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-temperature"]
+    refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-nmda"]
   },
   {
     id: "intervention:collagen-peptides",
@@ -40,7 +40,7 @@ export default [
       { rel: "increases", to: "compound:hydroxyproline" },
       { rel: "increases", to: "pathway:collagen-synthesis", note: "Substrate supply; clinical benefit modest" },
       { rel: "causes", to: "outcome:belching", note: "Reported by some users; mechanism unresolved" },
-      { rel: "aggravates", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" }
+      { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" }
     ],
     refs: ["article:iwai-2005-collagen-peptides-blood", "article:clark-2008-collagen-hydrolysate", "article:knight-2006-hydroxyproline-oxalate"]
   },
@@ -61,7 +61,7 @@ export default [
       { rel: "increases", to: "compound:glycine", note: "Negligible at 40 mg" },
       { rel: "causes", to: "outcome:belching", note: "Reported by some users; likely not a glycine-load effect at 40 mg" }
     ],
-    refs: ["article:lugo-2016-uc2-knee-oa"]
+    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
   {
     id: "intervention:dietary-glycine-sources",
@@ -100,7 +100,7 @@ export default [
       { rel: "interacts-with", to: "enzyme:bhmt" },
       { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" }
     ],
-    refs: ["article:olthof-2003-betaine-homocysteine"]
+    refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
   {
     id: "intervention:betaine-hcl",
@@ -224,7 +224,7 @@ export default [
     aliases: ["P5P", "P-5-P", "piridoxal-5-fosfato", "active B6", "vitamin B6 (P5P)"],
     summary: "Pre-phosphorylated B6 coenzyme taken at 5-50 mg; supports GAD, SHMT and transsulfuration enzymes, but chronic high doses risk sensory neuropathy.",
     body: [
-      "[[compound:plp]] is dephosphorylated to pyridoxal in the gut and plasma and taken up before rephosphorylation by [[enzyme:pdxk]], so its advantage over [[compound:pyridoxine]] is mainly relevant in rare PNPO-related conversion defects or hepatic dysfunction. Biochemical rationale for effects on anxiety, irritability, mental fog and sleep: [[enzyme:gad]] and the [[pathway:gaba-shunt]], histamine and serotonin synthesis/metabolism, and [[enzyme:shmt]]/[[enzyme:gcs]] glycine flux. Small trials of B6 (about 100 mg pyridoxine) reduced self-reported anxiety; whether P5P specifically is superior is untested.",
+      "[[compound:plp]] is dephosphorylated to pyridoxal in the gut and plasma and taken up before rephosphorylation by [[enzyme:pdxk]], so its advantage over [[compound:pyridoxine]] is mainly relevant in rare PNPO-related conversion defects or hepatic dysfunction. Biochemical rationale for effects on anxiety, irritability, mental fog and sleep: [[enzyme:gad]] and the [[pathway:gaba-shunt]], histamine and serotonin synthesis/metabolism, and [[enzyme:shmt]]/[[enzyme:glycine-cleavage-system|GCS]] glycine flux. Small trials of B6 (about 100 mg pyridoxine) reduced self-reported anxiety; whether P5P specifically is superior is untested.",
       "Safety: the US UL is 100 mg/day, the EFSA UL (2023) only 12 mg/day, and neuropathy has been reported with chronic doses of 50-200 mg; any persistent tingling or numbness warrants stopping. Interactions: lowers levodopa efficacy without a decarboxylase inhibitor, reduces phenytoin and phenobarbital levels, and is used as an antidote for isoniazid neurotoxicity. Prefer low doses (5-25 mg) and keep total B6 from all supplements within label limits."
     ],
     evidence: "plausible",
@@ -273,7 +273,7 @@ export default [
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "interacts-with", to: "compound:5-mthf", note: "Possible receptor competition at high doses (speculative)" }
     ],
-    refs: ["article:bailey-2009-folic-acid-dhfr"]
+    refs: ["article:bailey-2009-dhfr-slow-human-liver"]
   },
   {
     id: "intervention:folinic-acid-supplement",
@@ -359,8 +359,8 @@ export default [
     facts: { "elemental Mg": "about 15 %", "dosing-range": "100-400 mg elemental Mg/day", ul: "350 mg/day supplemental Mg (IOM); 250 mg/day (EU SCF)" },
     relations: [
       { rel: "increases", to: "compound:magnesium" },
-      { rel: "mitigates", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" },
-      { rel: "interacts-with", to: "enzyme:mat" }
+      { rel: "interacts-with", to: "enzyme:mat" },
+      { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" }
     ]
   },
   {
@@ -399,7 +399,7 @@ export default [
       { rel: "interacts-with", to: "intervention:h-pylori-eradication-therapy", note: "Adjunct; separate from tetracycline" },
       { rel: "increases", to: "compound:zinc" }
     ],
-    refs: ["article:mahmood-2007-zinc-carnosine-gut"]
+    refs: ["article:mahmood-2007-zinc-carnosine-gut-integrity"]
   },
   {
     id: "intervention:zinc-supplement",
@@ -473,7 +473,7 @@ export default [
       { rel: "mitigates", to: "outcome:throat-burning" },
       { rel: "aggravates", to: "outcome:belching", note: "CO2 released to float the raft; occasional" }
     ],
-    refs: ["article:leiman-2017-alginate-gerd-meta-analysis"]
+    refs: ["article:leiman-2017-alginate-meta-analysis"]
   },
   {
     id: "intervention:ginger-extract",
@@ -511,7 +511,7 @@ export default [
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Functional dyspepsia RCT" },
       { rel: "interacts-with", to: "compound:cynarin" }
     ],
-    refs: ["article:holtmann-2003-artichoke-dyspepsia"]
+    refs: ["article:holtmann-2003-artichoke-leaf-functional-dyspepsia"]
   },
   {
     id: "intervention:espinheira-santa",
@@ -566,7 +566,7 @@ export default [
       { rel: "interacts-with", to: "system:gut-microbiota" },
       { rel: "interacts-with", to: "intervention:ppi-therapy", note: "CYP interactions with some PPIs" }
     ],
-    refs: ["article:chedid-2014-herbal-rifaximin-sibo"]
+    refs: ["article:chedid-2014-herbal-vs-rifaximin"]
   },
   {
     id: "intervention:ppi-therapy",
@@ -589,7 +589,7 @@ export default [
       { rel: "decreases", to: "compound:vitamin-b12", note: "Food-bound B12 absorption falls with long-term use" },
       { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" }
     ],
-    refs: ["article:lam-2013-ppi-b12-deficiency", "article:fda-2011-ppi-magnesium", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound"]
+    refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid"]
   },
   {
     id: "intervention:h2-receptor-antagonists",
@@ -652,7 +652,7 @@ export default [
     aliases: ["teste do H. pylori", "teste respiratório da ureia", "UBT", "stool antigen test"],
     summary: "Non-invasive tests to diagnose infection or confirm eradication; PPIs, antibiotics and bismuth cause false negatives.",
     body: [
-      "The 13C-urea breath test ([[compound:urea]]) detects urease activity of H. pylori ([[enzyme:urease-h-pylori]]) with about 95 % accuracy; stool antigen testing is similar; serology only shows exposure and cannot confirm cure. Stop PPIs 2 weeks, antibiotics and bismuth 4 weeks before testing; H2 blockers should also be withheld for 1-2 days in some protocols. Endoscopy with biopsy is indicated with alarm features (dysphagia, weight loss, bleeding, anaemia, age over 50-60 with new symptoms) and for ulcers.",
+      "The 13C-urea breath test ([[compound:urea]]) detects urease activity of H. pylori ([[enzyme:h-pylori-urease|H. pylori urease]]) with about 95 % accuracy; stool antigen testing is similar; serology only shows exposure and cannot confirm cure. Stop PPIs 2 weeks, antibiotics and bismuth 4 weeks before testing; H2 blockers should also be withheld for 1-2 days in some protocols. Endoscopy with biopsy is indicated with alarm features (dysphagia, weight loss, bleeding, anaemia, age over 50-60 with new symptoms) and for ulcers.",
       "Testing after ulcer treatment is important when symptoms persist, because incomplete eradication would leave the ulcer's root cause in place ([[disease:h-pylori-infection]], [[intervention:ppi-therapy]])."
     ],
     evidence: "established",
@@ -680,7 +680,7 @@ export default [
       { rel: "interacts-with", to: "intervention:ppi-therapy", note: "PPI users have higher positive rates" },
       { rel: "interacts-with", to: "system:gut-microbiota" }
     ],
-    refs: ["article:rezaie-2017-breath-testing-consensus", "article:pimentel-2020-acg-sibo", "article:lo-2013-ppi-sibo-meta-analysis"]
+    refs: ["article:rezaie-2017-breath-test-consensus", "article:pimentel-2020-acg-sibo-guideline", "article:lo-2013-ppi-sibo-meta-analysis"]
   },
   {
     id: "intervention:amino-acids-with-meals",
@@ -810,7 +810,7 @@ export default [
       { rel: "decreases", to: "compound:guanidinoacetate", note: "Feedback repression of AGAT" },
       { rel: "mitigates", to: "state:undermethylation", note: "Methyl-sparing; plausible, indirect" }
     ],
-    refs: ["article:stead-2006-methyl-balance"]
+    refs: ["article:stead-2006-methyl-balance-reevaluation"]
   },
   {
     id: "intervention:homocysteine-mma-testing",
@@ -887,4 +887,24 @@ export default [
       { rel: "associated-with", to: "state:hypochlorhydria", note: "Claims to detect it; not validated" }
     ]
   },
+  {
+    id: "intervention:diaphragmatic-breathing",
+    type: "intervention",
+    name: "Diaphragmatic breathing therapy",
+    aliases: ["respiração diafragmática", "breathing retraining", "diaphragmatic breathing", "fonoterapia respiratória"],
+    summary: "Behavioural therapy teaching slow abdominal breathing; first-line for supragastric belching and an adjunct for PPI-refractory reflux symptoms.",
+    body: [
+      "The therapy trains relaxed, low abdominal breathing, often with speech-language pathologist coaching, to stop the learned habit of sucking air into the oesophagus and expelling it again (supragastric belching, see [[disease:aerophagia-belching-disorders]]). Reflux symptoms also improved in the trial below, which may reflect less air swallowing and better crural diaphragm function, but the mechanism is not established.",
+      "In a non-randomised open trial of PPI-refractory reflux with belching, 60% of treated patients cut their belching score by half or more versus none on the wait list ([[article:ong-2018-diaphragmatic-breathing-belching]]). The AGA update lists it with cognitive behavioural therapy and neuromodulators for supragastric belching, and states that evidence for all treatments is limited ([[article:moshiree-2023-aga-belching-bloating]]). It has no nutritional or methylation component, which makes it a useful comparison when belching is attributed to supplements ([[outcome:belching]])."
+    ],
+    evidence: "plausible",
+    facts: { "typical-programme": "Several sessions with a speech-language pathologist plus daily home practice", "evidence-base": "One open non-randomised trial; guideline-listed behavioural therapy" },
+    relations: [
+      { rel: "mitigates", to: "outcome:belching", note: "Reduced belching scores in PPI-refractory GERD with belching" },
+      { rel: "mitigates", to: "disease:aerophagia-belching-disorders", note: "Recommended behavioural treatment for supragastric belching" },
+      { rel: "mitigates", to: "disease:gerd", note: "Refractory reflux symptoms improved alongside belching in a small trial" },
+      { rel: "part-of", to: "intervention:reflux-lifestyle-measures" }
+    ],
+    refs: ["article:ong-2018-diaphragmatic-breathing-belching", "article:moshiree-2023-aga-belching-bloating", "article:kessing-2014-excessive-belching-review"]
+  }
 ];

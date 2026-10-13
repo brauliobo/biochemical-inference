@@ -8,7 +8,7 @@ export default [
     aliases: ["Úlcera péptica", "Úlcera gástrica", "Úlcera duodenal", "Gastric ulcer", "Duodenal ulcer"],
     summary: "Breaks in the gastric or duodenal mucosa reaching the muscularis, caused mainly by H. pylori infection or NSAIDs and healed with acid suppression and removal of the cause.",
     body: [
-      "Ulcers arise when aggressive factors (acid, [[compound:pepsin]], bile, [[disease:h-pylori-infection]], NSAIDs) overwhelm the [[system:mucosal-barrier]]. Standard care is to find and remove the cause (test and treat H. pylori, stop NSAIDs), use [[intervention:ppi]] for healing, and confirm eradication afterwards ([[claim:confirm-h-pylori-eradication]]). Complications are bleeding, perforation and gastric-outlet obstruction.",
+      "Ulcers arise when aggressive factors (acid, [[compound:pepsin]], bile, [[disease:h-pylori-infection]], NSAIDs) overwhelm the [[system:mucosal-barrier]]. Standard care is to find and remove the cause (test and treat H. pylori, stop NSAIDs), use [[intervention:ppi-therapy|PPIs]] for healing, and confirm eradication afterwards ([[claim:confirm-h-pylori-eradication]]). Complications are bleeding, perforation and gastric-outlet obstruction.",
       "In the source conversation the user's early-year gastric and duodenal ulcers are the pivot for caution about acidifying supplements ([[claim:betaine-hcl-contraindicated-post-ulcer]]) and for suggestions such as [[intervention:zinc-carnosine]], [[intervention:dgl-licorice]] and [[intervention:espinheira-santa]]. Whether those add benefit beyond standard therapy is uncertain ([[claim:zinc-carnosine-ulcer-healing]]). Educational only; ulcer symptoms need clinical evaluation."
     ],
     evidence: "established",
@@ -31,7 +31,7 @@ export default [
     summary: "Chronic gastric infection by a urease-producing bacterium, causing gastritis, ulcers, atrophy and gastric cancer risk; treated with PPI-based antibiotic regimens and confirmed by test of cure.",
     body: [
       "The bacterium survives acid by producing urease, which hydrolyses urea into ammonia and [[compound:carbon-dioxide]] and buffers its microenvironment. The same reaction is the basis of the urea breath test. Roughly 40-45% of people worldwide are infected in systematic reviews, often without symptoms. Chronic infection can cause antral gastritis and duodenal ulcers (high acid) or corpus atrophy with [[state:hypochlorhydria]] ([[disease:atrophic-gastritis]]), and is the principal risk factor for gastric cancer.",
-      "The source conversation proposes that urease-generated ammonia and CO2 are 'one of the biggest causes' of frequent belching; there is no good evidence for that, and eradication gives only a modest benefit in functional dyspepsia ([[claim:h-pylori-urease-ammonia-co2]], [[claim:h-pylori-causes-belching]]). The more important message in guidelines is to test, treat with a regimen chosen by local resistance, and confirm eradication at least four weeks after therapy and two weeks off PPIs ([[intervention:h-pylori-eradication]], [[claim:confirm-h-pylori-eradication]]). Educational only."
+      "The source conversation proposes that urease-generated ammonia and CO2 are 'one of the biggest causes' of frequent belching; there is no good evidence for that, and eradication gives only a modest benefit in functional dyspepsia ([[claim:h-pylori-urease-ammonia-co2]], [[claim:h-pylori-causes-belching]]). The more important message in guidelines is to test, treat with a regimen chosen by local resistance, and confirm eradication at least four weeks after therapy and two weeks off PPIs ([[intervention:h-pylori-eradication-therapy|H. pylori eradication]], [[claim:confirm-h-pylori-eradication]]). Educational only."
     ],
     evidence: "established",
     facts: { icd10: "A04.8; B96.81 (ICD-10-CM, as cause of diseases elsewhere)", mesh: "D016481", prevalence: "Roughly 40-45% worldwide; varies by region and age" },
@@ -64,7 +64,7 @@ export default [
       { rel: "associated-with", to: "state:gastric-dysmotility", note: "Impaired migrating motor complex is a recognised predisposition." },
       { rel: "interacts-with", to: "system:gut-microbiota" }
     ],
-    refs: ["article:pimentel-2020-acg-sibo-guideline", "article:rezaie-2017-breath-testing-consensus", "article:kashyap-2024-sibo-critical-appraisal"]
+    refs: ["article:pimentel-2020-acg-sibo-guideline", "article:rezaie-2017-breath-test-consensus", "article:kashyap-2024-sibo-critical-appraisal"]
   },
   {
     id: "disease:gerd",
@@ -74,7 +74,7 @@ export default [
     summary: "Troublesome symptoms or complications from gastric contents entering the oesophagus; diagnosed by symptoms, endoscopy and reflux monitoring; treated with lifestyle change, PPIs or alginates.",
     body: [
       "GERD results from a weak [[system:lower-esophageal-sphincter]] barrier (transient relaxations, hiatal hernia, low pressure), delayed emptying, and mucosal susceptibility ([[outcome:reflux-episodes]]). Typical symptoms are heartburn and regurgitation ([[outcome:heartburn]]); belching often coexists, and gastric belching is a normal venting reflex that can accompany reflux. The 2022 ACG guideline advises an empiric PPI trial for typical symptoms and objective testing when diagnosis is unclear or symptoms are atypical.",
-      "Alginate rafts such as the one proposed in the conversation float on gastric contents and displace the acid pocket without suppressing secretion; meta-analyses show benefit over placebo or antacids in GERD ([[intervention:alginate]], [[claim:alginate-rafts-reduce-lpr]]). Educational only."
+      "Alginate rafts such as the one proposed in the conversation float on gastric contents and displace the acid pocket without suppressing secretion; meta-analyses show benefit over placebo or antacids in GERD ([[intervention:sodium-alginate|alginate]], [[claim:alginate-rafts-reduce-lpr]]). Educational only."
     ],
     evidence: "established",
     facts: { icd10: "K21.0 (with oesophagitis), K21.9 (without)", mesh: "D005764" },
@@ -86,7 +86,7 @@ export default [
       { rel: "associated-with", to: "state:gastric-dysmotility" },
       { rel: "measured-by", to: "outcome:reflux-episodes" }
     ],
-    refs: ["article:katz-2022-acg-gerd-guideline", "article:leiman-2017-alginate-gerd-meta-analysis"]
+    refs: ["article:katz-2022-acg-gerd-guideline", "article:leiman-2017-alginate-meta-analysis"]
   },
   {
     id: "disease:lpr",
@@ -108,7 +108,7 @@ export default [
       { rel: "associated-with", to: "disease:gerd" },
       { rel: "associated-with", to: "outcome:belching" }
     ],
-    refs: ["article:chen-2023-aga-extraesophageal-reflux", "article:johnston-2009-pepsin-hypopharyngeal-cells", "article:pizzorni-2022-alginate-vs-ppi-lpr"]
+    refs: ["article:chen-2023-aga-extraesophageal-reflux", "article:johnston-2006-pepsin-laryngeal-epithelium", "article:pizzorni-2022-alginate-vs-ppi-lpr"]
   },
   {
     id: "disease:histamine-intolerance",
@@ -192,7 +192,7 @@ export default [
       { rel: "associated-with", to: "state:gastric-dysmotility" },
       { rel: "associated-with", to: "system:vagal-tone" }
     ],
-    refs: ["article:camilleri-2013-acg-gastroparesis-guideline"]
+    refs: ["article:camilleri-2022-acg-gastroparesis"]
   },
   {
     id: "disease:functional-dyspepsia",
@@ -234,7 +234,7 @@ export default [
       { rel: "measured-by", to: "outcome:reflux-episodes", note: "Impedance-pH separates gastric from supragastric belching." },
       { rel: "associated-with", to: "disease:gerd" }
     ],
-    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:halland-2018-diaphragmatic-breathing-belching"]
+    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:ong-2018-diaphragmatic-breathing-belching"]
   },
   {
     id: "disease:mthfr-deficiency",
@@ -243,18 +243,18 @@ export default [
     aliases: ["Deficiência de MTHFR", "MTHFR deficiency (homocystinuria type)", "Severe MTHFR deficiency"],
     summary: "A rare recessive inborn error with very low MTHFR activity causing homocystinuria, low methionine and neurological disease; unlike the common C677T variant, which mildly raises homocysteine at most.",
     body: [
-      "[[enzyme:mthfr]] reduces methylene-THF to [[compound:5-methyl-thf]], the methyl donor for remethylating [[compound:homocysteine]]. Severe deficiency (OMIM 236250) presents from infancy to adulthood with developmental delay, seizures, psychiatric features and thromboembolism, and is treated with betaine, folate forms and B12. Betaine ([[intervention:betaine-anhydrous]]) bypasses the block through [[enzyme:bhmt]].",
+      "[[enzyme:mthfr]] reduces methylene-THF to [[compound:5-mthf|5-methyl-THF]], the methyl donor for remethylating [[compound:homocysteine]]. Severe deficiency (OMIM 236250) presents from infancy to adulthood with developmental delay, seizures, psychiatric features and thromboembolism, and is treated with betaine, folate forms and B12. Betaine ([[intervention:betaine-anhydrous]]) bypasses the block through [[enzyme:bhmt]].",
       "The widespread 'MTHFR mutation' marketing refers to the common C677T (rs1801133) polymorphism, which reduces enzyme activity by a modest fraction in TT homozygotes and has no proven clinical effect when folate status is adequate; routine testing is not recommended. Do not equate the two. Educational only."
     ],
     evidence: "established",
     facts: { omim: "236250", icd10: "E72.12" },
     relations: [
-      { rel: "decreases", to: "compound:5-methyl-thf" },
+      { rel: "decreases", to: "compound:5-mthf" },
       { rel: "causes", to: "state:hyperhomocysteinemia" },
       { rel: "manifests-as", to: "outcome:elevated-homocysteine" },
       { rel: "interacts-with", to: "enzyme:mthfr" }
     ],
-    refs: ["article:huemer-2014-severe-mthfr-deficiency"]
+    refs: ["article:froese-2016-mthfr-deficiency"]
   },
   {
     id: "disease:pyroluria-kpu",
@@ -314,7 +314,7 @@ export default [
       { rel: "associated-with", to: "system:cardiac-autonomic-control" },
       { rel: "manifests-as", to: "outcome:tachycardia", note: "Non-specific; arrhythmias have many causes." }
     ],
-    refs: ["article:marti-carvajal-2017-homocysteine-lowering-cochrane", "article:wang-2011-tmao-atherosclerosis"]
+    refs: ["article:marti-carvajal-2017-homocysteine-lowering-cochrane", "article:wang-2011-gut-flora-phosphatidylcholine-cvd"]
   },
   {
     id: "disease:neural-tube-defects",
@@ -324,14 +324,14 @@ export default [
     summary: "Failure of neural tube closure in early pregnancy (spina bifida, anencephaly); folic acid before and during early pregnancy prevents a large fraction, the best-proven methylation-related intervention.",
     body: [
       "The MRC Vitamin Study (1991) showed that 4 mg folic acid reduced recurrence by about 72%, and public-health policy recommends 400 micrograms daily for women who could become pregnant, plus fortification in many countries. Risk is also associated with low maternal B12, high homocysteine, low choline and certain folate-pathway variants; mechanisms involve one-carbon supply for nucleotide synthesis and methylation ([[state:hyperhomocysteinemia]], [[pathway:folate-cycle]]).",
-      "Whether [[intervention:methylfolate]] is as effective as folic acid for NTD prevention is a topic of review; EFSA regards the forms as equivalent for dietary folate at lower doses ([[claim:folic-acid-competes-with-methylfolate]]). Pregnancy planning advice belongs with a clinician. Educational only."
+      "Whether [[intervention:methylfolate-supplement|methylfolate]] is as effective as folic acid for NTD prevention is a topic of review; EFSA regards the forms as equivalent for dietary folate at lower doses ([[claim:folic-acid-competes-with-methylfolate]]). Pregnancy planning advice belongs with a clinician. Educational only."
     ],
     evidence: "established",
     facts: { icd10: "Q00 (anencephaly), Q05 (spina bifida)", mesh: "D009436", omim: "182940 (susceptibility)" },
     relations: [
       { rel: "associated-with", to: "state:hyperhomocysteinemia" },
       { rel: "associated-with", to: "compound:choline", note: "Observational association with low maternal choline." },
-      { rel: "associated-with", to: "intervention:methylfolate" },
+      { rel: "associated-with", to: "intervention:methylfolate-supplement" },
       { rel: "associated-with", to: "pathway:folate-cycle" }
     ],
     refs: ["article:mrc-1991-folic-acid-neural-tube-defects", "article:efsa-2022-5-mthf-dietary-folate-equivalents"]
@@ -363,7 +363,7 @@ export default [
     aliases: ["Deficiência de B12", "Cobalamin deficiency", "Pernicious anaemia"],
     summary: "Low cobalamin from malabsorption (atrophic gastritis, PPIs, metformin, ileal disease) or diet; it causes megaloblastic anaemia, neuropathy and raised homocysteine and methylmalonic acid.",
     body: [
-      "Cobalamin is a cofactor for methionine synthase and methylmalonyl-CoA mutase, so deficiency traps folate as [[compound:5-methyl-thf]] ([[state:folate-trap]]), raises [[compound:homocysteine]] and methylmalonic acid, and may cause irreversible neurological damage if untreated. Risk groups include older adults, vegans, people with [[disease:atrophic-gastritis]], long-term [[intervention:ppi]] or metformin users and those with bowel resection.",
+      "Cobalamin is a cofactor for methionine synthase and methylmalonyl-CoA mutase, so deficiency traps folate as [[compound:5-mthf|5-methyl-THF]] ([[state:folate-trap]]), raises [[compound:homocysteine]] and methylmalonic acid, and may cause irreversible neurological damage if untreated. Risk groups include older adults, vegans, people with [[disease:atrophic-gastritis]], long-term [[intervention:ppi-therapy|PPIs]] or metformin users and those with bowel resection.",
       "Large doses of folic acid can mask the haematological signs while neuropathy progresses. Diagnosis and treatment (oral or intramuscular B12) require clinical evaluation. Educational only."
     ],
     evidence: "established",
@@ -453,7 +453,7 @@ export default [
       { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" },
       { rel: "associated-with", to: "system:connective-tissue" }
     ],
-    refs: ["article:lugo-2016-undenatured-collagen-type-ii"]
+    refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
   {
     id: "disease:choline-deficiency",
@@ -473,6 +473,6 @@ export default [
       { rel: "associated-with", to: "state:methyl-donor-depletion" },
       { rel: "interacts-with", to: "enzyme:pemt" }
     ],
-    refs: ["article:zeisel-1991-choline-essential-nutrient", "article:resseguie-2011-pemt-estrogen-choline", "article:efsa-2016-choline-reference-values"]
+    refs: ["article:zeisel-1991-choline-essential-nutrient", "article:resseguie-2011-pemt-estrogen-choline", "article:efsa-2016-choline-dri"]
   }
 ];

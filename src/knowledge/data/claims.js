@@ -35,7 +35,7 @@ export default [
     status: "unsupported",
     evidence: "speculative",
     body: [
-      "No human trial measures SAM, SAH or the SAM:SAH ratio after glycine supplementation. Mechanistically, GNMT activity is restrained when methyl supply is low (inhibition by 5-methyl-THF, reduced activity in methyl deficiency), and GNMT is only one of several SAM sinks next to PEMT and creatine synthesis ([[claim:pemt-consumes-three-sam]], [[article:stead-2006-methyl-balance]]).",
+      "No human trial measures SAM, SAH or the SAM:SAH ratio after glycine supplementation. Mechanistically, GNMT activity is restrained when methyl supply is low (inhibition by 5-methyl-THF, reduced activity in methyl deficiency), and GNMT is only one of several SAM sinks next to PEMT and creatine synthesis ([[claim:pemt-consumes-three-sam]], [[article:stead-2006-methyl-balance-reevaluation]]).",
       "A real interaction exists at extreme doses: rats on high-methionine diets given extra glycine kept lower hepatic methionine, and glycine at several percent of diet is proposed to mimic methionine restriction in rodents. Those doses are far above 2-3 g/day in a human, and the direction (less methionine toxicity) is not the 'drain in deficiency' story. Under-methylation itself is also a contested clinical category ([[state:undermethylation]], [[claim:walsh-under-over-methylation-categories-valid]])."
     ],
     relations: [
@@ -63,7 +63,7 @@ export default [
       { rel: "associated-with", to: "compound:sam" },
       { rel: "associated-with", to: "compound:phosphatidylcholine" }
     ],
-    refs: ["article:stead-2006-methyl-balance"]
+    refs: ["article:stead-2006-methyl-balance-reevaluation"]
   },
   {
     id: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
@@ -174,12 +174,12 @@ export default [
     refs: ["article:efsa-2022-5-mthf-dietary-folate-equivalents"],
     body: [
       "Folic acid must be reduced by dihydrofolate reductase, which is slow and saturable in human liver, so unmetabolised folic acid appears in plasma after fortified foods or higher supplement doses. 5-MTHF supplements clearly produce less of it. EFSA (2022) nevertheless proposes the same dietary-folate-equivalent factor as folic acid for 5-MTHF below 400 micrograms per day and a higher one above that dose.",
-      "Reviews state that the clinical meaning of unmetabolised folic acid is not established, and no direct human study shows harm. The statement is therefore plausible but unproven; for neural tube defect prevention, folic acid remains the best-validated form ([[intervention:methylfolate]], [[disease:neural-tube-defects]], [[state:folate-trap]])."
+      "Reviews state that the clinical meaning of unmetabolised folic acid is not established, and no direct human study shows harm. The statement is therefore plausible but unproven; for neural tube defect prevention, folic acid remains the best-validated form ([[intervention:methylfolate-supplement|methylfolate]], [[disease:neural-tube-defects]], [[state:folate-trap]])."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:methylfolate" },
-      { rel: "associated-with", to: "compound:5-methyl-thf" },
-      { rel: "associated-with", to: "intervention:folic-acid" }
+      { rel: "associated-with", to: "intervention:methylfolate-supplement" },
+      { rel: "associated-with", to: "compound:5-mthf" },
+      { rel: "associated-with", to: "intervention:folic-acid-supplement" }
     ]
   },
   {
@@ -192,7 +192,7 @@ export default [
     status: "unsupported",
     evidence: "speculative",
     body: [
-      "Taylor et al. (1982) instilled individual L-amino acids into the stomachs of volunteers: phenylalanine and tryptophan stimulated acid, pancreatic polypeptide and gastrin significantly more than any other amino acid, whereas glycine had no effect on hormone release or acid, even at 200 mM ([[article:taylor-1982-amino-acids-gastrin-acid]]). In a separate study, Wald and Adibi (1982) found that intragastric glycine raised acid output (5.6 vs 3.3 mmol/h) without any detectable change in serum gastrin, and attributed the effect to the rise in plasma glycine ([[article:wald-1982-glycine-gastric-acid]]).",
+      "Taylor et al. (1982) instilled individual L-amino acids into the stomachs of volunteers: phenylalanine and tryptophan stimulated acid, pancreatic polypeptide and gastrin significantly more than any other amino acid, whereas glycine had no effect on hormone release or acid, even at 200 mM ([[article:taylor-1982-amino-acids-gastric-acid]]). In a separate study, Wald and Adibi (1982) found that intragastric glycine raised acid output (5.6 vs 3.3 mmol/h) without any detectable change in serum gastrin, and attributed the effect to the rise in plasma glycine ([[article:wald-1982-glycine-gastric-acid]]).",
       "So glycine may modestly affect acid, but not via a 'potent' gastrin effect, and the two studies disagree on whether it affects acid at all. Collagen, which lacks tryptophan, is also an unlikely strong secretagogue ([[claim:collagen-peptides-excess-gastrin-delay-emptying]])."
     ],
     relations: [
@@ -212,7 +212,7 @@ export default [
     status: "unsupported",
     evidence: "speculative",
     body: [
-      "Protein hydrolysates in general can stimulate CCK and GLP-1 and slow gastric emptying; a collagen hydrolysate slowed emptying in mice through GLP-1, and in humans collagen hydrolysates are absorbed quickly as peptides and amino acids. No study measures gastrin or belching after collagen peptides, and collagen lacks tryptophan, one of the two strongest amino-acid gastrin triggers ([[article:taylor-1982-amino-acids-gastrin-acid]]).",
+      "Protein hydrolysates in general can stimulate CCK and GLP-1 and slow gastric emptying; a collagen hydrolysate slowed emptying in mice through GLP-1, and in humans collagen hydrolysates are absorbed quickly as peptides and amino acids. No study measures gastrin or belching after collagen peptides, and collagen lacks tryptophan, one of the two strongest amino-acid gastrin triggers ([[article:taylor-1982-amino-acids-gastric-acid]]).",
       "Intolerance to collagen powders is therefore plausible as a general protein-hydrolysate or taste/osmolarity effect, but the proposed mechanism is not documented ([[intervention:collagen-peptides]], [[compound:collagen]])."
     ],
     relations: [
@@ -297,7 +297,7 @@ export default [
       { rel: "associated-with", to: "disease:aerophagia-belching-disorders" },
       { rel: "associated-with", to: "system:lower-esophageal-sphincter" }
     ],
-    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:halland-2018-diaphragmatic-breathing-belching"]
+    refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:ong-2018-diaphragmatic-breathing-belching"]
   },
   {
     id: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
@@ -353,7 +353,7 @@ export default [
       "Limits: observational data, confounding by indication, varied diagnostic tests with modest accuracy, and expert reviews calling for a more critical view of the SIBO hypothesis ([[article:kashyap-2024-sibo-critical-appraisal]]). The conversation also assumes, without evidence, that the user took PPIs and antibiotics."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:ppi" },
+      { rel: "associated-with", to: "intervention:ppi-therapy" },
       { rel: "associated-with", to: "disease:sibo" },
       { rel: "associated-with", to: "state:hypochlorhydria" }
     ]
@@ -369,11 +369,11 @@ export default [
     evidence: "plausible",
     refs: ["article:sanaka-2010-ppi-gastric-emptying"],
     body: [
-      "A systematic review reported that PPIs consistently delayed gastric emptying of solid meals, probably through reduced peptic digestion, while liquid emptying was inconsistent; omeprazole 20 mg twice daily delayed scintigraphic emptying in a placebo-controlled trial, and the effect was prevented by tegaserod. Some single-dose studies suggested acceleration or no effect ([[outcome:delayed-gastric-emptying]], [[intervention:ppi]]).",
+      "A systematic review reported that PPIs consistently delayed gastric emptying of solid meals, probably through reduced peptic digestion, while liquid emptying was inconsistent; omeprazole 20 mg twice daily delayed scintigraphic emptying in a placebo-controlled trial, and the effect was prevented by tegaserod. Some single-dose studies suggested acceleration or no effect ([[outcome:delayed-gastric-emptying]], [[intervention:ppi-therapy|PPIs]]).",
       "The effect is modest compared with gastroparesis and does not by itself indicate neuromuscular damage ([[state:gastric-dysmotility]])."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:ppi" },
+      { rel: "associated-with", to: "intervention:ppi-therapy" },
       { rel: "associated-with", to: "outcome:delayed-gastric-emptying" },
       { rel: "associated-with", to: "state:acid-suppression" }
     ]
@@ -448,11 +448,11 @@ export default [
     evidence: "established",
     refs: ["article:chey-2024-acg-h-pylori-treatment", "article:malfertheiner-2022-maastricht-vi"],
     body: [
-      "ACG 2024 asks that everyone treated for H. pylori have a test of cure by urea breath test, stool antigen or biopsy-based test at least four weeks after antibiotics, off PPIs and PCABs for at least two weeks. PPI-clarithromycin triple therapy fails often where resistance is common ([[intervention:h-pylori-eradication]], [[outcome:h-pylori-test-result]]).",
+      "ACG 2024 asks that everyone treated for H. pylori have a test of cure by urea breath test, stool antigen or biopsy-based test at least four weeks after antibiotics, off PPIs and PCABs for at least two weeks. PPI-clarithromycin triple therapy fails often where resistance is common ([[intervention:h-pylori-eradication-therapy|H. pylori eradication]], [[outcome:h-pylori-test-result]]).",
       "This is guideline advice for ulcer care and does not mean that persistent H. pylori explains belching ([[disease:peptic-ulcer]])."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:h-pylori-eradication" },
+      { rel: "associated-with", to: "intervention:h-pylori-eradication-therapy" },
       { rel: "associated-with", to: "disease:peptic-ulcer" },
       { rel: "associated-with", to: "outcome:h-pylori-test-result" }
     ]
@@ -487,7 +487,7 @@ export default [
     status: "unsupported",
     evidence: "speculative",
     body: [
-      "Humans conjugate bile acids with glycine and taurine at roughly 3:1. Sjovall found that taurine (0.5 g three times daily) markedly increased taurine conjugates, whereas glycine (7 g three times daily) did not change the pattern; later work showed that hepatic taurine availability governs the ratio ([[article:sjovall-1959-bile-acid-conjugation]], [[pathway:bile-acid-conjugation]]).",
+      "Humans conjugate bile acids with glycine and taurine at roughly 3:1. Sjovall found that taurine (0.5 g three times daily) markedly increased taurine conjugates, whereas glycine (7 g three times daily) did not change the pattern; later work showed that hepatic taurine availability governs the ratio ([[article:sjovall-1959-glycine-taurine-bile-conjugation]], [[pathway:bile-acid-conjugation]]).",
       "Bile reflux into the stomach depends on pyloric and antral function and is not known to depend on conjugate type; the surface-tension argument has no source ([[system:bile]], [[system:pylorus]])."
     ],
     relations: [
@@ -548,10 +548,10 @@ export default [
     evidence: "plausible",
     body: [
       "Oral phosphorylated B6 is dephosphorylated by intestinal alkaline phosphatase, absorbed as pyridoxal, and rephosphorylated by pyridoxal kinase inside cells, so the supposed bypass is largely illusory. Pyridoxine itself requires conversion by pyridoxal kinase and PNPO, which can be limiting in rare genetic defects (PNPO deficiency responds to PLP), in severe liver disease or on interacting drugs.",
-      "Whether P5P gives better outcomes than pyridoxine in healthy people has not been tested head to head ([[intervention:p5p]], [[compound:plp]], [[state:b6-functional-deficiency]])."
+      "Whether P5P gives better outcomes than pyridoxine in healthy people has not been tested head to head ([[intervention:p5p-supplement|P5P]], [[compound:plp]], [[state:b6-functional-deficiency]])."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:p5p" },
+      { rel: "associated-with", to: "intervention:p5p-supplement" },
       { rel: "associated-with", to: "compound:plp" },
       { rel: "associated-with", to: "compound:pyridoxine" }
     ]
@@ -755,7 +755,7 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:choline" },
       { rel: "associated-with", to: "compound:glycine" },
-      { rel: "associated-with", to: "intervention:choline-salts" },
+      { rel: "associated-with", to: "intervention:choline-bitartrate" },
       { rel: "associated-with", to: "state:choline-excess" }
     ]
   },
@@ -768,7 +768,7 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:iom-1998-choline-reference-intakes", "article:efsa-2016-choline-reference-values"],
+    refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"],
     body: [
       "The IOM took a LOAEL of about 7.5 g/day (hypotension in a small study, supported by fishy odour reports), applied an uncertainty factor of 2 and rounded to 3.5 g/day for adults ([[state:choline-excess]]).",
       "EFSA's 2016 opinion set Adequate Intakes (400 mg/day for adults) and did not establish an upper limit, so the statement is half correct. Secondary sources sometimes misattribute the figure."
@@ -776,7 +776,7 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:choline-excess" },
       { rel: "associated-with", to: "compound:choline" },
-      { rel: "associated-with", to: "intervention:choline-salts" }
+      { rel: "associated-with", to: "intervention:choline-bitartrate" }
     ]
   },
   {
@@ -788,7 +788,7 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:iom-1998-choline-reference-intakes"],
+    refs: ["article:iom-1998-choline-dri"],
     body: [
       "IOM reports fishy odour, vomiting, salivation, sweating and diarrhoea at 10-16 g/day, hypotension at about 7.5 g/day choline-equivalent, and the UL was set on these ([[outcome:fishy-odor]], [[outcome:cholinergic-excess-symptoms]]). The symptoms are dose-related, and individual thresholds differ; FMO3 variants lower the threshold ([[disease:trimethylaminuria]]).",
       "The words 'cholinergic crisis' and the statement that bacteria 'saturate absorption' are not supported in the sources checked."
@@ -809,7 +809,7 @@ export default [
     source: "conversation",
     status: "contested",
     evidence: "plausible",
-    refs: ["article:wang-2011-tmao-atherosclerosis"],
+    refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd"],
     body: [
       "Wang et al. (2011) linked plasma TMAO to cardiovascular events and to a choline/lecithin challenge, and later meta-analyses found higher TMAO associated with more events. Adjusting for renal function weakens the association, TMAO is renally cleared, fish and seafood raise TMAO strongly yet are not associated with ASCVD, and reviews conclude there is no conclusive evidence that TMAO is causal ([[outcome:elevated-tmao]], [[disease:cardiovascular-disease]], [[system:kidney]]).",
       "Choline from egg and meat does raise TMAO, but 'strong marker of endothelial stress' goes beyond the evidence."
@@ -870,7 +870,7 @@ export default [
     source: "literature",
     status: "supported",
     evidence: "established",
-    refs: ["article:yamadera-2007-glycine-sleep", "article:bannai-2012-glycine-sleep"],
+    refs: ["article:yamadera-2007-glycine-sleep-psg", "article:bannai-2012-glycine-sleep"],
     body: [
       "The sleep studies of Yamadera et al. (2007) and Bannai et al. (2012) used 3 g without notable adverse effects ([[outcome:improved-sleep-quality]]). Schizophrenia trials used 15 g/day to about 0.4 g/kg/day, usually reporting good tolerance with occasional nausea or upper abdominal discomfort that stopped on discontinuation.",
       "This does not exclude personal intolerance such as belching; it just means that glycine powder is not generally associated with this symptom, and that the cause for an individual remains unexplained ([[outcome:glycine-intolerance]], [[intervention:glycine-powder]])."
@@ -890,7 +890,7 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:mahmood-2007-zinc-carnosine-gut"],
+    refs: ["article:mahmood-2007-zinc-carnosine-gut-integrity"],
     body: [
       "Polaprezinc (zinc-L-carnosine, 150 mg/day) is approved for gastric ulcer in Japan; randomised trials after endoscopic submucosal dissection show added benefit over PPI alone, and a 2022 meta-analysis of three trials found higher H. pylori eradication when added to triple therapy (OR about 2.7, certainty very low). In humans, zinc carnosine reduced NSAID-induced small-bowel permeability changes ([[intervention:zinc-carnosine]], [[outcome:ulcer-healing]]).",
       "There is no large Western RCT in ordinary peptic ulcer, the adherence-to-ulcer mechanism is mostly preclinical, and it is an adjunct to, not a replacement for, acid suppression and removal of the cause ([[system:mucosal-barrier]])."
@@ -949,7 +949,7 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:johnston-2009-pepsin-hypopharyngeal-cells"],
+    refs: ["article:johnston-2006-pepsin-laryngeal-epithelium"],
     body: [
       "Hypopharyngeal epithelial cells endocytose pepsin by receptor-mediated uptake and show damage even at weakly acidic to neutral pH in vitro. Pepsin is detected in the laryngeal tissue and saliva of some patients, but those tests have limited diagnostic accuracy ([[outcome:salivary-pepsin]], [[compound:pepsin]]).",
       "No study shows that belching propels droplets to the larynx, and gas reflux events in impedance studies are a separate topic ([[disease:lpr]], [[outcome:belching]])."
@@ -970,7 +970,7 @@ export default [
     status: "partly-supported",
     evidence: "plausible",
     body: [
-      "Laryngeal epithelium has fewer mucins and lower carbonic anhydrase III expression than oesophageal mucosa, and pepsin can injure hypopharyngeal cells ([[system:larynx-pharynx]], [[article:johnston-2009-pepsin-hypopharyngeal-cells]]). The stomach's mucus-bicarbonate barrier is far more protective ([[system:mucosal-barrier]]).",
+      "Laryngeal epithelium has fewer mucins and lower carbonic anhydrase III expression than oesophageal mucosa, and pepsin can injure hypopharyngeal cells ([[system:larynx-pharynx]], [[article:johnston-2006-pepsin-laryngeal-epithelium]]). The stomach's mucus-bicarbonate barrier is far more protective ([[system:mucosal-barrier]]).",
       "The multiplier appears widely in lay and ENT literature but I could not trace it to measured data."
     ],
     relations: [
@@ -988,13 +988,13 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:pizzorni-2022-alginate-vs-ppi-lpr", "article:leiman-2017-alginate-gerd-meta-analysis"],
+    refs: ["article:pizzorni-2022-alginate-vs-ppi-lpr", "article:leiman-2017-alginate-meta-analysis"],
     body: [
-      "A 2017 meta-analysis of GERD trials found higher odds of symptom resolution with alginate-based therapy than with placebo or antacids (OR 4.42). In LPR, a randomised non-inferiority trial found magnesium alginate comparable to PPIs on reflux findings, and systematic reviews (2025) judge alginates promising as monotherapy or add-on, noting small, heterogeneous studies and limited proof beyond placebo ([[intervention:alginate]], [[disease:lpr]], [[disease:gerd]]).",
+      "A 2017 meta-analysis of GERD trials found higher odds of symptom resolution with alginate-based therapy than with placebo or antacids (OR 4.42). In LPR, a randomised non-inferiority trial found magnesium alginate comparable to PPIs on reflux findings, and systematic reviews (2025) judge alginates promising as monotherapy or add-on, noting small, heterogeneous studies and limited proof beyond placebo ([[intervention:sodium-alginate|alginate]], [[disease:lpr]], [[disease:gerd]]).",
       "Alginate does not suppress acid secretion, which is correct; it works as a physical barrier displacing the acid pocket. Whether it reduces belch-borne pepsin is unstudied."
     ],
     relations: [
-      { rel: "associated-with", to: "intervention:alginate" },
+      { rel: "associated-with", to: "intervention:sodium-alginate" },
       { rel: "associated-with", to: "disease:lpr" },
       { rel: "associated-with", to: "disease:gerd" }
     ]
@@ -1028,7 +1028,7 @@ export default [
     source: "conversation",
     status: "partly-supported",
     evidence: "plausible",
-    refs: ["article:wu-2008-ginger-gastric-emptying", "article:hu-2011-ginger-dyspepsia", "article:walstab-2013-ginger-5ht3"],
+    refs: ["article:wu-2008-ginger-gastric-emptying", "article:hu-2011-ginger-functional-dyspepsia-motility", "article:walstab-2013-ginger-5ht3"],
     body: [
       "Wu et al. (2008) found ginger accelerated gastric emptying and antral contractions in healthy volunteers; Hu et al. (2011) found faster emptying in 11 functional dyspepsia patients without symptom change. Receptor work shows ginger extract and its pungent constituents inhibit human 5-HT3 receptors, so the stated 5-HT4 mechanism is unsupported ([[intervention:ginger-extract]], [[disease:functional-dyspepsia]]).",
       "No study shows that ginger prevents proximal bacterial fermentation by cleaning the duodenum."

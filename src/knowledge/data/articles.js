@@ -70,7 +70,7 @@ export default [
     ],
     "summary": "Review of glycine sources and sinks across tissues, concluding it is conditionally essential; names the glycine cleavage system as the major route releasing ammonia and CO2.",
     "body": [
-      "This review is a broad map of [[compound:glycine]] metabolism. It matters here because it places glycine breakdown (via [[enzyme:gcs]]) inside cells, so ammonia and CO2 from that route are systemic, not produced in the stomach lumen.",
+      "This review is a broad map of [[compound:glycine]] metabolism. It matters here because it places glycine breakdown (via [[enzyme:glycine-cleavage-system|GCS]]) inside cells, so ammonia and CO2 from that route are systemic, not produced in the stomach lumen.",
       "It also lists [[pathway:choline-oxidation]] as a glycine source and bile acid conjugation as a glycine sink."
     ],
     "evidence": "plausible",
@@ -110,7 +110,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "enzyme:gcs"
+        "to": "enzyme:glycine-cleavage-system"
       },
       {
         "rel": "evidence-for",
@@ -133,7 +133,7 @@ export default [
     ],
     "summary": "Stable-isotope infusion in five fed adults quantified whole-body glycine flux, showing ~39% is decarboxylated by the glycine cleavage system and a similar share is converted to serine.",
     "body": [
-      "First in vivo quantification of how much human [[compound:glycine]] is cleaved by [[enzyme:gcs]] versus converted by [[enzyme:shmt]]. It frames glycine as a major feeder of the [[pathway:folate-cycle]] rather than only a methyl sink."
+      "First in vivo quantification of how much human [[compound:glycine]] is cleaved by [[enzyme:glycine-cleavage-system|GCS]] versus converted by [[enzyme:shmt]]. It frames glycine as a major feeder of the [[pathway:folate-cycle]] rather than only a methyl sink."
     ],
     "evidence": "plausible",
     "authors": [
@@ -167,7 +167,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "enzyme:gcs"
+        "to": "enzyme:glycine-cleavage-system"
       },
       {
         "rel": "evidence-for",
@@ -190,7 +190,7 @@ export default [
     ],
     "summary": "Marginal vitamin B6 deficiency in healthy adults raised plasma glycine but barely changed glycine cleavage or turnover, arguing against a hard glycine bottleneck at low PLP.",
     "body": [
-      "Tests the idea that low [[compound:plp]] bottlenecks [[compound:glycine]] catabolism. Glycine does accumulate in plasma, but the flux through [[enzyme:gcs]] and [[enzyme:shmt]] is preserved, so a modest B6 deficit alone is a weak explanation for glycine intolerance."
+      "Tests the idea that low [[compound:plp]] bottlenecks [[compound:glycine]] catabolism. Glycine does accumulate in plasma, but the flux through [[enzyme:glycine-cleavage-system|GCS]] and [[enzyme:shmt]] is preserved, so a modest B6 deficit alone is a weak explanation for glycine intolerance."
     ],
     "evidence": "plausible",
     "authors": [
@@ -230,7 +230,7 @@ export default [
       },
       {
         "rel": "evidence-against",
-        "to": "enzyme:gcs",
+        "to": "enzyme:glycine-cleavage-system",
         "note": "Glycine cleavage flux was not reduced by marginal B6 deficiency in healthy adults."
       },
       {
@@ -312,7 +312,7 @@ export default [
     ],
     "summary": "Authoritative review of the mitochondrial glycine cleavage system: PLP-dependent P-protein, folate-dependent T-protein, and why defects cause nonketotic hyperglycinemia.",
     "body": [
-      "Standard reference on [[enzyme:gcs]]. Because it needs [[compound:plp]] and tetrahydrofolate, it is where [[compound:glycine]] and the [[pathway:folate-cycle]] touch. The CO2 and NH3 it releases are produced inside mitochondria."
+      "Standard reference on [[enzyme:glycine-cleavage-system|GCS]]. Because it needs [[compound:plp]] and tetrahydrofolate, it is where [[compound:glycine]] and the [[pathway:folate-cycle]] touch. The CO2 and NH3 it releases are produced inside mitochondria."
     ],
     "evidence": "established",
     "authors": [
@@ -339,7 +339,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "enzyme:gcs",
+        "to": "enzyme:glycine-cleavage-system",
         "note": "Defines composition and reaction of the human glycine cleavage system."
       },
       {
@@ -1062,7 +1062,7 @@ export default [
     ],
     "summary": "Showed that a rat-liver folate-binding protein is glycine N-methyltransferase, laying the groundwork for folate regulation of GNMT.",
     "body": [
-      "Foundational biochemistry connecting [[enzyme:gnmt]] to folate. It underlies the later demonstration that 5-methyltetrahydrofolate ([[compound:5-methyl-thf]]) inhibits the enzyme."
+      "Foundational biochemistry connecting [[enzyme:gnmt]] to folate. It underlies the later demonstration that 5-methyltetrahydrofolate ([[compound:5-mthf|5-methyl-THF]]) inhibits the enzyme."
     ],
     "evidence": "plausible",
     "authors": [
@@ -1092,7 +1092,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf",
+        "to": "compound:5-mthf",
         "note": "Folate binding links the methionine and folate cycles through GNMT."
       }
     ]
@@ -1106,7 +1106,7 @@ export default [
     ],
     "summary": "5-methyltetrahydrofolate pentaglutamate noncompetitively inhibits GNMT with strong SAM cooperativity, supporting a role as methyl-group regulator.",
     "body": [
-      "In vitro, [[compound:5-methyl-thf]] dials GNMT down when folate is plentiful and SAM is low, which is the opposite of an uncontrolled methyl drain. This is a mechanism for how [[intervention:methylfolate]] might matter, but it was shown with purified rat enzyme, not in people taking glycine."
+      "In vitro, [[compound:5-mthf|5-methyl-THF]] dials GNMT down when folate is plentiful and SAM is low, which is the opposite of an uncontrolled methyl drain. This is a mechanism for how [[intervention:methylfolate-supplement|methylfolate]] might matter, but it was shown with purified rat enzyme, not in people taking glycine."
     ],
     "evidence": "plausible",
     "authors": [
@@ -1137,7 +1137,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf",
+        "to": "compound:5-mthf",
         "note": "Methyl-folate restrains GNMT in vitro."
       },
       {
@@ -1147,7 +1147,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:methylfolate",
+        "to": "intervention:methylfolate-supplement",
         "note": "Mechanistic rationale only: higher cellular 5-methyl-THF could restrain GNMT; no in vivo test here."
       }
     ]
@@ -1500,7 +1500,7 @@ export default [
     ],
     "summary": "Crystal structure of human MTHFR reveals a SAM-binding regulatory domain and shows N-terminal phosphorylation raises sensitivity to SAM inhibition.",
     "body": [
-      "Explains how high [[compound:sam]] switches off [[enzyme:mthfr]], restraining [[compound:5-methyl-thf]] supply. It is a mechanistic reason why more methylfolate is not automatically more methylation."
+      "Explains how high [[compound:sam]] switches off [[enzyme:mthfr]], restraining [[compound:5-mthf|5-methyl-THF]] supply. It is a mechanistic reason why more methylfolate is not automatically more methylation."
     ],
     "evidence": "established",
     "authors": [
@@ -1544,7 +1544,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf"
+        "to": "compound:5-mthf"
       },
       {
         "rel": "evidence-for",
@@ -1817,7 +1817,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf",
+        "to": "compound:5-mthf",
         "note": "Genotype effect interacts with folate status."
       }
     ]
@@ -1878,7 +1878,7 @@ export default [
     ],
     "summary": "Meta-analysis of 8 trials (37,485 people): folic acid cut homocysteine ~25% but did not change vascular events, cancer or mortality over about five years.",
     "body": [
-      "The strongest randomised evidence that correcting [[state:hyperhomocysteinemia]] with folic acid does not by itself reduce disease, which limits how much weight the ontology gives to [[outcome:elevated-homocysteine]] as a treatment target. It tested folic acid, not [[intervention:methylfolate]]."
+      "The strongest randomised evidence that correcting [[state:hyperhomocysteinemia]] with folic acid does not by itself reduce disease, which limits how much weight the ontology gives to [[outcome:elevated-homocysteine]] as a treatment target. It tested folic acid, not [[intervention:methylfolate-supplement|methylfolate]]."
     ],
     "evidence": "established",
     "authors": [
@@ -1936,7 +1936,7 @@ export default [
     ],
     "summary": "Randomized crossover in women with MTHFR 677TT or CC: 5-methyl-THF raised plasma folate more effectively than folic acid in both genotypes, and unmetabolized folic acid appeared only after folic acid.",
     "body": [
-      "Pharmacokinetic evidence for [[intervention:methylfolate]] over folic acid. It addresses plasma levels only, not clinical outcomes, and the study is a single-dose crossover in women ([[compound:5-methyl-thf]], [[enzyme:mthfr]])."
+      "Pharmacokinetic evidence for [[intervention:methylfolate-supplement|methylfolate]] over folic acid. It addresses plasma levels only, not clinical outcomes, and the study is a single-dose crossover in women ([[compound:5-mthf|5-methyl-THF]], [[enzyme:mthfr]])."
     ],
     "evidence": "established",
     "authors": [
@@ -1967,12 +1967,12 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:methylfolate",
+        "to": "intervention:methylfolate-supplement",
         "note": "Better acute bioavailability than folic acid, regardless of MTHFR 677 genotype."
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf"
+        "to": "compound:5-mthf"
       },
       {
         "rel": "evidence-for",
@@ -1990,7 +1990,7 @@ export default [
     ],
     "summary": "Human liver reduces synthetic folic acid via DHFR at less than 2% of rat-liver rates and with ~5-fold variation, suggesting saturation at high folic acid intakes.",
     "body": [
-      "Mechanistic rationale for using [[intervention:methylfolate]] rather than synthetic folic acid at high doses. It is six liver samples; it neither demonstrates harm nor the claim that folic acid slows methylation by receptor competition ([[pathway:folate-cycle]])."
+      "Mechanistic rationale for using [[intervention:methylfolate-supplement|methylfolate]] rather than synthetic folic acid at high doses. It is six liver samples; it neither demonstrates harm nor the claim that folic acid slows methylation by receptor competition ([[pathway:folate-cycle]])."
     ],
     "evidence": "plausible",
     "authors": [
@@ -2016,7 +2016,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:methylfolate",
+        "to": "intervention:methylfolate-supplement",
         "note": "Provides a rationale for preferring reduced folates over folic acid at high intakes; effect on outcomes not shown."
       },
       {
@@ -2035,7 +2035,7 @@ export default [
     ],
     "summary": "Two sequential-parallel trials of adjunctive L-methylfolate in SSRI-resistant depression: no benefit in the first (7.5-15 mg), significant benefit at 15 mg in the second (NNT about 6).",
     "body": [
-      "Main randomized test of therapeutic-dose [[intervention:methylfolate]] in a psychiatric condition. It is mixed (one null trial) and concerns depression adjunct therapy, so it should not be read as support for methylfolate in anxiety or for correcting 'undermethylation'."
+      "Main randomized test of therapeutic-dose [[intervention:methylfolate-supplement|methylfolate]] in a psychiatric condition. It is mixed (one null trial) and concerns depression adjunct therapy, so it should not be read as support for methylfolate in anxiety or for correcting 'undermethylation'."
     ],
     "evidence": "plausible",
     "authors": [
@@ -2070,12 +2070,12 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:methylfolate",
+        "to": "intervention:methylfolate-supplement",
         "note": "15 mg/day adjunct improved response in one of two trials; the other was null."
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf",
+        "to": "compound:5-mthf",
         "note": "Therapeutic-dose L-methylfolate (7.5-15 mg) given as an adjunct; depression endpoint, not methylation status."
       }
     ]
@@ -2483,7 +2483,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:choline-salts",
+        "to": "intervention:choline-bitartrate",
         "note": "UL of 3.5 g/day caps supplemental dosing; the 14-35 g/day of choline needed to make 10 g glycine by stoichiometry would exceed it four- to ten-fold."
       },
       {
@@ -2536,7 +2536,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:choline-salts",
+        "to": "intervention:choline-bitartrate",
         "note": "No EU UL exists; the only formal ceiling is the IOM UL of 3.5 g/day."
       }
     ]
@@ -2589,7 +2589,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:choline-salts",
+        "to": "intervention:choline-bitartrate",
         "note": "States no EFSA UL; IOM figure of 3.5 g/day is the reference ceiling."
       }
     ]
@@ -2653,7 +2653,7 @@ export default [
     ],
     "summary": "In 18 adults, choline from egg-yolk phospholipid raised plasma choline about four-fold more than the same choline dose from choline bitartrate, with matching betaine and DMG rises.",
     "body": [
-      "Pharmacokinetic comparison of [[intervention:choline-salts]] with food phospholipids. The lower absorption of bitartrate means more could remain in the gut lumen, but this study did not test that, nor TMA or TMAO outcomes ([[compound:choline]])."
+      "Pharmacokinetic comparison of [[intervention:choline-bitartrate|choline salts]] with food phospholipids. The lower absorption of bitartrate means more could remain in the gut lumen, but this study did not test that, nor TMA or TMAO outcomes ([[compound:choline]])."
     ],
     "evidence": "plausible",
     "authors": [
@@ -2683,7 +2683,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:choline-salts",
+        "to": "intervention:choline-bitartrate",
         "note": "Salts such as bitartrate gave a smaller plasma choline response than phospholipid-bound choline at the same dose."
       },
       {
@@ -3257,7 +3257,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:choline-salts",
+        "to": "intervention:choline-bitartrate",
         "note": "Mouse diets enriched in choline promoted atherosclerosis; human supplement-dose relevance not tested."
       }
     ]
@@ -3704,7 +3704,7 @@ export default [
     ],
     "summary": "Kinetics showing GAD65 is mostly PLP-free apoenzyme (about 93%) in cells whereas GAD67 is mostly holoenzyme (about 72%), so cofactor cycling controls GAD65 activity.",
     "body": [
-      "Biochemical basis for linking [[compound:plp]] supply to [[compound:gaba]] synthesis through [[enzyme:gad]]. It is an in vitro kinetic study; it does not show that [[intervention:p5p]] increases GABA in people."
+      "Biochemical basis for linking [[compound:plp]] supply to [[compound:gaba]] synthesis through [[enzyme:gad]]. It is an in vitro kinetic study; it does not show that [[intervention:p5p-supplement|P5P]] increases GABA in people."
     ],
     "evidence": "plausible",
     "authors": [
@@ -3744,7 +3744,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "Mechanistic rationale: an apoGAD65 reserve could respond to PLP; in vitro, no supplementation test."
       }
     ]
@@ -3758,7 +3758,7 @@ export default [
     ],
     "summary": "Double-blind trial: 100 mg/day pyridoxine hydrochloride for a month reduced self-reported anxiety (within-group) and increased visual surround suppression, a putative GABAergic index; exploratory.",
     "body": [
-      "Often cited for B6 and anxiety. It supports high-dose B6 repletion generally, with plain pyridoxine, and does not support the claim that [[intervention:p5p]] is superior or that [[state:b6-functional-deficiency]] was present. The dose is far above safety limits ([[article:efsa-2023-b6-ul]])."
+      "Often cited for B6 and anxiety. It supports high-dose B6 repletion generally, with plain pyridoxine, and does not support the claim that [[intervention:p5p-supplement|P5P]] is superior or that [[state:b6-functional-deficiency]] was present. The dose is far above safety limits ([[article:efsa-2023-b6-ul]])."
     ],
     "evidence": "plausible",
     "authors": [
@@ -3799,7 +3799,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "B6 supplementation helped, but the form used was pyridoxine, so P5P superiority is untested."
       }
     ]
@@ -3813,7 +3813,7 @@ export default [
     ],
     "summary": "EFSA set the adult upper intake level for vitamin B6 at 12 mg/day, based on peripheral neuropathy risk, with intakes above it from supplements a concern.",
     "body": [
-      "Safety ceiling for B6 supplements, relevant to [[intervention:p5p]] dosing. It is a regulatory UL for total vitamin B6, so doses used in some trials ([[article:field-2022-b6-anxiety]]) exceed it."
+      "Safety ceiling for B6 supplements, relevant to [[intervention:p5p-supplement|P5P]] dosing. It is a regulatory UL for total vitamin B6, so doses used in some trials ([[article:field-2022-b6-anxiety]]) exceed it."
     ],
     "evidence": "established",
     "authors": [
@@ -3847,7 +3847,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-against",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "UL of 12 mg/day for adults; high-dose B6 supplements risk neuropathy."
       },
       {
@@ -3866,7 +3866,7 @@ export default [
     ],
     "summary": "Seven adults taking high-dose pyridoxine developed ataxia and sensory neuropathy or neuronopathy that improved after withdrawal, the first description of megadose B6 toxicity.",
     "body": [
-      "Founding case series for B6 toxicity. It involved pyridoxine; whether [[intervention:p5p]] carries the same risk is not established by this report, but total [[compound:plp]]/B6 exposure matters."
+      "Founding case series for B6 toxicity. It involved pyridoxine; whether [[intervention:p5p-supplement|P5P]] carries the same risk is not established by this report, but total [[compound:plp]]/B6 exposure matters."
     ],
     "evidence": "established",
     "authors": [
@@ -3896,7 +3896,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-against",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "Documents sensory neuropathy from megadose B6; applies to pyridoxine, with P5P likely similar but not tested here."
       },
       {
@@ -3914,7 +3914,7 @@ export default [
     ],
     "summary": "Review of vitamin B6 status biomarkers: plasma PLP is confounded by inflammation and other factors, so functional markers (cystathionine, glycine/serine, kynurenines) improve assessment.",
     "body": [
-      "Gives the lab definition behind [[state:b6-functional-deficiency]]: plasma [[compound:plp]] alone can mislead, and glycine/serine markers reflect [[enzyme:gcs]] and SHMT dependence on B6."
+      "Gives the lab definition behind [[state:b6-functional-deficiency]]: plasma [[compound:plp]] alone can mislead, and glycine/serine markers reflect [[enzyme:glycine-cleavage-system|GCS]] and SHMT dependence on B6."
     ],
     "evidence": "established",
     "authors": [
@@ -3951,7 +3951,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "enzyme:gcs",
+        "to": "enzyme:glycine-cleavage-system",
         "note": "Glycine and serine levels are used as functional markers of PLP-dependent glycine cleavage."
       }
     ]
@@ -4276,7 +4276,7 @@ export default [
     ],
     "summary": "Gastroenterology review of how gastric acid secretion is regulated and inhibited in health and disease, covering H2 blockers, proton pump inhibitors and H. pylori.",
     "body": [
-      "Textbook-level background for [[pathway:gastric-acid-secretion]], the roles of [[compound:gastrin]], histamine and acetylcholine, and how [[intervention:ppi]] act. Use it to ground discussion of acid as a variable in [[system:gastric-physiology]]."
+      "Textbook-level background for [[pathway:gastric-acid-secretion]], the roles of [[compound:gastrin]], histamine and acetylcholine, and how [[intervention:ppi-therapy|PPIs]] act. Use it to ground discussion of acid as a variable in [[system:gastric-physiology]]."
     ],
     "evidence": "established",
     "authors": [
@@ -4315,7 +4315,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Covers the pharmacology and role of PPIs."
       }
     ]
@@ -4639,7 +4639,7 @@ export default [
     ],
     "summary": "Review: gastric acid inactivates ingested microbes; acid blockade leads to bacterial overgrowth in the gut, though the clinical significance is uncertain.",
     "body": [
-      "Foundation for the argument that [[state:hypochlorhydria]] (or acid suppression with [[intervention:ppi]]) opens the way for upper-gut bacteria ([[disease:sibo]]). The review itself calls the clinical significance controversial."
+      "Foundation for the argument that [[state:hypochlorhydria]] (or acid suppression with [[intervention:ppi-therapy|PPIs]]) opens the way for upper-gut bacteria ([[disease:sibo]]). The review itself calls the clinical significance controversial."
     ],
     "evidence": "plausible",
     "authors": [
@@ -5268,7 +5268,7 @@ export default [
     ],
     "summary": "In 70 functional dyspepsia patients, delayed emptying and more belching than controls were found; H. pylori eradication plus domperidone beat domperidone alone on symptoms and emptying.",
     "body": [
-      "One of the few direct links between [[outcome:belching]] and slow emptying ([[state:gastric-dysmotility]]), seen in dyspepsia rather than in supplement users. It also supports testing for [[disease:h-pylori-infection]] and treating with [[intervention:h-pylori-eradication]] if present."
+      "One of the few direct links between [[outcome:belching]] and slow emptying ([[state:gastric-dysmotility]]), seen in dyspepsia rather than in supplement users. It also supports testing for [[disease:h-pylori-infection]] and treating with [[intervention:h-pylori-eradication-therapy|H. pylori eradication]] if present."
     ],
     "evidence": "plausible",
     "authors": [
@@ -5314,7 +5314,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication"
+        "to": "intervention:h-pylori-eradication-therapy"
       }
     ]
   },
@@ -5327,7 +5327,7 @@ export default [
     ],
     "summary": "ACG/CAG guideline: investigate dyspepsia over age 60 by endoscopy; test for H. pylori and treat if positive in younger patients, then use PPI, tricyclics or prokinetics.",
     "body": [
-      "Standard pathway for dyspepsia work-up and treatment that frames [[intervention:h-pylori-eradication]] and [[intervention:ppi]] use. It contains no recommendations for amino acid supplements."
+      "Standard pathway for dyspepsia work-up and treatment that frames [[intervention:h-pylori-eradication-therapy|H. pylori eradication]] and [[intervention:ppi-therapy|PPIs]] use. It contains no recommendations for amino acid supplements."
     ],
     "evidence": "established",
     "authors": [
@@ -5361,12 +5361,12 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Recommended in H. pylori-positive dyspepsia."
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "PPI trial is a first-line empiric step in H. pylori-negative dyspepsia."
       },
       {
@@ -5435,7 +5435,7 @@ export default [
     ],
     "summary": "Meta-analysis of 11 studies (n=3,134): PPI use raised SIBO odds 2.3-fold overall, but only when SIBO was diagnosed by small-bowel aspirate culture (OR 7.6), not by glucose breath test.",
     "body": [
-      "Core meta-analysis linking [[intervention:ppi]] use to [[disease:sibo]]. The effect is concentrated in culture-based diagnosis, so claims based on breath tests ([[intervention:sibo-breath-test]]) are weaker ([[state:hypochlorhydria]])."
+      "Core meta-analysis linking [[intervention:ppi-therapy|PPIs]] use to [[disease:sibo]]. The effect is concentrated in culture-based diagnosis, so claims based on breath tests ([[intervention:sibo-breath-test]]) are weaker ([[state:hypochlorhydria]])."
     ],
     "evidence": "established",
     "authors": [
@@ -5465,7 +5465,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Acid suppression is a risk factor for SIBO in aspirate-based studies."
       },
       {
@@ -5489,7 +5489,7 @@ export default [
     ],
     "summary": "Updated meta-analysis of 19 studies (n=7,055): PPI use moderately raises SIBO risk (OR 1.71) in studies using aspirate cultures or glucose breath tests.",
     "body": [
-      "Updates [[article:lo-2013-ppi-sibo-meta-analysis]] with more studies and a smaller but consistent effect ([[intervention:ppi]], [[disease:sibo]]). Together they support a moderate association, not a near-universal consequence of PPI use ([[state:hypochlorhydria]])."
+      "Updates [[article:lo-2013-ppi-sibo-meta-analysis]] with more studies and a smaller but consistent effect ([[intervention:ppi-therapy|PPIs]], [[disease:sibo]]). Together they support a moderate association, not a near-universal consequence of PPI use ([[state:hypochlorhydria]])."
     ],
     "evidence": "established",
     "authors": [
@@ -5522,7 +5522,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi"
+        "to": "intervention:ppi-therapy"
       },
       {
         "rel": "evidence-for",
@@ -5539,7 +5539,7 @@ export default [
     ],
     "summary": "Large retrospective breath-test study (n=1,191): PPI use was not associated with positive glucose breath tests, which tracked age and antidiarrheal use instead.",
     "body": [
-      "Counterpoint to [[article:lo-2013-ppi-sibo-meta-analysis]]: with glucose breath tests, [[intervention:ppi]] use did not predict [[intervention:sibo-breath-test]] positivity. The question of PPI-induced SIBO therefore depends on test choice."
+      "Counterpoint to [[article:lo-2013-ppi-sibo-meta-analysis]]: with glucose breath tests, [[intervention:ppi-therapy|PPIs]] use did not predict [[intervention:sibo-breath-test]] positivity. The question of PPI-induced SIBO therefore depends on test choice."
     ],
     "evidence": "plausible",
     "authors": [
@@ -5573,7 +5573,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-against",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "No association between PPI use and glucose breath-test SIBO."
       },
       {
@@ -5597,7 +5597,7 @@ export default [
     ],
     "summary": "In 150 patients with unexplained GI symptoms, duodenal overgrowth (bacterial or fungal) was found in 63%; PPI use and dysmotility were independent risk factors, symptoms were not predictive.",
     "body": [
-      "Provides manometric evidence that dysmotility and [[intervention:ppi]] each raise overgrowth risk ([[disease:sibo]], [[state:gastric-dysmotility]]). The study is from a referral centre and the symptom profile was similar with or without overgrowth, so belching or bloating alone cannot identify it."
+      "Provides manometric evidence that dysmotility and [[intervention:ppi-therapy|PPIs]] each raise overgrowth risk ([[disease:sibo]], [[state:gastric-dysmotility]]). The study is from a referral centre and the symptom profile was similar with or without overgrowth, so belching or bloating alone cannot identify it."
     ],
     "evidence": "plausible",
     "authors": [
@@ -5631,7 +5631,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "PPI use was an independent risk factor for overgrowth."
       },
       {
@@ -5950,7 +5950,7 @@ export default [
     ],
     "summary": "Evidence is inadequate to show PPIs causally produce most proposed adverse outcomes (residual confounding likely); use them for proven indications at the lowest effective dose.",
     "body": [
-      "Balanced summary of the safety of [[intervention:ppi]] and a useful brake on attributing every GI problem to acid suppression. Small-bowel effects are better dealt with in dedicated SIBO studies ([[disease:gerd]])."
+      "Balanced summary of the safety of [[intervention:ppi-therapy|PPIs]] and a useful brake on attributing every GI problem to acid suppression. Small-bowel effects are better dealt with in dedicated SIBO studies ([[disease:gerd]])."
     ],
     "evidence": "established",
     "authors": [
@@ -5976,7 +5976,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Balanced appraisal of PPI safety and appropriate use."
       },
       {
@@ -5995,7 +5995,7 @@ export default [
     ],
     "summary": "RCT in 120 healthy volunteers: eight weeks of esomeprazole then placebo produced acid-related symptoms in 44% versus 15% on placebo during weeks 9-12, consistent with rebound acid hypersecretion.",
     "body": [
-      "Shows that stopping [[intervention:ppi]] therapy can cause temporary acid-related symptoms, a confounder when interpreting new upper-GI symptoms after PPI courses ([[pathway:gastric-acid-secretion]], [[state:hypochlorhydria]])."
+      "Shows that stopping [[intervention:ppi-therapy|PPIs]] therapy can cause temporary acid-related symptoms, a confounder when interpreting new upper-GI symptoms after PPI courses ([[pathway:gastric-acid-secretion]], [[state:hypochlorhydria]])."
     ],
     "evidence": "established",
     "authors": [
@@ -6028,7 +6028,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Withdrawal symptoms after short courses in healthy people."
       },
       {
@@ -6093,7 +6093,7 @@ export default [
     ],
     "summary": "In 102 patients, H. pylori positivity doubled SIBO (49% vs 25%) and eradication cleared SIBO in about two-thirds while symptom scores fell.",
     "body": [
-      "Clinical cohort that links [[disease:h-pylori-infection]], [[disease:sibo]] and symptom burden, and shows improvement after [[intervention:h-pylori-eradication]]. Uncontrolled, so it can reflect spontaneous change or regression."
+      "Clinical cohort that links [[disease:h-pylori-infection]], [[disease:sibo]] and symptom burden, and shows improvement after [[intervention:h-pylori-eradication-therapy|H. pylori eradication]]. Uncontrolled, so it can reflect spontaneous change or regression."
     ],
     "evidence": "plausible",
     "authors": [
@@ -6133,7 +6133,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Eradication was followed by SIBO clearance and symptom relief in this cohort."
       },
       {
@@ -6152,7 +6152,7 @@ export default [
     ],
     "summary": "Maastricht VI/Florence consensus: H. pylori infection is an infectious disease to treat in all infected patients, with updated testing, treatment, cancer-prevention and microbiota advice.",
     "body": [
-      "Authoritative European guideline for [[disease:h-pylori-infection]]. Ulcer patients ([[disease:peptic-ulcer]]) with infection should receive [[intervention:h-pylori-eradication]], and cure should be confirmed."
+      "Authoritative European guideline for [[disease:h-pylori-infection]]. Ulcer patients ([[disease:peptic-ulcer]]) with infection should receive [[intervention:h-pylori-eradication-therapy|H. pylori eradication]], and cure should be confirmed."
     ],
     "evidence": "established",
     "authors": [
@@ -6191,7 +6191,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Guidance for treatment regimens and testing."
       },
       {
@@ -6210,7 +6210,7 @@ export default [
     ],
     "summary": "ACG 2024 guideline: bismuth quadruple therapy for 14 days is the preferred first-line regimen when susceptibility is unknown, with test-of-cure after treatment.",
     "body": [
-      "US standard for [[intervention:h-pylori-eradication]]. Relevant when someone with a past ulcer wants to be sure the bacterium was eradicated: the guideline recommends post-treatment testing ([[disease:h-pylori-infection]], [[disease:peptic-ulcer]])."
+      "US standard for [[intervention:h-pylori-eradication-therapy|H. pylori eradication]]. Relevant when someone with a past ulcer wants to be sure the bacterium was eradicated: the guideline recommends post-treatment testing ([[disease:h-pylori-infection]], [[disease:peptic-ulcer]])."
     ],
     "evidence": "established",
     "authors": [
@@ -6240,7 +6240,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Current North American treatment recommendations."
       },
       {
@@ -6264,7 +6264,7 @@ export default [
     ],
     "summary": "Showed acid triggers H. pylori cytoplasmic urease via UreI, an H+-gated urea channel, which is essential for acid resistance and gastric colonization.",
     "body": [
-      "Mechanistic basis for [[enzyme:urease-h-pylori]] and acid resistance in [[disease:h-pylori-infection]]. Urease hydrolyses urea to ammonia and [[compound:carbon-dioxide]] (standard enzymology); this paper does not address gas production or belching."
+      "Mechanistic basis for [[enzyme:h-pylori-urease|H. pylori urease]] and acid resistance in [[disease:h-pylori-infection]]. Urease hydrolyses urea to ammonia and [[compound:carbon-dioxide]] (standard enzymology); this paper does not address gas production or belching."
     ],
     "evidence": "established",
     "authors": [
@@ -6291,7 +6291,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "enzyme:urease-h-pylori",
+        "to": "enzyme:h-pylori-urease",
         "note": "Defines how acid regulates urease activity and bacterial survival."
       },
       {
@@ -6310,7 +6310,7 @@ export default [
     ],
     "summary": "Lancet seminar: peptic ulcer prevalence has fallen with H. pylori decline and acid-suppressing drugs, but management is harder because of antibiotic resistance and anti-thrombotic therapy.",
     "body": [
-      "Overview of [[disease:peptic-ulcer]] causes (H. pylori, NSAIDs, others) and therapy. It is the clinical context for people with an ulcer history and for deciding when [[intervention:ppi]] or eradication is needed ([[disease:h-pylori-infection]])."
+      "Overview of [[disease:peptic-ulcer]] causes (H. pylori, NSAIDs, others) and therapy. It is the clinical context for people with an ulcer history and for deciding when [[intervention:ppi-therapy|PPIs]] or eradication is needed ([[disease:h-pylori-infection]])."
     ],
     "evidence": "established",
     "authors": [
@@ -6345,7 +6345,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Potent antisecretory drugs reduce ulcer burden."
       }
     ]
@@ -6359,7 +6359,7 @@ export default [
     ],
     "summary": "Cochrane review of 55 trials: H. pylori eradication heals duodenal ulcers better than ulcer-healing drugs alone and prevents recurrence of duodenal and gastric ulcer versus no treatment.",
     "body": [
-      "Key meta-analysis behind ulcer practice: [[intervention:h-pylori-eradication]] improves [[outcome:ulcer-healing]] and recurrence prevention in [[disease:peptic-ulcer]], with some uncertainty for gastric ulcer healing."
+      "Key meta-analysis behind ulcer practice: [[intervention:h-pylori-eradication-therapy|H. pylori eradication]] improves [[outcome:ulcer-healing]] and recurrence prevention in [[disease:peptic-ulcer]], with some uncertainty for gastric ulcer healing."
     ],
     "evidence": "established",
     "authors": [
@@ -6387,7 +6387,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Eradication heals duodenal ulcers and prevents recurrence."
       },
       {
@@ -6411,7 +6411,7 @@ export default [
     ],
     "summary": "Meta-analysis of 849 trials (142,485 people): PPIs beat H2 blockers and prostaglandin analogues for ulcer healing (OR 5.2) and bleeding prevention, though small-study bias may inflate benefit.",
     "body": [
-      "Benchmark for [[outcome:ulcer-healing]] and the standing of [[intervention:ppi]]; it provides the comparator against which nutraceutical gastroprotectants must be judged ([[disease:peptic-ulcer]])."
+      "Benchmark for [[outcome:ulcer-healing]] and the standing of [[intervention:ppi-therapy|PPIs]]; it provides the comparator against which nutraceutical gastroprotectants must be judged ([[disease:peptic-ulcer]])."
     ],
     "evidence": "established",
     "authors": [
@@ -6445,7 +6445,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Most effective drug class for ulcer healing and bleeding prevention."
       },
       {
@@ -6468,7 +6468,7 @@ export default [
     ],
     "summary": "Meta-analysis of 29 RCTs (n=6,781): H. pylori eradication modestly improved functional dyspepsia (NNT 9 for improvement, 14 for cure), with more adverse events.",
     "body": [
-      "High-quality meta-analysis showing [[intervention:h-pylori-eradication]] helps some dyspepsia patients. It supports testing for [[disease:h-pylori-infection]] in persistent upper-GI symptoms, with realistic expectations ([[state:gastric-dysmotility]])."
+      "High-quality meta-analysis showing [[intervention:h-pylori-eradication-therapy|H. pylori eradication]] helps some dyspepsia patients. It supports testing for [[disease:h-pylori-infection]] in persistent upper-GI symptoms, with realistic expectations ([[state:gastric-dysmotility]])."
     ],
     "evidence": "established",
     "authors": [
@@ -6496,7 +6496,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Modest benefit in H. pylori-positive functional dyspepsia."
       },
       {
@@ -6676,7 +6676,7 @@ export default [
     ],
     "summary": "Meta-analysis of three RCTs (n=396): adding polaprezinc to standard triple therapy improved H. pylori eradication (ITT OR 2.01) without more adverse events, though evidence is scarce.",
     "body": [
-      "Suggests [[intervention:zinc-carnosine]] may improve the success of [[intervention:h-pylori-eradication]]. Only three small trials; it does not replace antibiotics for [[disease:h-pylori-infection]]."
+      "Suggests [[intervention:zinc-carnosine]] may improve the success of [[intervention:h-pylori-eradication-therapy|H. pylori eradication]]. Only three small trials; it does not replace antibiotics for [[disease:h-pylori-infection]]."
     ],
     "evidence": "plausible",
     "authors": [
@@ -6711,7 +6711,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Polaprezinc as an add-on to triple therapy."
       },
       {
@@ -7084,7 +7084,7 @@ export default [
     ],
     "summary": "In vitro, the alginate raft Gaviscon Advance inhibited pepsin beyond neutralisation, slowed diffusion of pepsin and bile acids, and removed both from a simulated reflux event.",
     "body": [
-      "Mechanistic support for [[intervention:alginate]] beyond acid neutralisation: it binds pepsin and [[compound:bile-acids]]. Clinical benefit in [[disease:lpr]] must come from trials such as [[article:leiman-2017-alginate-meta-analysis]]."
+      "Mechanistic support for [[intervention:sodium-alginate|alginate]] beyond acid neutralisation: it binds pepsin and [[compound:bile-acids]]. Clinical benefit in [[disease:lpr]] must come from trials such as [[article:leiman-2017-alginate-meta-analysis]]."
     ],
     "evidence": "plausible",
     "authors": [
@@ -7112,7 +7112,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:alginate",
+        "to": "intervention:sodium-alginate",
         "note": "In-vitro mechanisms for pepsin and bile acid capture by an alginate raft."
       },
       {
@@ -7136,7 +7136,7 @@ export default [
     ],
     "summary": "Meta-analysis of 14 RCTs (n=2,095): alginate therapies were over four times more likely than placebo or antacids to resolve GERD symptoms and not significantly different from PPI or H2 blockers.",
     "body": [
-      "Evidence base for [[intervention:alginate]] in [[disease:gerd]]. It covers GERD symptoms, not laryngopharyngeal symptoms specifically, and compares favourably with, but cannot replace, [[intervention:ppi]] for erosive disease."
+      "Evidence base for [[intervention:sodium-alginate|alginate]] in [[disease:gerd]]. It covers GERD symptoms, not laryngopharyngeal symptoms specifically, and compares favourably with, but cannot replace, [[intervention:ppi-therapy|PPIs]] for erosive disease."
     ],
     "evidence": "established",
     "authors": [
@@ -7168,7 +7168,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:alginate",
+        "to": "intervention:sodium-alginate",
         "note": "Effective for GERD symptoms versus placebo or antacid."
       },
       {
@@ -7178,7 +7178,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Alginates were not significantly worse than PPIs or H2RAs; underpowered comparison."
       }
     ]
@@ -7192,7 +7192,7 @@ export default [
     ],
     "summary": "In 100 patients with laryngopharyngeal reflux, Gaviscon Advance alone and with a PPI both lowered reflux symptom scores by about 9 points at 3 months, with no added benefit from the PPI.",
     "body": [
-      "Real-world evidence for [[intervention:alginate]] in [[disease:lpr]] and against adding [[intervention:ppi]]. Uncontrolled and without a placebo, so placebo effect and spontaneous change are not excluded."
+      "Real-world evidence for [[intervention:sodium-alginate|alginate]] in [[disease:lpr]] and against adding [[intervention:ppi-therapy|PPIs]]. Uncontrolled and without a placebo, so placebo effect and spontaneous change are not excluded."
     ],
     "evidence": "plausible",
     "authors": [
@@ -7219,7 +7219,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-for",
-        "to": "intervention:alginate",
+        "to": "intervention:sodium-alginate",
         "note": "Alginate alone improved LPR symptom scores."
       },
       {
@@ -7229,7 +7229,7 @@ export default [
       },
       {
         "rel": "evidence-against",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "Adding a high-dose PPI gave no additional benefit in this cohort."
       }
     ]
@@ -7243,7 +7243,7 @@ export default [
     ],
     "summary": "Placebo-controlled RCT: esomeprazole 40 mg twice daily for 16 weeks did not improve symptoms or laryngoscopic signs of presumed reflux laryngitis (resolution 14.7% vs 16.0%).",
     "body": [
-      "Key RCT showing that [[intervention:ppi]] therapy fails to improve presumed reflux laryngitis, which implies throat symptoms ([[outcome:throat-burning]]) are often not acid-driven. It supports non-acid mechanisms (pepsin, hypersensitivity) in [[disease:lpr]] and cautions against assuming gastric acid is the cause."
+      "Key RCT showing that [[intervention:ppi-therapy|PPIs]] therapy fails to improve presumed reflux laryngitis, which implies throat symptoms ([[outcome:throat-burning]]) are often not acid-driven. It supports non-acid mechanisms (pepsin, hypersensitivity) in [[disease:lpr]] and cautions against assuming gastric acid is the cause."
     ],
     "evidence": "established",
     "authors": [
@@ -7276,7 +7276,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-against",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "High-dose PPI was no better than placebo for chronic posterior laryngitis."
       },
       {
@@ -7300,7 +7300,7 @@ export default [
     ],
     "summary": "San Diego Consensus: laryngopharyngeal symptoms are not equal to laryngopharyngeal reflux disease; reflux monitoring is required for diagnosis when symptoms persist or are isolated.",
     "body": [
-      "Current consensus that throat burning ([[outcome:throat-burning]]) does not by itself establish [[disease:lpr]]. It supports objective testing and notes a role for [[intervention:alginate]] when esophageal reflux symptoms are present."
+      "Current consensus that throat burning ([[outcome:throat-burning]]) does not by itself establish [[disease:lpr]]. It supports objective testing and notes a role for [[intervention:sodium-alginate|alginate]] when esophageal reflux symptoms are present."
     ],
     "evidence": "established",
     "authors": [
@@ -7339,7 +7339,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:alginate",
+        "to": "intervention:sodium-alginate",
         "note": "Alginates are acceptable as part of empiric therapy when esophageal reflux symptoms coexist."
       },
       {
@@ -7758,7 +7758,7 @@ export default [
     ],
     "summary": "A savory plus oregano essential oil mixture eradicated H. pylori in 70% of infected mice without detectable toxicity.",
     "body": [
-      "Preclinical sign that oregano-containing essential oils kill H. pylori ([[disease:h-pylori-infection]]). It is a mouse study and far from [[intervention:h-pylori-eradication]] evidence in humans."
+      "Preclinical sign that oregano-containing essential oils kill H. pylori ([[disease:h-pylori-infection]]). It is a mouse study and far from [[intervention:h-pylori-eradication-therapy|H. pylori eradication]] evidence in humans."
     ],
     "evidence": "speculative",
     "authors": [
@@ -7797,7 +7797,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:h-pylori-eradication",
+        "to": "intervention:h-pylori-eradication-therapy",
         "note": "Candidate antibiotic-sparing agent; mouse only, not a replacement for guideline regimens."
       }
     ]
@@ -8594,7 +8594,7 @@ export default [
     ],
     "summary": "PRISMA review of 73 articles on pyroluria (urinary HPL): only 3 studies found higher HPL in psychiatric patients, there were no placebo-controlled treatment trials, and HPL testing is not recommended.",
     "body": [
-      "Best current critical review of [[disease:pyroluria-kpu]]. It argues against using HPL testing as a screening or treatment tool, and offers no support for supplementing [[intervention:p5p]] in pyroluria on current evidence ([[state:b6-functional-deficiency]])."
+      "Best current critical review of [[disease:pyroluria-kpu]]. It argues against using HPL testing as a screening or treatment tool, and offers no support for supplementing [[intervention:p5p-supplement|P5P]] in pyroluria on current evidence ([[state:b6-functional-deficiency]])."
     ],
     "evidence": "established",
     "authors": [
@@ -8626,7 +8626,7 @@ export default [
       },
       {
         "rel": "evidence-against",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "No placebo-controlled evidence that B6 (with zinc) treats pyrroluria."
       },
       {
@@ -8645,7 +8645,7 @@ export default [
     ],
     "summary": "Authors of a Mauve Factor review report that urinary HPL correlated inversely with red-cell B6 activity and zinc and plasma glutathione and directly with nitric oxide in mixed patient cohorts.",
     "body": [
-      "The main proponent-side source on [[disease:pyroluria-kpu]], reporting correlations between HPL and B6 and zinc markers ([[state:b6-functional-deficiency]]). It should be read alongside [[article:warren-2021-pyroluria-fact-or-fiction]], which found little controlled evidence for the treatment claim ([[intervention:p5p]])."
+      "The main proponent-side source on [[disease:pyroluria-kpu]], reporting correlations between HPL and B6 and zinc markers ([[state:b6-functional-deficiency]]). It should be read alongside [[article:warren-2021-pyroluria-fact-or-fiction]], which found little controlled evidence for the treatment claim ([[intervention:p5p-supplement|P5P]])."
     ],
     "evidence": "speculative",
     "authors": [
@@ -8688,7 +8688,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:p5p",
+        "to": "intervention:p5p-supplement",
         "note": "Claims improvement with B6 and zinc; form of B6 and controls not described in the abstract."
       }
     ]
@@ -8949,7 +8949,7 @@ export default [
     ],
     "summary": "Reactome curated pathway: glycine is catabolised by several routes, the major being the glycine cleavage system (GLDC, AMT, DLD, GCSH).",
     "body": [
-      "Database entry for [[pathway:glycine-cleavage]] and [[enzyme:gcs]], based on [[article:kikuchi-2008-glycine-cleavage-system]]. Reactions occur in cells and mitochondria, not in the gastric lumen."
+      "Database entry for [[pathway:glycine-cleavage]] and [[enzyme:glycine-cleavage-system|GCS]], based on [[article:kikuchi-2008-glycine-cleavage-system]]. Reactions occur in cells and mitochondria, not in the gastric lumen."
     ],
     "evidence": "established",
     "authors": [
@@ -8977,7 +8977,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "enzyme:gcs",
+        "to": "enzyme:glycine-cleavage-system",
         "note": "Components of the cleavage system are annotated."
       },
       {
@@ -8995,7 +8995,7 @@ export default [
     ],
     "summary": "Reactome curated pathway of folate transport, polyglutamylation, DHFR reduction of folic acid and generation of one-carbon folate derivatives, including 5-methyl-THF uptake.",
     "body": [
-      "Database map of the [[pathway:folate-cycle]] including DHFR reduction of folic acid and handling of [[compound:5-methyl-thf]]. It illustrates why [[intervention:methylfolate]] bypasses the DHFR step, without quantifying how much that matters."
+      "Database map of the [[pathway:folate-cycle]] including DHFR reduction of folic acid and handling of [[compound:5-mthf|5-methyl-THF]]. It illustrates why [[intervention:methylfolate-supplement|methylfolate]] bypasses the DHFR step, without quantifying how much that matters."
     ],
     "evidence": "established",
     "authors": [
@@ -9023,12 +9023,12 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "compound:5-methyl-thf",
+        "to": "compound:5-mthf",
         "note": "5-methyl-THF transport is annotated."
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:methylfolate",
+        "to": "intervention:methylfolate-supplement",
         "note": "Shows folic acid requires DHFR reduction while 5-methyl-THF is already reduced."
       }
     ]
@@ -9092,7 +9092,7 @@ export default [
     ],
     "summary": "In 12 healthy volunteers, seven days of omeprazole 20 mg left gastric emptying half-time unchanged and increased normal gastric rhythm on electrogastrography, arguing against PPI-slowed emptying.",
     "body": [
-      "Direct test of the idea that acid suppression slows the stomach. In healthy volunteers [[intervention:ppi]] did not delay emptying after a week ([[state:gastric-dysmotility]]), so the claim that PPIs cause or worsen dysmotility is not supported here. Long-term use and patients with SIBO or dysmotility were not examined."
+      "Direct test of the idea that acid suppression slows the stomach. In healthy volunteers [[intervention:ppi-therapy|PPIs]] did not delay emptying after a week ([[state:gastric-dysmotility]]), so the claim that PPIs cause or worsen dysmotility is not supported here. Long-term use and patients with SIBO or dysmotility were not examined."
     ],
     "evidence": "plausible",
     "authors": [
@@ -9127,7 +9127,7 @@ export default [
     "relations": [
       {
         "rel": "evidence-against",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "A one-week PPI course did not delay gastric emptying in healthy volunteers."
       },
       {
@@ -9146,7 +9146,7 @@ export default [
     ],
     "summary": "In PPI-resistant non-erosive reflux patients, those with delayed gastric emptying improved on adding the prokinetic mosapride to omeprazole, linking delayed emptying to PPI resistance.",
     "body": [
-      "Links delayed emptying ([[state:gastric-dysmotility]]) with PPI-resistant [[disease:gerd]]. It suggests belching or reflux that does not respond to [[intervention:ppi]] may reflect motility, but it does not show that PPIs caused the delay."
+      "Links delayed emptying ([[state:gastric-dysmotility]]) with PPI-resistant [[disease:gerd]]. It suggests belching or reflux that does not respond to [[intervention:ppi-therapy|PPIs]] may reflect motility, but it does not show that PPIs caused the delay."
     ],
     "evidence": "plausible",
     "authors": [
@@ -9190,7 +9190,7 @@ export default [
       },
       {
         "rel": "evidence-for",
-        "to": "intervention:ppi",
+        "to": "intervention:ppi-therapy",
         "note": "PPI response is limited when delayed emptying coexists."
       }
     ]
@@ -9242,5 +9242,1859 @@ export default [
         "note": "Reports an inhibitory effect on H. pylori."
       }
     ]
+  },
+  {
+    "id": "article:pizzorni-2022-alginate-vs-ppi-lpr",
+    "type": "article",
+    "name": "Magnesium alginate versus proton pump inhibitors for the treatment of laryngopharyngeal reflux: a non-inferiority randomized controlled trial",
+    "aliases": [
+      "Pizzorni 2022"
+    ],
+    "summary": "Randomised non-inferiority trial (n=50): an alginate suspension lowered laryngopharyngeal reflux symptom and sign scores about as much as omeprazole over two months.",
+    "body": [
+      "Fifty patients with laryngopharyngeal symptoms and findings were randomised to a magnesium-alginate suspension taken three times a day or omeprazole 20 mg once daily. Both arms improved and the difference between them was not statistically significant, which the authors read as non-inferiority of [[intervention:sodium-alginate]] to [[intervention:ppi-therapy]] in [[disease:lpr]].",
+      "It is a small trial without a placebo arm, so spontaneous improvement and placebo response cannot be separated from drug effect; it supports alginate as a reasonable alternative, not as proof that rafts specifically protect the larynx."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Pizzorni N",
+      "Ambrogi F",
+      "Eplite A",
+      "Rama S",
+      "Robotti C",
+      "Lechien J",
+      "Schindler A"
+    ],
+    "year": 2022,
+    "journal": "European archives of oto-rhino-laryngology : official journal of the European Federation of Oto-Rhino-Laryngological Societies (EUFOS) : affiliated with the German Society for Oto-Rhino-Laryngology - Head and Neck Surgery",
+    "doi": "10.1007/s00405-021-07219-0",
+    "pmid": "35032204",
+    "url": "https://doi.org/10.1007/s00405-021-07219-0",
+    "verified": true,
+    "takeaways": [
+      "Patients were randomised to alginate suspension (20 ml, three daily doses) or omeprazole 20 mg once daily and assessed after two months.",
+      "The Reflux Symptom Index and the Reflux Finding Score fell significantly in both groups, and the between-group differences were not significant.",
+      "The authors conclude alginate was non-inferior to omeprazole; with only 50 patients and no placebo group, the result is suggestive rather than definitive."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "50 adults with LPR symptoms (RSI >= 13) and signs (RFS >= 7)"
+    },
+    "relations": [
+      {
+        "rel": "evidence-for",
+        "to": "intervention:sodium-alginate",
+        "note": "Symptom and sign scores improved on alginate to a degree not distinguishable from omeprazole."
+      }
+    ]
+  },
+  {
+    "id": "article:guilliams-2020-betaine-hcl-evidence",
+    "type": "article",
+    "name": "Meal-Time Supplementation with Betaine HCl for Functional Hypochlorhydria: What is the Evidence?",
+    "aliases": [
+      "Guilliams 2020"
+    ],
+    "summary": "Review of betaine HCl for functional hypochlorhydria: acidifies PPI-treated stomachs quickly, the empirical dose protocol is untested, and it is contraindicated in peptic ulcer.",
+    "body": [
+      "The authors outline why mealtime \"functional\" hypochlorhydria may matter in older people, then review the thin human evidence for [[intervention:betaine-hcl]]. The key data are small studies in healthy volunteers whose acid was suppressed with a [[intervention:ppi-therapy]]; a 1,500 mg dose of betaine HCl drove gastric pH from about 5 to below 1 within minutes, with the effect lasting roughly an hour in the fasted state.",
+      "The paper distinguishes the acidic hydrochloride salt from non-acidic anhydrous [[compound:betaine]] (TMG), whose main use is as a methyl donor, and states that HCl/pepsin products are contraindicated in [[disease:peptic-ulcer]]. One author discloses an adviser role for a supplement company."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Guilliams TG",
+      "Drake LE"
+    ],
+    "year": 2020,
+    "journal": "Integrative medicine (Encinitas, Calif.)",
+    "pmid": "32549862",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7238915/",
+    "verified": true,
+    "takeaways": [
+      "Betaine HCl releases about 0.65 mmol of H+ per 100 mg and is a different substance from non-acidic betaine (TMG), which is used as a methyl donor; the two are often confused.",
+      "In small volunteer studies, 1,500 mg betaine HCl rapidly re-acidified a PPI-suppressed stomach but the effect faded within roughly 75 minutes when fasting, and was slower in the fed state.",
+      "The popular dose-escalation protocol (increase until a burning sensation appears) is described as widely used but not rigorously tested.",
+      "HCl/pepsin products are listed as contraindicated in peptic ulcer disease; fasting hypochlorhydria prevalence in older adults varies widely between studies."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:ueland-2011-choline-betaine",
+    "type": "article",
+    "name": "Choline and betaine in health and disease",
+    "aliases": [
+      "Ueland 2011"
+    ],
+    "summary": "Review linking choline and betaine to one-carbon metabolism: both lower plasma homocysteine, betaine derives from choline, and cardiovascular and cancer associations are inconsistent.",
+    "body": [
+      "Ueland summarises how [[compound:choline]] is oxidised to [[compound:betaine]], which serves both as an osmolyte and as the methyl donor of [[enzyme:bhmt]], thereby linking choline status to [[compound:homocysteine]] remethylation when folate is limiting. The review covers [[system:liver]] and [[system:kidney]] handling and the evidence on health outcomes."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Ueland PM"
+    ],
+    "year": 2011,
+    "journal": "Journal of inherited metabolic disease",
+    "doi": "10.1007/s10545-010-9088-4",
+    "pmid": "20446114",
+    "url": "https://doi.org/10.1007/s10545-010-9088-4",
+    "verified": true,
+    "takeaways": [
+      "Choline is both essential in the diet and made de novo; it is oxidised to betaine, which feeds the BHMT reaction that remethylates homocysteine.",
+      "Choline or betaine supplementation lowers plasma total homocysteine in humans, and plasma betaine predicts homocysteine most strongly when folate and other B vitamins are low.",
+      "Choline and betaine are important one-carbon donors, especially during folate deficiency.",
+      "Intake of choline and betaine shows no consistent relation to cancer or cardiovascular risk, while high choline with low betaine in plasma tracks an unfavourable metabolic profile."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:shoulders-2009-collagen-structure",
+    "type": "article",
+    "name": "Collagen structure and stability",
+    "aliases": [
+      "Shoulders & Raines 2009"
+    ],
+    "summary": "Review of collagen structure: a triple helix of polyproline II-type chains with glycine at every third position, stabilised by stereoelectronic effects of hydroxyproline.",
+    "body": [
+      "The review explains the Gly-X-Y repeat that lets three left-handed chains pack into a right-handed triple helix, and why [[compound:hydroxyproline]] stabilises it. This is the structural reason [[compound:glycine]] makes up roughly one residue in three of [[compound:collagen]] and of [[compound:collagen-type-ii]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Shoulders MD",
+      "Raines RT"
+    ],
+    "year": 2009,
+    "journal": "Annual review of biochemistry",
+    "doi": "10.1146/annurev.biochem.77.032207.120833",
+    "pmid": "19344236",
+    "url": "https://doi.org/10.1146/annurev.biochem.77.032207.120833",
+    "verified": true,
+    "takeaways": [
+      "Collagen is the most abundant animal protein, built from three parallel left-handed polyproline II-type helices wound into a right-handed triple helix.",
+      "Stereoelectronic effects and preorganisation of the proline derivatives are central to triple-helix stability.",
+      "Fibrillar organisation of type I collagen is now understood in detail, and mechanical properties of native fibrils are an active research area."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:efsa-2022-5-mthf-dietary-folate-equivalents",
+    "type": "article",
+    "name": "Conversion of calcium-L-methylfolate and (6S)-5-methyltetrahydrofolic acid glucosamine salt into dietary folate equivalents",
+    "aliases": [
+      "EFSA 2022 (5-MTHF DFE)"
+    ],
+    "summary": "EFSA scientific opinion on how much L-5-MTHF salts count in dietary folate equivalents compared with folic acid (bioavailability basis for the DFE conversion factor).",
+    "body": [
+      "The opinion reviews bioavailability data to decide how [[compound:5-mthf]] salts used in supplements and fortified foods should be converted to dietary folate equivalents relative to [[compound:folic-acid]]. It is the regulatory basis for treating L-methylfolate and folic acid as comparable sources of folate for population intake purposes.",
+      "It does not by itself show that methylfolate is clinically superior to folic acid for any outcome, nor does it address receptor competition between the two forms."
+    ],
+    "evidence": "established",
+    "authors": [
+      "EFSA Panel on Nutrition, Novel Foods and Food Allergens (NDA)",
+      "Turck D",
+      "Bohn T",
+      "Castenmiller J",
+      "De Henauw S",
+      "Hirsch-Ernst KI",
+      "Knutsen HK",
+      "Maciuk A",
+      "et al."
+    ],
+    "year": 2022,
+    "journal": "EFSA Journal",
+    "doi": "10.2903/j.efsa.2022.7452",
+    "url": "https://doi.org/10.2903/j.efsa.2022.7452",
+    "verified": true,
+    "takeaways": [
+      "The opinion addresses the conversion of calcium L-methylfolate and the glucosamine salt of (6S)-5-methyltetrahydrofolic acid into dietary folate equivalents (DFE).",
+      "It is a bioavailability-based regulatory conversion for intake accounting, not a clinical efficacy assessment.",
+      "It underpins the position that methylfolate forms are accepted folate sources alongside folic acid for dietary reference purposes."
+    ],
+    "facts": {
+      "design": "guideline"
+    }
+  },
+  {
+    "id": "article:walstab-2013-ginger-5ht3",
+    "type": "article",
+    "name": "Ginger and its pungent constituents non-competitively inhibit activation of human recombinant and native 5-HT3 receptors of enteric neurons",
+    "aliases": [
+      "Walstab 2013"
+    ],
+    "summary": "In vitro study: ginger extracts and 6-gingerol/6-shogaol non-competitively inhibit human 5-HT3 receptors, including on enteric neurons; it does not show 5-HT4 stimulation.",
+    "body": [
+      "Using human receptors expressed in cells and human submucous plexus preparations, the study shows that the pungent constituents of [[intervention:ginger-extract]] ([[compound:gingerols]]) block 5-HT3 receptors with low-micromolar potency. This is an antiemetic and sensory mechanism; it is not evidence for the 5-HT4 agonism that a prokinetic effect would be expected to rely on."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Walstab J",
+      "Krüger D",
+      "Stark T",
+      "Hofmann T",
+      "Demir IE",
+      "Ceyhan GO",
+      "Feistel B",
+      "Schemann M",
+      "Niesler B"
+    ],
+    "year": 2013,
+    "journal": "Neurogastroenterology and motility",
+    "doi": "10.1111/nmo.12107",
+    "pmid": "23490018",
+    "url": "https://doi.org/10.1111/nmo.12107",
+    "verified": true,
+    "takeaways": [
+      "Ginger extracts and the arylalkane constituents 6-gingerol and 6-shogaol inhibited human 5-HT3A and 5-HT3AB receptors at low micromolar concentrations.",
+      "Inhibition was non-competitive: the extract did not displace a radioligand, and 6-gingerol lowered the maximal serotonin response instead of shifting its potency.",
+      "The effect was confirmed on enteric neurons in human submucous plexus tissue, supporting use against nausea and some functional GI symptoms, but no prokinetic (5-HT4) mechanism was tested."
+    ],
+    "facts": {
+      "design": "in vitro"
+    }
+  },
+  {
+    "id": "article:bannai-2012-glycine-sleep",
+    "type": "article",
+    "name": "New therapeutic strategy for amino acid medicine: glycine improves the quality of sleep",
+    "aliases": [
+      "Bannai & Kawai 2012"
+    ],
+    "summary": "Review of the Kawai/Bannai group: 3 g glycine before bed improves subjective sleep quality, apparently by lowering core temperature via the suprachiasmatic nucleus.",
+    "body": [
+      "The authors summarise human and rat work showing that oral [[compound:glycine]] raises plasma and cerebrospinal fluid glycine and lowers core body temperature with increased skin blood flow, which they propose underlies the better subjective sleep seen with [[intervention:glycine-powder]] taken before bedtime. Mechanistic follow-up is in [[article:kawai-2015-glycine-sleep-nmda]].",
+      "It is a narrative review by the group that ran the studies; most human trials were small, short and based on subjective ratings."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Bannai M",
+      "Kawai N"
+    ],
+    "year": 2012,
+    "journal": "Journal of pharmacological sciences",
+    "doi": "10.1254/jphs.11r04fm",
+    "pmid": "22293292",
+    "url": "https://doi.org/10.1254/jphs.11r04fm",
+    "verified": true,
+    "takeaways": [
+      "Glycine taken before bedtime improved subjective sleep quality in people with insomniac tendencies.",
+      "In rats, oral glycine increased plasma and CSF glycine and decreased core body temperature while raising cutaneous blood flow, a plausible route to sleep onset.",
+      "Pharmacological experiments suggested the effect depends on NMDA-type receptors; the evidence base is small trials from one research group."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:kusters-2006-h-pylori-pathogenesis",
+    "type": "article",
+    "name": "Pathogenesis of Helicobacter pylori infection",
+    "aliases": [
+      "Kusters 2006"
+    ],
+    "summary": "Review of H. pylori pathogenesis: colonisation relies on urease-mediated acid resistance, and CagA/VacA and host genetics steer outcomes from gastritis to ulcer and cancer.",
+    "body": [
+      "The review covers microbiology, immunology and biochemistry of [[disease:h-pylori-infection]]. Its account of [[enzyme:h-pylori-urease]] hydrolysing urea to [[compound:ammonia]] and CO2 to buffer the bacterium's surroundings is the textbook basis for the urea breath test and for the ammonia/CO2 chemistry discussed in [[claim:h-pylori-urease-ammonia-co2]].",
+      "It does not address belching, so it neither supports nor refutes the idea that H. pylori urease gas explains frequent belching."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Kusters JG",
+      "van Vliet AH",
+      "Kuipers EJ"
+    ],
+    "year": 2006,
+    "journal": "Clinical microbiology reviews",
+    "doi": "10.1128/CMR.00054-05",
+    "pmid": "16847081",
+    "url": "https://doi.org/10.1128/CMR.00054-05",
+    "verified": true,
+    "takeaways": [
+      "More than half of the world population is colonised by H. pylori and untreated infection usually persists for life.",
+      "Infection underlies chronic gastritis, peptic ulcer, gastric adenocarcinoma and MALT lymphoma, with outcome determined by host-bacterium interplay.",
+      "Bacterial factors such as CagA and VacA, host immune polymorphisms and gastric acid secretion shape colonisation.",
+      "Urease-driven acid resistance is part of the biochemical machinery that allows colonisation of the stomach."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:nakamura-2017-mast-cell-clock-histamine",
+    "type": "article",
+    "name": "Regulation of plasma histamine levels by the mast cell clock and its modulation by stress",
+    "aliases": [
+      "Nakamura 2017"
+    ],
+    "summary": "Mouse study: steady-state plasma histamine follows a circadian rhythm with nocturnal peaks, driven by the mast cell clock via OCT3, and lost under stress or disturbed light cycles.",
+    "body": [
+      "Plasma histamine in mice was lower without mast cells and lost its daily variation when mast cells carried a Clock mutation; the rhythm depended on transporter OCT3 and was blunted by restraint stress or abnormal light-dark cycles. The authors link nocturnal histamine peaks to night-time worsening of allergic symptoms.",
+      "Mice are nocturnal, so \"nocturnal peak\" means the animals' active phase; the study does not measure humans and gives no clock time such as 2-4 am for people. It supports the existence of a circadian histamine rhythm ([[outcome:blood-histamine-level]]), not the specific human timing in [[claim:histamine-peaks-2-4am]]."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Nakamura Y",
+      "Ishimaru K",
+      "Shibata S",
+      "Nakao A"
+    ],
+    "year": 2017,
+    "journal": "Scientific reports",
+    "doi": "10.1038/srep39934",
+    "pmid": "28074918",
+    "url": "https://doi.org/10.1038/srep39934",
+    "verified": true,
+    "takeaways": [
+      "Steady-state plasma histamine shows a circadian variation with nocturnal peaks in mice.",
+      "Mast cells set the rhythm: the variation vanished in mast cell-deficient mice reconstituted with Clock-mutant mast cells, and depended on expression of organic cation transporter 3.",
+      "Circadian desynchronisation by aberrant light/dark conditions or restraint stress abolished the histamine rhythm.",
+      "Plasma histamine level correlated with plasma extravasation after mast cell activation, suggesting it potentiates allergic reactions; human timing is not tested."
+    ],
+    "facts": {
+      "design": "animal study",
+      "population": "Mice (wild type, mast cell-deficient, Clock mutant)"
+    }
+  },
+  {
+    "id": "article:marti-carvajal-2017-homocysteine-lowering-cochrane",
+    "type": "article",
+    "name": "Homocysteine-lowering interventions for preventing cardiovascular events",
+    "aliases": [
+      "Martí-Carvajal 2017 (Cochrane)"
+    ],
+    "summary": "Cochrane review of 15 RCTs (71,422 people): B-vitamin homocysteine lowering did not change heart attacks or mortality and gave a small stroke reduction.",
+    "body": [
+      "Despite lowering [[compound:homocysteine]], supplementation with folate, B6 and B12 did not reduce myocardial infarction or all-cause death in pooled randomised trials, and the stroke signal was small. This is the main evidence that raised homocysteine is a marker rather than a modifiable cause of most vascular events, and it is the counterweight in [[claim:homocysteine-lowering-reduces-cardiovascular-events]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Martí-Carvajal AJ",
+      "Solà I",
+      "Lathyris D",
+      "Dayer M"
+    ],
+    "year": 2017,
+    "journal": "The Cochrane database of systematic reviews",
+    "doi": "10.1002/14651858.CD006612.pub5",
+    "pmid": "28816346",
+    "url": "https://doi.org/10.1002/14651858.CD006612.pub5",
+    "verified": true,
+    "takeaways": [
+      "Fifteen randomised trials with 71,422 participants and at least one year of follow-up were pooled.",
+      "Homocysteine-lowering vitamins made no difference to myocardial infarction (RR 1.02) or death from any cause (RR 1.01), with high-quality evidence.",
+      "Stroke was slightly lower with treatment (RR 0.90, 95% CI 0.82 to 0.99), and the authors say further trials are unlikely to change the conclusions."
+    ],
+    "facts": {
+      "design": "systematic review"
+    }
+  },
+  {
+    "id": "article:sanaka-2010-ppi-gastric-emptying",
+    "type": "article",
+    "name": "Effects of proton pump inhibitors on gastric emptying: a systematic review",
+    "aliases": [
+      "Sanaka 2010"
+    ],
+    "summary": "Systematic review: PPIs consistently delay gastric emptying of solid meals but have inconsistent effects on liquids; the delay is attributed mainly to reduced acid-dependent peptic digestion.",
+    "body": [
+      "The review gathers studies of [[intervention:ppi-therapy]] and gastric emptying and finds a consistent delay for solids and variable effects for liquids. The proposed mechanism is impaired acid-dependent peptic hydrolysis, with PPI-induced hypergastrinaemia judged of minor importance. It supports the plausible but mechanistically hypothetical link in [[claim:ppis-slow-gastric-emptying]]."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Sanaka M",
+      "Yamamoto T",
+      "Kuyama Y"
+    ],
+    "year": 2010,
+    "journal": "Digestive diseases and sciences",
+    "doi": "10.1007/s10620-009-1076-x",
+    "pmid": "20012198",
+    "url": "https://doi.org/10.1007/s10620-009-1076-x",
+    "verified": true,
+    "takeaways": [
+      "The delaying effect of PPIs on emptying of solid meals was consistent across the reviewed studies.",
+      "Effects on liquid emptying were inconsistent, probably because PPIs change intragastric volume and energy density in unpredictable ways.",
+      "Most proposed mechanisms (loss of peptic hydrolysis, altered volume) remain hypothetical, and hypergastrinaemia appeared of minor importance."
+    ],
+    "facts": {
+      "design": "systematic review"
+    }
+  },
+  {
+    "id": "article:parra-2018-vitamin-b6-metabolism",
+    "type": "article",
+    "name": "Vitamin B₆ and Its Role in Cell Metabolism and Physiology",
+    "aliases": [
+      "Parra 2018"
+    ],
+    "summary": "Review of vitamin B6 as a cofactor for diverse reactions, covering biosynthesis, regulation and health roles of PLP.",
+    "body": [
+      "The review treats [[compound:plp]] as a central cofactor in amino acid, one-carbon and neurotransmitter metabolism and describes how its supply is synthesised and controlled. It is a general reference for the PLP dependence of enzymes such as [[enzyme:shmt]], the [[enzyme:glycine-cleavage-system]] and [[enzyme:gad]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Parra M",
+      "Stahl S",
+      "Hellmann H"
+    ],
+    "year": 2018,
+    "journal": "Cells",
+    "doi": "10.3390/cells7070084",
+    "pmid": "30037155",
+    "url": "https://doi.org/10.3390/cells7070084",
+    "verified": true,
+    "takeaways": [
+      "Vitamin B6 is a critical cofactor for a wide range of reactions in basic cellular metabolism.",
+      "New structural and regulatory information defines how the vitamin is synthesised and controlled in the cell.",
+      "The review also discusses applications of B6 to human health, pathogen resistance and stress tolerance."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:chen-2023-aga-extraesophageal-reflux",
+    "type": "article",
+    "name": "AGA Clinical Practice Update on the Diagnosis and Management of Extraesophageal Gastroesophageal Reflux Disease: Expert Review",
+    "aliases": [
+      "AGA CPU extraesophageal reflux 2023"
+    ],
+    "summary": "AGA expert review: no single test proves reflux as the cause of extraesophageal symptoms; test before or after one failed PPI trial; alginates and lifestyle measures are options.",
+    "body": [
+      "Ten best-practice statements guide the evaluation of suspected extraesophageal reflux such as laryngitis and chronic cough. Symptom improvement on [[intervention:ppi-therapy]] may arise from mechanisms other than acid suppression and does not confirm [[disease:gerd]], and throat symptoms alone do not establish [[disease:lpr]].",
+      "The document is expert opinion without formal evidence grading, which matters when judging how firmly \"throat burning means reflux\" ([[claim:throat-burning-means-lpr]]) is supported."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Chen JW",
+      "Vela MF",
+      "Peterson KA",
+      "Carlson DA"
+    ],
+    "year": 2023,
+    "journal": "Clinical gastroenterology and hepatology : the official clinical practice journal of the American Gastroenterological Association",
+    "doi": "10.1016/j.cgh.2023.01.040",
+    "pmid": "37061897",
+    "url": "https://doi.org/10.1016/j.cgh.2023.01.040",
+    "verified": true,
+    "takeaways": [
+      "No single diagnostic tool can conclusively identify reflux as the cause of extraesophageal symptoms; judgement combines symptoms, therapy response, endoscopy and reflux testing.",
+      "Patients without typical GERD symptoms should have reflux testing considered before starting PPI therapy; after one failed PPI trial of up to 12 weeks, objective testing is advised.",
+      "Symptom improvement on a PPI may reflect effects other than acid suppression and does not confirm GERD.",
+      "Alginate-containing antacids, lifestyle changes, neuromodulators and behavioural therapy may have a role; the statements are not based on a formal systematic review."
+    ],
+    "facts": {
+      "design": "guideline"
+    }
+  },
+  {
+    "id": "article:trexler-2015-issn-beta-alanine",
+    "type": "article",
+    "name": "International society of sports nutrition position stand: Beta-Alanine",
+    "aliases": [
+      "ISSN beta-alanine position stand"
+    ],
+    "summary": "ISSN position stand: 4-6 g/day beta-alanine for 4+ weeks raises muscle carnosine and improves 1-4 minute exercise; tingling (paraesthesia) is the only reported side effect.",
+    "body": [
+      "The position stand reviews [[compound:beta-alanine]] as the rate-limiting precursor of [[compound:carnosine]] and concludes that [[intervention:beta-alanine-supplement]] is safe at recommended doses in healthy people. Paraesthesia can be reduced with divided small doses or sustained-release forms."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Trexler ET",
+      "Smith-Ryan AE",
+      "Stout JR",
+      "Hoffman JR",
+      "Wilborn CD",
+      "Sale C",
+      "Kreider RB",
+      "Jäger R",
+      "Earnest CP",
+      "Bannock L",
+      "et al."
+    ],
+    "year": 2015,
+    "journal": "Journal of the International Society of Sports Nutrition",
+    "doi": "10.1186/s12970-015-0090-y",
+    "pmid": "26175657",
+    "url": "https://doi.org/10.1186/s12970-015-0090-y",
+    "verified": true,
+    "takeaways": [
+      "Four weeks of 4-6 g/day beta-alanine significantly raises muscle carnosine, an intracellular pH buffer.",
+      "Supplementation appears safe in healthy populations at recommended doses; the only reported side effect is paraesthesia, reduced by lower divided doses or sustained-release formulas.",
+      "Benefit is greatest for open-ended efforts lasting about 1-4 minutes; effects on strength and longer endurance need more research."
+    ],
+    "facts": {
+      "design": "guideline"
+    }
+  },
+  {
+    "id": "article:iwai-2005-collagen-peptides-blood",
+    "type": "article",
+    "name": "Identification of food-derived collagen peptides in human blood after oral ingestion of gelatin hydrolysates",
+    "aliases": [
+      "Iwai 2005"
+    ],
+    "summary": "Human study: after 9.4-23 g gelatin hydrolysate, hydroxyproline-containing peptides (mainly Pro-Hyp) appear in blood, peaking at 1-2 h.",
+    "body": [
+      "Healthy volunteers drank gelatin hydrolysates and peptide-bound [[compound:hydroxyproline]] rose from negligible to 20-60 nmol/mL within one to two hours, so part of ingested [[compound:collagen]] reaches the circulation as small peptides rather than only free amino acids. This is the basic absorption evidence for [[intervention:collagen-peptides]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Iwai K",
+      "Hasegawa T",
+      "Taguchi Y",
+      "Morimatsu F",
+      "Sato K",
+      "Nakamura Y",
+      "Higashi A",
+      "Kido Y",
+      "Nakabo Y",
+      "Ohtsuki K"
+    ],
+    "year": 2005,
+    "journal": "Journal of agricultural and food chemistry",
+    "doi": "10.1021/jf050206p",
+    "pmid": "16076145",
+    "url": "https://doi.org/10.1021/jf050206p",
+    "verified": true,
+    "takeaways": [
+      "Peptide forms of hydroxyproline were negligible before ingestion and rose to 20-60 nmol/mL of plasma after 9.4-23 g of gelatin hydrolysate.",
+      "Levels peaked at 1-2 hours and fell by about half at 4 hours.",
+      "Pro-Hyp was the main peptide, with smaller amounts of Ala-Hyp, Ala-Hyp-Gly, Pro-Hyp-Gly, Leu-Hyp, Ile-Hyp and Phe-Hyp."
+    ],
+    "facts": {
+      "design": "human pharmacokinetic study"
+    }
+  },
+  {
+    "id": "article:clark-2008-collagen-hydrolysate",
+    "type": "article",
+    "name": "24-Week study on the use of collagen hydrolysate as a dietary supplement in athletes with activity-related joint pain",
+    "aliases": [
+      "Clark 2008"
+    ],
+    "summary": "Randomised placebo-controlled trial in 97 evaluable athletes: 10 g/day collagen hydrolysate for 24 weeks modestly reduced activity-related joint pain; industry-linked, modest effect sizes.",
+    "body": [
+      "Athletes without joint disease took 10 g of collagen hydrolysate or placebo daily. Several visual analogue pain scores improved more with [[intervention:collagen-peptides]] than with placebo, with larger differences in those with knee pain, but only 97 of 147 randomised participants were analysed."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Clark KL",
+      "Sebastianelli W",
+      "Flechsenhar KR",
+      "Aukermann DF",
+      "Meza F",
+      "Millard RL",
+      "Deitch JR",
+      "Sherbondy PS",
+      "Albert A"
+    ],
+    "year": 2008,
+    "journal": "Current medical research and opinion",
+    "doi": "10.1185/030079908x291967",
+    "pmid": "18416885",
+    "url": "https://doi.org/10.1185/030079908x291967",
+    "verified": true,
+    "takeaways": [
+      "A 24-week double-blind trial compared 10 g/day collagen hydrolysate with placebo in athletes with activity-related joint pain.",
+      "Six pain-related parameters improved significantly versus placebo overall; the difference was clearer in the knee-pain subgroup.",
+      "Only 97 of 147 participants could be analysed, and the authors call for further studies, so the result is modest and preliminary."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "147 randomised athletes (97 analysed) with activity-related joint pain"
+    }
+  },
+  {
+    "id": "article:sekhar-2011-glynac-glutathione",
+    "type": "article",
+    "name": "Deficient synthesis of glutathione underlies oxidative stress in aging and can be corrected by dietary cysteine and glycine supplementation",
+    "aliases": [
+      "Sekhar 2011"
+    ],
+    "summary": "Small human study: older adults had low red-cell glycine, cysteine and glutathione from reduced synthesis; two weeks of cysteine plus glycine restored glutathione synthesis.",
+    "body": [
+      "Eight elderly and eight younger volunteers received stable-isotope glycine infusions. The elderly group showed lower [[compound:glycine]], [[compound:cysteine]] and [[compound:glutathione]] concentrations and slower synthesis, and supplementing the two precursors for two weeks normalised them. It links glycine availability to [[pathway:glutathione-synthesis]], though the sample is small and uncontrolled for the supplement step."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Sekhar RV",
+      "Patel SG",
+      "Guthikonda AP",
+      "Reid M",
+      "Balasubramanyam A",
+      "Taffet GE",
+      "Jahoor F"
+    ],
+    "year": 2011,
+    "journal": "The American journal of clinical nutrition",
+    "doi": "10.3945/ajcn.110.003483",
+    "pmid": "21795440",
+    "url": "https://doi.org/10.3945/ajcn.110.003483",
+    "verified": true,
+    "takeaways": [
+      "Older subjects had markedly lower red blood cell glycine, cysteine and glutathione and lower glutathione synthesis rates than younger subjects.",
+      "Plasma oxidative stress and F2-isoprostanes were higher in the older group.",
+      "Two weeks of cysteine and glycine supplementation raised glutathione concentration and synthesis in the elderly to levels not different from younger subjects."
+    ],
+    "facts": {
+      "design": "human intervention study",
+      "population": "8 older and 8 younger adults"
+    }
+  },
+  {
+    "id": "article:knight-2006-hydroxyproline-oxalate",
+    "type": "article",
+    "name": "Hydroxyproline ingestion and urinary oxalate and glycolate excretion",
+    "aliases": [
+      "Knight 2006"
+    ],
+    "summary": "Controlled feeding study: 30 g gelatin raised urinary oxalate by 43% and glycolate 5.3-fold versus whey; hydroxyproline load from 5-10 g gelatin was already measurable.",
+    "body": [
+      "Gelatin is rich in [[compound:hydroxyproline]], a glyoxylate precursor. Compared with whey protein on controlled oxalate diets, gelatin increased urinary [[compound:oxalate]] and glycolate, and the authors estimate that hydroxyproline accounts for a meaningful share of endogenous oxalate. It underlies the caution about [[intervention:collagen-peptides]] in people prone to calcium oxalate stones."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Knight J",
+      "Jiang J",
+      "Assimos DG",
+      "Holmes RP"
+    ],
+    "year": 2006,
+    "journal": "Kidney international",
+    "doi": "10.1038/sj.ki.5001906",
+    "pmid": "17021603",
+    "url": "https://doi.org/10.1038/sj.ki.5001906",
+    "verified": true,
+    "takeaways": [
+      "Urinary glycolate was 5.3-fold and oxalate 43% higher after 30 g gelatin than after whey protein on controlled oxalate diets.",
+      "Significant changes in plasma hydroxyproline and urinary oxalate and glycolate occurred with 5 and 10 g gelatin loads, not with 1 or 2 g.",
+      "Extrapolation suggests hydroxyproline metabolism contributes 20-50% of urinary glycolate and 5-20% of endogenously derived urinary oxalate."
+    ],
+    "facts": {
+      "design": "controlled feeding study"
+    }
+  },
+  {
+    "id": "article:cheungpasitporn-2015-ppi-hypomagnesemia",
+    "type": "article",
+    "name": "Proton pump inhibitors linked to hypomagnesemia: a systematic review and meta-analysis of observational studies",
+    "aliases": [
+      "Cheungpasitporn 2015"
+    ],
+    "summary": "Meta-analysis of nine observational studies (109,798 patients): PPI use was associated with hypomagnesaemia, pooled RR 1.43.",
+    "body": [
+      "The pooled analysis supports the regulatory warning that prolonged acid suppression can lower serum magnesium. The association persisted in higher-quality studies (RR 1.63), but observational data cannot prove causation or define a safe duration for [[intervention:ppi-therapy]]; it is the reason [[compound:magnesium]] status is sometimes monitored in long-term users."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Cheungpasitporn W",
+      "Thongprayoon C",
+      "Kittanamongkolchai W",
+      "Srivali N",
+      "Edmonds PJ",
+      "Ungprasert P",
+      "O'Corragain OA",
+      "Korpaisarn S",
+      "Erickson SB"
+    ],
+    "year": 2015,
+    "journal": "Renal failure",
+    "doi": "10.3109/0886022X.2015.1057800",
+    "pmid": "26108134",
+    "url": "https://doi.org/10.3109/0886022X.2015.1057800",
+    "verified": true,
+    "takeaways": [
+      "Nine observational studies (three cohort, five cross-sectional, one case-control) with 109,798 patients were pooled.",
+      "PPI use was associated with hypomagnesaemia with a pooled relative risk of 1.43 (95% CI 1.08-1.88).",
+      "Restricting to high-quality studies gave RR 1.63; the design cannot establish causation."
+    ],
+    "facts": {
+      "design": "meta-analysis of observational studies"
+    }
+  },
+  {
+    "id": "article:lane-2008-sarcosine-schizophrenia",
+    "type": "article",
+    "name": "Sarcosine (N-methylglycine) treatment for acute schizophrenia: a randomized, double-blind study",
+    "aliases": [
+      "Lane 2008"
+    ],
+    "summary": "Small double-blind trial in 20 drug-free acutely ill patients: sarcosine 2 g/day gave more responders than 1 g/day, with no significant dose-by-time difference; well tolerated.",
+    "body": [
+      "Sarcosine, a glycine transporter-1 inhibitor, was tested as a primary treatment for acute schizophrenia in a six-week study with only two active dose arms and no placebo. The 2 g group had more responders, but the formal dose-by-time interaction was not significant, so the study cannot show efficacy of [[compound:sarcosine]]."
+    ],
+    "evidence": "speculative",
+    "authors": [
+      "Lane HY",
+      "Liu YC",
+      "Huang CL",
+      "Chang YC",
+      "Liau CH",
+      "Perng CH",
+      "Tsai GE"
+    ],
+    "year": 2008,
+    "journal": "Biological psychiatry",
+    "doi": "10.1016/j.biopsych.2007.04.038",
+    "pmid": "17659263",
+    "url": "https://doi.org/10.1016/j.biopsych.2007.04.038",
+    "verified": true,
+    "takeaways": [
+      "Twenty drug-free patients were randomised to 1 g or 2 g sarcosine daily for six weeks, double-blind, without a placebo arm.",
+      "More patients responded (>= 20% PANSS reduction) on 2 g, especially antipsychotic-naive patients, but the dose-by-time interaction was not significant.",
+      "Both doses were well tolerated; the authors state that larger placebo- or active-controlled trials are needed."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "20 drug-free acutely ill patients with schizophrenia"
+    }
+  },
+  {
+    "id": "article:shao-2008-osl-taurine-glutamine-arginine",
+    "type": "article",
+    "name": "Risk assessment for the amino acids taurine, L-glutamine and L-arginine",
+    "aliases": [
+      "Shao & Hathcock 2008"
+    ],
+    "summary": "Risk assessment (Observed Safe Level method): strong evidence of no adverse effects for taurine up to 3 g/day, glutamine up to 14 g/day and arginine up to 20 g/day in healthy adults.",
+    "body": [
+      "Because no consistent adverse-effect pattern emerged, the authors could not set a conventional upper limit and used the Observed Safe Level approach instead. The values apply to healthy adults taking [[compound:taurine]], [[compound:glutamine]] or arginine as supplements ([[intervention:taurine-supplement]], [[intervention:l-glutamine-supplement]]); higher intakes were tested without harm but the data are insufficient to call them safe long term."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Shao A",
+      "Hathcock JN"
+    ],
+    "year": 2008,
+    "journal": "Regulatory toxicology and pharmacology : RTP",
+    "doi": "10.1016/j.yrtph.2008.01.004",
+    "pmid": "18325648",
+    "url": "https://doi.org/10.1016/j.yrtph.2008.01.004",
+    "verified": true,
+    "takeaways": [
+      "No systematic adverse-effect pattern was found in human trials of oral taurine, glutamine or arginine, so NOAEL/LOAEL-based upper limits could not be derived.",
+      "Observed Safe Levels for healthy adults were taurine 3 g/day, L-glutamine 14 g/day and L-arginine 20 g/day.",
+      "Higher intakes have been tested without reported harm but evidence is insufficient to confirm long-term safety."
+    ],
+    "facts": {
+      "design": "risk assessment"
+    }
+  },
+  {
+    "id": "article:lam-2013-ppi-b12-deficiency",
+    "type": "article",
+    "name": "Proton pump inhibitor and histamine 2 receptor antagonist use and vitamin B12 deficiency",
+    "aliases": [
+      "Lam 2013"
+    ],
+    "summary": "Kaiser case-control study (25,956 cases): two or more years of PPI (OR 1.65) or H2RA (OR 1.25) use was associated with vitamin B12 deficiency, with higher risk at higher PPI doses.",
+    "body": [
+      "Using pharmacy and laboratory records, the study found that long-term acid suppression preceded B12 deficiency more often than expected, consistent with impaired release of food-bound cobalamin in a less acidic stomach. As an observational study it shows association, not that [[intervention:ppi-therapy]] caused every case of [[disease:vitamin-b12-deficiency]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Lam JR",
+      "Schneider JL",
+      "Zhao W",
+      "Corley DA"
+    ],
+    "year": 2013,
+    "journal": "JAMA",
+    "doi": "10.1001/jama.2013.280490",
+    "pmid": "24327038",
+    "url": "https://doi.org/10.1001/jama.2013.280490",
+    "verified": true,
+    "takeaways": [
+      "At least two years of PPI supply was associated with vitamin B12 deficiency (OR 1.65, 95% CI 1.58-1.73); H2 receptor antagonists gave OR 1.25.",
+      "Higher PPI doses (more than 1.5 pills/day) carried a stronger association (OR 1.95) than doses under 0.75 pills/day (OR 1.63).",
+      "The authors advise weighing the risk of B12 deficiency against the benefit when choosing long-term acid suppression."
+    ],
+    "facts": {
+      "design": "case-control",
+      "population": "25,956 cases and 184,199 controls (Kaiser Permanente Northern California)"
+    }
+  },
+  {
+    "id": "article:penninx-2021-anxiety-disorders",
+    "type": "article",
+    "name": "Anxiety disorders",
+    "aliases": [
+      "Penninx 2021"
+    ],
+    "summary": "Lancet seminar: anxiety disorders are the commonest mental disorders; CBT and serotonergic drugs are effective, and no enduring preventive measures exist.",
+    "body": [
+      "The seminar gives the clinical frame for [[disease:anxiety-disorder]]: persistent excessive fear or avoidance, dysfunction in threat-response circuits, frequent comorbidity with depression, and first-line treatment by psychotherapy or serotonergic medication. It does not support nutrient-based treatment claims, which is why GABA/B6 explanations for anxiety ([[outcome:anxiety]]) remain speculative."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Penninx BW",
+      "Pine DS",
+      "Holmes EA",
+      "Reif A"
+    ],
+    "year": 2021,
+    "journal": "Lancet (London, England)",
+    "doi": "10.1016/S0140-6736(21)00359-7",
+    "pmid": "33581801",
+    "url": "https://doi.org/10.1016/S0140-6736(21)00359-7",
+    "verified": true,
+    "takeaways": [
+      "Anxiety disorders are the most common group of mental disorders and usually start in early adulthood or before.",
+      "Evidence-based psychotherapy (especially CBT) and psychoactive medication (especially serotonergic) are both effective.",
+      "No enduring preventive measures are available, and therapy resistance is common."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:lenti-2020-autoimmune-gastritis",
+    "type": "article",
+    "name": "Autoimmune gastritis",
+    "aliases": [
+      "Lenti 2020"
+    ],
+    "summary": "Primer on autoimmune gastritis: parietal cell loss reduces acid and intrinsic factor, causing iron and B12 malabsorption and raising neuroendocrine tumour and gastric cancer risk.",
+    "body": [
+      "Autoimmune gastritis destroys parietal cells, with the gastric H+/K+ ATPase ([[enzyme:h-k-atpase]]) as the main autoantigen. The result is a true, often severe [[state:hypochlorhydria]] and loss of intrinsic factor, so it is the clearest organic cause of low stomach acid and is a form of [[disease:atrophic-gastritis]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Lenti MV",
+      "Rugge M",
+      "Lahner E",
+      "Miceli E",
+      "Toh BH",
+      "Genta RM",
+      "De Block C",
+      "Hershko C",
+      "Di Sabatino A"
+    ],
+    "year": 2020,
+    "journal": "Nature reviews. Disease primers",
+    "doi": "10.1038/s41572-020-0187-8",
+    "pmid": "32647173",
+    "url": "https://doi.org/10.1038/s41572-020-0187-8",
+    "verified": true,
+    "takeaways": [
+      "Autoimmune gastritis is an organ-specific autoimmune destruction of gastric parietal cells that reduces acid output and intrinsic factor.",
+      "Consequences include malabsorption of iron and vitamin B12 (pernicious anaemia); it is often diagnosed late.",
+      "Advanced disease can progress to neuroendocrine tumours and gastric adenocarcinoma, so surveillance and micronutrient replacement are part of management."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:zeisel-1991-choline-essential-nutrient",
+    "type": "article",
+    "name": "Choline, an essential nutrient for humans",
+    "aliases": [
+      "Zeisel 1991"
+    ],
+    "summary": "Controlled human depletion study: three weeks on a choline-free diet lowered plasma choline about 30% and raised ALT in most men, showing choline is an essential nutrient.",
+    "body": [
+      "Healthy male volunteers were fed a semisynthetic choline-free diet with adequate methionine for three weeks. Plasma choline and phosphatidylcholine fell and liver enzymes rose, evidence of incipient liver dysfunction that supported classifying [[compound:choline]] as essential and that underlies [[disease:choline-deficiency]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Zeisel SH",
+      "Da Costa KA",
+      "Franklin PD",
+      "Alexander EA",
+      "Lamont JT",
+      "Sheard NF",
+      "Beiser A"
+    ],
+    "year": 1991,
+    "journal": "FASEB journal : official publication of the Federation of American Societies for Experimental Biology",
+    "pmid": "2010061",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/2010061/",
+    "verified": true,
+    "takeaways": [
+      "On a choline-free diet, plasma choline and phosphatidylcholine fell by about 30% and 15% respectively over three weeks.",
+      "Serum ALT activity rose steadily in the deficient group but not in controls, indicating early liver dysfunction.",
+      "The authors conclude choline is essential when excess methionine and folate are not available in the diet."
+    ],
+    "facts": {
+      "design": "controlled depletion study"
+    }
+  },
+  {
+    "id": "article:resseguie-2011-pemt-estrogen-choline",
+    "type": "article",
+    "name": "Aberrant estrogen regulation of PEMT results in choline deficiency-associated liver dysfunction",
+    "aliases": [
+      "Resseguie 2011"
+    ],
+    "summary": "Genetic study: a PEMT promoter SNP (rs12325817) removes oestrogen-driven PEMT induction and is linked to choline-deficiency liver dysfunction in women.",
+    "body": [
+      "De novo choline synthesis by [[enzyme:pemt]] is under oestrogen control, which explains why many premenopausal women tolerate low-choline diets better than men and postmenopausal women. A risk haplotype near the oestrogen response element disables this induction and is associated with [[disease:choline-deficiency]] and hepatic steatosis ([[outcome:hepatic-steatosis]])."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Resseguie ME",
+      "da Costa KA",
+      "Galanko JA",
+      "Patel M",
+      "Davis IJ",
+      "Zeisel SH"
+    ],
+    "year": 2011,
+    "journal": "The Journal of biological chemistry",
+    "doi": "10.1074/jbc.M110.106922",
+    "pmid": "21059658",
+    "url": "https://doi.org/10.1074/jbc.M110.106922",
+    "verified": true,
+    "takeaways": [
+      "When dietary choline is restricted, most men and postmenopausal women develop multiorgan dysfunction with hepatic steatosis, but many premenopausal women are protected.",
+      "PEMT is regulated by oestrogen in an isoform-specific way; a risk haplotype was associated with loss of hormonal activation.",
+      "The most strongly linked SNP (rs12325817) lies within 1 kb of the oestrogen response element and the risk allele failed to bind the oestrogen receptor or FOXA1."
+    ],
+    "facts": {
+      "design": "genetic association with functional work"
+    }
+  },
+  {
+    "id": "article:rinella-2023-fatty-liver-nomenclature",
+    "type": "article",
+    "name": "A multisociety Delphi consensus statement on new fatty liver disease nomenclature",
+    "aliases": [
+      "Rinella 2023"
+    ],
+    "summary": "Multisociety Delphi consensus replacing NAFLD with MASLD (metabolic dysfunction-associated steatotic liver disease), defined by steatosis plus at least one cardiometabolic risk factor.",
+    "body": [
+      "The consensus renamed non-alcoholic fatty liver disease as metabolic dysfunction-associated steatotic liver disease and introduced MetALD for greater alcohol intake. The new terms apply to [[disease:fatty-liver-nafld]] and the imaging or histological finding [[outcome:hepatic-steatosis]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Rinella ME",
+      "Lazarus JV",
+      "Ratziu V",
+      "Francque SM",
+      "Sanyal AJ",
+      "Kanwal F",
+      "Romero D",
+      "Abdelmalek MF",
+      "Anstee QM",
+      "Arab JP",
+      "et al."
+    ],
+    "year": 2023,
+    "journal": "Journal of hepatology",
+    "doi": "10.1016/j.jhep.2023.06.003",
+    "pmid": "37364790",
+    "url": "https://doi.org/10.1016/j.jhep.2023.06.003",
+    "verified": true,
+    "takeaways": [
+      "A total of 236 panellists from 56 countries took part; 74% judged the old nomenclature sufficiently flawed to change.",
+      "\"Steatotic liver disease\" became the umbrella term; NAFLD is replaced by MASLD, requiring at least one of five cardiometabolic risk factors.",
+      "A new category, MetALD, covers MASLD with higher weekly alcohol intake; cryptogenic steatotic liver disease covers cases with no metabolic factor and no known cause."
+    ],
+    "facts": {
+      "design": "consensus statement"
+    }
+  },
+  {
+    "id": "article:katz-2022-acg-gerd-guideline",
+    "type": "article",
+    "name": "ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease",
+    "aliases": [
+      "ACG GERD guideline 2022"
+    ],
+    "summary": "ACG guideline for GERD: PPIs remain first-line drug therapy; recommends lifestyle measures, limits long-term PPI use to those with a clear indication, and covers testing and surgical options.",
+    "body": [
+      "The guideline grades recommendations on diagnosis and treatment of [[disease:gerd]] and treats [[intervention:ppi-therapy]] as the medical treatment of choice while addressing concerns about long-term adverse events and overprescribing. It is the standard reference for [[outcome:heartburn]] management and for the role of [[intervention:reflux-lifestyle-measures]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Katz PO",
+      "Dunbar KB",
+      "Schnoll-Sussman FH",
+      "Greer KB",
+      "Yadlapati R",
+      "Spechler SJ"
+    ],
+    "year": 2022,
+    "journal": "The American journal of gastroenterology",
+    "doi": "10.14309/ajg.0000000000001538",
+    "pmid": "34807007",
+    "url": "https://doi.org/10.14309/ajg.0000000000001538",
+    "verified": true,
+    "takeaways": [
+      "PPIs remain the medical treatment of choice for GERD, yet scrutiny of adverse events and overprescribing has increased.",
+      "The guideline uses GRADE to rate recommendations on diagnosis, pharmacologic, lifestyle, surgical and endoscopic management.",
+      "Some key concepts are reported as lacking sufficient evidence to grade."
+    ],
+    "facts": {
+      "design": "guideline"
+    }
+  },
+  {
+    "id": "article:mrc-1991-folic-acid-neural-tube-defects",
+    "type": "article",
+    "name": "Prevention of neural tube defects: results of the Medical Research Council Vitamin Study. MRC Vitamin Study Research Group",
+    "aliases": [
+      "MRC Vitamin Study 1991"
+    ],
+    "summary": "Landmark randomised trial (1,817 high-risk women): 4 mg folic acid around conception cut recurrent neural tube defects by 72%; other vitamins had no significant effect.",
+    "body": [
+      "The factorial trial ran at 33 centres. Of pregnancies with known outcome, 6 neural tube defects occurred in the folic acid groups and 21 in the others, a relative risk of 0.28. It is the key evidence behind folic acid recommendations in preconception care for [[disease:neural-tube-defects]] and the benchmark for [[compound:folic-acid]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "MRC Vitamin Study Research Group"
+    ],
+    "year": 1991,
+    "journal": "Lancet (London, England)",
+    "doi": "10.1016/0140-6736(91)90133-A",
+    "pmid": "1677062",
+    "url": "https://doi.org/10.1016/0140-6736(91)90133-A",
+    "verified": true,
+    "takeaways": [
+      "Folic acid supplementation started before pregnancy produced a 72% protective effect (relative risk 0.28, 95% CI 0.12-0.71) on recurrence of neural tube defects.",
+      "The mixture of other vitamins without folic acid showed no significant protective effect.",
+      "No demonstrable harm from folic acid was seen, though the trial could not rule out rare effects."
+    ],
+    "facts": {
+      "design": "rct",
+      "population": "1,817 women with a previous neural tube defect-affected pregnancy"
+    }
+  },
+  {
+    "id": "article:applegarth-2004-glycine-encephalopathy",
+    "type": "article",
+    "name": "Glycine encephalopathy (nonketotic hyperglycinaemia) : review and update",
+    "aliases": [
+      "Applegarth & Toone 2004"
+    ],
+    "summary": "Workshop summary on glycine encephalopathy (non-ketotic hyperglycinaemia), an inborn defect of the glycine cleavage system with severe neurological disease.",
+    "body": [
+      "The article condenses a workshop on [[disease:nonketotic-hyperglycinemia]], where defects of the [[enzyme:glycine-cleavage-system]] cause glycine to accumulate in tissues and cerebrospinal fluid. It is why supplemental [[compound:glycine]] is avoided in people with this disorder."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Applegarth DA",
+      "Toone JR"
+    ],
+    "year": 2004,
+    "journal": "Journal of inherited metabolic disease",
+    "doi": "10.1023/b:boli.0000031222.38328.59",
+    "pmid": "15272469",
+    "url": "https://doi.org/10.1023/b:boli.0000031222.38328.59",
+    "verified": true,
+    "takeaways": [
+      "The review summarises current knowledge of glycine encephalopathy, also called non-ketotic hyperglycinaemia.",
+      "The disorder arises from impaired function of the glycine cleavage system, so glycine accumulates, notably in the brain.",
+      "It is a rare inborn error of metabolism; findings from it do not describe the healthy population."
+    ],
+    "facts": {
+      "design": "workshop review"
+    }
+  },
+  {
+    "id": "article:kashyap-2024-sibo-critical-appraisal",
+    "type": "article",
+    "name": "Critical appraisal of the SIBO hypothesis and breath testing: A clinical practice update endorsed by the European society of neurogastroenterology and motility (ESNM) and the American neurogastroenterology and motility society (ANMS)",
+    "aliases": [
+      "Kashyap 2024"
+    ],
+    "summary": "Expert clinical practice update: the SIBO-IBS hypothesis remains unproven, and breath tests are unreliable, driving unnecessary antibiotic use.",
+    "body": [
+      "The authors argue that the idea that small intestinal bacterial overgrowth explains symptoms in IBS and related disorders has not been proven after two decades, and that unvalidated breath tests ([[intervention:sibo-breath-test]]) have led to over-diagnosis of [[disease:sibo]] and injudicious antibiotic use.",
+      "It is a strongly sceptical position that contrasts with guideline documents such as [[article:pimentel-2020-acg-sibo-guideline]]; it is relevant to claims that gas or belching can be attributed to SIBO, including [[claim:ppis-cause-sibo]] and [[claim:sibo-gas-appears-in-15-45-min-as-belching]]."
+    ],
+    "evidence": "plausible",
+    "authors": [
+      "Kashyap P",
+      "Moayyedi P",
+      "Quigley EMM",
+      "Simren M",
+      "Vanner S"
+    ],
+    "year": 2024,
+    "journal": "Neurogastroenterology and motility",
+    "doi": "10.1111/nmo.14817",
+    "pmid": "38798120",
+    "url": "https://doi.org/10.1111/nmo.14817",
+    "verified": true,
+    "takeaways": [
+      "SIBO has long been recognised in people with stasis from surgery or diseases such as scleroderma, causing diarrhoea and malabsorption.",
+      "The hypothesis that SIBO explains symptoms in IBS without malabsorption remains unproven after two decades.",
+      "Breath tests used to diagnose it are unvalidated and unreliable, with consequences including widespread antibiotic use."
+    ],
+    "facts": {
+      "design": "expert review"
+    }
+  },
+  {
+    "id": "article:stabler-2013-vitamin-b12-deficiency",
+    "type": "article",
+    "name": "Clinical practice. Vitamin B12 deficiency",
+    "aliases": [
+      "Stabler 2013"
+    ],
+    "summary": "NEJM clinical practice review of vitamin B12 deficiency: causes (including food-cobalamin malabsorption), use of serum B12 with MMA and homocysteine, and high-dose oral or injected treatment.",
+    "body": [
+      "The review is the standard clinical summary for [[disease:vitamin-b12-deficiency]]. It explains why serum B12 alone can miss deficiency and why [[compound:methylmalonic-acid]] and [[compound:homocysteine]] help confirm it, and it notes that high-dose oral cobalamin works even when absorption through intrinsic factor is impaired.",
+      "The article is a clinical practice review without an abstract in PubMed; takeaways are drawn from its recognised content. Neurological manifestations, including cognitive slowing, are a reason to treat promptly."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Stabler SP"
+    ],
+    "year": 2013,
+    "journal": "The New England journal of medicine",
+    "doi": "10.1056/NEJMcp1113996",
+    "pmid": "23301732",
+    "url": "https://doi.org/10.1056/NEJMcp1113996",
+    "verified": true,
+    "takeaways": [
+      "Common causes include pernicious anaemia and food-cobalamin malabsorption in older adults, for example with atrophic gastritis or acid-suppressing drugs.",
+      "Serum B12 is an imperfect test; elevated methylmalonic acid and homocysteine help confirm functional deficiency.",
+      "Daily oral cobalamin in the milligram range is generally effective, with injections reserved for severe or neurological cases."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:slutsky-2010-magnesium-threonate",
+    "type": "article",
+    "name": "Enhancement of learning and memory by elevating brain magnesium",
+    "aliases": [
+      "Slutsky 2010"
+    ],
+    "summary": "Rat study: raising brain magnesium with magnesium L-threonate improved learning and memory and increased synaptic density and NR2B-NMDA signalling.",
+    "body": [
+      "The study introduced [[intervention:magnesium-l-threonate]] as a way to raise brain [[compound:magnesium]] and found improved learning, working memory and memory in young and aged rats, with more presynaptic release sites and enhanced plasticity. It is animal work; human cognitive benefit is not established by this paper."
+    ],
+    "evidence": "speculative",
+    "authors": [
+      "Slutsky I",
+      "Abumaria N",
+      "Wu LJ",
+      "Huang C",
+      "Zhang L",
+      "Li B",
+      "Zhao X",
+      "Govindarajan A",
+      "Zhao MG",
+      "Zhuo M",
+      "et al."
+    ],
+    "year": 2010,
+    "journal": "Neuron",
+    "doi": "10.1016/j.neuron.2009.12.026",
+    "pmid": "20152124",
+    "url": "https://doi.org/10.1016/j.neuron.2009.12.026",
+    "verified": true,
+    "takeaways": [
+      "Elevating brain magnesium with magnesium-L-threonate improved learning, working memory and short- and long-term memory in rats, including pattern completion in aged rats.",
+      "Treated animals had higher density of synaptic puncta in hippocampal subregions that correlated with memory performance.",
+      "Magnesium upregulated NR2B-containing NMDA receptors and enhanced short-term facilitation and long-term potentiation."
+    ],
+    "facts": {
+      "design": "animal study",
+      "population": "Rats"
+    }
+  },
+  {
+    "id": "article:petroff-2002-gaba-glutamate",
+    "type": "article",
+    "name": "GABA and glutamate in the human brain",
+    "aliases": [
+      "Petroff 2002"
+    ],
+    "summary": "Review of GABA and glutamate in the human brain: GABA is made from glutamate by two glutamic acid decarboxylase isoforms, and the balance controls cortical excitability.",
+    "body": [
+      "Glutamate is the main excitatory and GABA the main inhibitory transmitter; [[compound:glutamate]] is the metabolic precursor of [[compound:gaba]]. The synthesis step is catalysed by [[enzyme:gad]] (isoforms [[enzyme:gad1]] and [[enzyme:gad2]]), whose PLP dependence links vitamin B6 status to the balance in [[system:brain-gaba-glutamate]].",
+      "The paper is neurochemistry, not a clinical study: it provides the mechanism for B6-dependent GABA synthesis but does not show that B6 supplements treat [[outcome:anxiety]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Petroff OA"
+    ],
+    "year": 2002,
+    "journal": "The Neuroscientist : a review journal bringing neurobiology, neurology and psychiatry",
+    "doi": "10.1177/1073858402238515",
+    "pmid": "12467378",
+    "url": "https://doi.org/10.1177/1073858402238515",
+    "verified": true,
+    "takeaways": [
+      "Cortical excitability reflects the balance between glutamate (excitatory) and GABA (inhibitory).",
+      "Glutamate is the metabolic precursor of GABA, and GABA can be recycled through the TCA cycle to make glutamate.",
+      "GABA synthesis uses two glutamic acid decarboxylase isoforms encoded on separate chromosomes; GABA metabolites homocarnosine and pyrrolidinone are unusually abundant in human brain and affect excitability."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:refsum-2004-homocysteine-recommendations",
+    "type": "article",
+    "name": "Facts and recommendations about total homocysteine determinations: an expert opinion",
+    "aliases": [
+      "Refsum 2004"
+    ],
+    "summary": "International expert opinion on total homocysteine measurement: sampling, reference intervals, and recommendations for use in homocystinuria, B-vitamin deficiency and vascular risk.",
+    "body": [
+      "The document covers how to measure [[outcome:elevated-homocysteine]] (sample handling, assays, within-person variability, the methionine loading test) and when it is useful as a diagnostic or screening marker, including [[state:hyperhomocysteinemia]] in folate and cobalamin deficiency, renal failure and pregnancy complications."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Refsum H",
+      "Smith AD",
+      "Ueland PM",
+      "Nexo E",
+      "Clarke R",
+      "McPartlin J",
+      "Johnston C",
+      "Engbaek F",
+      "Schneede J",
+      "McPartlin C",
+      "et al."
+    ],
+    "year": 2004,
+    "journal": "Clinical chemistry",
+    "doi": "10.1373/clinchem.2003.021634",
+    "pmid": "14709635",
+    "url": "https://doi.org/10.1373/clinchem.2003.021634",
+    "verified": true,
+    "takeaways": [
+      "Plasma total homocysteine is raised in a wide range of disorders, so interpretation requires context.",
+      "Pre-analytical handling, assay method, biological determinants and within-person variability influence results and reference intervals.",
+      "Disease-specific recommendations are given for homocystinuria, folate and cobalamin deficiency, cardiovascular disease, renal failure, psychiatric and cognitive disorders, and pregnancy."
+    ],
+    "facts": {
+      "design": "expert opinion"
+    }
+  },
+  {
+    "id": "article:wald-1982-glycine-gastric-acid",
+    "type": "article",
+    "name": "Stimulation of gastric acid secreted by glycine and related oligopeptides in humans",
+    "aliases": [
+      "Wald & Adibi 1982"
+    ],
+    "summary": "Human study: intragastric glycine and glycine peptides raised gastric acid output from 3.3 to about 5.6 mmol/h, but serum gastrin did not change detectably.",
+    "body": [
+      "Healthy volunteers received intragastric glycine, diglycine, triglycine, tetraglycine or saline matched for osmolality and pH. [[compound:glycine]] stimulated acid secretion (see [[outcome:increased-gastric-acid-output]]) without a measurable change in serum [[compound:gastrin]], and the authors tied the stimulus to the plasma glycine rise after small-intestinal absorption.",
+      "This weakens the idea that glycine acts mainly by releasing gastrin ([[claim:free-glycine-stimulates-gastrin]]) while supporting a modest acid-stimulating effect."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Wald A",
+      "Adibi SA"
+    ],
+    "year": 1982,
+    "journal": "The American journal of physiology",
+    "doi": "10.1152/ajpgi.1982.242.2.G85",
+    "pmid": "7065145",
+    "url": "https://doi.org/10.1152/ajpgi.1982.242.2.G85",
+    "verified": true,
+    "takeaways": [
+      "Acid output was greater during intragastric glycine than saline infusion (5.6 vs 3.3 mmol/h) and not significantly different between glycine and its peptides.",
+      "Plasma glycine rose during infusion but serum gastrin showed no detectable change.",
+      "The authors conclude that the raised plasma glycine, after absorption from the small intestine, was the stimulus, because there was no gastric absorption of glycine or peptide hydrolysis in the stomach."
+    ],
+    "facts": {
+      "design": "human physiology study",
+      "population": "Healthy volunteers"
+    }
+  },
+  {
+    "id": "article:gordan-2015-autonomic-cardiovascular-control",
+    "type": "article",
+    "name": "Autonomic and endocrine control of cardiovascular function",
+    "aliases": [
+      "Gordan 2015"
+    ],
+    "summary": "Review of cardiovascular control: the sinoatrial node alone would pace at about 100 beats/min, and parasympathetic and sympathetic input plus hormones set heart rate and contractility.",
+    "body": [
+      "The review explains how autonomic and endocrine inputs regulate heart rate, so the resting rate reflects ongoing parasympathetic (vagal) restraint of the intrinsic pacemaker. It supplies the physiological background for [[system:cardiac-autonomic-control]], [[system:vagal-tone]] and [[outcome:tachycardia]], but does not test any dietary or choline-related intervention."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Gordan R",
+      "Gwathmey JK",
+      "Xie LH"
+    ],
+    "year": 2015,
+    "journal": "World journal of cardiology",
+    "doi": "10.4330/wjc.v7.i4.204",
+    "pmid": "25914789",
+    "url": "https://doi.org/10.4330/wjc.v7.i4.204",
+    "verified": true,
+    "takeaways": [
+      "Without extrinsic influences the sinoatrial node paces at roughly 100 beats per minute.",
+      "Heart rate and contractility are adjusted by the nervous system, hormones and other factors to match tissue demand.",
+      "Both the autonomic nervous system and the endocrine system exert major control over cardiovascular function."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:browning-2014-vagal-control-gi",
+    "type": "article",
+    "name": "Central nervous system control of gastrointestinal motility and secretion and modulation of gastrointestinal functions",
+    "aliases": [
+      "Browning & Travagli 2014"
+    ],
+    "summary": "Comprehensive Physiology review: the stomach and oesophagus depend on vagal (parasympathetic) input for tone, motility and secretion, while the intestines work more autonomously.",
+    "body": [
+      "The review describes vagovagal circuitry from brainstem nuclei to the gut, with parasympathetic pathways exerting both excitatory and inhibitory control over gastric tone and motility and sympathetic input mainly inhibitory. It underpins [[system:vagal-tone]] as a determinant of [[system:gastric-physiology]], [[system:pylorus]] function and [[state:gastric-dysmotility]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Browning KN",
+      "Travagli RA"
+    ],
+    "year": 2014,
+    "journal": "Comprehensive physiology",
+    "doi": "10.1002/cphy.c130055",
+    "pmid": "25428846",
+    "url": "https://doi.org/10.1002/cphy.c130055",
+    "verified": true,
+    "takeaways": [
+      "The gut has intrinsic neural plexuses, but the stomach and oesophagus rely much more on extrinsic autonomic input than the intestines.",
+      "Sympathetic activity is mostly inhibitory to GI muscle and secretion; parasympathetic activity can be both excitatory and inhibitory.",
+      "Brainstem reflex circuits can be modulated under physiological and pathophysiological conditions."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:ridlon-2014-bile-acids-microbiome",
+    "type": "article",
+    "name": "Bile acids and the gut microbiome",
+    "aliases": [
+      "Ridlon 2014"
+    ],
+    "summary": "Review of the bile acid-gut microbiome axis: microbes deconjugate and transform bile acids, shaping the pool size and composition, while bile acids in turn regulate the microbiome.",
+    "body": [
+      "Bacterial bile salt hydrolysis ([[enzyme:bile-salt-hydrolase]]) removes glycine or taurine from conjugated [[compound:bile-acids]], altering the hydrophobicity of the pool and FXR signalling. Reduced bile acid levels in the gut are associated with bacterial overgrowth, linking [[system:bile]] to [[system:gut-microbiota]] balance."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Ridlon JM",
+      "Kang DJ",
+      "Hylemon PB",
+      "Bajaj JS"
+    ],
+    "year": 2014,
+    "journal": "Current opinion in gastroenterology",
+    "doi": "10.1097/MOG.0000000000000057",
+    "pmid": "24625896",
+    "url": "https://doi.org/10.1097/MOG.0000000000000057",
+    "verified": true,
+    "takeaways": [
+      "Bile acid pool size is a function of microbial metabolism in the intestine.",
+      "The host makes a large pool of conjugated hydrophilic bile acids, whereas microbial activity yields a smaller unconjugated hydrophobic pool, via opposing effects on FXR.",
+      "Reduced bile acid levels in the gut are associated with bacterial overgrowth and inflammation; diet, antibiotics and disease shift the balance."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:furness-2012-enteric-nervous-system",
+    "type": "article",
+    "name": "The enteric nervous system and neurogastroenterology",
+    "aliases": [
+      "Furness 2012"
+    ],
+    "summary": "Review of neurogastroenterology: the enteric nervous system controls gut muscle and fluid movement, and the degree of CNS control differs along the digestive tract.",
+    "body": [
+      "Furness describes how enteric reflex circuits, sympathetic ganglia and the central nervous system integrate digestion, and how ENS neuropathies such as achalasia and gastroparesis cause dysfunction. It is the general reference for the [[system:enteric-nervous-system]] in this knowledge base."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Furness JB"
+    ],
+    "year": 2012,
+    "journal": "Nature reviews. Gastroenterology & hepatology",
+    "doi": "10.1038/nrgastro.2012.32",
+    "pmid": "22392290",
+    "url": "https://doi.org/10.1038/nrgastro.2012.32",
+    "verified": true,
+    "takeaways": [
+      "Digestion is controlled by integrating signals from the ENS, the CNS and sympathetic ganglia, with neural and endocrine control tightly coordinated.",
+      "The balance of ENS and CNS control differs considerably along the digestive tract.",
+      "Disorders such as achalasia and gastroparesis show the clinical importance of the ENS, and enteric receptors are potential drug targets."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:mato-2008-methionine-metabolism-liver",
+    "type": "article",
+    "name": "Methionine metabolism and liver disease",
+    "aliases": [
+      "Mato 2008"
+    ],
+    "summary": "Review: labile methyl-group balance (choline, methionine, betaine, folate) governs liver health; deficiency causes steatosis and liver cancer in animals and in inborn errors.",
+    "body": [
+      "From the 1930s observation that choline prevents fatty liver, the authors trace how methyl-donor deficiency and enzyme defects in methionine and folate metabolism lead to steatosis and tumours, and how methionine metabolites protect the liver in models. It supports the [[system:liver]] as the main hub of [[pathway:methionine-cycle]] and methyl-balance reactions."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Mato JM",
+      "Martínez-Chantar ML",
+      "Lu SC"
+    ],
+    "year": 2008,
+    "journal": "Annual review of nutrition",
+    "doi": "10.1146/annurev.nutr.28.061807.155438",
+    "pmid": "18331185",
+    "url": "https://doi.org/10.1146/annurev.nutr.28.061807.155438",
+    "verified": true,
+    "takeaways": [
+      "Choline was shown in the 1930s to prevent fatty liver in pancreatectomised dogs.",
+      "Diets deficient in labile methyl groups produce fatty liver in rodents, and long-term choline- and methionine-deficient diets also cause hepatocellular carcinoma.",
+      "Mice or patients lacking key methionine and folate enzymes confirm the importance of methyl balance for liver function."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:mittal-1997-esophagogastric-junction",
+    "type": "article",
+    "name": "The esophagogastric junction",
+    "aliases": [
+      "Mittal & Balaban 1997"
+    ],
+    "summary": "NEJM review of the oesophagogastric junction: the lower oesophageal sphincter and crural diaphragm form the reflux barrier, and transient sphincter relaxations are a main route of reflux.",
+    "body": [
+      "The review describes the anatomy and physiology of the [[system:lower-esophageal-sphincter]] and crural diaphragm and how gastric distension triggers transient relaxations, the basis for much physiological reflux and venting of gas. It does not address amino acid or pH effects on sphincter closure."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Mittal RK",
+      "Balaban DH"
+    ],
+    "year": 1997,
+    "journal": "The New England journal of medicine",
+    "doi": "10.1056/NEJM199703273361306",
+    "pmid": "9070474",
+    "url": "https://doi.org/10.1056/NEJM199703273361306",
+    "verified": true,
+    "takeaways": [
+      "The antireflux barrier at the junction consists of the intrinsic lower oesophageal sphincter and the surrounding crural diaphragm.",
+      "Transient lower oesophageal sphincter relaxations, often triggered by gastric distension, allow gas to vent and are a main reflux mechanism.",
+      "The article has no abstract in PubMed; these points reflect the review's established content."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:chebi-2016",
+    "type": "article",
+    "name": "ChEBI in 2016: Improved services and an expanding collection of metabolites",
+    "aliases": [
+      "ChEBI 2016"
+    ],
+    "summary": "ChEBI, the ontology and database of chemical entities of biological interest, used here as the source of formulae, structures and CHEBI identifiers for small molecules.",
+    "body": [
+      "ChEBI classifies and annotates small molecules with structures, synonyms and cross-references and includes an expanded collection of human endogenous metabolites. Entries for cofactors, intermediates and nutrients cite it for their chemical identity (formula, charge state, CHEBI id), not for physiological claims."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Hastings J",
+      "Owen G",
+      "Dekker A",
+      "Ennis M",
+      "Kale N",
+      "Muthukrishnan V",
+      "Turner S",
+      "Swainston N",
+      "Mendes P",
+      "Steinbeck C"
+    ],
+    "year": 2016,
+    "journal": "Nucleic acids research",
+    "doi": "10.1093/nar/gkv1031",
+    "pmid": "26467479",
+    "url": "https://doi.org/10.1093/nar/gkv1031",
+    "verified": true,
+    "takeaways": [
+      "ChEBI held over 46,000 entries, each classified in an ontology and annotated with structure, synonyms and cross-references.",
+      "The 2016 update substantially extended endogenous metabolites for human, mouse, E. coli and yeast.",
+      "It is a chemistry reference: it defines identity and classification, not clinical relevance."
+    ],
+    "facts": {
+      "design": "database"
+    }
+  },
+  {
+    "id": "article:rhea-2022",
+    "type": "article",
+    "name": "Rhea, the reaction knowledgebase in 2022",
+    "aliases": [
+      "Rhea 2022"
+    ],
+    "summary": "Rhea, the expert-curated reaction knowledgebase based on ChEBI; it is the reference vocabulary for enzyme reaction annotation in UniProtKB and the source of the Rhea ids used for reactions here.",
+    "body": [
+      "Rhea provides atom- and charge-balanced reaction equations with enzyme links, which is why reaction entries here list protons, water and cofactors explicitly. Participants such as [[compound:water]], [[compound:proton]] and [[compound:phosphate]] cite it for their role as stoichiometric participants."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Bansal P",
+      "Morgat A",
+      "Axelsen KB",
+      "Muthukrishnan V",
+      "Coudert E",
+      "Aimo L",
+      "Hyka-Nouspikel N",
+      "Gasteiger E",
+      "Kerhornou A",
+      "Neto TB",
+      "et al."
+    ],
+    "year": 2022,
+    "journal": "Nucleic acids research",
+    "doi": "10.1093/nar/gkab1016",
+    "pmid": "34755880",
+    "url": "https://doi.org/10.1093/nar/gkab1016",
+    "verified": true,
+    "takeaways": [
+      "Rhea is an expert-curated knowledgebase of biochemical reactions built on ChEBI.",
+      "It has been adopted as the reference vocabulary for enzyme annotation in UniProtKB and is an ELIXIR Core Data Resource.",
+      "Reactions are balanced for atoms and charge, so cofactors, water and protons are stated explicitly."
+    ],
+    "facts": {
+      "design": "database"
+    }
+  },
+  {
+    "id": "article:hmdb-2022",
+    "type": "article",
+    "name": "HMDB 5.0: the Human Metabolome Database for 2022",
+    "aliases": [
+      "HMDB 5.0"
+    ],
+    "summary": "HMDB 5.0, the Human Metabolome Database: curated reference data on 217,920 metabolites, their properties, concentrations and pathways.",
+    "body": [
+      "The database collects chemical, biological and physiological information on human metabolites. Metabolite entries cite it for identifiers (HMDB numbers) and descriptive properties, again for identity rather than clinical meaning."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Wishart DS",
+      "Guo A",
+      "Oler E",
+      "Wang F",
+      "Anjum A",
+      "Peters H",
+      "Dizon R",
+      "Sayeeda Z",
+      "Tian S",
+      "Lee BL",
+      "et al."
+    ],
+    "year": 2022,
+    "journal": "Nucleic acids research",
+    "doi": "10.1093/nar/gkab1062",
+    "pmid": "34986597",
+    "url": "https://doi.org/10.1093/nar/gkab1062",
+    "verified": true,
+    "takeaways": [
+      "HMDB 5.0 expanded from 114,100 to 217,920 metabolite entries.",
+      "It improved metabolite descriptions and added structure, spectral and pathway visualisation tools.",
+      "It serves metabolomics, nutrition, biochemistry and clinical chemistry as a reference resource."
+    ],
+    "facts": {
+      "design": "database"
+    }
+  },
+  {
+    "id": "article:ying-2008-nad-nadp",
+    "type": "article",
+    "name": "NAD+/NADH and NADP+/NADPH in cellular functions and cell death: regulation and biological consequences",
+    "aliases": [
+      "Ying 2008"
+    ],
+    "summary": "Review of NAD(H) and NADP(H): NAD mediates energy metabolism, NADPH powers antioxidant systems, and both shape calcium signalling, cell death and ageing.",
+    "body": [
+      "The review explains the division of labour between [[compound:nad]] / [[compound:nadh]] (catabolic redox, energy metabolism, sirtuins) and [[compound:nadp]] / [[compound:nadph]] (reductive biosynthesis and antioxidant defence), including the NADPH-requiring reactions in this knowledge base such as the [[enzyme:mthfr]] step."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Ying W"
+    ],
+    "year": 2008,
+    "journal": "Antioxidants & redox signaling",
+    "doi": "10.1089/ars.2007.1672",
+    "pmid": "18020963",
+    "url": "https://doi.org/10.1089/ars.2007.1672",
+    "verified": true,
+    "takeaways": [
+      "NAD(H) mediates energy metabolism and mitochondrial function, while NADPH is a key component of cellular antioxidation systems.",
+      "NAD- and NADP-derived molecules such as cyclic ADP-ribose mediate calcium homeostasis, and both coenzymes modulate cell death pathways.",
+      "NAD-dependent sirtuins link NAD metabolism to ageing-related processes."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:sies-2017-h2o2-redox-signaling",
+    "type": "article",
+    "name": "Hydrogen peroxide as a central redox signaling molecule in physiological oxidative stress: Oxidative eustress",
+    "aliases": [
+      "Sies 2017"
+    ],
+    "summary": "Review of hydrogen peroxide as a redox signalling molecule: nanomolar levels signal (oxidative eustress), while supraphysiological levels damage biomolecules (oxidative distress).",
+    "body": [
+      "The overview covers the metabolic sources and sinks of H2O2, including peroxisomal and flavoprotein oxidases such as diamine oxidase ([[enzyme:dao]]) and PNP oxidase ([[enzyme:pnpo]]), and the concentration windows at which it signals or damages."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Sies H"
+    ],
+    "year": 2017,
+    "journal": "Redox biology",
+    "doi": "10.1016/j.redox.2016.12.035",
+    "pmid": "28110218",
+    "url": "https://doi.org/10.1016/j.redox.2016.12.035",
+    "verified": true,
+    "takeaways": [
+      "H2O2 is a major redox metabolite operating in sensing, signalling and regulation.",
+      "Physiological concentrations of about 1-10 nM define oxidative eustress; higher levels trigger adaptive stress responses via Nrf2/Keap1 or NF-kB.",
+      "Concentrations above about 100 nM damage biomolecules (oxidative distress)."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:shi-2015-acetyl-coa-metabolism",
+    "type": "article",
+    "name": "Acetyl-CoA and the regulation of metabolism: mechanisms and consequences",
+    "aliases": [
+      "Shi & Tu 2015"
+    ],
+    "summary": "Review of acetyl-CoA as a sentinel metabolite: high nucleocytosolic acetyl-CoA signals the fed state and drives lipid synthesis and histone acetylation; the fasted state routes it into mitochondria.",
+    "body": [
+      "Acetyl-CoA is the carrier of two-carbon units that links glycolysis, fatty acid oxidation and the TCA cycle to biosynthesis and protein acetylation. In this knowledge base it is the acetyl donor of [[enzyme:chat]] in [[pathway:acetylcholine-synthesis]]; the review is a general reference for [[compound:acetyl-coa]] and [[compound:coa]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Shi L",
+      "Tu BP"
+    ],
+    "year": 2015,
+    "journal": "Current opinion in cell biology",
+    "doi": "10.1016/j.ceb.2015.02.003",
+    "pmid": "25703630",
+    "url": "https://doi.org/10.1016/j.ceb.2015.02.003",
+    "verified": true,
+    "takeaways": [
+      "Acetyl-CoA is a key node in metabolism, intersecting many pathways.",
+      "Cells monitor acetyl-CoA levels as an indicator of metabolic state through acetylation of proteins.",
+      "High nucleocytosolic acetyl-CoA marks a fed or growth state; in fasting it is directed into mitochondria for ATP and ketone body synthesis."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:lu-2014-thioredoxin-system",
+    "type": "article",
+    "name": "The thioredoxin antioxidant system",
+    "aliases": [
+      "Lu & Holmgren 2014"
+    ],
+    "summary": "Review of the thioredoxin antioxidant system (NADPH, thioredoxin reductase, thioredoxin): a disulfide reductase system that supplies electrons to peroxiredoxins and other redox-sensitive proteins.",
+    "body": [
+      "Thioredoxin cycles between the reduced dithiol and oxidised disulfide forms ([[compound:thioredoxin-dithiol]], [[compound:thioredoxin-disulfide]]) at the expense of [[compound:nadph]]. In some bacteria that lack a glutathione system the thioredoxin system is essential, which is relevant to the proposed thioredoxin-dependent glycine reductase ([[reaction:bacterial-glycine-reductase]])."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Lu J",
+      "Holmgren A"
+    ],
+    "year": 2014,
+    "journal": "Free radical biology & medicine",
+    "doi": "10.1016/j.freeradbiomed.2013.07.036",
+    "pmid": "23899494",
+    "url": "https://doi.org/10.1016/j.freeradbiomed.2013.07.036",
+    "verified": true,
+    "takeaways": [
+      "The Trx system comprises NADPH, thioredoxin reductase and thioredoxin and regulates protein dithiol/disulfide balance.",
+      "It provides electrons to peroxiredoxins, ribonucleotide reductase and methionine sulfoxide reductases, and works alongside the glutathione-glutaredoxin system.",
+      "Bacteria such as H. pylori lack a glutathione-glutaredoxin system, making their thioredoxin system essential under oxidative stress."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:watmough-2010-etf-qo",
+    "type": "article",
+    "name": "The electron transfer flavoprotein: ubiquinone oxidoreductases",
+    "aliases": [
+      "Watmough & Frerman 2010"
+    ],
+    "summary": "Review of ETF and ETF:ubiquinone oxidoreductase, the short pathway that passes electrons from 11 mitochondrial flavoprotein dehydrogenases (including DMGDH and SARDH) to ubiquinone.",
+    "body": [
+      "Electron transfer flavoprotein ([[compound:etf-oxidized]] / [[compound:etf-reduced]]) accepts electrons from mitochondrial flavoenzymes and hands them to ETF-QO. It is the immediate acceptor for [[enzyme:dmgdh]] and [[enzyme:sardh]] in the choline-oxidation route."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Watmough NJ",
+      "Frerman FE"
+    ],
+    "year": 2010,
+    "journal": "Biochimica et biophysica acta",
+    "doi": "10.1016/j.bbabio.2010.10.007",
+    "pmid": "20937244",
+    "url": "https://doi.org/10.1016/j.bbabio.2010.10.007",
+    "verified": true,
+    "takeaways": [
+      "ETF and ETF-QO transfer electrons from 11 different mitochondrial flavoprotein dehydrogenases to the ubiquinone pool.",
+      "ETF-QO is a monotopic membrane protein with FAD and a [4Fe-4S] cluster; the flavin is the immediate reductant of ubiquinone.",
+      "Mutations in the pathway are associated with multiple acyl-CoA dehydrogenase deficiency (MADD)."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:szegedi-2008-bhmt2-smm",
+    "type": "article",
+    "name": "Betaine-homocysteine S-methyltransferase-2 is an S-methylmethionine-homocysteine methyltransferase",
+    "aliases": [
+      "Szegedi 2008"
+    ],
+    "summary": "Enzymology: human BHMT-2 is a zinc enzyme that methylates homocysteine using S-methylmethionine and cannot use betaine, unlike BHMT.",
+    "body": [
+      "The kinetic study defines [[enzyme:bhmt2]] as an S-methylmethionine-homocysteine methyltransferase with a Km of 0.94 mM for [[compound:s-methylmethionine]]. It suggests that, in vivo, SMM-dependent homocysteine methylation occurs via BHMT-2 rather than [[enzyme:bhmt]]. The physiological importance of the SMM route in humans, where SMM comes from plant foods, is unclear."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Szegedi SS",
+      "Castro CC",
+      "Koutmos M",
+      "Garrow TA"
+    ],
+    "year": 2008,
+    "journal": "The Journal of biological chemistry",
+    "doi": "10.1074/jbc.M710449200",
+    "pmid": "18230605",
+    "url": "https://doi.org/10.1074/jbc.M710449200",
+    "verified": true,
+    "takeaways": [
+      "Purified recombinant human BHMT-2 is a zinc metalloenzyme that uses SMM as methyl donor for homocysteine and cannot use betaine.",
+      "BHMT-2 is not inhibited by dimethylglycine or betaine, whereas dimethylglycine strongly inhibits BHMT.",
+      "The authors hypothesise that most SMM-dependent methylation of homocysteine in vivo occurs via BHMT-2."
+    ],
+    "facts": {
+      "design": "enzymology"
+    }
+  },
+  {
+    "id": "article:mattaini-2016-serine-metabolism",
+    "type": "article",
+    "name": "The importance of serine metabolism in cancer",
+    "aliases": [
+      "Mattaini 2016"
+    ],
+    "summary": "Review of serine metabolism: serine comes from the diet or from glucose via 3-phosphoglycerate, and supplies amino acid transport, nucleotide synthesis, folate one-carbon units and redox balance.",
+    "body": [
+      "The review summarises the phosphoglycerate dehydrogenase route ([[enzyme:phgdh]], [[enzyme:psat1]], [[enzyme:psph]]) from [[compound:3-phosphoglycerate]] through [[compound:3-phosphohydroxypyruvate]] and [[compound:3-phosphoserine]] to [[compound:serine]], and why cells use it. The discussion is framed around cancer but the biochemistry is general."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Mattaini KR",
+      "Sullivan MR",
+      "Vander Heiden MG"
+    ],
+    "year": 2016,
+    "journal": "The Journal of cell biology",
+    "doi": "10.1083/jcb.201604085",
+    "pmid": "27458133",
+    "url": "https://doi.org/10.1083/jcb.201604085",
+    "verified": true,
+    "takeaways": [
+      "Serine can be taken up or synthesised de novo from glucose, and many cancers depend on the synthetic route.",
+      "Serine synthesis supports amino acid transport, nucleotide synthesis, folate metabolism and redox homeostasis.",
+      "The paper is framed around tumour biology, so physiological regulation in healthy tissue is not its focus."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:meiser-2013-dopamine-metabolism",
+    "type": "article",
+    "name": "Complexity of dopamine metabolism",
+    "aliases": [
+      "Meiser 2013"
+    ],
+    "summary": "Review of dopamine biosynthesis, degradation and oxidation chemistry, including COMT and MAO routes, with emphasis on oxidative stress in Parkinson disease.",
+    "body": [
+      "The review follows [[compound:dopamine]] from synthesis to degradation, including methylation by [[enzyme:comt]] to [[compound:3-methoxytyramine]], and explains how its metabolism generates reactive oxygen species. It is a general reference for the catecholamine methylation example used in [[reaction:comt-dopamine-methylation]]."
+    ],
+    "evidence": "established",
+    "authors": [
+      "Meiser J",
+      "Weindl D",
+      "Hiller K"
+    ],
+    "year": 2013,
+    "journal": "Cell communication and signaling : CCS",
+    "doi": "10.1186/1478-811X-11-34",
+    "pmid": "23683503",
+    "url": "https://doi.org/10.1186/1478-811X-11-34",
+    "verified": true,
+    "takeaways": [
+      "Dopamine metabolism is tightly linked to oxidative stress because its degradation generates reactive oxygen species.",
+      "The review covers biosynthesis, sequestration, degradation and oxidation, and regulation of the enzymes involved.",
+      "It is oriented to Parkinson disease; relevance to methylation capacity is indirect."
+    ],
+    "facts": {
+      "design": "review"
+    }
+  },
+  {
+    "id": "article:kennedy-1956-cytidine-coenzymes",
+    "type": "article",
+    "name": "The function of cytidine coenzymes in the biosynthesis of phospholipides",
+    "aliases": [
+      "Kennedy & Weiss 1956"
+    ],
+    "summary": "Classic biochemical paper establishing that CDP-choline and CDP-ethanolamine are the activated intermediates for phosphatidylcholine and phosphatidylethanolamine synthesis (the Kennedy pathway).",
+    "body": [
+      "Kennedy and Weiss showed that cytidine coenzymes carry the phosphorylated head groups to diacylglycerol. This defines the [[pathway:kennedy-pathway]] in which [[compound:phosphocholine]] and [[compound:phosphoethanolamine]] are activated by CTP to [[compound:cdp-choline]] and [[compound:cdp-ethanolamine]], releasing [[compound:cmp]] when the lipid is formed."
+    ],
+    "evidence": "established",
+    "authors": [
+      "KENNEDY EP",
+      "WEISS SB"
+    ],
+    "year": 1956,
+    "journal": "The Journal of biological chemistry",
+    "pmid": "13366993",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/13366993/",
+    "verified": true,
+    "takeaways": [
+      "Cytidine coenzymes (CDP-choline, CDP-ethanolamine) are the activated forms used to build membrane phospholipids.",
+      "The head-group-activation strategy, reacting CDP-base with diacylglycerol, became the template of the Kennedy pathway.",
+      "This is a 1956 foundational paper; modern enzymology and regulation are covered by later work such as the review by Vance."
+    ],
+    "facts": {
+      "design": "biochemistry"
+    }
   }
 ];

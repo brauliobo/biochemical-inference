@@ -13,7 +13,7 @@ export default [
     summary: "Cytosolic liver enzyme that transfers a methyl group from SAM to glycine, forming sarcosine and SAH; the main hepatic 'methyl sink' that buffers the SAM:SAH ratio.",
     body: [
       "GNMT is a homotetrameric cytosolic enzyme that makes up on the order of 1-3% of soluble protein in liver (less in pancreas, kidney and prostate). It methylates [[compound:glycine]] using [[compound:sam]] to give [[compound:sarcosine]] and [[compound:sah]] ([[reaction:gnmt-glycine-methylation]]). Unlike most methyltransferases it is only weakly inhibited by SAH and has a glycine affinity in the range of hepatic glycine concentrations, so it can dispose of surplus methyl groups when SAM is high.",
-      "Its activity is tuned by folate: 5-methyltetrahydrofolate polyglutamates bind GNMT and inhibit it. When SAM is high, [[enzyme:mthfr]] is inhibited by SAM so less [[compound:5-methyl-thf]] is made and GNMT is released; when SAM is low, 5-MTHF rises and GNMT is throttled, sparing methyl groups. Together this makes GNMT a flux-sensing 'methyl sink' ([[pathway:methyl-budget]]). The sarcosine it makes is demethylated back to glycine by [[enzyme:sardh]], so the methyl group is not lost but re-enters the folate one-carbon pool as 5,10-methylene-THF.",
+      "Its activity is tuned by folate: 5-methyltetrahydrofolate polyglutamates bind GNMT and inhibit it. When SAM is high, [[enzyme:mthfr]] is inhibited by SAM so less [[compound:5-mthf|5-methyl-THF]] is made and GNMT is released; when SAM is low, 5-MTHF rises and GNMT is throttled, sparing methyl groups. Together this makes GNMT a flux-sensing 'methyl sink' ([[pathway:methyl-budget]]). The sarcosine it makes is demethylated back to glycine by [[enzyme:sardh]], so the methyl group is not lost but re-enters the folate one-carbon pool as 5,10-methylene-THF.",
       "Human GNMT deficiency gives a benign hypermethioninaemia with raised SAM, and Gnmt knockout mice develop fatty liver and hepatocellular carcinoma, confirming the role in SAM homeostasis. The source conversation proposed that a large oral glycine dose could over-recruit GNMT in an already under-methylated person and further drain SAM; this is mechanistically conceivable but is not demonstrated in humans (SARDH recapture and folate feedback should blunt it), so it is recorded as conversation-only."
     ],
     evidence: "established",
@@ -31,7 +31,7 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methyl-budget", note: "main hepatic methyl sink" },
       { rel: "part-of", to: "pathway:methionine-cycle", note: "transmethylation arm: SAM to SAH" },
-      { rel: "interacts-with", to: "compound:5-methyl-thf", note: "5-MTHF polyglutamate binds and inhibits GNMT (established)" },
+      { rel: "interacts-with", to: "compound:5-mthf", note: "5-MTHF polyglutamate binds and inhibits GNMT (established)" },
       { rel: "mitigates", to: "state:overmethylation", note: "disposes of surplus SAM methyl groups" },
       { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: bolus free glycine over-recruits GNMT and drains SAM; human evidence lacking" }
     ],
@@ -74,7 +74,7 @@ export default [
     aliases: ["BHMT", "BHMT1", "betaína-homocisteína metiltransferase", "remetilação por betaína", "via da betaína"],
     summary: "Zinc enzyme of liver and kidney that remethylates homocysteine to methionine using betaine (TMG), releasing dimethylglycine; folate- and B12-independent.",
     body: [
-      "BHMT is a cytosolic zinc-dependent homotetramer that transfers one methyl group from [[compound:betaine]] to [[compound:homocysteine]], giving [[compound:methionine]] and [[compound:dimethylglycine]] ([[reaction:bhmt-betaine-homocysteine]]). It is expressed mainly in liver and kidney and provides a remethylation route that needs neither [[compound:5-methyl-thf]] nor [[compound:vitamin-b12-methylcobalamin]], in parallel with [[enzyme:mtr]]. In liver it accounts for a substantial but variable fraction of homocysteine remethylation; Bhmt knockout mice have raised homocysteine, fatty liver and liver tumours.",
+      "BHMT is a cytosolic zinc-dependent homotetramer that transfers one methyl group from [[compound:betaine]] to [[compound:homocysteine]], giving [[compound:methionine]] and [[compound:dimethylglycine]] ([[reaction:bhmt-betaine-homocysteine]]). It is expressed mainly in liver and kidney and provides a remethylation route that needs neither [[compound:5-mthf|5-methyl-THF]] nor [[compound:methylcobalamin]], in parallel with [[enzyme:mtr]]. In liver it accounts for a substantial but variable fraction of homocysteine remethylation; Bhmt knockout mice have raised homocysteine, fatty liver and liver tumours.",
       "Betaine comes from the oxidation of [[compound:choline]] ([[pathway:choline-oxidation]]) or from the diet (anhydrous betaine/TMG supplements, beet, wheat, shellfish). The dimethylglycine product is shuttled to mitochondria where [[enzyme:dmgdh]] and [[enzyme:sardh]] strip the remaining methyls to leave glycine, so one betaine can yield one SAM-regenerating methyl plus two folate-pool one-carbon units plus a glycine molecule.",
       "The conversation's argument that choline supports night-time histamine clearance via betaine, BHMT, SAM and [[enzyme:hnmt]] is mechanistically coherent for liver SAM, but brain and airway HNMT depend on local SAM (these tissues have little BHMT), so the effect on central histamine is plausible rather than demonstrated."
     ],
@@ -131,7 +131,7 @@ export default [
     aliases: ["MTHFR", "metilenotetraidrofolato redutase", "C677T", "A1298C", "MTHFR NADPH"],
     summary: "FAD enzyme that irreversibly reduces 5,10-methylene-THF to 5-methyl-THF with NADPH, committing one-carbon units to homocysteine remethylation; inhibited by SAM.",
     body: [
-      "MTHFR is a cytosolic FAD-containing homodimer that uses NADPH to reduce [[compound:5-10-methylene-thf]] to [[compound:5-methyl-thf]] ([[reaction:mthfr-methylene-thf-reduction]]). The reaction is effectively irreversible in vivo, so it commits folate one-carbon units to the methyl donor used by [[enzyme:mtr]]. The N-terminal catalytic domain binds FAD and the C-terminal regulatory domain binds [[compound:sam]] as an allosteric inhibitor (and is phosphorylated, which also lowers activity). This is the feedback loop that couples SAM status to 5-MTHF supply and, through 5-MTHF inhibition of [[enzyme:gnmt]], to the methyl sink.",
+      "MTHFR is a cytosolic FAD-containing homodimer that uses NADPH to reduce [[compound:5-10-methylene-thf]] to [[compound:5-mthf|5-methyl-THF]] ([[reaction:mthfr-methylene-thf-reduction]]). The reaction is effectively irreversible in vivo, so it commits folate one-carbon units to the methyl donor used by [[enzyme:mtr]]. The N-terminal catalytic domain binds FAD and the C-terminal regulatory domain binds [[compound:sam]] as an allosteric inhibitor (and is phosphorylated, which also lowers activity). This is the feedback loop that couples SAM status to 5-MTHF supply and, through 5-MTHF inhibition of [[enzyme:gnmt]], to the methyl sink.",
       "The common C677T (A222V) variant is thermolabile and loses FAD more easily; homozygotes (TT) have roughly 30% of wild-type activity and heterozygotes about 65%. Effects on homocysteine are mostly visible with low folate status. Current UniProt/IUBMB nomenclature lists the NADPH enzyme as EC 1.5.1.53 (formerly 1.5.1.20). The repository's one-carbon model uses an MTHFR activity multiplier (baseline 1, reduced 0.35) as its main perturbation."
     ],
     evidence: "established",
@@ -161,7 +161,7 @@ export default [
     aliases: ["MTR", "MS", "metionina sintase", "5-metiltetraidrofolato-homocisteína metiltransferase", "cobalamina-dependente"],
     summary: "Cytosolic cobalamin-dependent enzyme that moves the methyl of 5-methyl-THF onto homocysteine to make methionine and regenerate THF.",
     body: [
-      "MTR uses [[compound:vitamin-b12-methylcobalamin]] as a methyl carrier: cob(I)alamin takes the methyl from [[compound:5-methyl-thf]] to become methylcobalamin, which then methylates [[compound:homocysteine]] to give [[compound:methionine]], regenerating cob(I)alamin ([[reaction:mtr-methionine-synthase]]). The tetrahydrofolate released ([[compound:thf]]) re-enters the folate cycle. It is the only route that releases THF from 5-MTHF, which is why B12 deficiency traps folate as 5-MTHF (the 'methyl-folate trap').",
+      "MTR uses [[compound:methylcobalamin]] as a methyl carrier: cob(I)alamin takes the methyl from [[compound:5-mthf|5-methyl-THF]] to become methylcobalamin, which then methylates [[compound:homocysteine]] to give [[compound:methionine]], regenerating cob(I)alamin ([[reaction:mtr-methionine-synthase]]). The tetrahydrofolate released ([[compound:thf]]) re-enters the folate cycle. It is the only route that releases THF from 5-MTHF, which is why B12 deficiency traps folate as 5-MTHF (the 'methyl-folate trap').",
       "The supernucleophilic cob(I)alamin occasionally oxidises to inactive cob(II)alamin; [[enzyme:mtrr]] restores it by reductive methylation with [[compound:sam]] ([[reaction:mtrr-cobalamin-reactivation]]). In liver MTR works in parallel with [[enzyme:bhmt]]; in most other tissues, including brain, it is the principal remethylation enzyme. Reactome splits the catalytic cycle into two half-reactions; the repository records the net transfer."
     ],
     evidence: "established",
@@ -180,7 +180,7 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "only enzyme that releases THF from 5-MTHF" },
-      { rel: "interacts-with", to: "compound:vitamin-b12-methylcobalamin", note: "cofactor / methyl carrier" },
+      { rel: "interacts-with", to: "compound:methylcobalamin", note: "cofactor / methyl carrier" },
       { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" }
     ]
   },
@@ -1250,7 +1250,7 @@ export default [
     aliases: ["BAAT", "BAT", "BACAT", "conjugação biliar", "glicina N-colil-transferase"],
     summary: "Hepatic peroxisomal/cytosolic enzyme that conjugates choloyl-CoA with glycine or taurine; the glycine:taurine ratio of human bile is about 3:1.",
     body: [
-      "BAAT transfers the bile acyl group from CoA to the amino group of [[compound:glycine]] ([[reaction:baat-glycine-conjugation]], giving [[compound:glycocholate]]) or [[compound:taurine]] ([[reaction:baat-taurine-conjugation]], giving [[compound:taurocholate]]). Human bile is predominantly glycine-conjugated (about three-quarters), but the ratio responds to the relative availability of the two amino acids and shifts toward taurine when taurine intake is high.",
+      "BAAT transfers the bile acyl group from CoA to the amino group of [[compound:glycine]] ([[reaction:baat-glycine-conjugation]], giving [[compound:glycocholic-acid|glycocholate]]) or [[compound:taurine]] ([[reaction:baat-taurine-conjugation]], giving [[compound:taurocholic-acid|taurocholate]]). Human bile is predominantly glycine-conjugated (about three-quarters), but the ratio responds to the relative availability of the two amino acids and shifts toward taurine when taurine intake is high.",
       "Conjugation lowers the pKa of the bile acid so that it stays ionised and membrane-impermeant at intestinal pH ([[pathway:bile-acid-conjugation]]). The conversation suggests that an acute glycine load changes the glycine:taurine ratio and makes bile more irritant, favouring duodenogastric reflux and eructation. Hepatic glycine is not normally limiting for conjugation and a pronounced shift from oral glycine is unproven, so this link is conversation-only. Bacterial bile-salt hydrolases reverse the reaction in the gut ([[enzyme:bile-salt-hydrolase]])."
     ],
     evidence: "established",
@@ -1278,7 +1278,7 @@ export default [
     aliases: ["BSH", "bile salt hydrolase", "hidrolase de sais biliares", "desconjugação biliar", "colilglicina hidrolase"],
     summary: "Gut-bacterial amidase that deconjugates glycine- and taurine-conjugated bile acids, releasing free glycine or taurine in the intestinal lumen.",
     body: [
-      "BSH is produced by many gut bacteria (Lactobacillus, Bifidobacterium, Bacteroides, Clostridium, Enterococcus). It hydrolyses the amide bond of [[compound:glycocholate]] to [[compound:cholate]] and [[compound:glycine]] ([[reaction:bsh-glycocholate-deconjugation]]) or of taurocholate to cholate and [[compound:taurine]]. In health most deconjugation occurs in the distal ileum and colon.",
+      "BSH is produced by many gut bacteria (Lactobacillus, Bifidobacterium, Bacteroides, Clostridium, Enterococcus). It hydrolyses the amide bond of [[compound:glycocholic-acid|glycocholate]] to [[compound:cholate]] and [[compound:glycine]] ([[reaction:bsh-glycocholate-deconjugation]]) or of taurocholate to cholate and [[compound:taurine]]. In health most deconjugation occurs in the distal ileum and colon.",
       "Bacterial overgrowth of the small intestine deconjugates bile acids too early, impairing fat micelle formation (a classical mechanism of fat malabsorption in [[disease:sibo]]) and releasing free glycine locally, which is a real, if small, luminal source of free glycine and thus a bridge to the proposed fermentation by upper-gut bacteria ([[pathway:gut-bacterial-glycine-fates]]). Taurine released is used by sulfate-reducing bacteria (e.g. Bilophila) to make hydrogen sulfide, a different gas."
     ],
     evidence: "established",
@@ -1633,5 +1633,140 @@ export default [
       { rel: "part-of", to: "pathway:glycine-serine-route", note: "irreversible last step" },
       { rel: "interacts-with", to: "enzyme:psat1", note: "previous step" }
     ]
+  },
+  {
+    id: "enzyme:glycine-cleavage-system",
+    type: "enzyme",
+    name: "Glycine cleavage system (GCS; glycine decarboxylase complex)",
+    aliases: ["GCS", "glycine cleavage complex", "glycine decarboxylase complex", "sistema de clivagem da glicina", "complexo da glicina descarboxilase"],
+    summary: "Mitochondrial four-protein complex (GLDC, AMT, GCSH, DLD) that degrades glycine to CO2, ammonia and 5,10-methylene-THF; the main route of glycine catabolism in liver.",
+    body: [
+      "The complex is made of the P protein [[enzyme:gldc]] (PLP-dependent decarboxylase), the lipoate-carrying H protein [[enzyme:gcsh]], the folate-binding T protein [[enzyme:amt]] and the L protein [[enzyme:dld]] (lipoamide dehydrogenase, NAD+-dependent). Together they run [[reaction:glycine-cleavage-system]], so the system needs three cofactors that nutrition can limit: [[compound:plp]], lipoate and [[compound:thf]].",
+      "It is the main sink for surplus glycine and a source of [[compound:5-10-methylene-thf]] in mitochondria, linking glycine to the folate pool. Loss of its function causes [[disease:nonketotic-hyperglycinemia]], where glycine accumulates in brain; this rare inborn error is why supplemental glycine is avoided in that disease. In tracer studies of five healthy men and women, glycine decarboxylation accounted for roughly 39% of whole-body glycine flux ([[article:lamers-2007-glycine-flux]]), far more than methylation by GNMT is thought to contribute."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "GLDC; AMT; GCSH; DLD",
+      ec: "1.4.4.2; 2.1.2.10; 1.8.1.4",
+      reactome: "R-HSA-5693967",
+      compartment: "mitochondrial matrix",
+      tissue: "liver, kidney, brain",
+      cofactors: "PLP (P protein); lipoate (H protein); THF (T protein); FAD and NAD+ (L protein)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:glycine-cleavage-system" },
+      { rel: "part-of", to: "pathway:glycine-cleavage" },
+      { rel: "decreases", to: "compound:glycine", note: "Main catabolic route" },
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Provides one-carbon units to the folate pool" }
+    ],
+    refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation", "article:applegarth-2004-glycine-encephalopathy"]
+  },
+  {
+    id: "enzyme:shmt",
+    type: "enzyme",
+    name: "Serine hydroxymethyltransferase (SHMT; SHMT1 and SHMT2)",
+    aliases: ["SHMT", "serina hidroximetiltransferase", "SHMT1/SHMT2"],
+    summary: "Family-level entry for the PLP-dependent enzyme interconverting serine with glycine while moving one carbon to or from THF; cytosolic SHMT1 and mitochondrial SHMT2.",
+    body: [
+      "SHMT transfers the hydroxymethyl carbon of [[compound:serine]] to [[compound:thf]], giving [[compound:glycine]] and [[compound:5-10-methylene-thf]] ([[reaction:shmt-serine-glycine-interconversion]]). The cytosolic isoform is [[enzyme:shmt1]] and the mitochondrial isoform is [[enzyme:shmt2]]; this page covers what is common to both, and the isoform pages give gene, tissue and compartment detail.",
+      "The reaction needs [[compound:plp]], so glycine and serine handling follows vitamin B6 status. Serine to glycine is the dominant source of glycine in the body, which makes SHMT the usual starting point for estimates of how much glycine the body can make ([[article:melendez-hevia-2009-glycine-weak-link]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "SHMT1; SHMT2",
+      ec: "2.1.2.1",
+      rhea: "RHEA:15481",
+      reactome: "R-HSA-200651",
+      compartment: "cytosol (SHMT1); mitochondrial matrix (SHMT2)",
+      cofactors: "PLP; THF (substrate)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:shmt-serine-glycine-interconversion" },
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "part-of", to: "pathway:glycine-serine-route" },
+      { rel: "increases", to: "compound:glycine", note: "Main endogenous source, from serine" }
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:parra-2018-vitamin-b6-metabolism"]
+  },
+  {
+    id: "enzyme:gad",
+    type: "enzyme",
+    name: "Glutamate decarboxylase (GAD; GAD65 and GAD67)",
+    aliases: ["GAD", "glutamato descarboxilase", "GAD65/GAD67"],
+    summary: "Family-level entry for the PLP-dependent enzyme converting glutamate to GABA; two isoforms, GAD1 (GAD67) and GAD2 (GAD65), differ in cofactor saturation and regulation.",
+    body: [
+      "GAD decarboxylates [[compound:glutamate]] to [[compound:gaba]] and CO2 using [[compound:plp]] as cofactor ([[reaction:gad-glutamate-decarboxylation]]). [[enzyme:gad1]] (GAD67) is mostly saturated with PLP and supplies baseline GABA, while [[enzyme:gad2]] (GAD65) is largely present as the cofactor-free apoenzyme and responds to PLP availability and demand.",
+      "Because both isoforms need PLP, severe B6 deficiency lowers brain GABA and can cause seizures. Whether milder low B6 status changes mood or anxiety is plausible but not shown; the review by Petroff describes the neurochemistry rather than any treatment effect."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "GAD1; GAD2",
+      ec: "4.1.1.15",
+      rhea: "RHEA:17785",
+      compartment: "cytosol; synaptic vesicle membrane (GAD65)",
+      cofactors: "PLP"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:gad-glutamate-decarboxylation" },
+      { rel: "part-of", to: "pathway:gaba-shunt" },
+      { rel: "increases", to: "compound:gaba", note: "Rate-controlling synthesis step" },
+      { rel: "decreases", to: "compound:glutamate" }
+    ],
+    refs: ["article:erlander-1991-two-gad-genes", "article:battaglioli-2003-gad-isoform-kinetics", "article:petroff-2002-gaba-glutamate"]
+  },
+  {
+    id: "enzyme:mat",
+    type: "enzyme",
+    name: "Methionine adenosyltransferase (MAT; SAM synthetase)",
+    aliases: ["MAT", "SAM synthetase", "metionina adenosiltransferase", "SAMe sintetase", "MAT I/II/III"],
+    summary: "Family-level entry for the enzyme that makes SAM from methionine and ATP; liver MAT1A (MAT I/III) and extrahepatic MAT2A (MAT II) share the reaction and Mg-ATP requirement.",
+    body: [
+      "MAT forms [[compound:sam]] from [[compound:methionine]] and [[compound:atp]], releasing [[compound:phosphate]] and [[compound:pyrophosphate]] ([[reaction:mat-sam-synthesis]]). Two genes encode the catalytic subunits: [[enzyme:mat1a]] in adult liver and [[enzyme:mat2a]] in other tissues, with regulatory differences in affinity for methionine and sensitivity to SAM.",
+      "The real substrate is Mg-ATP, so [[compound:magnesium]] is an obligatory cofactor. SAM synthesis is the first step of the methylation cycle and its rate sets the pool from which GNMT, PEMT and creatine synthesis draw ([[pathway:methyl-budget]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "MAT1A; MAT2A (regulatory MAT2B)",
+      ec: "2.5.1.6",
+      rhea: "RHEA:21080",
+      reactome: "R-HSA-174391",
+      compartment: "cytosol",
+      cofactors: "Mg2+ and K+ (substrate is Mg-ATP)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:mat-sam-synthesis" },
+      { rel: "part-of", to: "pathway:methionine-cycle" },
+      { rel: "increases", to: "compound:sam" },
+      { rel: "decreases", to: "compound:methionine" }
+    ],
+    refs: ["article:mato-2008-methionine-metabolism-liver", "article:reactome-sulfur-amino-acid-metabolism"]
+  },
+  {
+    id: "enzyme:nnmt",
+    type: "enzyme",
+    name: "Nicotinamide N-methyltransferase (NNMT)",
+    aliases: ["NNMT", "nicotinamida N-metiltransferase", "nicotinamide methyltransferase"],
+    summary: "SAM-dependent cytosolic enzyme that methylates nicotinamide to 1-methylnicotinamide, clearing excess vitamin B3 and acting as a modest methyl sink.",
+    body: [
+      "NNMT transfers a methyl group from [[compound:sam]] to [[compound:nicotinamide]], forming [[compound:1-methylnicotinamide]] and [[compound:sah]]. The methylated product is excreted in urine; its excretion rises when nicotinamide or niacin intake is high, which is the biochemical basis for the idea that large [[compound:niacin]] doses consume methyl groups.",
+      "Pissios reviews NNMT as more than a clearance enzyme: its level in adipose tissue and some tumours changes the SAM:SAH balance and epigenetic marks. How much NNMT-mediated methyl loss matters at supplemental B3 doses in humans is not established; animal and high-dose data are the main support for the concern ([[claim:niacin-drains-methyl-groups]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "NNMT",
+      ec: "2.1.1.1",
+      uniprot: "P40261",
+      compartment: "cytosol",
+      tissue: "liver (highest), adipose tissue, kidney; overexpressed in several cancers",
+      cofactors: "SAM (methyl donor)"
+    },
+    relations: [
+      { rel: "increases", to: "compound:1-methylnicotinamide" },
+      { rel: "increases", to: "compound:sah", note: "Co-product of every methylation" },
+      { rel: "decreases", to: "compound:sam", note: "Methyl donor consumed" },
+      { rel: "decreases", to: "compound:nicotinamide" },
+      { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" }
+    ],
+    refs: ["article:pissios-2017-nnmt-methyl-sink"]
   }
 ]

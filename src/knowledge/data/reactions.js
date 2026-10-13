@@ -145,7 +145,7 @@ export default [
     aliases: ["5-MTHF + Hcy → THF + Met", "metionina sintase", "remetilação dependente de B12"],
     summary: "Cobalamin-dependent methyl transfer from 5-methyltetrahydrofolate to homocysteine; the only route that releases THF from 5-MTHF.",
     body: [
-      "[[compound:5-methyl-thf]] + [[compound:homocysteine]] -> [[compound:thf]] + [[compound:methionine]], catalysed by [[enzyme:mtr]] through the cob(I)alamin/methylcobalamin cycle (net transfer shown; methylcobalamin is an enzyme-bound carrier, [[compound:vitamin-b12-methylcobalamin]]). The repository's one-carbon model lumps this step with folate regeneration (Rhea RHEA:11173 plus conversion back to 5,10-methylene-THF), so its lumped product differs from this single-reaction record."
+      "[[compound:5-mthf|5-methyl-THF]] + [[compound:homocysteine]] -> [[compound:thf]] + [[compound:methionine]], catalysed by [[enzyme:mtr]] through the cob(I)alamin/methylcobalamin cycle (net transfer shown; methylcobalamin is an enzyme-bound carrier, [[compound:methylcobalamin]]). The repository's one-carbon model lumps this step with folate regeneration (Rhea RHEA:11173 plus conversion back to 5,10-methylene-THF), so its lumped product differs from this single-reaction record."
     ],
     evidence: "established",
     facts: {
@@ -157,7 +157,7 @@ export default [
       direction: "irreversible in vivo"
     },
     reaction: {
-      reactants: [{ id: "compound:5-methyl-thf", n: 1 }, { id: "compound:homocysteine", n: 1 }],
+      reactants: [{ id: "compound:5-mthf", n: 1 }, { id: "compound:homocysteine", n: 1 }],
       products: [{ id: "compound:thf", n: 1 }, { id: "compound:methionine", n: 1 }],
       ec: "2.1.1.13",
       rhea: "RHEA:11173",
@@ -178,7 +178,7 @@ export default [
     aliases: ["reativação da metionina sintase", "cob(II)alamina → metilcobalamina", "MTRR + SAM"],
     summary: "Methionine synthase reductase reduces oxidised cob(II)alamin with NADPH and re-methylates it from SAM, restoring active methylcobalamin.",
     body: [
-      "2 cob(II)alamin (bound to [[enzyme:mtr]]) + NADPH + 2 [[compound:sam]] -> 2 [[compound:vitamin-b12-methylcobalamin]] + 2 [[compound:sah]] + NADP+ + H+, catalysed by [[enzyme:mtrr]]. The two sequential steps (one-electron reduction to cob(I)alamin, then methyl transfer from SAM) are written as a net reaction. Rhea RHEA:23908 is this reaction written in the reverse direction."
+      "2 cob(II)alamin (bound to [[enzyme:mtr]]) + NADPH + 2 [[compound:sam]] -> 2 [[compound:methylcobalamin]] + 2 [[compound:sah]] + NADP+ + H+, catalysed by [[enzyme:mtrr]]. The two sequential steps (one-electron reduction to cob(I)alamin, then methyl transfer from SAM) are written as a net reaction. Rhea RHEA:23908 is this reaction written in the reverse direction."
     ],
     evidence: "established",
     facts: {
@@ -190,7 +190,7 @@ export default [
     },
     reaction: {
       reactants: [{ id: "compound:cob-ii-alamin", n: 2 }, { id: "compound:nadph", n: 1 }, { id: "compound:sam", n: 2 }],
-      products: [{ id: "compound:vitamin-b12-methylcobalamin", n: 2 }, { id: "compound:sah", n: 2 }, { id: "compound:nadp", n: 1 }, { id: "compound:proton", n: 1 }],
+      products: [{ id: "compound:methylcobalamin", n: 2 }, { id: "compound:sah", n: 2 }, { id: "compound:nadp", n: 1 }, { id: "compound:proton", n: 1 }],
       ec: "1.16.1.8",
       rhea: "RHEA:23908",
       reactome: "R-HSA-3149518",
@@ -210,7 +210,7 @@ export default [
     aliases: ["5,10-metileno-THF → 5-MTHF", "redução da metilenotetraidrofolato", "MTHFR"],
     summary: "FAD-dependent, effectively irreversible reduction of 5,10-methylene-THF to 5-methyl-THF, the methyl donor for homocysteine remethylation.",
     body: [
-      "[[compound:5-10-methylene-thf]] + [[compound:nadph]] + H+ -> [[compound:5-methyl-thf]] + [[compound:nadp]], catalysed by [[enzyme:mthfr]] (Rhea master RHEA:19817 is written in the opposite, oxidative direction; RHEA:19819 is this physiological direction and is the id used by the repository's one-carbon model). SAM inhibits the enzyme allosterically."
+      "[[compound:5-10-methylene-thf]] + [[compound:nadph]] + H+ -> [[compound:5-mthf|5-methyl-THF]] + [[compound:nadp]], catalysed by [[enzyme:mthfr]] (Rhea master RHEA:19817 is written in the opposite, oxidative direction; RHEA:19819 is this physiological direction and is the id used by the repository's one-carbon model). SAM inhibits the enzyme allosterically."
     ],
     evidence: "established",
     facts: {
@@ -223,7 +223,7 @@ export default [
     },
     reaction: {
       reactants: [{ id: "compound:5-10-methylene-thf", n: 1 }, { id: "compound:nadph", n: 1 }, { id: "compound:proton", n: 1 }],
-      products: [{ id: "compound:5-methyl-thf", n: 1 }, { id: "compound:nadp", n: 1 }],
+      products: [{ id: "compound:5-mthf", n: 1 }, { id: "compound:nadp", n: 1 }],
       ec: "1.5.1.53",
       rhea: "RHEA:19819",
       reactome: "R-HSA-200676",
@@ -1106,7 +1106,7 @@ export default [
     aliases: ["colil-CoA + glicina → glicocolato", "glicoconjugação biliar"],
     summary: "Amide-bond formation between choloyl-CoA and glycine, producing glycocholate; the dominant bile-acid conjugation in humans.",
     body: [
-      "[[compound:choloyl-coa]] + [[compound:glycine]] -> [[compound:glycocholate]] + [[compound:coa]] + H+ by [[enzyme:baat]]. About three quarters of human conjugated bile acids are glycine conjugates. The conversation proposes that a glycine bolus enriches glycine over taurine conjugates and makes bile more irritant; this is conversation-only and unquantified."
+      "[[compound:choloyl-coa]] + [[compound:glycine]] -> [[compound:glycocholic-acid|glycocholate]] + [[compound:coa]] + H+ by [[enzyme:baat]]. About three quarters of human conjugated bile acids are glycine conjugates. The conversation proposes that a glycine bolus enriches glycine over taurine conjugates and makes bile more irritant; this is conversation-only and unquantified."
     ],
     evidence: "established",
     facts: {
@@ -1118,7 +1118,7 @@ export default [
     },
     reaction: {
       reactants: [{ id: "compound:choloyl-coa", n: 1 }, { id: "compound:glycine", n: 1 }],
-      products: [{ id: "compound:glycocholate", n: 1 }, { id: "compound:coa", n: 1 }, { id: "compound:proton", n: 1 }],
+      products: [{ id: "compound:glycocholic-acid", n: 1 }, { id: "compound:coa", n: 1 }, { id: "compound:proton", n: 1 }],
       ec: "2.3.1.65",
       rhea: "RHEA:14001",
       reactome: "R-HSA-192312",
@@ -1138,7 +1138,7 @@ export default [
     aliases: ["colil-CoA + taurina → taurocolato", "tauroconjugação biliar"],
     summary: "Amide-bond formation between choloyl-CoA and taurine, producing taurocholate; competes with glycine conjugation.",
     body: [
-      "[[compound:choloyl-coa]] + [[compound:taurine]] -> [[compound:taurocholate]] + [[compound:coa]] + H+ by [[enzyme:baat]]. Taurine conjugation rises with taurine intake (taurine supplementation shifts the glycine:taurine ratio toward taurine conjugates)."
+      "[[compound:choloyl-coa]] + [[compound:taurine]] -> [[compound:taurocholic-acid|taurocholate]] + [[compound:coa]] + H+ by [[enzyme:baat]]. Taurine conjugation rises with taurine intake (taurine supplementation shifts the glycine:taurine ratio toward taurine conjugates)."
     ],
     evidence: "established",
     facts: {
@@ -1150,7 +1150,7 @@ export default [
     },
     reaction: {
       reactants: [{ id: "compound:choloyl-coa", n: 1 }, { id: "compound:taurine", n: 1 }],
-      products: [{ id: "compound:taurocholate", n: 1 }, { id: "compound:coa", n: 1 }, { id: "compound:proton", n: 1 }],
+      products: [{ id: "compound:taurocholic-acid", n: 1 }, { id: "compound:coa", n: 1 }, { id: "compound:proton", n: 1 }],
       ec: "2.3.1.65",
       rhea: "RHEA:47100",
       reactome: "R-HSA-192312",
@@ -1170,7 +1170,7 @@ export default [
     aliases: ["desconjugação bacteriana", "glicocolato → colato + glicina", "BSH"],
     summary: "Gut-bacterial hydrolysis of glycine-conjugated bile acids, regenerating free bile acid and releasing free glycine in the lumen.",
     body: [
-      "[[compound:glycocholate]] + [[compound:water]] -> [[compound:cholate]] + [[compound:glycine]] by bacterial [[enzyme:bile-salt-hydrolase]]. Occurs predominantly in the distal gut in health but proximally in bacterial overgrowth ([[disease:sibo]]), where it contributes to fat malabsorption and to a local pool of free glycine."
+      "[[compound:glycocholic-acid|glycocholate]] + [[compound:water]] -> [[compound:cholate]] + [[compound:glycine]] by bacterial [[enzyme:bile-salt-hydrolase]]. Occurs predominantly in the distal gut in health but proximally in bacterial overgrowth ([[disease:sibo]]), where it contributes to fat malabsorption and to a local pool of free glycine."
     ],
     evidence: "established",
     facts: {
@@ -1180,7 +1180,7 @@ export default [
       direction: "irreversible"
     },
     reaction: {
-      reactants: [{ id: "compound:glycocholate", n: 1 }, { id: "compound:water", n: 1 }],
+      reactants: [{ id: "compound:glycocholic-acid", n: 1 }, { id: "compound:water", n: 1 }],
       products: [{ id: "compound:cholate", n: 1 }, { id: "compound:glycine", n: 1 }],
       ec: "3.5.1.24",
       rhea: "RHEA:19353",
