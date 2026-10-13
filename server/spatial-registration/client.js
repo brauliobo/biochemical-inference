@@ -19,10 +19,9 @@ import {
   verifySpatialRegistrationRecordPage,
   verifySpatialRegistrationTrust
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
-export class SpatialRegistrationUpstreamError extends SpatialRegistrationVerificationError {
-  constructor(message, options = {}) { super(message, { code: options.code ?? 'SPATIAL_REGISTRATION_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 }); this.name = 'SpatialRegistrationUpstreamError' }
-}
+export const SpatialRegistrationUpstreamError = defineProblemError('SpatialRegistrationUpstreamError', { statusCode: 503, code: 'SPATIAL_REGISTRATION_UPSTREAM_FAILED', parent: SpatialRegistrationVerificationError })
 
 export function validateSpatialRegistrationLoopbackUrl(value) {
   return validateLoopbackOrigin(value, { ErrorClass: SpatialRegistrationUpstreamError, subject: 'Goal 14 registration upstream', codePrefix: 'SPATIAL_REGISTRATION_UPSTREAM' })

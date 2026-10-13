@@ -19,14 +19,16 @@ export function defineRequestError(name, defaultStatus = 422) {
   }, name)
 }
 
-// new XError(message, { code, statusCode })
-export function defineProblemError(name, { statusCode, code }) {
-  return named(class extends Error {
+// new XError(message, { code, statusCode }); `parent` makes the class a subclass
+// of another problem error (its constructor receives the merged options).
+export function defineProblemError(name, { statusCode, code, parent = Error }) {
+  return named(class extends parent {
     constructor(message, options = {}) {
-      super(message)
+      const merged = { statusCode: options.statusCode ?? statusCode, code: options.code ?? code }
+      super(message, merged)
       this.name = name
-      this.statusCode = options.statusCode ?? statusCode
-      this.code = options.code ?? code
+      this.statusCode = merged.statusCode
+      this.code = merged.code
     }
   }, name)
 }

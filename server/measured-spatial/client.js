@@ -22,15 +22,11 @@ import {
   verifyMeasuredSpatialRecordPage,
   verifyMeasuredSpatialTrust
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
 export const DEFAULT_MEASURED_SPATIAL_URL = 'http://127.0.0.1:8000'
 
-export class MeasuredSpatialUpstreamError extends MeasuredSpatialVerificationError {
-  constructor(message, options = {}) {
-    super(message, { code: options.code ?? 'MEASURED_SPATIAL_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 })
-    this.name = 'MeasuredSpatialUpstreamError'
-  }
-}
+export const MeasuredSpatialUpstreamError = defineProblemError('MeasuredSpatialUpstreamError', { statusCode: 503, code: 'MEASURED_SPATIAL_UPSTREAM_FAILED', parent: MeasuredSpatialVerificationError })
 
 export function validateMeasuredSpatialLoopbackUrl(value) {
   return validateLoopbackOrigin(value, { ErrorClass: MeasuredSpatialUpstreamError, subject: 'Goal 14 upstream', codePrefix: 'MEASURED_SPATIAL_UPSTREAM' })

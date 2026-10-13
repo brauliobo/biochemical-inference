@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { lstat, readFile, readdir, readlink } from 'node:fs/promises'
-import { dirname, relative, resolve, sep } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { canonicalJson } from '../../shared/canonical-json.js'
 import { compareUtf8 } from '../../server/commons/digest.js'
 import { inside } from '../../server/commons/paths.js'

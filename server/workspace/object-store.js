@@ -1,8 +1,7 @@
-import { createHash, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { mkdir, open, readFile, rename, rm } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-
-const digestBuffer = (buffer) => `sha256:${createHash('sha256').update(buffer).digest('hex')}`
+import { sha256Prefixed as digestBuffer } from '../commons/digest.js'
 
 export function objectPath(root, digest) {
   const hash = digest.slice('sha256:'.length)

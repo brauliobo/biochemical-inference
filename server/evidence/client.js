@@ -13,19 +13,13 @@ import {
   UpstreamEvidenceSearchResponseSchema
 } from '../../shared/evidence-contracts.js'
 import { createEvidenceFixtureClient, EVIDENCE_LICENSES } from './fixture.js'
+import { defineProblemError } from '../commons/errors.js'
 
 export const DEFAULT_EVIDENCE_URL = 'http://127.0.0.1:8000'
 export const DEFAULT_EVIDENCE_RELEASE_ID = 'mthfr-evidence-v1.0.0'
 export const DEFAULT_EVIDENCE_RELEASE_DIGEST = '93662849ac8913c0953db9492364900a07ebd824020f6cd65d1fc9e47ac86701'
 
-export class EvidenceCompatibilityError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'EvidenceCompatibilityError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'EVIDENCE_INCOMPATIBLE'
-  }
-}
+export const EvidenceCompatibilityError = defineProblemError('EvidenceCompatibilityError', { statusCode: 409, code: 'EVIDENCE_INCOMPATIBLE' })
 
 function detailMessage(payload, fallback) {
   return payload && typeof payload === 'object' && 'detail' in payload && typeof payload.detail === 'string' ? payload.detail : fallback

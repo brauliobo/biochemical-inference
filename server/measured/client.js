@@ -31,15 +31,11 @@ import {
   verifyMeasuredSignedViews,
   verifyMeasuredTrust
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
 export const DEFAULT_MEASURED_URL = 'http://127.0.0.1:8000'
 
-export class MeasuredUpstreamError extends MeasuredVerificationError {
-  constructor(message, options = {}) {
-    super(message, { code: options.code ?? 'MEASURED_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 })
-    this.name = 'MeasuredUpstreamError'
-  }
-}
+export const MeasuredUpstreamError = defineProblemError('MeasuredUpstreamError', { statusCode: 503, code: 'MEASURED_UPSTREAM_FAILED', parent: MeasuredVerificationError })
 
 export function validateMeasuredLoopbackUrl(value) {
   let url

@@ -12,17 +12,11 @@ import {
   UpstreamApapValidationSchema
 } from '../../shared/apap-contracts.js'
 import { createApapFixtureClient } from './fixture.js'
+import { defineProblemError } from '../commons/errors.js'
 
 export const DEFAULT_APAP_URL = 'http://127.0.0.1:8000'
 
-export class ApapCompatibilityError extends Error {
-  constructor(message, options = {}) {
-    super(message)
-    this.name = 'ApapCompatibilityError'
-    this.statusCode = options.statusCode ?? 409
-    this.code = options.code ?? 'APAP_INCOMPATIBLE'
-  }
-}
+export const ApapCompatibilityError = defineProblemError('ApapCompatibilityError', { statusCode: 409, code: 'APAP_INCOMPATIBLE' })
 
 export function createApapClient(env = process.env) {
   if (env.BIOCHEMICAL_APAP_USE_FIXTURE === 'true' || env.BIOCHEMICAL_INFERENCE_USE_FIXTURE === 'true') return createApapFixtureClient()

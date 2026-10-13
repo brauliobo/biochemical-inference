@@ -27,15 +27,11 @@ import {
   verifyTrust,
   parsePartition
 } from './verification.js'
+import { defineProblemError } from '../commons/errors.js'
 
 export const DEFAULT_FACTORY_URL = 'http://127.0.0.1:8000'
 
-export class DataPlaneUpstreamError extends DataPlaneVerificationError {
-  constructor(message, options = {}) {
-    super(message, { code: options.code ?? 'DATA_PLANE_UPSTREAM_FAILED', statusCode: options.statusCode ?? 503 })
-    this.name = 'DataPlaneUpstreamError'
-  }
-}
+export const DataPlaneUpstreamError = defineProblemError('DataPlaneUpstreamError', { statusCode: 503, code: 'DATA_PLANE_UPSTREAM_FAILED', parent: DataPlaneVerificationError })
 
 export function validateLoopbackFactoryUrl(value) {
   return validateLoopbackOrigin(value, { ErrorClass: DataPlaneUpstreamError, subject: 'Factory upstream', codePrefix: 'DATA_PLANE_UPSTREAM', noun: 'URL' })

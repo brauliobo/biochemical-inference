@@ -1,7 +1,7 @@
 import { createPublicKey, randomBytes } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { lstat, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path'
+import { dirname, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { canonicalJson } from '../shared/canonical-json.js'
 import { acquireInferenceBackupLock } from '../server/operations/runtime-lock.js'
