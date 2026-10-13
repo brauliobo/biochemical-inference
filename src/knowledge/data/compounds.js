@@ -312,7 +312,7 @@ export default [
       "'Under-methylation' as a clinical state is discussed at [[state:undermethylation]]; its biochemical definitions are inconsistent and measurement is rarely standardised."
     ],
     evidence: "established",
-    facts: { formula: "C15H22N6O5S (cation)", molarMass: "398.44 g/mol", chebi: "CHEBI:15414", pubchem: "CID 34755", hmdb: "HMDB0001185" },
+    facts: { formula: "C15H23N6O5S+ (cation; neutral zwitterion C15H22N6O5S)", molarMass: "399.45 g/mol (cation); 398.44 g/mol (zwitterion)", chebi: "CHEBI:15414", pubchem: "CID 34755", hmdb: "HMDB0001185" },
     relations: [
       { rel: "product-of", to: "enzyme:mat" },
       { rel: "substrate-of", to: "enzyme:gnmt" },

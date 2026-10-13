@@ -587,7 +587,7 @@ export default [
     aliases: ["Gastrina elevada", "Hypergastrinaemia"],
     summary: "Raised serum gastrin, most commonly from low acid (PPIs, atrophic gastritis), less often from gastrinoma; amino acids such as phenylalanine and tryptophan stimulate it, glycine did not in human tests.",
     body: [
-      "Antral G cells release [[compound:gastrin]] in response to peptides, amino acids, distension and alkaline pH, and are inhibited by acid via somatostatin. In humans, intragastric phenylalanine and tryptophan strongly raised gastrin and acid; glycine did not, even at 200 mM ([[claim:free-glycine-stimulates-gastrin]]). Chronic hypergastrinaemia commonly signals hypochlorhydria ([[disease:atrophic-gastritis]]). Educational only."
+      "Antral G cells release [[compound:gastrin]] in response to peptides, amino acids, distension and alkaline pH, and are inhibited by acid via somatostatin. In humans, intragastric phenylalanine and tryptophan strongly raised gastrin and acid; glycine did not (Taylor 1982; Wald 1982, 100 mM glycine, [[claim:free-glycine-stimulates-gastrin]]). Chronic hypergastrinaemia commonly signals hypochlorhydria ([[disease:atrophic-gastritis]]). Educational only."
     ],
     evidence: "established",
     relations: [

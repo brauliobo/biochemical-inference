@@ -186,13 +186,13 @@ export default [
     id: "claim:free-glycine-stimulates-gastrin",
     type: "claim",
     name: "Free glycine stimulates gastrin release",
-    summary: "Unsupported: in human tests glycine did not raise serum gastrin, even at 200 mM; phenylalanine and tryptophan are the potent amino-acid stimulants.",
+    summary: "Unsupported: in human tests glycine did not raise serum gastrin (Wald 1982); phenylalanine and tryptophan are the potent amino-acid stimulants of gastrin and acid (Taylor 1982).",
     statement: "Free glycine and short collagen peptides are potent stimulators of antral G cells, raising gastrin and therefore HCl secretion.",
     source: "conversation",
     status: "unsupported",
     evidence: "speculative",
     body: [
-      "Taylor et al. (1982) instilled individual L-amino acids into the stomachs of volunteers: phenylalanine and tryptophan stimulated acid, pancreatic polypeptide and gastrin significantly more than any other amino acid, whereas glycine had no effect on hormone release or acid, even at 200 mM ([[article:taylor-1982-amino-acids-gastric-acid]]). In a separate study, Wald and Adibi (1982) found that intragastric glycine raised acid output (5.6 vs 3.3 mmol/h) without any detectable change in serum gastrin, and attributed the effect to the rise in plasma glycine ([[article:wald-1982-glycine-gastric-acid]]).",
+      "Taylor et al. (1982) instilled individual L-amino acids into the stomachs of volunteers: phenylalanine and tryptophan stimulated acid, pancreatic polypeptide and gastrin significantly more than any other amino acid, whereas glycine was not among the amino acids that gave a significant response (only threonine and serine produced smaller, significant responses, for pancreatic polypeptide and acid respectively) ([[article:taylor-1982-amino-acids-gastric-acid]]). In a separate study, Wald and Adibi (1982) infused 100 mM glycine and found that it raised acid output (5.6 vs 3.3 mmol/h) without any detectable change in serum gastrin, and attributed the effect to the rise in plasma glycine ([[article:wald-1982-glycine-gastric-acid]]).",
       "So glycine may modestly affect acid, but not via a 'potent' gastrin effect, and the two studies disagree on whether it affects acid at all. Collagen, which lacks tryptophan, is also an unlikely strong secretagogue ([[claim:collagen-peptides-excess-gastrin-delay-emptying]])."
     ],
     relations: [

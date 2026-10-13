@@ -472,7 +472,7 @@ export default [
       ec: "1.5.1.5; 3.5.4.9; 6.3.4.3",
       uniprot: "P11586",
       rhea: "RHEA:22812; RHEA:23700; RHEA:20221",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200661; R-HSA-200718",
       kegg: "ec:6.3.4.3",
       compartment: "cytosol",
       tissue: "ubiquitous",

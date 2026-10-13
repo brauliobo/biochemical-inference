@@ -588,7 +588,7 @@ export default [
     facts: {
       ec: "1.5.1.5",
       rhea: "RHEA:22812",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200718",
       compartment: "cytosol"
     },
     reaction: {
@@ -596,7 +596,7 @@ export default [
       products: [{ id: "compound:5-10-methenyl-thf", n: 1 }, { id: "compound:nadph", n: 1 }],
       ec: "1.5.1.5",
       rhea: "RHEA:22812",
-      reactome: "R-HSA-200661",
+      reactome: "R-HSA-200718",
       reversible: true,
       compartment: "cytosol",
       enzymes: ["enzyme:mthfd1"]
