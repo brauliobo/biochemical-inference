@@ -978,7 +978,7 @@ export default [
     id: "enzyme:h-k-atpase",
     type: "enzyme",
     name: "Gastric H+/K+-ATPase (proton pump; ATP4A/ATP4B)",
-    aliases: ["ATP4A", "ATP4B", "bomba de prótons", "H+/K+ ATPase gástrica", "IBP", "omeprazol", "vonoprazana"],
+    aliases: ["ATP4A", "ATP4B", "bomba de prótons", "H+/K+ ATPase gástrica", "alvo dos IBPs", "alvo do omeprazol", "vonoprazana"],
     summary: "P-type ATPase of the parietal-cell canalicular membrane that exchanges cytosolic H+ for luminal K+ at the expense of ATP, acidifying gastric juice to pH ~1.",
     body: [
       "The gastric H+/K+-ATPase (alpha subunit ATP4A, beta subunit ATP4B) hydrolyses [[compound:atp]] to pump H+ into the secretory canaliculus in exchange for K+, producing a gradient of roughly a million-fold (cytosol pH ~7.2, lumen pH ~1; [[reaction:h-k-atpase-proton-pumping]]). Chloride follows through apical channels, completing [[compound:hydrochloric-acid]] secretion ([[reaction:gastric-hcl-secretion]], [[pathway:gastric-acid-secretion]]). The supply of protons comes from [[enzyme:carbonic-anhydrase]].",

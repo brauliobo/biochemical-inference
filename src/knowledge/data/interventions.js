@@ -159,7 +159,8 @@ export default [
       { rel: "increases", to: "compound:acetylcholine", note: "Plausible; evidence in adults with adequate intake weak" },
       { rel: "contraindicated-in", to: "disease:trimethylaminuria" },
       { rel: "aggravates", to: "disease:trimethylaminuria", note: "Adds substrate for TMA formation." },
-      { rel: "causes", to: "state:choline-excess", note: "Only when the dose exceeds the 3.5 g/day upper level of choline." }
+      { rel: "causes", to: "state:choline-excess", note: "Only when the dose exceeds the 3.5 g/day upper level of choline." },
+      { rel: "causes", to: "outcome:cholinergic-excess-symptoms", note: "Only at doses far above the 3.5 g/day upper level." }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"]
   },
@@ -178,7 +179,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:acetylcholine", note: "Plausible" },
-      { rel: "increases", to: "compound:tmao", note: "Smaller effect than free choline in some data; not settled" }
+      { rel: "increases", to: "compound:tmao", note: "Smaller effect than free choline in some data; not settled" },
+      { rel: "mitigates", to: "disease:choline-deficiency", note: "Supplies choline; about 40 % choline by mass." },
+      { rel: "associated-with", to: "pathway:acetylcholine-synthesis" }
     ]
   },
   {
@@ -196,7 +199,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:choline" },
       { rel: "increases", to: "compound:phosphatidylcholine", note: "Via Kennedy pathway in brain" },
-      { rel: "interacts-with", to: "pathway:kennedy-pathway" }
+      { rel: "interacts-with", to: "pathway:kennedy-pathway" },
+      { rel: "mitigates", to: "disease:choline-deficiency", note: "Supplies choline (about 20 % by mass) and cytidine." },
+      { rel: "associated-with", to: "pathway:acetylcholine-synthesis" }
     ]
   },
   {
@@ -352,7 +357,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:cyanocobalamin" },
       { rel: "decreases", to: "compound:methylmalonic-acid" },
-      { rel: "decreases", to: "compound:homocysteine" }
+      { rel: "decreases", to: "compound:homocysteine" },
+      { rel: "mitigates", to: "disease:vitamin-b12-deficiency" },
+      { rel: "mitigates", to: "state:hyperhomocysteinemia", note: "When raised homocysteine is due to B12 shortage." }
     ],
     refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -389,7 +396,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:magnesium" },
       { rel: "interacts-with", to: "enzyme:mat" },
-      { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" }
+      { rel: "interacts-with", to: "intervention:ppi-therapy", note: "Replaces PPI-associated magnesium depletion (adverse-effect mitigation)" },
+      { rel: "interacts-with", to: "intervention:magnesium-glycinate", note: "Alternative magnesium salts." },
+      { rel: "interacts-with", to: "intervention:magnesium-l-threonate", note: "Alternative magnesium salts." }
     ]
   },
   {
@@ -407,7 +416,9 @@ export default [
     relations: [
       { rel: "increases", to: "compound:magnesium" },
       { rel: "increases", to: "compound:glycine", note: "About 2.4 g glycine per 400 mg Mg" },
-      { rel: "mitigates", to: "outcome:night-waking", note: "Plausible via magnesium or glycine; evidence modest" }
+      { rel: "mitigates", to: "outcome:night-waking", note: "Plausible via magnesium or glycine; evidence modest" },
+      { rel: "interacts-with", to: "intervention:magnesium-malate" },
+      { rel: "interacts-with", to: "intervention:magnesium-l-threonate" }
     ]
   },
   {
@@ -607,7 +618,7 @@ export default [
     id: "intervention:ppi-therapy",
     type: "intervention",
     name: "Proton pump inhibitors (omeprazole, pantoprazole, esomeprazole, lansoprazole, rabeprazole)",
-    aliases: ["IBP", "inibidores da bomba de prótons", "omeprazol", "pantoprazol", "PPI", "proton pump inhibitor"],
+    aliases: ["IBP", "inibidores da bomba de prótons", "omeprazol", "pantoprazol", "PPI", "proton pump inhibitor", "inibidor da bomba de prótons"],
     summary: "Prodrugs that irreversibly block parietal-cell H+/K+-ATPase; first-line for ulcer, GERD and H. pylori regimens, with long-term effects on B12, magnesium and the upper-gut microbiome.",
     body: [
       "PPIs are acid-activated, form covalent sulfenamide bonds with the proton pump and suppress [[compound:hydrochloric-acid]] for 24 hours or more; acid recovers over 3-5 days as new pumps appear. Standard courses are 4 weeks for duodenal and 8 weeks for gastric ulcer, 14 days within [[intervention:h-pylori-eradication-therapy]], and 8 weeks for erosive oesophagitis; take 30-60 minutes before the first meal. Hypergastrinaemia is expected ([[compound:gastrin]]) and withdrawal produces rebound acid symptoms (Reimer 2009), so tapering is advisable.",
@@ -841,7 +852,9 @@ export default [
       { rel: "increases", to: "compound:sam" },
       { rel: "increases", to: "compound:sah", note: "After methyl transfer" },
       { rel: "aggravates", to: "state:overmethylation" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible; unproven for the state as defined clinically" }
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible; unproven for the state as defined clinically" },
+      { rel: "aggravates", to: "outcome:anxiety", note: "Agitation, insomnia and anxiety are recognised adverse effects in susceptible people." },
+      { rel: "mitigates", to: "outcome:low-sam-sah-ratio", note: "Raises SAM; clinical benefit is a separate question." }
     ]
   },
   {
@@ -937,7 +950,9 @@ export default [
     relations: [
       { rel: "contraindicated-in", to: "disease:peptic-ulcer" },
       { rel: "contraindicated-in", to: "disease:lpr" },
-      { rel: "associated-with", to: "state:hypochlorhydria", note: "Claims to detect it; not validated" }
+      { rel: "associated-with", to: "state:hypochlorhydria", note: "Claims to detect it; not validated" },
+      { rel: "associated-with", to: "outcome:heartburn", note: "Burning is the stop signal of the protocol." },
+      { rel: "contraindicated-in", to: "disease:esophagitis" }
     ]
   },
   {

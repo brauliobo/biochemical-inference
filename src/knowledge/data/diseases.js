@@ -28,7 +28,7 @@ export default [
     id: "disease:h-pylori-infection",
     type: "disease",
     name: "Helicobacter pylori infection",
-    aliases: ["Infecção por H. pylori", "Helicobacter pylori", "H. pylori gastritis"],
+    aliases: ["Infecção por H. pylori", "Helicobacter pylori", "H. pylori gastritis", "H. pylori", "Helicobacter"],
     summary: "Chronic gastric infection by a urease-producing bacterium, causing gastritis, ulcers, atrophy and gastric cancer risk; treated with PPI-based antibiotic regimens and confirmed by test of cure.",
     body: [
       "The bacterium survives acid by producing urease, which hydrolyses urea into ammonia and [[compound:carbon-dioxide]] and buffers its microenvironment. The same reaction is the basis of the urea breath test. Roughly 40-45% of people worldwide are infected in systematic reviews, often without symptoms. Chronic infection can cause antral gastritis and duodenal ulcers (high acid) or corpus atrophy with [[state:hypochlorhydria]] ([[disease:atrophic-gastritis]]), and is the principal risk factor for gastric cancer.",

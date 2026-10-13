@@ -765,7 +765,9 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:methylcobalamin" },
       { rel: "precursor-of", to: "compound:adenosylcobalamin" },
-      { rel: "part-of", to: "compound:vitamin-b12" }
+      { rel: "part-of", to: "compound:vitamin-b12" },
+      { rel: "mitigates", to: "disease:vitamin-b12-deficiency", note: "Standard, inexpensive supplement form; converted to active forms in cells." },
+      { rel: "decreases", to: "compound:methylmalonic-acid", note: "Falls with effective B12 repletion." }
     ],
     refs: ["article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -841,7 +843,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "Hypothesised link only" },
       { rel: "interacts-with", to: "compound:plp", note: "Proposed binding of pyridoxal" },
-      { rel: "interacts-with", to: "compound:zinc", note: "Proposed co-depletion" }
+      { rel: "interacts-with", to: "compound:zinc", note: "Proposed co-depletion" },
+      { rel: "measured-by", to: "outcome:urinary-hpl", note: "The assay is non-specific and its link to symptoms is disputed." },
+      { rel: "associated-with", to: "disease:pyroluria-kpu" }
     ]
   },
   {
@@ -1213,7 +1217,10 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:trimethylamine", note: "Via gut microbial CntA/B" },
       { rel: "associated-with", to: "compound:methionine", note: "Biosynthesis uses lysine and methionine-derived SAM methyls" },
-      { rel: "interacts-with", to: "compound:sam", note: "Biosynthesis consumes three methyls" }
+      { rel: "interacts-with", to: "compound:sam", note: "Biosynthesis consumes three methyls" },
+      { rel: "part-of", to: "pathway:tma-tmao-axis", note: "Gut bacteria can cleave carnitine to TMA." },
+      { rel: "interacts-with", to: "system:gut-microbiota" },
+      { rel: "associated-with", to: "disease:cardiovascular-disease", note: "Carnitine-TMAO link reported in cohorts and mice; causality debated." }
     ],
     refs: ["article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },
@@ -1307,7 +1314,9 @@ export default [
     relations: [
       { rel: "part-of", to: "compound:collagen" },
       { rel: "precursor-of", to: "compound:glycine", note: "Negligible at 40 mg doses" },
-      { rel: "associated-with", to: "intervention:type-ii-collagen" }
+      { rel: "associated-with", to: "intervention:type-ii-collagen" },
+      { rel: "associated-with", to: "disease:osteoarthritis" },
+      { rel: "associated-with", to: "pathway:collagen-synthesis" }
     ],
     refs: ["article:lugo-2016-uc-ii-knee-osteoarthritis"]
   },
@@ -1586,7 +1595,8 @@ export default [
     relations: [
       { rel: "increases", to: "system:bile", note: "Choleretic effect" },
       { rel: "mitigates", to: "state:gastric-dysmotility", note: "Dyspepsia symptom trial evidence" },
-      { rel: "part-of", to: "intervention:artichoke-leaf-extract" }
+      { rel: "part-of", to: "intervention:artichoke-leaf-extract" },
+      { rel: "associated-with", to: "disease:functional-dyspepsia", note: "Extract trial in dyspepsia; the role of cynarin itself is untested." }
     ],
     refs: ["article:holtmann-2003-artichoke-leaf-functional-dyspepsia"]
   },
@@ -1605,7 +1615,9 @@ export default [
     relations: [
       { rel: "causes", to: "outcome:tachycardia", note: "Palpitations or arrhythmia via hypokalaemia with excess intake (rare)" },
       { rel: "part-of", to: "intervention:dgl-licorice", note: "Removed (mostly) in DGL; residual amount matters in hypertension or hypokalaemia" },
-      { rel: "associated-with", to: "disease:peptic-ulcer", note: "Licorice derivative carbenoxolone was an ulcer drug but caused mineralocorticoid effects" }
+      { rel: "associated-with", to: "disease:peptic-ulcer", note: "Licorice derivative carbenoxolone was an ulcer drug but caused mineralocorticoid effects" },
+      { rel: "associated-with", to: "outcome:ulcer-healing", note: "Licorice derivatives were used for ulcers; DGL removes most glycyrrhizin." },
+      { rel: "interacts-with", to: "compound:prostaglandin-e2" }
     ],
     refs: ["article:isbrucker-2006-licorice-glycyrrhizin-safety"]
   },
@@ -1624,7 +1636,9 @@ export default [
     relations: [
       { rel: "decreases", to: "disease:sibo", note: "Small, low-quality trial evidence" },
       { rel: "interacts-with", to: "system:gut-microbiota" },
-      { rel: "part-of", to: "intervention:berberine-supplement" }
+      { rel: "part-of", to: "intervention:berberine-supplement" },
+      { rel: "interacts-with", to: "intervention:oregano-oil", note: "Combined in herbal antimicrobial regimens for suspected SIBO." },
+      { rel: "associated-with", to: "outcome:breath-hydrogen-methane", note: "Herbal-versus-rifaximin study used breath-test normalisation." }
     ],
     refs: ["article:chedid-2014-herbal-vs-rifaximin"]
   },
@@ -1642,7 +1656,10 @@ export default [
     relations: [
       { rel: "mitigates", to: "disease:gerd" },
       { rel: "mitigates", to: "disease:lpr", note: "Plausible; modest evidence" },
-      { rel: "interacts-with", to: "compound:pepsin", note: "In vitro binding" }
+      { rel: "interacts-with", to: "compound:pepsin", note: "In vitro binding" },
+      { rel: "part-of", to: "intervention:sodium-alginate" },
+      { rel: "decreases", to: "outcome:reflux-episodes", note: "Raft impedes reflux without lowering acid; clinical effect sizes vary." },
+      { rel: "interacts-with", to: "compound:hydrochloric-acid", note: "Gels on contact with acid." }
     ],
     refs: ["article:leiman-2017-alginate-meta-analysis"]
   },
@@ -1726,7 +1743,9 @@ export default [
         rel: "decreases",
         to: "enzyme:h-k-atpase",
         note: "A flavonoid-rich fraction inhibited H+/K+-ATPase activity in rats; not shown in people."
-      }
+      },
+      { rel: "associated-with", to: "outcome:ulcer-healing" },
+      { rel: "associated-with", to: "pathway:gastric-acid-secretion" }
     ],
     refs: ["article:baggio-2007-maytenus-ilicifolia-gastroprotection"]
   },

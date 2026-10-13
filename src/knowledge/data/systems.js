@@ -5,7 +5,7 @@ export default [
     id: "system:vagal-tone",
     type: "system",
     name: "Vagal tone (parasympathetic control)",
-    aliases: ["Tônus vagal", "Nervo vago", "Vagus nerve activity", "Parasympathetic tone"],
+    aliases: ["Tônus vagal", "Nervo vago", "Vagus nerve activity", "Parasympathetic tone", "vago"],
     summary: "Activity of the vagus nerve, which releases acetylcholine to slow the heart, drive gastric acid secretion and antral contractions, coordinate the LES and relax the pylorus; measured indirectly (HRV).",
     body: [
       "Vagal efferents release [[compound:acetylcholine]] onto M2 receptors in the sinoatrial node ([[system:cardiac-autonomic-control]]) and onto stomach nerves and parietal cells ([[pathway:gastric-acid-secretion]], [[system:gastric-physiology]]). The vagus also coordinates swallowing-related relaxation and vago-vagal reflexes of the [[system:lower-esophageal-sphincter]]. Vagal tone is commonly estimated from heart-rate variability.",
@@ -25,7 +25,7 @@ export default [
     id: "system:gastric-physiology",
     type: "system",
     name: "Gastric physiology (stomach)",
-    aliases: ["Fisiologia gástrica", "Stomach", "Estômago", "Gastric secretion and motility"],
+    aliases: ["Fisiologia gástrica", "Stomach", "Estômago", "Gastric secretion and motility", "fundo gástrico", "antro gástrico"],
     summary: "The stomach's functions: acid and pepsin secretion, mucus-bicarbonate protection, storage and mixing, and regulated emptying into the duodenum under vagal, hormonal and enteric control.",
     body: [
       "Parietal cells secrete [[compound:hydrochloric-acid]] (stimulated by gastrin, histamine, acetylcholine; inhibited by somatostatin and duodenal feedback), chief cells release pepsinogen, which acid converts to [[compound:pepsin]], and G cells release [[compound:gastrin]] ([[pathway:gastric-acid-secretion]]). The fundus accommodates, the antrum grinds, and the [[system:pylorus]] meters emptying. The fasting stomach hosts migrating motor complexes that sweep residue into the small intestine.",
@@ -270,7 +270,8 @@ export default [
       { rel: "associated-with", to: "outcome:delayed-gastric-emptying" },
       { rel: "interacts-with", to: "system:vagal-tone" },
       { rel: "associated-with", to: "system:duodenum" },
-      { rel: "associated-with", to: "system:bile" }
+      { rel: "associated-with", to: "system:bile" },
+      { rel: "causes", to: "state:duodenogastric-reflux", note: "An incompetent or resected pylorus lets bile reflux into the stomach." }
     ],
     refs: ["article:browning-2014-vagal-control-gi"]
   },

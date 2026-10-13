@@ -269,7 +269,8 @@ export default [
     relations: [
       { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
       { rel: "associated-with", to: "system:pylorus" },
-      { rel: "associated-with", to: "outcome:elevated-gastric-ph" }
+      { rel: "associated-with", to: "outcome:elevated-gastric-ph" },
+      { rel: "associated-with", to: "outcome:transient-les-relaxations" }
     ]
   },
   {
@@ -297,7 +298,7 @@ export default [
     id: "claim:belching-mostly-swallowed-air",
     type: "claim",
     name: "Most belching is swallowed air; supragastric belching is a behaviour",
-    aliases: ["arroto é principalmente ar engolido"],
+    aliases: ["arroto é principalmente ar engolido", "ar engolido", "aerofagia"],
     summary: "Supported (literature): excessive belching is usually swallowed air vented via gastric or supragastric mechanisms, diagnosed by impedance and treated with diaphragmatic breathing or CBT.",
     statement: "Excessive belching in most patients reflects swallowed air expelled by gastric belching or by supragastric belching; chemical or bacterial gas is a minor contributor.",
     source: "literature",
@@ -484,7 +485,7 @@ export default [
     id: "claim:collagen-ii-33-percent-glycine",
     type: "claim",
     name: "Collagen type II is about 33% glycine (Gly-X-Y)",
-    aliases: ["colágeno tipo 2 tem 33% de glicina"],
+    aliases: ["colágeno tipo 2 tem 33% de glicina", "colágeno 33% glicina"],
     summary: "Supported with nuance: every third collagen residue is glycine (one third by count, about a fifth to a quarter by mass), so 10 g collagen peptides give around 2-3 g glycine.",
     statement: "Type II collagen has a repetitive Gly-X-Y primary structure in which every third amino acid is glycine, about 33% of its amino-acid composition.",
     source: "conversation",
@@ -498,7 +499,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:collagen" },
       { rel: "associated-with", to: "compound:glycine" },
-      { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" }
+      { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" },
+      { rel: "associated-with", to: "intervention:type-ii-collagen" },
+      { rel: "associated-with", to: "compound:collagen-type-ii" }
     ]
   },
   {
@@ -581,7 +584,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "intervention:p5p-supplement" },
       { rel: "associated-with", to: "compound:plp" },
-      { rel: "associated-with", to: "compound:pyridoxine" }
+      { rel: "associated-with", to: "compound:pyridoxine" },
+      { rel: "associated-with", to: "pathway:vitamin-b6-activation" },
+      { rel: "associated-with", to: "enzyme:pdxk" }
     ]
   },
   {
@@ -759,7 +764,7 @@ export default [
     id: "claim:glycine-deficit-10g",
     type: "claim",
     name: "Endogenous glycine synthesis leaves a deficit of about 10 g/day",
-    aliases: ["déficit de glicina de 10 g por dia"],
+    aliases: ["déficit de glicina de 10 g por dia", "10 g de glicina por dia"],
     summary: "Contested: Melendez-Hevia et al. (2009) estimate a shortfall of about 10 g/day for a 70 kg adult, but the figure is model-based and glycine is classed non-essential in mainstream references.",
     statement: "Endogenous synthesis (about 3 g/day) plus an average diet does not meet total glycine demand (collagen, elastin, glutathione), leaving a deficit of about 10 g/day.",
     source: "conversation",
@@ -773,14 +778,16 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:glycine-insufficiency" },
       { rel: "associated-with", to: "compound:glycine" },
-      { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" }
+      { rel: "associated-with", to: "outcome:collagen-synthesis-adequacy" },
+      { rel: "associated-with", to: "intervention:glycine-powder" },
+      { rel: "associated-with", to: "pathway:glycine-serine-route" }
     ]
   },
   {
     id: "claim:choline-28-35g-for-10g-glycine",
     type: "claim",
     name: "About 28-35 g of choline per day would be needed to make 10 g of glycine",
-    aliases: ["28 a 35 g de colina para 10 g de glicina"],
+    aliases: ["28 a 35 g de colina para 10 g de glicina", "colina para 10 g de glicina", "70 a 85 g de bitartarato"],
     summary: "Partly supported: the stoichiometry is right (about 13.9 g choline for 10 g glycine), but the 40-50% conversion factor is unsourced; the practical conclusion that choline cannot fill the gap holds.",
     statement: "Making 10 g glycine requires 13.9 g choline at 1:1; with 40-50% hepatic conversion to betaine/glycine, you would need 28-35 g/day choline (70-85 g of choline bitartrate).",
     source: "conversation",
@@ -801,7 +808,7 @@ export default [
     id: "claim:choline-ul-3-5g-iom-efsa",
     type: "claim",
     name: "The choline UL is 3.5 g/day (IOM and EFSA)",
-    aliases: ["limite superior de colina de 3,5 g"],
+    aliases: ["limite superior de colina de 3,5 g", "UL da colina", "limite superior tolerável de colina"],
     summary: "Partly supported: the IOM UL is 3.5 g/day; EFSA (2016) set an adequate intake of 400 mg/day but did not derive a UL, so attributing 3.5 g to EFSA is incorrect.",
     statement: "The Tolerable Upper Intake Level established by the Institute of Medicine and EFSA for adults is 3,500 mg of elemental choline per day.",
     source: "conversation",
@@ -879,7 +886,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "intervention:betaine-anhydrous" },
       { rel: "associated-with", to: "intervention:betaine-hcl" },
-      { rel: "associated-with", to: "compound:betaine" }
+      { rel: "associated-with", to: "compound:betaine" },
+      { rel: "associated-with", to: "outcome:heartburn" },
+      { rel: "associated-with", to: "enzyme:bhmt" }
     ]
   },
   {
@@ -984,7 +993,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "disease:lpr" },
       { rel: "associated-with", to: "outcome:throat-burning" },
-      { rel: "associated-with", to: "outcome:reflux-episodes" }
+      { rel: "associated-with", to: "outcome:reflux-episodes" },
+      { rel: "associated-with", to: "outcome:salivary-pepsin" },
+      { rel: "associated-with", to: "system:larynx-pharynx" }
     ]
   },
   {
@@ -1025,7 +1036,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "system:larynx-pharynx" },
       { rel: "associated-with", to: "system:mucosal-barrier" },
-      { rel: "associated-with", to: "disease:lpr" }
+      { rel: "associated-with", to: "disease:lpr" },
+      { rel: "associated-with", to: "outcome:throat-burning" },
+      { rel: "associated-with", to: "compound:pepsin" }
     ]
   },
   {
@@ -1046,7 +1059,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "intervention:sodium-alginate" },
       { rel: "associated-with", to: "disease:lpr" },
-      { rel: "associated-with", to: "disease:gerd" }
+      { rel: "associated-with", to: "disease:gerd" },
+      { rel: "associated-with", to: "outcome:throat-burning" },
+      { rel: "associated-with", to: "compound:alginate" }
     ]
   },
   {
@@ -1067,7 +1082,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:pepsin" },
       { rel: "associated-with", to: "compound:bicarbonate" },
-      { rel: "associated-with", to: "disease:lpr" }
+      { rel: "associated-with", to: "disease:lpr" },
+      { rel: "associated-with", to: "outcome:throat-burning" },
+      { rel: "associated-with", to: "intervention:bicarbonate-rinse" }
     ]
   },
   {
@@ -1129,7 +1146,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:hyperhomocysteinemia" },
       { rel: "associated-with", to: "disease:cardiovascular-disease" },
-      { rel: "associated-with", to: "outcome:elevated-homocysteine" }
+      { rel: "associated-with", to: "outcome:elevated-homocysteine" },
+      { rel: "associated-with", to: "intervention:homocysteine-mma-testing" },
+      { rel: "associated-with", to: "compound:homocysteine" }
     ]
   },
   {
@@ -1173,7 +1192,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:glutamine" },
       { rel: "associated-with", to: "intervention:l-glutamine-supplement" },
-      { rel: "associated-with", to: "system:duodenum" }
+      { rel: "associated-with", to: "system:duodenum" },
+      { rel: "associated-with", to: "system:mucosal-barrier" },
+      { rel: "associated-with", to: "outcome:ulcer-healing" }
     ],
     refs: ["article:reeds-2001-glutamine-and-the-bowel"]
   },
@@ -1218,7 +1239,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "intervention:dgl-licorice" },
       { rel: "associated-with", to: "compound:glycyrrhizin" },
-      { rel: "associated-with", to: "claim:dgl-ulcer-healing" }
+      { rel: "associated-with", to: "claim:dgl-ulcer-healing" },
+      { rel: "associated-with", to: "system:mucosal-barrier" },
+      { rel: "associated-with", to: "compound:gastric-mucus" }
     ],
     refs: ["article:isbrucker-2006-licorice-glycyrrhizin-safety"]
   },
@@ -1244,7 +1267,9 @@ export default [
         to: "claim:glycine-well-tolerated-in-trials",
         note: "Trial tolerability data pull the other way on how common it is."
       },
-      { rel: "associated-with", to: "intervention:type-ii-collagen" }
+      { rel: "associated-with", to: "intervention:type-ii-collagen" },
+      { rel: "associated-with", to: "pathway:gut-bacterial-glycine-fates" },
+      { rel: "associated-with", to: "outcome:belching" }
     ]
   },
   {
@@ -1264,7 +1289,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "intervention:amino-acids-with-meals" },
       { rel: "associated-with", to: "intervention:glycine-powder" },
-      { rel: "associated-with", to: "outcome:belching" }
+      { rel: "associated-with", to: "outcome:belching" },
+      { rel: "associated-with", to: "outcome:glycine-intolerance" },
+      { rel: "associated-with", to: "compound:glycine" }
     ]
   },
   {
@@ -1284,7 +1311,8 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:choline" },
       { rel: "associated-with", to: "state:choline-excess" },
-      { rel: "associated-with", to: "intervention:dietary-choline-sources" }
+      { rel: "associated-with", to: "intervention:dietary-choline-sources" },
+      { rel: "associated-with", to: "compound:betaine" }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri", "article:blusztajn-2017-choline-brain"]
   },

@@ -278,7 +278,7 @@ export default [
     id: "outcome:glycine-intolerance",
     type: "outcome",
     name: "Glycine intolerance (GI side effects)",
-    aliases: ["Intolerância à glicina", "Gas and belching on glycine powder", "Glycine powder GI upset"],
+    aliases: ["Intolerância à glicina", "Gas and belching on glycine powder", "Glycine powder GI upset", "gases com glicina", "glicina causa arrotos"],
     summary: "Upper-GI symptoms such as belching, nausea or soft stool after taking glycine powder, reported at high doses and anecdotally at 2-3 g; mechanisms and prevalence are unmeasured.",
     body: [
       "Trials of glycine at 3 g before bed for sleep reported no major problems ([[outcome:improved-sleep-quality]]), and schizophrenia trials used 15-60 g/day with mild upper-GI discomfort in some. No study has characterised belching on 2-3 g, so possible causes (swallowed air while dissolving a sweet powder, hyperosmolar drinking, taste, nausea, sensitivity) cannot be ranked, and the conversation's specific chain through gastrin, bicarbonate and SIBO is not supported ([[claim:free-glycine-stimulates-gastrin]], [[claim:sibo-bacteria-metabolize-glycine-co2-nh3]]). Taking glycine with food is a common suggestion without controlled data ([[intervention:amino-acids-with-meals|glycine with meals]]). Educational only."
@@ -305,7 +305,10 @@ export default [
     relations: [
       { rel: "associated-with", to: "state:undermethylation" },
       { rel: "associated-with", to: "state:overmethylation" },
-      { rel: "associated-with", to: "compound:sam" }
+      { rel: "associated-with", to: "compound:sam" },
+      { rel: "associated-with", to: "compound:sah", note: "SAH inhibits DNA methyltransferases." },
+      { rel: "associated-with", to: "pathway:methionine-cycle" },
+      { rel: "associated-with", to: "pathway:folate-cycle" }
     ]
   },
   {
@@ -442,7 +445,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:acetylcholine" },
       { rel: "associated-with", to: "compound:choline" },
-      { rel: "associated-with", to: "state:choline-excess" }
+      { rel: "associated-with", to: "state:choline-excess" },
+      { rel: "associated-with", to: "system:vagal-tone" },
+      { rel: "associated-with", to: "system:enteric-nervous-system" }
     ],
     refs: ["article:iom-1998-choline-dri"]
   },
@@ -545,7 +550,9 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:trimethylamine" },
       { rel: "associated-with", to: "compound:tmao" },
-      { rel: "associated-with", to: "disease:trimethylaminuria" }
+      { rel: "associated-with", to: "disease:trimethylaminuria" },
+      { rel: "associated-with", to: "pathway:tma-tmao-axis" },
+      { rel: "associated-with", to: "system:liver" }
     ],
     refs: ["article:mackay-2011-trimethylaminuria"]
   },
@@ -561,7 +568,9 @@ export default [
     evidence: "speculative",
     relations: [
       { rel: "associated-with", to: "disease:pyroluria-kpu" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency" },
+      { rel: "associated-with", to: "compound:zinc" },
+      { rel: "associated-with", to: "compound:kryptopyrrole" }
     ]
   },
   {

@@ -82,7 +82,7 @@ export default [
     id: "pathway:choline-oxidation",
     type: "pathway",
     name: "Choline oxidation to betaine and glycine",
-    aliases: ["oxidação da colina", "colina → betaína → glicina", "via da betaína", "via colina-TMG-glicina", "catabolismo da betaína"],
+    aliases: ["oxidação da colina", "colina → betaína → glicina", "via da betaína", "via colina-TMG-glicina", "catabolismo da betaína", "colina para glicina", "colina em glicina"],
     summary: "Mitochondrial and cytosolic route in liver and kidney that oxidises choline to betaine, then strips its three methyl groups (BHMT, DMGDH, SARDH), leaving glycine.",
     body: [
       "In plain words: this is the route by which the body turns choline into betaine and then, step by step, into glycine, handing out three methyl groups on the way: one to homocysteine and two to the folate pool. It happens inside liver and kidney cells, which is why the source conversation calls glycine made this way \"clean\": it never meets the gut. How much glycine it can realistically supply is limited, because most choline goes to membranes and acetylcholine.",
@@ -203,7 +203,7 @@ export default [
     id: "pathway:glycine-serine-route",
     type: "pathway",
     name: "Endogenous glycine biosynthesis (serine route and choline-derived route)",
-    aliases: ["biossíntese de glicina", "via da serina", "síntese endógena de glicina", "glicina endógena", "fonte limpa de glicina"],
+    aliases: ["biossíntese de glicina", "via da serina", "síntese endógena de glicina", "glicina endógena", "fonte limpa de glicina", "glicina limpa", "glicina endógena limpa"],
     summary: "Glycine is made from serine (from 3-phosphoglycerate via PHGDH/PSAT1/PSPH) by SHMT and from choline via betaine, DMG and sarcosine; synthesis (~3 g/day) is argued to fall short of demand.",
     body: [
       "Serine is synthesised from the glycolytic intermediate [[compound:3-phosphoglycerate]] by [[enzyme:phgdh]], [[enzyme:psat1]] (a [[compound:plp]] enzyme) and [[enzyme:psph]], and converted to [[compound:glycine]] with transfer of one carbon to THF by [[enzyme:shmt1]] (cytosol) and [[enzyme:shmt2]] (mitochondria) ([[reaction:shmt-serine-glycine-interconversion]]). A second route runs through choline oxidation: betaine to dimethylglycine to sarcosine to glycine ([[pathway:choline-oxidation]]); sarcosine is also produced by [[enzyme:gnmt]] and returned to glycine by [[enzyme:sardh]]. Minor routes include threonine degradation and glyoxylate transamination.",

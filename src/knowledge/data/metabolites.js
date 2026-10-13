@@ -116,9 +116,9 @@ export default [
   {
     id: "compound:pyrophosphate",
     type: "compound",
-    name: "Pyrophosphate (diphosphate, PPi)",
-    aliases: ["PPi", "diphosphate", "pirofosfato"],
-    summary: "Two linked phosphates released when ATP or CTP is cleaved to the monophosphate; its hydrolysis by pyrophosphatases drives nucleotidyl-transfer steps forward.",
+    name: "Pyrophosphate (diphosphate, inorganic)",
+    aliases: ["diphosphate", "pirofosfato", "inorganic pyrophosphate"],
+    summary: "Pyrophosphate (PPi, not the drug class PPI): two linked phosphates released when ATP or CTP is cleaved; its hydrolysis by pyrophosphatases drives nucleotidyl-transfer steps forward.",
     body: [
       "PPi is a by-product of [[reaction:mat-sam-synthesis]] (alongside phosphate), of CTP-dependent activation in [[reaction:pcyt1a-cdp-choline-synthesis]] and [[reaction:pcyt2-cdp-ethanolamine-synthesis]], and of bile-acid activation ([[reaction:bacs-cholate-coa-ligation]]). Rapid cleavage to two phosphates makes these steps effectively irreversible."
     ],
@@ -196,7 +196,9 @@ export default [
     evidence: "established",
     facts: { formula: "C9H14N3O8P", molarMass: "323.20 g/mol", chebi: "CHEBI:17361", pubchem: "CID 6131" },
     relations: [
-      { rel: "part-of", to: "pathway:kennedy-pathway", note: "By-product of the phosphotransferase steps" }
+      { rel: "part-of", to: "pathway:kennedy-pathway", note: "By-product of the phosphotransferase steps" },
+      { rel: "product-of", to: "enzyme:chpt1" },
+      { rel: "product-of", to: "enzyme:selenoi" }
     ],
     refs: ["article:kennedy-1956-cytidine-coenzymes"]
   },
@@ -339,7 +341,9 @@ export default [
     evidence: "established",
     facts: { class: "protein cofactor (redox)", uniprot: "P10599 (human TXN)" },
     relations: [
-      { rel: "associated-with", to: "compound:thioredoxin-dithiol", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:thioredoxin-dithiol", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:bacterial-glycine-reductase" },
+      { rel: "part-of", to: "pathway:gut-bacterial-glycine-fates" }
     ],
     refs: ["article:lu-2014-thioredoxin-system"]
   },
@@ -373,7 +377,10 @@ export default [
     evidence: "established",
     facts: { class: "flavoprotein (FAD + AMP)", uniprot: "P13804 (ETFA); P38117 (ETFB)", compartment: "mitochondrial matrix" },
     relations: [
-      { rel: "associated-with", to: "compound:etf-oxidized", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:etf-oxidized", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:dmgdh" },
+      { rel: "product-of", to: "enzyme:sardh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ],
     refs: ["article:watmough-2010-etf-qo"]
   },
@@ -390,7 +397,9 @@ export default [
     evidence: "plausible",
     facts: { class: "generic placeholder", "reduced-form": "compound:hydrogen-acceptor-reduced" },
     relations: [
-      { rel: "associated-with", to: "compound:hydrogen-acceptor-reduced", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:hydrogen-acceptor-reduced", note: "Redox partner" },
+      { rel: "substrate-of", to: "enzyme:chdh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ]
   },
   {
@@ -406,7 +415,9 @@ export default [
     evidence: "plausible",
     facts: { class: "generic placeholder" },
     relations: [
-      { rel: "associated-with", to: "compound:hydrogen-acceptor", note: "Redox partner" }
+      { rel: "associated-with", to: "compound:hydrogen-acceptor", note: "Redox partner" },
+      { rel: "product-of", to: "enzyme:chdh" },
+      { rel: "part-of", to: "pathway:choline-oxidation" }
     ]
   },
   // ------------------------------------------------------------------ carbon units and folates
@@ -815,7 +826,8 @@ export default [
     summary: "O-methylated, largely inactive metabolite of dopamine formed by COMT; further oxidised by MAO to homovanillic acid.",
     body: [
       "Produced in [[reaction:comt-dopamine-methylation]], 3-MT leaves [[compound:sah]] as the co-product of the SAM-dependent methylation. Plasma or urinary 3-MT is a research marker of dopamine turnover and a useful tumour marker for dopamine-secreting paragangliomas.",
-      "It is not a measure of methylation capacity."
+      "It is not a measure of methylation capacity.",
+      "COMT is one of the many SAM-dependent sinks in the [[pathway:methyl-budget]], though a small one compared with [[enzyme:pemt]] and creatine synthesis ([[pathway:creatine-synthesis]])."
     ],
     evidence: "established",
     facts: { formula: "C9H13NO2", molarMass: "167.20 g/mol", chebi: "CHEBI:1582", pubchem: "CID 1669" },
@@ -1002,7 +1014,8 @@ export default [
     summary: "First complete purine nucleotide of de novo synthesis and the precursor of AMP and GMP; two of its ten synthetic steps take a formyl group from 10-formyl-THF.",
     body: [
       "IMP is assembled step by step on a ribose phosphate scaffold. Two of the steps (the GART and ATIC transformylase activities) take a formyl unit from [[compound:10-formyl-thf]], so each IMP consumes two folate-carried one-carbon units ([[pathway:nucleotide-synthesis]]). It is then converted to [[compound:amp]] and to GMP, the purines of DNA and RNA.",
-      "It appears here as a bookkeeping node: the source conversation mentions purine synthesis only as one destination of the mitochondrial one-carbon pool."
+      "It appears here as a bookkeeping node: the source conversation mentions purine synthesis only as one destination of the mitochondrial one-carbon pool.",
+      "Folate or B12 shortage ([[state:folate-trap]]) slows this branch together with thymidylate synthesis ([[reaction:tyms-thymidylate-synthesis]])."
     ],
     evidence: "established",
     facts: { formula: "C10H13N4O8P", molarMass: "348.21 g/mol", chebi: "CHEBI:17202", pubchem: "CID 135398640" },

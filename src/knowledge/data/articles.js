@@ -10062,7 +10062,8 @@ export default [
     ],
     "summary": "Small double-blind trial in 20 drug-free acutely ill patients: sarcosine 2 g/day gave more responders than 1 g/day, with no significant dose-by-time difference; well tolerated.",
     "body": [
-      "Sarcosine, a glycine transporter-1 inhibitor, was tested as a primary treatment for acute schizophrenia in a six-week study with only two active dose arms and no placebo. The 2 g group had more responders, but the formal dose-by-time interaction was not significant, so the study cannot show efficacy of [[compound:sarcosine]]."
+      "Sarcosine, a glycine transporter-1 inhibitor, was tested as a primary treatment for acute schizophrenia in a six-week study with only two active dose arms and no placebo. The 2 g group had more responders, but the formal dose-by-time interaction was not significant, so the study cannot show efficacy of [[compound:sarcosine]].",
+      "Relevance here: sarcosine is the product of [[enzyme:gnmt]] and the intermediate that [[enzyme:sardh]] converts back to [[compound:glycine]]. This small tolerability dataset is the nearest human information on dosing sarcosine at gram scale, which bears on whether sarcosine accumulation after glycine would matter ([[outcome:sarcosine-elevation]])."
     ],
     "evidence": "speculative",
     "authors": [
@@ -10799,7 +10800,11 @@ export default [
     ],
     "facts": {
       "design": "review"
-    }
+    },
+    "relations": [
+      { "rel": "evidence-for", "to": "pathway:migrating-motor-complex", "note": "Enteric circuits generate and integrate motility patterns." },
+      { "rel": "evidence-for", "to": "state:gastric-dysmotility", "note": "Enteric neuropathies such as gastroparesis cause dysmotility." }
+    ]
   },
   {
     "id": "article:mato-2008-methionine-metabolism-liver",

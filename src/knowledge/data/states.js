@@ -236,7 +236,7 @@ export default [
     id: "state:post-ulcer-mucosal-recovery",
     type: "state",
     name: "Post-ulcer mucosal recovery",
-    aliases: ["Recuperação mucosa pós-úlcera", "Healed ulcer mucosa", "Mucosa gastroduodenal em cicatrização"],
+    aliases: ["Recuperação mucosa pós-úlcera", "Healed ulcer mucosa", "Mucosa gastroduodenal em cicatrização", "pós-úlcera", "mucosa pós-úlcera"],
     summary: "The weeks to months after an ulcer is treated, when epithelium and mucus-bicarbonate barrier regenerate; acid exposure, NSAIDs, H. pylori persistence and irritants matter and symptoms may linger.",
     body: [
       "Ulcer healing is driven by cause removal (eradicating [[disease:h-pylori-infection]], stopping NSAIDs) and acid suppression, which allows epithelial restitution and rebuilds the [[system:mucosal-barrier]]. Symptom resolution and endoscopic healing do not always coincide, and residual gastritis or duodenitis may cause burning with irritating foods or supplements. Guidelines recommend confirming H. pylori eradication after therapy ([[claim:confirm-h-pylori-eradication]]).",
@@ -325,7 +325,8 @@ export default [
         rel: "associated-with",
         to: "outcome:reflux-episodes",
         note: "Bile-containing reflux is detected by bilirubin and impedance monitoring."
-      }
+      },
+      { rel: "causes", to: "disease:gastritis", note: "Bile reflux gastritis, mainly after gastric surgery or with pyloric incompetence." }
     ],
     refs: ["article:fein-2006-duodenogastric-reflux-gord", "article:stefaniwsky-1985-udca-alkaline-reflux-gastritis"]
   }

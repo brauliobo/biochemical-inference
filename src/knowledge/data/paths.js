@@ -148,7 +148,7 @@ export default [
       { id: 'compound:5-mthf', why: 'The active folate that enters the methionine cycle directly.' },
       { id: 'claim:folic-acid-competes-with-methylfolate', why: 'How strong the idea is that folic acid slows methylation.' },
       { id: 'compound:pyridoxine', why: 'Conventional B6, which the liver must phosphorylate.' },
-      { id: 'compound:plp', why: 'P5P, the active B6 coenzyme.' },
+      { id: 'compound:plp', why: 'P5P, the active B6 coenzyme, needs no liver phosphorylation step.' },
       { id: 'intervention:choline-bitartrate', why: 'A choline salt, about 41 % choline by mass.' },
       { id: 'intervention:phosphatidylcholine-supplement', why: 'Phospholipid choline, absorbed through pancreatic and mucosal enzymes.' },
       { id: 'claim:alpha-gpc-pc-absorbed-without-acid', why: 'What is and is not known about acid-independent absorption of these forms.' }
