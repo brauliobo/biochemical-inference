@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { ODE_MODEL } from '../../server/portfolio/registry.js'
 import { modelDigest } from '../../server/portfolio/identity.js'
 import { workspaceSpecification } from '../fixtures/workspace.js'
@@ -137,5 +138,14 @@ describe('ExperimentWorkspace', () => {
     await fireEvent.click(next)
     await waitFor(() => expect(api.loadWorkspaceHistory).toHaveBeenCalledWith(expect.objectContaining({ limit: 25, offset: 25 }), expect.any(AbortSignal)))
     expect(screen.getByText('Showing 26–26 of 30')).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations with a persisted experiment, history and an inspected attempt', async () => {
+    api.loadWorkspaceExperiments.mockResolvedValue([experiment])
+    api.loadWorkspaceHistory.mockResolvedValue({ items: [{ attempt, experimentId: experiment.experimentId, experimentName: experiment.name, taxonId: 'NCBITaxon:9606', tissueId: null, modelIds: [ODE_MODEL.id], releaseIds: [ODE_MODEL.knowledgeRelease.id] }], total: 1, limit: 25, offset: 0 })
+    render(ExperimentWorkspace)
+    await fireEvent.click(await screen.findByRole('button', { name: experiment.name }))
+    await screen.findByRole('button', { name: 'Restart from specification' })
+    await expectAccessible()
   })
 })

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import {
@@ -179,11 +180,22 @@ describe('DataPlaneWorkbench', () => {
     fireEvent.click(within(pagination).getByRole('button', { name: 'Next' }))
     await fireEvent.update(screen.getByLabelText('Local record collection'), 'proteins')
     currentType.resolve(page('proteins'))
-    await waitFor(() => expect(screen.getByText('UniProtKB:P34896')).toBeTruthy())
+    expect(await screen.findByRole('region', { name: 'proteins from the local verified mirror, sorted by ID' })).toBeTruthy()
     slowPage.resolve(page('compounds', { cursor: 'page-2' }))
+    await new Promise((settle) => setTimeout(settle))
 
-    await waitFor(() => expect(screen.queryByText('CHEBI:33384')).toBeNull())
+    expect(screen.queryByText('CHEBI:33384')).toBeNull()
+    expect(screen.getByRole('region', { name: 'proteins from the local verified mirror, sorted by ID' })).toBeTruthy()
     expect(screen.getByText('Page 1')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Next' }).disabled).toBe(true)
+  })
+
+  it('has no WCAG 2.2 AA violations with a published release pair and an audit', async () => {
+    api.loadDataPlaneDiscovery.mockReset().mockResolvedValue(readyDiscovery)
+    render(DataPlaneWorkbench)
+    expect(await screen.findByText('CHEBI:15377')).toBeTruthy()
+    await fireEvent.click(screen.getByRole('button', { name: 'Run offline audit' }))
+    await screen.findByText(report.reportDigest)
+    await expectAccessible()
   })
 })

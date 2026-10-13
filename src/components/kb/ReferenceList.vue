@@ -1,6 +1,6 @@
 <script setup vapor>
 import { describeFacts } from '../../knowledge/facts.js'
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 import EntityLink from './EntityLink.vue'
 import VerifiedBadge from './VerifiedBadge.vue'
 

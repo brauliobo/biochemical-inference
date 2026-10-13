@@ -1,6 +1,4 @@
 {
-  "comment": "Files with raw colour/px/rem/font literals that the per-workbench CSS migration will convert to design tokens. This list may only shrink; the migration phase ends when it is empty. See docs/DESIGN_SYSTEM.md.",
-  "files": [
-    "src/styles/legacy-workbench.css"
-  ]
+  "comment": "Files allowed to keep raw colour/px/rem/font literals. Must stay empty: only src/styles/tokens.primitive.css holds raw values. See docs/DESIGN_SYSTEM.md.",
+  "files": []
 }

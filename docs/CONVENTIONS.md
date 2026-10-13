@@ -39,7 +39,27 @@ Pug conventions:
 - Styles: layout primitives and semantic tokens only; see the design system.
 
 Do not add a non-Vapor SFC. If Vapor cannot do something, document it in
-[VAPOR.md](VAPOR.md) with the evidence.
+[VAPOR.md](VAPOR.md) with the evidence. No `<style>` blocks (a test fails on one).
+
+## Workbenches
+
+A workbench is a component under `src/components/` registered in
+`src/workbenches.js`. Keep it small: if it passes about 200 lines, move a section
+into a child under `src/components/<name>/` and the stateful logic into a composable.
+
+- Build the page from `src/ui` (`Panel`, `Facts`, `DataTable`, `InputField`,
+  `SelectField`, `ErrorNotice`, `LiveMessage`, `Badge`, ...), never from copied markup
+  or new classes. The list is in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+- Every request goes through `useTask` (or `useWorkflow` / `useMirror` /
+  `usePolling`, which use it): it aborts the previous run, drops stale responses and
+  cancels on unmount. Do not write `AbortController` or generation counters again.
+  Return the result from the work function and commit it in `done`, so data and the
+  state that goes with it change together.
+- Print every state as a word (`Badge status="failed"`); announce what an action did
+  with `LiveMessage`; show a failure with `ErrorNotice`. Colour only reinforces.
+- Handlers of `InputField` / `SelectField` take the new value as their argument.
+- Keep existing `data-testid`s and accessible names; tests and the browser specs
+  depend on them. Add a populated-state `expectAccessible()` to the workbench's test.
 
 ## Routes
 

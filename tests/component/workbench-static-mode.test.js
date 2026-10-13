@@ -2,11 +2,8 @@ import { screen } from '@testing-library/vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../../src/App.vue'
 import { navigate } from '../../src/router.js'
-import { findWorkbench } from '../../src/workbenches.js'
+import { findWorkbench, workbenches } from '../../src/workbenches.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
-
-// Workbenches migrated to the design system (no legacy-workbench.css wrapper).
-const migrated = ['challenge', 'spatial-registration', 'evidence', 'experiments', 'apap', 'data-plane']
 
 beforeEach(() => {
   window.scrollTo = vi.fn()
@@ -17,8 +14,8 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('migrated workbenches in the static build', () => {
-  it.each(migrated)('shows the API notice instead of the %s workbench and makes no request', async (name) => {
+describe('workbenches in the static build', () => {
+  it.each(workbenches.map((item) => item.name))('shows the API notice instead of the %s workbench and makes no request', async (name) => {
     const request = vi.fn()
     vi.stubGlobal('fetch', request)
     vi.stubEnv('VITE_STATIC_MODE', 'true')
@@ -31,7 +28,9 @@ describe('migrated workbenches in the static build', () => {
     expect(request).not.toHaveBeenCalled()
   })
 
-  it.each(migrated)('registers %s without the legacy wrapper', (name) => {
-    expect(findWorkbench(name)).toMatchObject({ needsApi: true, legacy: false })
+  it('registers only the fields the workbench view reads', () => {
+    for (const item of workbenches) {
+      expect(Object.keys(item).filter((key) => !['name', 'title', 'summary', 'needsApi', 'props', 'load'].includes(key)), item.name).toEqual([])
+    }
   })
 })

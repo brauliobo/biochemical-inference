@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { createEvidenceFixtureClient } from '../../server/evidence/fixture.js'
 
 const api = vi.hoisted(() => ({
@@ -51,7 +52,7 @@ describe('EvidencePanel', () => {
     await fireEvent.click(span)
     await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
 
-    expect(await screen.findByText(/MTHFR phosphorylation · increases sensitivity to · SAM inhibition/)).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: /MTHFR phosphorylation · increases sensitivity to · SAM inhibition/ })).toBeTruthy()
     expect(screen.getAllByText(/Unreviewed, not trusted knowledge/i).length).toBeGreaterThan(1)
     expect(screen.getByText(/cannot enter the atlas or trusted release/)).toBeTruthy()
     expect(screen.getAllByText(/mthfr-evidence-v1.0.0 · sha256:93662849/).length).toBeGreaterThan(0)
@@ -142,5 +143,13 @@ describe('EvidencePanel', () => {
 
     expect(await screen.findByText('Candidate response failed schema validation.')).toBeTruthy()
     expect(screen.queryByText('Ollama generation unavailable; no candidate was created')).toBeNull()
+  })
+
+  it('has no WCAG 2.2 AA violations with a document and an extracted candidate', async () => {
+    await openLicensedDocument()
+    await fireEvent.click(screen.getByLabelText(/Phosphorylation has been identified/))
+    await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
+    await screen.findByRole('heading', { name: /MTHFR phosphorylation/ })
+    await expectAccessible()
   })
 })

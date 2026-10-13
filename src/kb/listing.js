@@ -10,7 +10,7 @@ export const SORTS = Object.freeze([
   { id: 'evidence', label: 'Evidence (strongest first)' },
   { id: 'linked', label: 'Most linked first' }
 ])
-export const SORT_IDS = SORTS.map((sort) => sort.id)
+const SORT_IDS = SORTS.map((sort) => sort.id)
 export const DEFAULT_SORT = 'name'
 
 const OTHER_PATHWAY = 'Not in a pathway'

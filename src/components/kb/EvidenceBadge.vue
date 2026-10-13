@@ -1,7 +1,7 @@
 <script setup vapor>
 import { computed } from 'vue'
 import { evidenceInfo } from '../../knowledge/evidence.js'
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 
 // Evidence grade as a badge. `explain` adds the plain-language meaning underneath.
 const props = defineProps({

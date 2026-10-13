@@ -1,59 +1,62 @@
 <script setup vapor>
 import { computed } from 'vue'
-import Metric from './ui/Metric.vue'
-import { badgeClass } from './ui/tone.js'
+import Badge from '../ui/Badge.vue'
+import Card from '../ui/Card.vue'
+import Disclosure from '../ui/Disclosure.vue'
+import ErrorNotice from '../ui/ErrorNotice.vue'
+import Facts from '../ui/Facts.vue'
+import LiveMessage from '../ui/LiveMessage.vue'
+import { statusTone } from '../ui/tone.js'
 
+// How a release was built (recipe, source lock, transformer, validator) and
+// the source objects it contains. Open by default when it is unavailable.
 const props = defineProps({
   provenance: { type: Object, default: undefined },
   status: { type: String, required: true },
   error: { type: String, default: '' }
 })
-
 const emit = defineEmits(['retry'])
 
-const label = computed(() => (props.status === 'available' ? 'Available' : props.status === 'unavailable' ? 'Unavailable' : 'Loading'))
-const recordTypes = computed(() => [...new Set(props.provenance?.sourceObjects.map((item) => item.recordType) ?? [])].sort())
-const sourceNamespaces = computed(() => [...new Set(props.provenance?.sourceObjects.flatMap((item) => item.sourceIds) ?? [])].sort())
-const licenseIds = computed(() => [...new Set(props.provenance?.sourceObjects.map((item) => item.licenseId) ?? [])].sort())
+const LABELS = { available: 'Available', unavailable: 'Unavailable' }
+const unique = (values) => [...new Set(values)].sort().join(', ')
+const pins = computed(() => {
+  const { recipe, sourceLock, transformer, validation } = props.provenance
+  return [
+    { label: 'Recipe', value: recipe.path, code: recipe.digest },
+    { label: 'Source lock', value: sourceLock.path, code: sourceLock.digest },
+    { label: 'Transformer', value: `${transformer.id} ${transformer.version}`, code: transformer.digest },
+    { label: 'Validator', value: `${validation.id} ${validation.version}`, code: validation.digest }
+  ]
+})
+const inventory = computed(() => {
+  const objects = props.provenance.sourceObjects
+  return [
+    { label: 'Record types', value: unique(objects.map((item) => item.recordType)) },
+    { label: 'Source namespaces', value: unique(objects.flatMap((item) => item.sourceIds)) },
+    { label: 'License IDs', value: unique(objects.map((item) => item.licenseId)) }
+  ]
+})
 </script>
 
 <template lang="pug">
-details.stack(:open="status === 'unavailable'")
-  summary.cluster
-    strong Build provenance
-    span(:class="badgeClass(status)") {{ label }}
-  .stack
-    p.muted(v-if="status === 'loading'" role="status") Loading verified build provenance…
-    .notice.notice--danger.stack.stack--tight(v-else-if="status === 'unavailable'" role="alert")
-      strong Build provenance unavailable
-      p {{ error }}
-      p Reproducibility is not established from the information currently available.
-      button.button.button--secondary(type="button" @click="emit('retry')") Retry provenance request
-    template(v-else-if="provenance")
-      dl.metrics.metrics--wide
-        Metric(label="Recipe")
-          | {{ provenance.recipe.path }}
-          code.digest {{ provenance.recipe.digest }}
-        Metric(label="Source lock")
-          | {{ provenance.sourceLock.path }}
-          code.digest {{ provenance.sourceLock.digest }}
-        Metric(label="Transformer")
-          | {{ provenance.transformer.id }} {{ provenance.transformer.version }}
-          code.digest {{ provenance.transformer.digest }}
-        Metric(label="Validator")
-          | {{ provenance.validation.id }} {{ provenance.validation.version }}
-          code.digest {{ provenance.validation.digest }}
-      dl.metrics
-        Metric(label="Record types" :value="recordTypes.join(', ')")
-        Metric(label="Source namespaces" :value="sourceNamespaces.join(', ')")
-        Metric(label="License IDs" :value="licenseIds.join(', ')")
-      section.stack.stack--tight(aria-labelledby="source-objects-title")
-        h3#source-objects-title Source objects
-        .source-objects.grid
-          article.card.card--flat.stack.stack--tight(v-for="sourceObject in provenance.sourceObjects" :key="sourceObject.name")
-            .repel
-              strong {{ sourceObject.name }}
-              span.muted {{ sourceObject.recordType }} · {{ sourceObject.bytes.toLocaleString() }} bytes
-            code.digest {{ sourceObject.digest }}
-            small.muted {{ sourceObject.sourceIds.join(', ') }} · {{ sourceObject.licenseId }}
+Disclosure(:open="status === 'unavailable'")
+  template(#summary)
+    span.cluster
+      strong Build provenance
+      Badge(:label="LABELS[status] ?? 'Loading'" :tone="statusTone(status)")
+  LiveMessage(v-if="status === 'loading'" visible text="Loading verified build provenance…")
+  ErrorNotice(v-else-if="status === 'unavailable'" title="Build provenance unavailable" :message="error" retry-label="Retry provenance request" @retry="emit('retry')")
+    p Reproducibility is not established from the information currently available.
+  template(v-else-if="provenance")
+    Facts(size="wide" :items="pins")
+    Facts(:items="inventory")
+    section.stack.stack--tight(aria-labelledby="source-objects-title")
+      h3#source-objects-title Source objects
+      .source-objects.grid
+        Card(v-for="sourceObject in provenance.sourceObjects" :key="sourceObject.name" flat)
+          .repel
+            strong {{ sourceObject.name }}
+            span.muted {{ sourceObject.recordType }} · {{ sourceObject.bytes.toLocaleString() }} bytes
+          code.digest {{ sourceObject.digest }}
+          small.muted {{ sourceObject.sourceIds.join(', ') }} · {{ sourceObject.licenseId }}
 </template>

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import { BUNDLED_RELEASE, bundledNetwork } from '../../server/knowledge/fixture.js'
 import { BUNDLED_PROVENANCE } from '../../server/knowledge/fixture.js'
 import { simulate } from '../../server/simulation.js'
@@ -53,5 +54,13 @@ describe('scientific workbench components', () => {
 
     expect(screen.getByText('upstream provenance failed')).toBeTruthy()
     expect(screen.getByText(/Reproducibility is not established/)).toBeTruthy()
+  })
+
+  it('has no WCAG 2.2 AA violations for the charts, the network key and the provenance closure', async () => {
+    render(TimeSeriesChart, { props: { result, selectedId: METABOLITE_IDS.homocysteine } })
+    render(NetworkView, { props: { model: MODEL, network: bundledNetwork(9606), result, selectedId: METABOLITE_IDS.homocysteine } })
+    render(BuildProvenance, { props: { provenance: BUNDLED_PROVENANCE, status: 'available' } })
+    await screen.findByText('3D view unavailable')
+    await expectAccessible()
   })
 })

@@ -2,10 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { knowledgeModule, loadKnowledge } from '../../kb/knowledge-lazy.js'
 import { entityPath } from '../../kb/paths.js'
-import { uniqueId } from '../../kb/uid.js'
+import { uniqueId } from '../../ui/uid.js'
 import { navigate } from '../../router.js'
 import RouterLink from '../../ui/RouterLink.vue'
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 import EvidenceBadge from './EvidenceBadge.vue'
 
 // Client-side search over the whole knowledge base. Results are a plain list of

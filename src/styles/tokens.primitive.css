@@ -155,9 +155,7 @@
   /* Sizes */
   --size-target: 2.75rem; /* 44px, WCAG 2.2 AAA target size; AA minimum is 24px */
   --size-icon: 1.25rem;
-  --size-container-narrow: 40rem;
   --size-container: 72rem;
-  --size-container-wide: 96rem;
   --size-measure: 68ch;
   --size-sidebar: 16rem;
   --size-grid-min: 16rem;

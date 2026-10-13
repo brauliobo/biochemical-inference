@@ -1,12 +1,25 @@
 <script setup vapor>
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { loadAtlasEntity, loadAtlasSubgraph, loadAtlasWorkspace } from '../api.js'
-import Metric from './ui/Metric.vue'
-import Section from './ui/Section.vue'
-import { statusTone } from './ui/tone.js'
+import { errorMessage, useTask } from '../composables/useTask.js'
+import Badge from '../ui/Badge.vue'
+import Card from '../ui/Card.vue'
+import Disclosure from '../ui/Disclosure.vue'
+import EmptyState from '../ui/EmptyState.vue'
+import ErrorNotice from '../ui/ErrorNotice.vue'
+import Facts from '../ui/Facts.vue'
+import InputField from '../ui/InputField.vue'
+import LiveMessage from '../ui/LiveMessage.vue'
+import Notice from '../ui/Notice.vue'
+import Panel from '../ui/Panel.vue'
+import { humanize } from '../ui/format.js'
+import { statusTone } from '../ui/tone.js'
+import AtlasCoverage from './atlas/AtlasCoverage.vue'
+import AtlasMappings from './atlas/AtlasMappings.vue'
 
 const props = defineProps({ taxonId: { type: Number, required: true } })
 
+const STATUS_LABELS = { loading: 'Verifying', traversing: 'Traversing', ready: 'Atlas pinned', unknown: 'Unknown seed', failed: 'Unavailable' }
 const defaultSeeds = { 9606: 'HGNC:7436', 10090: 'MGI:106639' }
 const workspace = ref()
 const subgraph = ref()
@@ -15,52 +28,30 @@ const maxDepth = ref(4)
 const maxNodes = ref(50)
 const state = ref('loading')
 const message = ref('')
-let generation = 0
-let controller
+const task = useTask()
 
-const statusLabel = computed(() => state.value === 'loading' ? 'Verifying' : state.value === 'traversing' ? 'Traversing' : state.value === 'ready' ? 'Atlas pinned' : state.value === 'unknown' ? 'Unknown seed' : 'Unavailable')
-const taxonName = computed(() => props.taxonId === 9606 ? 'Human · Homo sapiens' : 'Mouse · Mus musculus')
+const taxonName = computed(() => (props.taxonId === 9606 ? 'Human · Homo sapiens' : 'Mouse · Mus musculus'))
 const seedOptions = computed(() => (workspace.value?.includedEntities ?? workspace.value?.network.entities ?? []).filter((entity) => !['compound', 'compartment', 'tissue'].includes(entity.entityType)))
-const entityById = computed(() => new Map((subgraph.value?.entities ?? []).map((entity) => [entity.id, entity])))
-const evidenceById = computed(() => new Map((subgraph.value?.evidence ?? []).map((item) => [item.id, item])))
-const transformationById = computed(() => new Map((subgraph.value?.transformations ?? []).map((item) => [item.id, item])))
-const coverage = computed(() => workspace.value?.coverage.items ?? [])
-const coverageTotal = computed(() => coverage.value.reduce((total, item) => total + item.denominator, 0))
-const coverageCovered = computed(() => coverage.value.reduce((total, item) => total + item.numerator, 0))
-const gaps = computed(() => coverage.value.filter((item) => item.evidenceClass === 'uncovered' || item.gapIds.length))
-const structuralAmbiguities = computed(() => {
-  if (!workspace.value || workspace.value.network.mappings.some((mapping) => mapping.status === 'ambiguous')) return []
-  const entities = workspace.value.includedEntities ?? workspace.value.network.entities
-  const byProtein = new Map()
-  for (const entity of entities.filter((item) => item.entityType === 'isoform')) {
-    byProtein.set(entity.proteinId, [...(byProtein.get(entity.proteinId) ?? []), entity.id])
-  }
-  return [...byProtein.entries()]
-    .filter(([, candidateIds]) => candidateIds.length > 1)
-    .map(([sourceId, candidateIds]) => ({ sourceId, candidateIds: candidateIds.sort() }))
-})
-
-function isAbort(error) {
-  return error instanceof DOMException && error.name === 'AbortError'
-}
+const byId = (key) => computed(() => new Map((subgraph.value?.[key] ?? []).map((item) => [item.id, item])))
+const entityById = byId('entities')
+const evidenceById = byId('evidence')
+const transformationById = byId('transformations')
+const provenance = computed(() => [
+  { label: 'Atlas release', value: workspace.value.release.id },
+  { label: 'Independent SHA-256', value: workspace.value.release.digest, mono: true },
+  { label: 'Taxon context', value: taxonName.value },
+  { label: 'Verified inventory', value: `${workspace.value.detail.recordCounts.entities} entities · ${workspace.value.detail.recordCounts.claims} claims` }
+])
 
 function displayEntity(id) {
   const entity = entityById.value.get(id)
   return entity ? `${entity.name} (${entity.id})` : id
 }
 
-function transformationFor(id) {
-  return transformationById.value.get(id)
-}
-
 // The claim badges print a derivation or a polarity; the tone only reinforces
 // it. The `derivation-*` and `polarity-*` classes are stable test hooks.
-function claimBadge(kind, value) {
-  const tone = kind === 'derivation'
-    ? { direct: 'success', 'orthology-transferred': 'warning' }[value]
-    : { contradicting: 'danger' }[value]
-  return ['badge', `${kind}-${value}`, tone ? `badge--${tone}` : '']
-}
+const derivationTone = { direct: 'success', 'orthology-transferred': 'warning' }
+const polarityTone = { contradicting: 'danger' }
 
 function resolveSeed() {
   const query = seed.value.trim().toLowerCase()
@@ -71,102 +62,72 @@ function resolveSeed() {
   return matches.length === 1 ? matches[0] : undefined
 }
 
+const fail = (fallback) => (error) => {
+  state.value = 'failed'
+  message.value = errorMessage(error, fallback)
+}
+
 async function traverse() {
   if (!workspace.value) return
   const selected = resolveSeed()
   if (!selected) {
+    task.cancel()
     subgraph.value = undefined
     state.value = 'unknown'
     message.value = 'Unknown or ambiguous seed in this taxon context. No entity was substituted; choose an included CURIE or a unique label.'
     return
   }
   seed.value = selected.id
-  const requestGeneration = ++generation
-  controller?.abort()
-  controller = new AbortController()
   subgraph.value = undefined
   state.value = 'traversing'
   message.value = ''
-  try {
-    await loadAtlasEntity(workspace.value.release, selected.id, props.taxonId, controller.signal)
-    const loaded = await loadAtlasSubgraph(workspace.value.release, selected.id, props.taxonId, maxDepth.value, maxNodes.value, controller.signal)
-    if (requestGeneration !== generation) return
-    subgraph.value = loaded
+  await task.run(async ({ signal, fresh }) => {
+    fresh(await loadAtlasEntity(workspace.value.release, selected.id, props.taxonId, signal))
+    subgraph.value = fresh(await loadAtlasSubgraph(workspace.value.release, selected.id, props.taxonId, maxDepth.value, maxNodes.value, signal))
     state.value = 'ready'
-  } catch (error) {
-    if (requestGeneration !== generation || isAbort(error)) return
-    state.value = 'failed'
-    message.value = error instanceof Error ? error.message : 'The bounded atlas traversal failed.'
-  }
+  }, { fail: fail('The bounded atlas traversal failed.') })
 }
 
 async function initialize() {
-  const requestGeneration = ++generation
-  controller?.abort()
-  controller = new AbortController()
   workspace.value = undefined
   subgraph.value = undefined
   seed.value = defaultSeeds[props.taxonId]
   state.value = 'loading'
   message.value = ''
-  try {
-    const loaded = await loadAtlasWorkspace(props.taxonId, controller.signal)
-    if (requestGeneration !== generation) return
-    workspace.value = loaded
-    await traverse()
-  } catch (error) {
-    if (requestGeneration !== generation || isAbort(error)) return
-    state.value = 'failed'
-    message.value = error instanceof Error ? error.message : 'The contextual atlas could not be loaded.'
-  }
+  const loaded = await task.run(async ({ signal, fresh }) => {
+    workspace.value = fresh(await loadAtlasWorkspace(props.taxonId, signal))
+    return true
+  }, { fail: fail('The contextual atlas could not be loaded.') })
+  if (loaded) await traverse()
 }
 
 watch(() => props.taxonId, initialize, { immediate: true })
-onBeforeUnmount(() => controller?.abort())
 </script>
 
 <template lang="pug">
-Section.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow="05 · Context atlas" :status="statusLabel" :tone="statusTone(state)")
-  p.muted(v-if="state === 'loading'" role="status") Verifying the independent atlas v2 release and loading {{ taxonName }} context…
-  .notice.notice--danger.stack.stack--tight(v-else-if="state === 'failed' && !workspace" role="alert")
-    strong Context atlas unavailable
-    p {{ message }}
+Panel.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow="05 · Context atlas" :status="STATUS_LABELS[state]" :tone="statusTone(state)")
+  LiveMessage(visible :text="state === 'loading' ? `Verifying the independent atlas v2 release and loading ${taxonName} context…` : ''")
+  ErrorNotice(v-if="state === 'failed' && !workspace" title="Context atlas unavailable" :message="message" retry-label="Retry atlas verification" @retry="initialize")
     p The simulation release remains separate; no atlas facts are inferred from simulation data.
-    button.button.button--secondary(type="button" @click="initialize") Retry atlas verification
 
   template(v-else-if="workspace")
     .atlas-provenance.stack.stack--tight
-      dl.metrics
-        Metric(label="Atlas release" :value="workspace.release.id")
-        Metric(label="Independent SHA-256" :value="workspace.release.digest" mono)
-        Metric(label="Taxon context" :value="taxonName")
-        Metric(label="Verified inventory" :value="`${workspace.detail.recordCounts.entities} entities · ${workspace.detail.recordCounts.claims} claims`")
+      Facts(:items="provenance")
       p.muted {{ workspace.detail.scientificScope }}
 
     form.grid.grid--end(@submit.prevent="traverse")
-      .form
-        label(for="atlas-seed") Seed CURIE or unique label
-        input#atlas-seed(v-model="seed" list="atlas-seeds" autocomplete="off" aria-describedby="atlas-seed-help")
-        datalist#atlas-seeds
-          template(v-for="entity in seedOptions" :key="entity.id")
-            option(:value="entity.id" :label="entity.name")
-            option(:value="entity.name" :label="entity.id")
-        small#atlas-seed-help Species-specific and taxon-neutral entities in the verified projection. Press Enter to traverse.
-      .form
-        label(for="atlas-depth") Maximum depth
-        input#atlas-depth(v-model.number="maxDepth" type="number" min="0" max="6" step="1")
-      .form
-        label(for="atlas-nodes") Node limit
-        input#atlas-nodes(v-model.number="maxNodes" type="number" min="1" max="100" step="1")
+      InputField(id="atlas-seed" label="Seed CURIE or unique label" v-model="seed" list="atlas-seeds" autocomplete="off" hint="Species-specific and taxon-neutral entities in the verified projection. Press Enter to traverse.")
+      datalist#atlas-seeds
+        template(v-for="entity in seedOptions" :key="entity.id")
+          option(:value="entity.id" :label="entity.name")
+          option(:value="entity.name" :label="entity.id")
+      InputField(id="atlas-depth" label="Maximum depth" type="number" v-model="maxDepth" min="0" max="6" step="1")
+      InputField(id="atlas-nodes" label="Node limit" type="number" v-model="maxNodes" min="1" max="100" step="1")
       button.button(type="submit" :disabled="state === 'traversing'") {{ state === 'traversing' ? 'Traversing…' : 'Traverse bounded graph' }}
 
-    p.muted(v-if="state === 'traversing'" role="status") Loading a species-isolated bounded traversal; previous graph content is hidden.
-    .notice.notice--danger.stack.stack--tight(v-else-if="state === 'failed'" role="alert")
-      strong Atlas traversal failed
-      p {{ message }}
-      button.button.button--secondary(type="button" @click="traverse") Retry traversal
-    .notice.notice--warning.stack.stack--tight(v-else-if="state === 'unknown'" role="status")
-      strong Unknown is not absent
+    LiveMessage(v-if="state === 'traversing'" visible text="Loading a species-isolated bounded traversal; previous graph content is hidden.")
+    ErrorNotice(v-else-if="state === 'failed'" title="Atlas traversal failed" :message="message" retry-label="Retry traversal" @retry="traverse")
+    Notice(v-else-if="state === 'unknown'" tone="warning" role="status" title="Unknown is not absent")
       p {{ message }}
 
     .stack(v-else-if="subgraph")
@@ -175,7 +136,7 @@ Section.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow=
         span {{ subgraph.truncated ? `Traversal stopped at the ${subgraph.maxNodes}-node bound.` : `Complete within depth ${subgraph.maxDepth} and the ${subgraph.maxNodes}-node bound.` }}
 
       .sidebar
-        Section(title="Typed entities" title-id="atlas-entities-title" :level="3" flat)
+        Panel(title="Typed entities" title-id="atlas-entities-title" :level="3" flat)
           ul.atlas-entity-list.plain-list.stack
             li.stack.stack--tight(v-for="entity in subgraph.entities" :key="entity.id")
               p.eyebrow {{ entity.entityType }} · {{ entity.taxonId ?? 'taxon-neutral' }}
@@ -184,64 +145,36 @@ Section.atlas-panel(title="MTHFR evidence atlas" title-id="atlas-title" eyebrow=
               p
                 code {{ entity.id }}
 
-        Section(title="Qualified claims" title-id="atlas-claims-title" :level="3" flat)
-          p.muted(v-if="!subgraph.claims.length") No claims occur within this traversal bound. This is unknown beyond the bound, not evidence of absence.
-          article.card.stack.stack--tight(v-for="claim in subgraph.claims" :key="claim.id")
+        Panel(title="Qualified claims" title-id="atlas-claims-title" :level="3" flat)
+          EmptyState(v-if="!subgraph.claims.length") No claims occur within this traversal bound. This is unknown beyond the bound, not evidence of absence.
+          Card(v-for="claim in subgraph.claims" :key="claim.id")
             .cluster
-              span(:class="claimBadge('derivation', claim.derivation)") {{ claim.derivation }}
-              span(:class="claimBadge('polarity', claim.polarity)") {{ claim.polarity }}
+              Badge(:class="`derivation-${claim.derivation}`" :label="claim.derivation" :tone="derivationTone[claim.derivation]")
+              Badge(:class="`polarity-${claim.polarity}`" :label="claim.polarity" :tone="polarityTone[claim.polarity]")
             p
               strong {{ displayEntity(claim.subjectId) }}
-              span {{ ` ${claim.relation.replaceAll('_', ' ')} ` }}
+              span {{ ` ${humanize(claim.relation)} ` }}
               strong {{ displayEntity(claim.objectId) }}
             small.muted Taxon {{ claim.context.taxonId }} · tissue {{ claim.context.tissueId ?? 'unknown' }} · compartment {{ claim.context.compartmentId ?? 'unknown' }} · cell {{ claim.context.cellId ?? 'unknown' }}
-            details.stack.stack--tight
-              summary Evidence lineage ({{ claim.evidenceIds.length }})
+            Disclosure(:summary="`Evidence lineage (${claim.evidenceIds.length})`")
               ul
                 li(v-for="evidenceId in claim.evidenceIds" :key="evidenceId")
                   a(v-if="evidenceById.get(evidenceId)" :href="evidenceById.get(evidenceId).url" target="_blank" rel="noreferrer") {{ evidenceById.get(evidenceId).citation }}
                   span(v-else) {{ evidenceId }} · unresolved in this bounded response
               p.muted This claim is {{ claim.derivation }} and {{ claim.polarity }}. Evidence records do not override that derivation.
-            details.transformation-details.stack.stack--tight(v-if="claim.transformationId && transformationById.get(claim.transformationId)")
-              summary Inspect orthology transformation
+            Disclosure.transformation-details(v-if="claim.transformationId && transformationById.get(claim.transformationId)" summary="Inspect orthology transformation")
               p
-                code {{ transformationFor(claim.transformationId).id }}
-              p {{ transformationFor(claim.transformationId).method }}
+                code {{ transformationById.get(claim.transformationId).id }}
+              p {{ transformationById.get(claim.transformationId).method }}
               ul
-                li(v-for="pair in transformationFor(claim.transformationId).entityPairs" :key="`${pair.sourceId}-${pair.targetId}`") {{ pair.sourceId }} → {{ pair.targetId }}
-              p.notice.notice--warning {{ transformationFor(claim.transformationId).limitations }}
+                li(v-for="pair in transformationById.get(claim.transformationId).entityPairs" :key="`${pair.sourceId}-${pair.targetId}`") {{ pair.sourceId }} → {{ pair.targetId }}
+              Notice(tone="warning") {{ transformationById.get(claim.transformationId).limitations }}
 
       .grid
-        Section(title="Identity mappings and ambiguity" title-id="atlas-mappings-title" :level="3" flat)
-          p.muted(v-if="!workspace.network.mappings.length") No identity mapping is asserted for this taxon projection; this is not evidence that identifiers are equivalent or absent.
-          article.card.stack.stack--tight(v-for="mapping in workspace.network.mappings" :key="mapping.id")
-            .repel
-              strong {{ mapping.status }} · {{ mapping.relation.replaceAll('_', ' ') }}
-              code {{ mapping.id }}
-            p {{ mapping.sourceId }} → {{ mapping.targetId ?? 'no selected target' }}
-            p(v-if="mapping.candidateIds.length") Ambiguous candidates: {{ mapping.candidateIds.join(', ') }}
-            small.muted {{ mapping.rationale }}
-          article.card.stack.stack--tight(v-for="ambiguity in structuralAmbiguities" :key="ambiguity.sourceId")
-            .repel
-              strong unresolved · structural ambiguity
-              code Typed entity structure
-            p {{ ambiguity.sourceId }} → no selected isoform
-            p Ambiguous candidates: {{ ambiguity.candidateIds.join(', ') }}
-            small.muted Multiple typed isoforms resolve in this verified release, while the taxon network projection supplies no selected identity target. This is not presented as an asserted mapping record.
+        AtlasMappings(:workspace="workspace")
+        AtlasCoverage(:workspace="workspace")
 
-        Section(title="Coverage and measured gaps" title-id="atlas-coverage-title" :level="3" flat)
-          p
-            strong {{ coverageCovered }} / {{ coverageTotal }} denominator targets covered across {{ coverage.length }} partitions.
-          article.notice.notice--warning.stack.stack--tight(v-for="gap in gaps" :key="gap.id")
-            p
-              strong Unknown / measured gap · {{ gap.entityType }}
-            p {{ gap.numerator }} / {{ gap.denominator }} covered
-            p {{ gap.denominatorDefinition }}
-            p
-              code {{ gap.gapIds.join(', ') }}
-          p.muted(v-if="!gaps.length") No measured gaps are listed for this projection. Unmeasured scope remains unknown.
-
-      Section(title="Atlas limitations" title-id="atlas-limitations-title" :level="3" flat)
+      Panel(title="Atlas limitations" title-id="atlas-limitations-title" :level="3" flat)
         ul.stack.stack--tight
           li(v-for="limitation in workspace.network.limitations" :key="limitation.id")
             strong {{ limitation.category }}

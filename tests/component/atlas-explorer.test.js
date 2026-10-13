@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { expectAccessible } from '../helpers/axe.js'
 import {
   BUNDLED_ATLAS_DETAIL,
   BUNDLED_ATLAS_RELEASE,
@@ -67,5 +68,11 @@ describe('AtlasExplorer', () => {
     expect(await screen.findByText('Unknown is not absent')).toBeTruthy()
     expect(screen.getByText(/No entity was substituted/)).toBeTruthy()
     await waitFor(() => expect(api.loadAtlasSubgraph).toHaveBeenCalledTimes(1))
+  })
+
+  it('has no WCAG 2.2 AA violations for the mouse atlas with orthology transfer', async () => {
+    render(AtlasExplorer, { props: { taxonId: 10090 } })
+    await screen.findAllByText('orthology-transferred')
+    await expectAccessible()
   })
 })

@@ -11,8 +11,8 @@ import {
   varReferences
 } from '../helpers/css-tokens.js'
 
-// Files that still contain raw literals and are scheduled for migration. The
-// list may only shrink: a listed file with no violations fails (remove it).
+// The migration is finished: nothing may hold raw literals except
+// tokens.primitive.css, so the allowlist stays empty.
 const allowlist = JSON.parse(read('tests/unit/design-tokens.allowlist.json')).files
 
 const primitives = customProperties(PRIMITIVE_FILE)
@@ -56,15 +56,15 @@ describe('design tokens', () => {
   const files = sourceFiles().filter((path) => path !== PRIMITIVE_FILE)
 
   it('keeps raw colour, px/rem and font literals out of every file except tokens.primitive.css', () => {
-    const violations = files.filter((path) => !allowlist.includes(path)).flatMap(fileViolations)
-    expect(describeViolations(violations)).toEqual([])
+    expect(describeViolations(files.flatMap(fileViolations))).toEqual([])
   })
 
-  it('lists only real files that still need migration', () => {
-    for (const path of allowlist) {
-      expect(files, `${path} is not a source file`).toContain(path)
-      expect(fileViolations(path).length, `${path} is clean: remove it from the allowlist`).toBeGreaterThan(0)
-    }
+  it('has no exemptions: the allowlist is empty', () => {
+    expect(allowlist).toEqual([])
+  })
+
+  it('has no legacy stylesheet', () => {
+    expect(sourceFiles('src', ['.css']).filter((path) => /legacy/.test(path))).toEqual([])
   })
 
   it('defines semantic tokens only as references to primitives', () => {

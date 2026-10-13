@@ -11,7 +11,3 @@ button.child(type="button" @click="emit('picked', { id: 7 })")
   slot(:label="label") default {{ label }}
   span.theme {{ theme }}
 </template>
-
-<style scoped>
-.child { color: var(--color-text); }
-</style>

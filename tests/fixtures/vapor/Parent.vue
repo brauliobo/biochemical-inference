@@ -3,7 +3,6 @@
 // app relies on, in one component.
 import { computed, provide, ref } from 'vue'
 import Child from './Child.vue'
-import Legacy from './Legacy.js'
 
 provide('theme', 'dark')
 const picked = ref(null)
@@ -22,7 +21,6 @@ function focusBox() {
 .parent
   Child(label="L" @picked="picked = $event")
     template(#default="{ label }") slot-{{ label }}
-  Legacy(@picked="picked = $event")
   p.picked {{ picked?.id ?? 'none' }}
   input.text(v-model="text")
   p.upper {{ upper }}

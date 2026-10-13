@@ -1,7 +1,7 @@
 <script setup vapor>
 import { computed } from 'vue'
 import { claimStatusInfo } from '../../knowledge/evidence.js'
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 
 // Claim status ("Supported", "Contested", ...). Pass the status id.
 const props = defineProps({ status: { type: String, required: true } })

@@ -82,7 +82,7 @@ An interaction is one activation of a link or control (click, tap, or Enter).
 
 | ID | Requirement | Enforced by |
 |---|---|---|
-| A1 | WCAG 2.2 Level AA on every route | axe in `tests/e2e/shell.spec.js` (0 violations, light and dark, desktop and mobile); manual checks below |
+| A1 | WCAG 2.2 Level AA on every route, including all workbenches in their working states | axe in `tests/e2e/shell.spec.js` over every route, the 15 registered workbenches included (0 violations, light and dark, desktop and mobile; there each workbench shows its API-required notice); axe in jsdom over every route as a page (`tests/component/route-accessibility.test.js`) and over each workbench with mocked API data in a populated state (`expectAccessible()` from `tests/helpers/axe.js`, one test per `tests/component/*workbench*.test.js`); `tests/e2e/populated-states.spec.js` replays those same populated states in the browser with the built stylesheet (colour contrast, target size, no horizontal overflow; light and dark, desktop and mobile); manual checks below |
 | A2 | Text contrast 4.5:1, non-text 3:1, both colour schemes | `tests/unit/design-contrast.test.js` |
 | A3 | Everything operable from the keyboard, no traps, focus always visible | `shell.spec.js`, `base.css` `:focus-visible` |
 | A4 | Touch targets at least 44 px (WCAG 2.2 requires 24 px at AA) | `--target-min`, checked in `shell.spec.js` |
@@ -112,10 +112,14 @@ An interaction is one activation of a link or control (click, tap, or Enter).
 ## Verification
 
 Automated, on every change: `npm test` (contrast, tokens, router, shell, knowledge
-views, link integrity) and `npm run test:acceptance:e2e` (`shell.spec.js`, axe, keyboard,
-targets). The same browser specs run against the static build, with no API, through
-`npm run build:static && npm run test:e2e:static` (`shell.spec.js` and
-`usability-tasks.spec.js`, desktop and mobile projects).
+views, link integrity, and the jsdom axe audit of every route and of each workbench in
+a populated state; jsdom has no layout, so colour contrast is covered by the token
+test and the browser scan) and `npm run test:acceptance:e2e` (`shell.spec.js`, axe,
+keyboard, targets). The same browser specs run against the static build, with no API, through
+`npm run build:static && npm run test:e2e:static` (`shell.spec.js`,
+`usability-tasks.spec.js` and `populated-states.spec.js`, desktop and mobile projects).
+The last one first runs the component tests with `A11Y_SNAPSHOT_DIR` set, about a minute,
+to capture the populated states it replays.
 
 Manual, each release, on the home page, one entity page and one workbench page:
 
@@ -133,7 +137,7 @@ SEQ per task, SUS at the end; fix every task that misses E1 before release.
 ## Results
 
 Automated task measures, static build, Chromium desktop (1280 x 720) and the mobile
-project (360 x 740), 2026-10-12, 50 browser tests passing. An interaction is one
+project (360 x 740), 2026-10-13, 54 browser tests passing. An interaction is one
 click, tap or Enter. Source: `tests/e2e/usability-tasks.spec.js` (prints a `MEASURE` line
 per measure) and `tests/e2e/shell.spec.js`.
 
@@ -157,11 +161,12 @@ per measure) and `tests/e2e/shell.spec.js`.
 | Keyboard only: Tab to a reaction link on an entity page, then the "connected to" control | operable | 20 Tab presses to the first reaction or enzyme link; control opens and chooses with Enter |
 | F5 Tab presses to the primary navigation (Home, entity page) | 5 or fewer | 3 and 3 |
 | Focus indicator on every Tab stop (Home, claims, reaction) | always visible | 0 stops without an outline |
-| A1 axe WCAG 2.2 AA, 17 routes, light and dark, desktop and mobile | 0 violations | 0 (also with search results, every disclosure open and a filtered listing) |
+| A1 axe WCAG 2.2 AA, 33 routes (knowledge site, workbench index, all 15 workbenches, unknown routes), light and dark, desktop and mobile | 0 violations | 0 (also with search results, every disclosure open and a filtered listing) |
+| A1 axe WCAG 2.2 AA + best practices in jsdom, 25 routes as pages and 16 workbench states with mocked API data | 0 violations | 0 (the audit is checked to find unlabelled controls, unnamed buttons, bad lists and missing alternatives, `tests/component/axe-helper.test.js`) |
+| A1 the same 16 populated workbench states in Chromium with the built CSS (contrast, target size, reflow), light and dark, desktop and 360 px | 0 violations, no horizontal overflow | 0 violations. It found one defect, fixed: a long digest in the single-page workbench's "Controlled run" grid widened the page by 303 px at 360 px (`.grid > *` now has `min-inline-size: 0` and wraps long identifiers) |
 | A4 buttons, fields, disclosure summaries in `main` on 4 key pages | 44 px or more | 0 under 44 px |
 | A5 horizontal overflow at 320 px, 8 key routes | none | 0 routes overflow |
-| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 71.9 kB (index 65.6 kB); the data chunk (181.9 kB) follows lazily, 255 kB in total |
-| JavaScript, an entity page (data is required) | n/a | 258 kB gzip in total |
+| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 41.7 kB (index 34.9 kB; was 71.9 kB before the virtual-DOM interop runtime was removed); the knowledge data chunk (about 328 kB gzip as built today) follows lazily |
 
 Not measured here (needs people or devices): E1, E2, F2, F3, S1 to S4, screen readers,
 zoom to 400 percent, forced colours. They stay on the manual list above.

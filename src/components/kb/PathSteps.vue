@@ -1,5 +1,5 @@
 <script setup vapor>
-import Badge from './Badge.vue'
+import Badge from '../../ui/Badge.vue'
 import EntityLink from './EntityLink.vue'
 
 // A chain of links between two entities, one labelled step per line:
