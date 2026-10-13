@@ -2156,7 +2156,7 @@ export default [
     "body": [
       "Shows genetic variation in [[enzyme:pemt]] and [[enzyme:chdh]] changes how much dietary [[compound:choline]] a person needs. It supports a rationale for individualised choline intake, but the tested outcome was organ dysfunction on a deficient diet, not methylation status."
     ],
-    "evidence": "established",
+    "evidence": "plausible",
     "authors": [
       "da Costa KA",
       "Kozyreva OG",
@@ -2178,7 +2178,7 @@ export default [
       "A PEMT coding SNP and a BHMT SNP (+742 G>A) were not associated with susceptibility."
     ],
     "facts": {
-      "design": "RCT",
+      "design": "controlled depletion study with genetic association",
       "population": "57 adults on controlled low-choline diet"
     },
     "relations": [

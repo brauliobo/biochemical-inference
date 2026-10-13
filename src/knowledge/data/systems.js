@@ -318,7 +318,7 @@ export default [
     aliases: ["células G", "células G antrais", "G cells", "gastrin cells"],
     summary: "Endocrine cells of the gastric antrum that release gastrin in response to peptides and amino acids, distension and alkaline pH; acid and somatostatin restrain them.",
     body: [
-      "G cells sit in the lower stomach (antrum) and sense the meal. Peptides and certain amino acids, especially phenylalanine and tryptophan, stretch of the stomach wall and a less acidic lumen make them release [[compound:gastrin]], which drives acid secretion by [[system:gastric-parietal-cells]]. As the stomach becomes acidic, somatostatin from neighbouring cells switches them off ([[compound:somatostatin]], [[article:schubert-2008-gastric-acid-secretion-control]], [[article:feng-2010-casr-gastrin-secretion]]).",
+      "G cells sit in the lower stomach (antrum) and sense the meal. Peptides and certain amino acids (especially phenylalanine and tryptophan), stretch of the stomach wall and a less acidic lumen make them release [[compound:gastrin]], which drives acid secretion by [[system:gastric-parietal-cells]]. As the stomach becomes acidic, somatostatin from neighbouring cells switches them off ([[compound:somatostatin]], [[article:schubert-2008-gastric-acid-secretion-control]], [[article:feng-2010-casr-gastrin-secretion]]).",
       "The conversation says free glycine and collagen peptides are potent stimulators of these cells. In human tests glycine was not among the amino acids that raised gastrin ([[claim:free-glycine-stimulates-gastrin]], [[article:taylor-1982-amino-acids-gastric-acid]]). Chronic acid suppression raises gastrin because the brake is lost ([[outcome:elevated-gastrin]])."
     ],
     evidence: "established",

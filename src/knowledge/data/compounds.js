@@ -262,7 +262,7 @@ export default [
     aliases: ["alpha-GPC", "alfa-GPC", "GPC", "choline alfoscerate", "L-alfa-glicerilfosforilcolina", "glicerofosfocolina"],
     summary: "Water-soluble phosphatidylcholine breakdown product and choline supplement, about 40 % choline by mass.",
     body: [
-      "GPC is produced when phospholipases strip both fatty acids from [[compound:phosphatidylcholine]] and is normally further cleaved to [[compound:choline]] and glycerol-3-phosphate. In milk and many tissues it is a natural choline reservoir. As a supplement ([[intervention:alpha-gpc-supplement]]) it is absorbed without needing gastric acid and delivers choline efficiently. An observational Korean claims-data study reported higher stroke incidence in users; it is confounded by indication and not proof of harm."
+      "GPC is produced when phospholipases strip both fatty acids from [[compound:phosphatidylcholine]] and is normally further cleaved to [[compound:choline]] and glycerol-3-phosphate. In milk and many tissues it is a natural choline reservoir. As a supplement ([[intervention:alpha-gpc-supplement]]) it is water-soluble and is generally described as absorbed without needing gastric acid and as delivering choline efficiently; that description rests on manufacturer and review statements, not on the sources used here ([[claim:alpha-gpc-pc-absorbed-without-acid]]). An observational Korean claims-data study reported higher stroke incidence in users; it is confounded by indication and not proof of harm."
     ],
     evidence: "established",
     facts: { formula: "C8H20NO6P", molarMass: "257.22 g/mol", chebi: "CHEBI:16870", pubchem: "CID 657272", "choline-content": "about 40 % choline by mass" },
