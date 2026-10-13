@@ -1,7 +1,8 @@
-<script setup>
+<script setup vapor>
 import * as THREE from 'three'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { resolveExistingBin, scaleValue } from '../spatial.js'
+import { minimumHeight, onSchemeChange, readSceneColors } from './ui/scene-colors.js'
 
 const props = defineProps({
   cells: { type: Array, required: true },
@@ -22,12 +23,27 @@ let scene
 let camera
 let cellsMesh
 let lobule
+let portal
+let central
 let resizeObserver
+let stopSchemeWatch
+let palette
 let frame = 0
 const pointer = new THREE.Vector2()
 const raycaster = new THREE.Raycaster()
 const matrix = new THREE.Matrix4()
 const color = new THREE.Color()
+
+// Semantic design tokens, resolved at runtime for the active light/dark scheme.
+const PALETTE_TOKENS = {
+  low: '--color-info-border',
+  high: '--color-warning-border',
+  selected: '--color-accent',
+  portal: '--color-info-border',
+  central: '--color-warning-border',
+  frame: '--color-border-strong',
+  background: '--color-surface-sunken'
+}
 
 function dimensions() {
   return props.space.axes.map((axis) => axis.upper - axis.lower)
@@ -56,8 +72,8 @@ function updateEncoding() {
   props.cells.forEach((cell, index) => {
     const bin = cellsMesh.userData.bins[index]
     const scaled = scaleValue(values[bin], domain, { mode: 'forbidden', sentinel: null })
-    color.set(0x214842).lerp(new THREE.Color(0xf0a65a), scaled.ratio)
-    if (bin === props.selectedBin) color.lerp(new THREE.Color(0xe4ff9a), 0.5)
+    color.copy(palette.low).lerp(palette.high, scaled.ratio)
+    if (bin === props.selectedBin) color.lerp(palette.selected, 0.5)
     cellsMesh.setColorAt(index, color)
     const scale = bin === props.selectedBin ? 1.45 : 1
     matrix.makeScale(scale, scale, scale)
@@ -67,6 +83,15 @@ function updateEncoding() {
   cellsMesh.instanceColor.needsUpdate = true
   cellsMesh.instanceMatrix.needsUpdate = true
   renderer?.render(scene, camera)
+}
+
+// Re-colours the scene from the current tokens (first paint and scheme change).
+function applyPalette() {
+  scene.background = palette.background
+  lobule.material.color.copy(palette.frame)
+  portal.material.color.copy(palette.portal)
+  central.material.color.copy(palette.central)
+  updateEncoding()
 }
 
 function selectFromPointer(event) {
@@ -93,6 +118,8 @@ function teardown(forceContextLoss = true) {
   frame = 0
   resizeObserver?.disconnect()
   resizeObserver = undefined
+  stopSchemeWatch?.()
+  stopSchemeWatch = undefined
   const currentRenderer = renderer
   currentRenderer?.domElement.removeEventListener('pointerdown', selectFromPointer)
   currentRenderer?.domElement.removeEventListener('webglcontextlost', contextLost)
@@ -108,6 +135,8 @@ function teardown(forceContextLoss = true) {
   camera = undefined
   cellsMesh = undefined
   lobule = undefined
+  portal = undefined
+  central = undefined
 }
 
 function markUnavailable(message, forceContextLoss = true) {
@@ -124,8 +153,8 @@ function contextLost(event) {
 onMounted(() => {
   if (!host.value || typeof WebGLRenderingContext === 'undefined') return markUnavailable('WebGL is not supported.')
   try {
+    palette = readSceneColors(host.value, PALETTE_TOKENS)
     scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x081311)
     camera = new THREE.PerspectiveCamera(43, 1, 0.1, 100)
     camera.position.set(0, 6.5, 14)
     camera.lookAt(0, 0, 0)
@@ -137,18 +166,18 @@ onMounted(() => {
     renderer.domElement.addEventListener('webglcontextlost', contextLost, { once: true })
     host.value.append(renderer.domElement)
 
-    scene.add(new THREE.AmbientLight(0x8ed0bd, 1.5))
-    const light = new THREE.DirectionalLight(0xffffff, 2.5)
+    scene.add(new THREE.AmbientLight(undefined, 1.5))
+    const light = new THREE.DirectionalLight(undefined, 2.5)
     light.position.set(3, 8, 9)
     scene.add(light)
 
-    lobule = new THREE.Mesh(new THREE.BoxGeometry(10, 4.8, 2.8), new THREE.MeshStandardMaterial({ color: 0x18302c, transparent: true, opacity: 0.33, wireframe: true }))
+    lobule = new THREE.Mesh(new THREE.BoxGeometry(10, 4.8, 2.8), new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.33, wireframe: true }))
     lobule.userData.synthetic = true
     scene.add(lobule)
 
     const vesselGeometry = new THREE.CylinderGeometry(0.32, 0.32, 4.2, 18)
-    const portal = new THREE.Mesh(vesselGeometry, new THREE.MeshStandardMaterial({ color: 0x49b8a5 }))
-    const central = new THREE.Mesh(vesselGeometry, new THREE.MeshStandardMaterial({ color: 0xf0a65a }))
+    portal = new THREE.Mesh(vesselGeometry, new THREE.MeshStandardMaterial())
+    central = new THREE.Mesh(vesselGeometry, new THREE.MeshStandardMaterial())
     portal.position.x = -5.3
     central.position.x = 5.3
     scene.add(portal, central)
@@ -158,12 +187,17 @@ onMounted(() => {
     cellsMesh.userData.bins = props.cells.map((cell) => binForPosition(cell.position))
     cellsMesh.userData.synthetic = true
     scene.add(cellsMesh)
-    updateEncoding()
+    applyPalette()
+    stopSchemeWatch = onSchemeChange(() => {
+      if (!scene || !host.value) return
+      palette = readSceneColors(host.value, PALETTE_TOKENS)
+      applyPalette()
+    })
 
     const resize = () => {
       if (!renderer || !camera || !host.value) return
       const width = host.value.clientWidth
-      const height = Math.max(320, host.value.clientHeight)
+      const height = Math.max(minimumHeight(host.value), host.value.clientHeight)
       renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
@@ -190,11 +224,12 @@ onBeforeUnmount(teardown)
 </script>
 
 <template lang="pug">
-.tissue-scene(ref="host" role="group" tabindex="0" :aria-label="`Synthetic lobule scene. Bin ${selectedBin + 1} selected. Portal left, central right. Use left and right arrow keys to select bins.`" @keydown="selectFromKeyboard")
-  .scene-orientation(aria-hidden="true")
+.stack.stack--tight
+  .repel.muted(aria-hidden="true")
     span Portal · bin 1
     span Central · bin 12
-  .fallback(v-if="fallback" role="status")
-    strong 3D view unavailable
-    p {{ fallback }}
+  .scene(ref="host" role="group" tabindex="0" :class="{ 'scene--unavailable': fallback }" :aria-label="`Synthetic lobule scene. Bin ${selectedBin + 1} selected. Portal left, central right. Use left and right arrow keys to select bins.`" @keydown="selectFromKeyboard")
+    .stack.stack--tight(v-if="fallback")
+      strong 3D view unavailable
+      p {{ fallback }}
 </template>

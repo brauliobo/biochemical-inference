@@ -1,7 +1,11 @@
-<script setup>
-import { computed, defineAsyncComponent, onBeforeUnmount, ref, watch } from 'vue'
+<script setup vapor>
+import { computed, defineVaporAsyncComponent, onBeforeUnmount, ref, watch } from 'vue'
 import { loadSpatialWorkspace } from '../api.js'
 import { parsePointInstances, scaleValue } from '../spatial.js'
+import Metric from './ui/Metric.vue'
+import Section from './ui/Section.vue'
+import Toolbar from './ui/Toolbar.vue'
+import { statusTone } from './ui/tone.js'
 
 const props = defineProps({
   taxonId: { type: String, required: true },
@@ -11,7 +15,7 @@ const props = defineProps({
   selectedBin: { type: Number, required: true }
 })
 const emit = defineEmits({ selectBin: (bin) => Number.isInteger(bin) && bin >= 0 && bin < 12 })
-const TissueScene = defineAsyncComponent(() => import('./TissueScene.vue'))
+const TissueScene = defineVaporAsyncComponent(() => import('./TissueScene.vue'))
 const workspace = ref()
 const cells = ref([])
 const state = ref('loading')
@@ -66,55 +70,42 @@ onBeforeUnmount(() => controller?.abort())
 </script>
 
 <template lang="pug">
-section.spatial-workbench(aria-labelledby="spatial-title")
-  .section-heading
-    div
-      p.kicker Goal 7 · linked tissue space
-      h3#spatial-title Synthetic lobule spatial view
-    span.status-chip(:class="state" aria-live="polite") {{ state }}
-  .spatial-boundary(role="note")
+Section.spatial-workbench(title="Synthetic lobule spatial view" title-id="spatial-title" eyebrow="Goal 7 · linked tissue space" :level="3" :status="state" :tone="statusTone(state)" flat)
+  .notice.notice--warning.stack.stack--tight(role="note")
     strong Synthetic geometry · HRA unavailable
     p The cuboid, coordinates, cells, and registration are repository-authored algorithm fixtures, not measured tissue or human reference anatomy.
     p Mouse placement into human reference anatomy is refused. No click or pointer action creates anatomy or registration data.
-  .alert.error(v-if="state === 'failed'" role="alert")
+  .notice.notice--danger.stack.stack--tight(v-if="state === 'failed'" role="alert")
     p {{ message }}
-    button.secondary(type="button" @click="load") Retry spatial compatibility check
-  .loading(v-else-if="state === 'loading'" aria-live="polite") Verifying spatial release and content digests…
+    button.button.button--secondary(type="button" @click="load") Retry spatial compatibility check
+  p.muted(v-else-if="state === 'loading'" role="status") Verifying spatial release and content digests…
   template(v-else-if="workspace && fieldDescriptor && localSpace && lod")
-    dl.spatial-provenance
-      div
-        dt Spatial release
-        dd {{ workspace.detail.release.id }}
-      div
-        dt Trusted digest
-        dd.digest {{ workspace.detail.release.digest }}
-      div
-        dt Coordinates
-        dd {{ localSpace.coordinate_system }} · {{ localSpace.unit }} · {{ taxonLabel }} only
-      div
-        dt HRA mapping
-        dd {{ hra?.status ?? 'unavailable' }} · no target space or transform
-    .spatial-layout
-      .scene-column
+    dl.metrics
+      Metric(label="Spatial release" :value="workspace.detail.release.id")
+      Metric(label="Trusted digest" :value="workspace.detail.release.digest" mono)
+      Metric(label="Coordinates" :value="`${localSpace.coordinate_system} · ${localSpace.unit} · ${taxonLabel} only`")
+      Metric(label="HRA mapping" :value="`${hra?.status ?? 'unavailable'} · no target space or transform`")
+    .sidebar.sidebar--end
+      .stack.stack--tight
         TissueScene(:cells="cells" :space="localSpace" :snapshot="snapshot" :field="field" :selected-bin="selectedBin" :level="lod.level" @select-bin="emit('selectBin', $event)" @unavailable="sceneFallback = $event")
-        .fallback(v-if="sceneFallback" role="status")
+        .notice.notice--warning.stack.stack--tight(v-if="sceneFallback" role="status")
           strong 3D tissue view unavailable
           p {{ sceneFallback }} The complete numeric table and controls remain active.
-      aside.spatial-inspector(aria-label="Selected lobule bin details")
-        span.assumption-label Shared selection
+      aside.card.card--flat.stack.stack--tight(aria-label="Selected lobule bin details")
+        p.eyebrow Shared selection
         h4 Bin {{ selectedBin + 1 }} · {{ snapshot.timeHours }} h
-        p Portal-to-central position {{ selectedBin + 1 }} of 12. Field {{ field }} is {{ snapshot[field][selectedBin].toFixed(4) }} model-unit.
-        dl.compact-list
+        p.muted Portal-to-central position {{ selectedBin + 1 }} of 12. Field {{ field }} is {{ snapshot[field][selectedBin].toFixed(4) }} model-unit.
+        dl.facts
           div(v-for="(value, key) in selectedValues" :key="key")
             dt {{ key }}
             dd {{ value.toFixed(4) }}
-    .encoding-legend(aria-label="Spatial encoding legend")
-      strong Encoding and data policy
-      span Color: {{ field }} scaled linearly from {{ encoding.domain[0].toFixed(4) }} to {{ encoding.domain[1].toFixed(4) }}; selected ratio {{ encoding.selected.ratio?.toFixed(3) }}.
-      span Portal is bin 1; central is bin 12. No spatial interpolation is applied to APAP run bins.
-      span Release field descriptor: {{ fieldDescriptor.interpolation }} interpolation; missing value {{ fieldDescriptor.missing_value_policy.mode }} at sentinel {{ fieldDescriptor.missing_value_policy.sentinel }}.
-      span LOD {{ lod.level }} · {{ lod.dimensions.join('×') }} · loaded {{ lod.content_id }} only for this viewport.
-      span {{ fieldDescriptor.uncertainty.kind }} means byte-exact synthetic fixture values, not zero biological uncertainty.
-    .spatial-bin-controls(role="group" aria-label="Select portal-to-central lobule bin without WebGL")
-      button(v-for="bin in 12" :key="bin" type="button" :class="{ selected: selectedBin === bin - 1 }" :aria-pressed="selectedBin === bin - 1" @click="emit('selectBin', bin - 1)") Bin {{ bin }}
+    section.card.card--flat.stack.stack--tight(aria-labelledby="spatial-encoding-title")
+      h4#spatial-encoding-title Encoding and data policy
+      p.muted Color: {{ field }} scaled linearly from {{ encoding.domain[0].toFixed(4) }} to {{ encoding.domain[1].toFixed(4) }}; selected ratio {{ encoding.selected.ratio?.toFixed(3) }}.
+      p.muted Portal is bin 1; central is bin 12. No spatial interpolation is applied to APAP run bins.
+      p.muted Release field descriptor: {{ fieldDescriptor.interpolation }} interpolation; missing value {{ fieldDescriptor.missing_value_policy.mode }} at sentinel {{ fieldDescriptor.missing_value_policy.sentinel }}.
+      p.muted LOD {{ lod.level }} · {{ lod.dimensions.join('×') }} · loaded {{ lod.content_id }} only for this viewport.
+      p.muted {{ fieldDescriptor.uncertainty.kind }} means byte-exact synthetic fixture values, not zero biological uncertainty.
+    Toolbar.spatial-bin-controls(label="Select portal-to-central lobule bin without WebGL")
+      button.button.button--secondary(v-for="bin in 12" :key="bin" type="button" :aria-pressed="selectedBin === bin - 1" @click="emit('selectBin', bin - 1)") Bin {{ bin }}
 </template>
