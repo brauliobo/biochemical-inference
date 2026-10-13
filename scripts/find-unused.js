@@ -24,7 +24,6 @@ function walk(directory, files = []) {
 
 const files = SCAN_ROOTS.flatMap((name) => walk(join(root, name)))
 const sources = new Map(files.map((path) => [path, readFileSync(path, 'utf8')]))
-const corpus = [...sources.values()].join('\n')
 
 const importPattern = /import\s+(?:([A-Za-z_$][\w$]*)\s*,?\s*)?(?:\{([^}]*)\}|\*\s+as\s+([A-Za-z_$][\w$]*))?\s*from\s*['"][^'"]+['"]/g
 const exportPattern = /^export\s+(?:async\s+)?(?:function\*?|class|const|let|var)\s+([A-Za-z_$][\w$]*)/gm
@@ -76,9 +75,9 @@ function unusedExports(path, text, imported) {
   }
   for (const name of declared) {
     if (imported.has(name)) continue
-    // `import * as ns` consumers read any export; count a namespace import of this file as use.
-    const stem = relative(join(root), path).replace(/\\/g, '/')
-    const namespaced = [...sources.entries()].some(([other, otherText]) => other !== path && new RegExp(`import\\s*\\*\\s*as\\s+\\w+\\s+from\\s*['"][^'"]*${stem.split('/').at(-1).replace('.', '\\.')}['"]`).test(otherText))
+    // `import * as ns` consumers may read any export.
+    const file = path.split('/').at(-1).replace('.', '\\.')
+    const namespaced = [...sources.entries()].some(([other, otherText]) => other !== path && new RegExp(`import\\s*\\*\\s*as\\s+\\w+\\s+from\\s*['"][^'"]*${file}['"]`).test(otherText))
     if (namespaced) continue
     if (occurrences(text, name) > 1) findings.push(`${relative(root, path)}: export ${name} is only used inside its own module`)
     else findings.push(`${relative(root, path)}: export ${name} is never used`)
@@ -96,6 +95,5 @@ for (const [path, text] of sources) {
   if (wantImports) output.push(...unusedImports(path, text))
   if (wantExports) output.push(...unusedExports(path, text, imported))
 }
-void corpus
 process.stdout.write(`${output.sort().join('\n')}${output.length ? '\n' : ''}`)
 process.exitCode = output.length ? 1 : 0

@@ -158,9 +158,42 @@ tests/                Unit, API, and browser automation
 specs/e2e/            Product-level acceptance scenarios
 ```
 
+### Module Map
+
+```text
+src/api.js              public entry of the browser API client (re-exports every client function)
+src/api/core.js         HTTP core: ApiError, requestJson, CSRF headers, strict cache-policy clients, paging
+src/api/chunks.js       browser SHA-256 + gzip verification of immutable chunks
+src/api/<domain>.js     one module per API generation (simulation, portfolio, apap, spatial, atlas,
+                        evidence, derived, workspace, physiology, data-plane, measured,
+                        measured-spatial, spatial-registration, challenge, revalidation)
+server/app.js           buildApp(): constructs services, then registers hooks, error handler and routes
+server/routes/*.js      one registerXRoutes(app, context) per domain; static client is registered last
+server/http/*.js        problem replies, table-driven error handler, cache-header hooks, route/param helpers
+server/commons/*.js     shared server primitives, see below
+server/<domain>/        client (loopback producer), verification (digest/signature pins), service, database
+shared/*-contracts.js   versioned wire contracts (also bundled by the browser)
+shared/commons/         zod primitives shared by the contracts (digests, instants, identifiers, paging)
+shared/canonical-json.js  RFC 8785 serialisation and digests
+scripts/                operations CLI, supply-chain and deployment tooling, find-unused.js, vite-static-edition.js
+```
+
+`server/commons/` holds the code that every producer-backed domain used to repeat:
+
+- `digest.js`: `sha256Hex`, `sha256Prefixed`, `canonicalSha256Hex`, `compareUtf8`.
+- `verification.js`: strict base64url, bounded canonical-JSON parsing against a schema, Ed25519 signature checks. Each domain keeps its own error class, messages and pins and passes them in.
+- `errors.js`: `defineRequestError` (code, message, status) and `defineProblemError` (message, options) class factories.
+- `storage.js`, `paths.js`: storage-root selection outside the source tree (plain or symlink-refusing 0700 mode, ephemeral test roots).
+- `sqlite.js`: WAL pragmas, `transaction`, plain and owner-only (`O_NOFOLLOW`, schema-version checked) database openers.
+- `cursor.js`: HMAC-signed canonical pagination cursors and 32-byte secrets.
+- `upstream.js`: timeout signal, Content-Length-bounded body reads, loopback origin validation.
+- `clock.js`: ISO timestamps.
+
+Digest-sensitive code is shared only where the bytes are provably identical. `server/simulation.js` (run identity) and `server/spatial/client.js` keep their own serialisers because their pinned digests depend on them. `server/challenge/model.js` hashes the source bytes of the files listed in `SOFTWARE_SOURCE_PATHS` (the challenge `software` artifact), so those files are changed only together with a deliberate artifact rotation: `server/challenge/*.js`, `server/apap/model.js`, `server/data-plane/object-store.js`, `server/data-plane/safe-path.js`, `server/portfolio/identity.js`, `shared/apap-contracts.js`, `shared/canonical-json.js` and `shared/challenge-contracts.js`.
+
 The legacy Jekyll, Slim, Riot, and generated `docs/` application remains outside the active build until unrelated local modifications are resolved. The new build writes only to `dist/` and `server-dist/`.
 
-The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the browser application, while the server build reproducibly copies the ES modules in `server/` and `shared/` without a compilation step.
+The active application is plain JavaScript (ES6) on Node.js 22. Vite builds the browser application, while the server build reproducibly copies the ES modules in `server/` and `shared/` without a compilation step. The workbenches are lazy chunks and only they import `src/api`, so knowledge pages never load the API client or its validation schemas. The static edition (`npm run build:static`, `VITE_STATIC_MODE=true`) additionally rewrites the API workbench imports in `src/workbenches.js` (`scripts/vite-static-edition.js`), so none of that code is emitted into `dist-static/`.
 
 Goal 4 adds `shared/portfolio-contracts.js`, `server/portfolio/`, and `src/components/PortfolioWorkbench.vue`. Registry models are immutable declarative data. Numerical execution occurs only in bounded child processes; the parent validates input and output contracts and owns timeout, output-limit, cancellation, and lifecycle transitions. The archive boundary validates XML and ZIP safety before a model can reach execution.
 
