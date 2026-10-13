@@ -15,6 +15,13 @@ virtual DOM.
   `vue@3.x`, which semver does not satisfy with a prerelease, so without the
   override `npm install` fails with ERESOLVE. Delete the override when Vue 3.6
   is stable.
+- The same `overrides` block pins every `@vue/*` package to 3.6.0-rc.11 and
+  `@vue/server-renderer` is an explicit devDependency. Without them npm resolves
+  `@vue/test-utils`' peer `@vue/compiler-dom@3.x` to 3.5.x, hoists mixed 3.5/3.6
+  copies, and leaves `@vue/server-renderer` nested under `node_modules/vue/`, so a
+  clean `npm ci` makes every vitest file fail with `Could not resolve
+  "@vue/server-renderer" imported by "@vue/test-utils"`. Keep these versions in
+  step with `vue` when upgrading.
 
 ## Writing a component
 
