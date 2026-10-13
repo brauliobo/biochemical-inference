@@ -1,5 +1,5 @@
 <script setup vapor>
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   extractEvidenceCandidate,
   loadEvidenceCandidate,
@@ -8,8 +8,18 @@ import {
   loadEvidenceHealth,
   searchEvidence
 } from '../api.js'
-import Field from '../ui/Field.vue'
+import { errorMessage, useTask } from '../composables/useTask.js'
+import Card from '../ui/Card.vue'
+import EmptyState from '../ui/EmptyState.vue'
+import ErrorNotice from '../ui/ErrorNotice.vue'
+import Facts from '../ui/Facts.vue'
+import LiveMessage from '../ui/LiveMessage.vue'
+import Notice from '../ui/Notice.vue'
 import Panel from '../ui/Panel.vue'
+import CandidateForm from './evidence/CandidateForm.vue'
+import DocumentView from './evidence/DocumentView.vue'
+import ResultList from './evidence/ResultList.vue'
+import SearchForm from './evidence/SearchForm.vue'
 
 const props = defineProps({ suggestedQuery: { type: String, default: 'MTHFR' } })
 
@@ -30,335 +40,157 @@ const candidateState = ref('idle')
 const message = ref('')
 const documentMessage = ref('')
 const candidateMessage = ref('')
-let controller
-let searchController
-let documentController
-let candidateController
-let searchGeneration = 0
-let documentGeneration = 0
-let candidateGeneration = 0
+// A search owns the document and candidate it leads to: starting one cancels both.
+const healthTask = useTask()
+const searchTask = useTask()
+const documentTask = useTask()
+const candidateTask = useTask()
 
 const release = computed(() => health.value?.release)
-const spanById = computed(() => new Map((documentResponse.value?.spans ?? []).map((span) => [span.id, span])))
-const sectionById = computed(() => new Map((documentResponse.value?.sections ?? []).map((section) => [section.id, section])))
-const annotationById = computed(() => new Map((documentResponse.value?.annotations ?? []).map((annotation) => [annotation.id, annotation])))
-const lifecycleWarning = computed(() => documentResponse.value?.document.publication_status !== 'active')
-const canExtract = computed(() => selectedSpanIds.value.length > 0 && instruction.value.trim() && candidateState.value !== 'extracting')
+const canExtract = computed(() => selectedSpanIds.value.length > 0 && instruction.value.trim() !== '' && candidateState.value !== 'extracting' && Boolean(documentResponse.value))
+const statusLabel = computed(() => (state.value === 'loading' ? 'Verifying' : state.value === 'ready' ? 'Evidence pinned' : 'Unavailable'))
+const pins = computed(() => [
+  { label: 'Evidence release', value: health.value.release.id },
+  { label: 'Independent SHA-256', value: `sha256:${health.value.release.digest}` },
+  { label: 'Strict schema', value: health.value.release.schema_version },
+  { label: 'Bounded corpus', value: `${health.value.documents} documents` }
+])
 
-const lifecycleTone = (status) => (status === 'active' ? 'success' : 'warning')
-const lifecycleClass = (status) => `badge--${lifecycleTone(status)}`
-
-function isAbort(error) {
-  return error instanceof DOMException && error.name === 'AbortError'
+function forgetDocument() {
+  documentResponse.value = undefined
+  selectedCandidate.value = undefined
+  selectedSpanIds.value = []
+  candidateState.value = 'idle'
+  candidateMessage.value = ''
 }
 
-function errorMessage(error, fallback) {
-  return error instanceof Error ? error.message : fallback
-}
-
-function rankingChannels(result) {
-  return Object.entries(result.score_components).map(([name, component]) => ({ name, ...component }))
-}
-
-function annotationLabel(identifier) {
-  const annotation = annotationById.value.get(identifier)
-  if (!annotation) return identifier
-  const span = spanById.value.get(annotation.span_id)
-  return `${span?.text ?? annotation.span_id} (${annotation.normalized_id ?? 'unresolved'})`
-}
-
-function useSelection() {
-  query.value = props.suggestedQuery || 'MTHFR'
-}
-
-async function search() {
-  if (!release.value || !query.value.trim()) return
-  const generation = ++searchGeneration
-  documentGeneration += 1
-  candidateGeneration += 1
-  searchController?.abort()
-  documentController?.abort()
-  candidateController?.abort()
-  searchController = new AbortController()
+function search() {
+  if (!release.value || !query.value.trim()) return undefined
+  documentTask.cancel()
+  candidateTask.cancel()
   results.value = []
   searchResponse.value = undefined
-  documentResponse.value = undefined
-  selectedCandidate.value = undefined
-  selectedSpanIds.value = []
+  forgetDocument()
   searchState.value = 'searching'
   documentState.value = 'idle'
-  candidateState.value = 'idle'
   message.value = ''
   documentMessage.value = ''
-  candidateMessage.value = ''
-  try {
-    const response = await searchEvidence(release.value, { query: query.value, limit: 10, use_vector: useVector.value }, searchController.signal)
-    if (generation !== searchGeneration) return
-    searchResponse.value = response
-    results.value = response.items
-    searchState.value = 'ready'
-  } catch (error) {
-    if (generation !== searchGeneration || isAbort(error)) return
-    searchState.value = useVector.value ? 'vector-failed' : 'failed'
-    message.value = errorMessage(error, 'Evidence search failed.')
-  }
+  return searchTask.run(async ({ signal, fresh }) => fresh(await searchEvidence(release.value, { query: query.value, limit: 10, use_vector: useVector.value }, signal)), {
+    done: (response) => {
+      searchResponse.value = response
+      results.value = response.items
+      searchState.value = 'ready'
+    },
+    fail: (error) => {
+      searchState.value = useVector.value ? 'vector-failed' : 'failed'
+      message.value = errorMessage(error, 'Evidence search failed.')
+    }
+  })
 }
 
-async function openDocument(identifier) {
-  if (!release.value) return
-  const generation = ++documentGeneration
-  const owner = searchGeneration
-  candidateGeneration += 1
-  documentController?.abort()
-  candidateController?.abort()
-  documentController = new AbortController()
-  documentResponse.value = undefined
-  selectedCandidate.value = undefined
-  selectedSpanIds.value = []
+function openDocument(identifier) {
+  if (!release.value) return undefined
+  candidateTask.cancel()
+  forgetDocument()
   documentState.value = 'loading'
   documentMessage.value = ''
-  candidateState.value = 'idle'
-  candidateMessage.value = ''
-  try {
-    const response = await loadEvidenceDocument(release.value, identifier, documentController.signal)
-    if (generation !== documentGeneration || owner !== searchGeneration) return
-    documentResponse.value = response
-    documentState.value = 'ready'
-  } catch (error) {
-    if (generation !== documentGeneration || owner !== searchGeneration || isAbort(error)) return
-    documentState.value = 'failed'
-    documentMessage.value = errorMessage(error, 'The evidence document could not be loaded.')
-  }
+  return documentTask.run(async ({ signal, fresh }) => fresh(await loadEvidenceDocument(release.value, identifier, signal)), {
+    done: (response) => {
+      documentResponse.value = response
+      documentState.value = 'ready'
+    },
+    fail: (error) => {
+      documentState.value = 'failed'
+      documentMessage.value = errorMessage(error, 'The evidence document could not be loaded.')
+    }
+  })
 }
 
-async function refreshCandidates(signal = controller?.signal, current = () => true) {
-  if (!release.value) return
-  const response = await loadEvidenceCandidates(release.value, signal)
-  if (current()) candidates.value = response.items
-}
-
-async function extractCandidate() {
-  if (!release.value || !documentResponse.value || !canExtract.value) return
-  const generation = ++candidateGeneration
-  const owner = searchGeneration
+function extractCandidate() {
+  if (!release.value || !canExtract.value) return undefined
   const documentId = documentResponse.value.document.id
-  candidateController?.abort()
-  candidateController = new AbortController()
   candidateState.value = 'extracting'
   candidateMessage.value = ''
   selectedCandidate.value = undefined
-  try {
-    const response = await extractEvidenceCandidate(release.value, {
-      document_id: documentId,
-      span_ids: [...selectedSpanIds.value],
-      instruction: instruction.value
-    }, candidateController.signal)
-    if (generation !== candidateGeneration || owner !== searchGeneration || documentId !== documentResponse.value?.document.id) return
-    selectedCandidate.value = response.candidate
-    candidateState.value = 'ready'
-    await refreshCandidates(candidateController.signal, () => generation === candidateGeneration && owner === searchGeneration)
-  } catch (error) {
-    if (generation !== candidateGeneration || owner !== searchGeneration || isAbort(error)) return
-    candidateState.value = error && typeof error === 'object' && error.code === 'EVIDENCE_MODEL_UNAVAILABLE' ? 'generation-unavailable' : 'failed'
-    candidateMessage.value = errorMessage(error, 'Candidate extraction failed.')
-  }
+  return candidateTask.run(async ({ signal, fresh }) => {
+    const { candidate } = fresh(await extractEvidenceCandidate(release.value, { document_id: documentId, span_ids: [...selectedSpanIds.value], instruction: instruction.value }, signal))
+    return { candidate, queue: fresh(await loadEvidenceCandidates(release.value, signal)).items }
+  }, {
+    done: ({ candidate, queue }) => {
+      selectedCandidate.value = candidate
+      candidates.value = queue
+      candidateState.value = 'ready'
+    },
+    fail: (error) => {
+      candidateState.value = error && typeof error === 'object' && error.code === 'EVIDENCE_MODEL_UNAVAILABLE' ? 'generation-unavailable' : 'failed'
+      candidateMessage.value = errorMessage(error, 'Candidate extraction failed.')
+    }
+  })
 }
 
-async function openCandidate(identifier) {
-  if (!release.value) return
-  const generation = ++candidateGeneration
-  const owner = searchGeneration
-  candidateController?.abort()
-  candidateController = new AbortController()
+function openCandidate(identifier) {
+  if (!release.value) return undefined
   candidateState.value = 'loading'
   candidateMessage.value = ''
-  try {
-    const response = await loadEvidenceCandidate(release.value, identifier, candidateController.signal)
-    if (generation !== candidateGeneration || owner !== searchGeneration) return
-    selectedCandidate.value = response.candidate
-    candidateState.value = 'ready'
-  } catch (error) {
-    if (generation !== candidateGeneration || owner !== searchGeneration || isAbort(error)) return
-    candidateState.value = 'failed'
-    candidateMessage.value = errorMessage(error, 'The unreviewed candidate could not be loaded.')
-  }
+  return candidateTask.run(async ({ signal, fresh }) => fresh(await loadEvidenceCandidate(release.value, identifier, signal)).candidate, {
+    done: (candidate) => {
+      selectedCandidate.value = candidate
+      candidateState.value = 'ready'
+    },
+    fail: (error) => {
+      candidateState.value = 'failed'
+      candidateMessage.value = errorMessage(error, 'The unreviewed candidate could not be loaded.')
+    }
+  })
 }
 
-async function initialize() {
-  controller?.abort()
-  controller = new AbortController()
+function initialize() {
   state.value = 'loading'
   message.value = ''
-  try {
-    health.value = await loadEvidenceHealth(controller.signal)
+  return healthTask.run(async (task) => {
+    health.value = task.fresh(await loadEvidenceHealth(task.signal))
     state.value = 'ready'
-    await Promise.all([search(), refreshCandidates()])
-  } catch (error) {
-    if (isAbort(error)) return
-    health.value = undefined
-    state.value = 'failed'
-    message.value = errorMessage(error, 'The pinned evidence release is unavailable.')
-  }
+    await Promise.all([search(), loadQueue(task)])
+  }, {
+    fail: (error) => {
+      health.value = undefined
+      state.value = 'failed'
+      message.value = errorMessage(error, 'The pinned evidence release is unavailable.')
+    }
+  })
 }
 
-initialize()
-onBeforeUnmount(() => {
-  controller?.abort()
-  searchController?.abort()
-  documentController?.abort()
-  candidateController?.abort()
-})
+async function loadQueue({ signal, fresh }) {
+  if (release.value) candidates.value = fresh(await loadEvidenceCandidates(release.value, signal)).items
+}
+
+onMounted(initialize)
 </script>
 
 <template lang="pug">
-Panel(title-id="literature-title" title="Search exact evidence" eyebrow="06 · Literature intelligence" :status="state === 'loading' ? 'Verifying' : state === 'ready' ? 'Evidence pinned' : 'Unavailable'" :tone="state === 'ready' ? 'success' : state === 'loading' ? '' : 'danger'")
-  div(role="status")
-    p.notice(v-if="state === 'loading'") Verifying the independent evidence release and digest…
-  .notice.notice--danger.stack.stack--tight(v-if="state === 'failed'" role="alert")
-    strong Evidence intelligence unavailable
-    p {{ message }}
+Panel(title="Search exact evidence" title-id="literature-title" eyebrow="06 · Literature intelligence" :status="statusLabel" :tone="state === 'ready' ? 'success' : state === 'loading' ? '' : 'danger'")
+  LiveMessage(visible :text="state === 'loading' ? 'Verifying the independent evidence release and digest…' : ''")
+  ErrorNotice(v-if="state === 'failed'" title="Evidence intelligence unavailable" :message="message" retry-label="Retry evidence verification" @retry="initialize")
     p Atlas and simulation state do not establish literature compatibility.
-    button.button.button--secondary(type="button" @click="initialize") Retry evidence verification
 
   template(v-if="state === 'ready' && health")
-    dl.facts
-      div
-        dt Evidence release
-        dd {{ health.release.id }}
-      div
-        dt Independent SHA-256
-        dd sha256:{{ health.release.digest }}
-      div
-        dt Strict schema
-        dd {{ health.release.schema_version }}
-      div
-        dt Bounded corpus
-        dd {{ health.documents }} documents
+    Facts(:items="pins")
+    SearchForm(v-model:query="query" v-model:useVector="useVector" :searching="searchState === 'searching'" @search="search" @selection="query = props.suggestedQuery || 'MTHFR'")
 
-    form.stack(aria-label="Evidence search" @submit.prevent="search")
-      Field(id="evidence-query" label="PMID, PMCID, DOI, ontology ID, or text" hint="Search works with exact and BM25 ranking when vectors are off." v-slot="{ describedby }")
-        input#evidence-query(v-model="query" type="search" maxlength="500" autocomplete="off" :aria-describedby="describedby")
-      Field(id="evidence-vector" label="Add local Ollama vector rank" inline)
-        input#evidence-vector(v-model="useVector" type="checkbox")
-      .cluster
-        button.button.button--secondary(type="button" @click="useSelection") Use workbench selection
-        button.button(type="submit" :disabled="searchState === 'searching'") {{ searchState === 'searching' ? 'Searching…' : 'Search evidence' }}
-
-    div(role="status")
-      p.notice(v-if="searchState === 'searching'") Ranking exact identifiers, annotations, and full text{{ useVector ? ' with the requested vector channel' : '' }}…
-    .notice.notice--danger.stack.stack--tight(v-if="searchState === 'vector-failed'" role="alert")
-      strong Vector search failed; no lexical fallback was substituted
-      p {{ message }}
+    LiveMessage(visible :text="searchState === 'searching' ? `Ranking exact identifiers, annotations, and full text${useVector ? ' with the requested vector channel' : ''}…` : ''")
+    ErrorNotice(v-if="searchState === 'vector-failed'" title="Vector search failed; no lexical fallback was substituted" :message="message" retry-label="Retry vector search" @retry="search")
       p Turn vectors off for an explicit exact/BM25 search, or retry the requested vector search.
-      button.button.button--secondary(type="button" @click="search") Retry vector search
-    .notice.notice--danger.stack.stack--tight(v-if="searchState === 'failed'" role="alert")
-      strong Evidence search failed
-      p {{ message }}
-      button.button.button--secondary(type="button" @click="search") Retry search
+    ErrorNotice(v-if="searchState === 'failed'" title="Evidence search failed" :message="message" retry-label="Retry search" @retry="search")
+    ResultList(v-if="searchState === 'ready'" :response="searchResponse" :results="results" @open="openDocument")
 
-    template(v-if="searchState === 'ready'")
-      .stack.stack--tight
-        strong Transparent ranking · reciprocal-rank-fusion-v1
-        details.card
-          summary Explain exact, annotation, BM25, vector, and RRF channels
-          dl.facts.facts--rows
-            div(v-for="(explanation, channel) in searchResponse.explanations" :key="channel")
-              dt {{ channel }}
-              dd {{ explanation }}
-      p.notice.notice--warning(v-if="!results.length" role="status") No evidence matched this bounded release. This does not establish absence from the literature.
-      ul.plain-list.stack(v-else aria-label="Ranked evidence results")
-        li.card.stack.stack--tight(v-for="(result, index) in results" :key="result.document.id")
-          .repel
-            span.muted Rank {{ index + 1 }} · RRF {{ result.score.toFixed(6) }}
-            span.badge(:class="lifecycleClass(result.document.publication_status)") {{ result.document.publication_status }}
-          h3
-            button.button.button--link(type="button" @click="openDocument(result.document.id)") {{ result.document.title }}
-          p {{ result.document.canonical_id }} · {{ result.document.journal }} · {{ result.document.publication_date }}
-          ul.plain-list.stack.stack--tight(aria-label="Ranking channels and scores")
-            li.cluster(v-for="channel in rankingChannels(result)" :key="channel.name")
-              strong {{ channel.name }} rank {{ channel.rank }}
-              span(v-if="channel.raw !== undefined") BM25 raw {{ channel.raw.toFixed(6) }}
-              span(v-if="channel.cosine !== undefined") cosine {{ channel.cosine.toFixed(6) }}
-              span RRF +{{ channel.rrf.toFixed(6) }}
+    LiveMessage(visible :text="documentState === 'loading' ? 'Loading license-filtered document evidence…' : ''")
+    ErrorNotice(v-if="documentState === 'failed'" title="Evidence document failed" :message="documentMessage")
+    DocumentView(v-if="documentResponse" v-model:selectedSpanIds="selectedSpanIds" :document="documentResponse")
+      CandidateForm(v-model:instruction="instruction" :selected-count="selectedSpanIds.length" :state="candidateState" :message="candidateMessage" :candidate="selectedCandidate" :can-extract="Boolean(canExtract)" @extract="extractCandidate")
 
-    div(role="status")
-      p.notice(v-if="documentState === 'loading'") Loading license-filtered document evidence…
-    .notice.notice--danger.stack.stack--tight(v-if="documentState === 'failed'" role="alert")
-      strong Evidence document failed
-      p {{ documentMessage }}
-    Panel(v-if="documentResponse" title-id="evidence-document-title" :title="documentResponse.document.title" eyebrow="Selected document" :level="3" :status="documentResponse.document.publication_status" :tone="lifecycleTone(documentResponse.document.publication_status)")
-      .notice.notice--warning.stack.stack--tight(v-if="lifecycleWarning" role="alert")
-        strong Publication lifecycle warning
-        p This record is {{ documentResponse.document.publication_status }}. Inspect its lifecycle before using any span.
-      dl.facts
-        div
-          dt Content policy
-          dd {{ documentResponse.document.content_scope }}
-        div
-          dt Authors
-          dd {{ documentResponse.document.authors.join(', ') }}
-      section.card.stack.stack--tight(aria-labelledby="license-title")
-        h4#license-title License and redistribution policy
-        article.stack.stack--tight(v-for="license in documentResponse.licenses" :key="license.id")
-          strong {{ license.name }} · {{ license.redistribution }}
-          p {{ license.attribution }}
-          a(:href="license.url" target="_blank" rel="noreferrer") Read license terms
-      details
-        summary Publication lifecycle ({{ documentResponse.lifecycle.length }})
-        ol
-          li(v-for="event in documentResponse.lifecycle" :key="event.id") {{ event.occurred_at }} · {{ event.event_type }} · {{ event.note }}
-      section.stack.stack--tight(v-for="section in documentResponse.sections" :key="section.id")
-        h4 {{ section.section_type }}
-        p.muted {{ section.source_locator }} · source [{{ section.source_offset }}, {{ section.source_end }})
-        p(v-if="section.text") {{ section.text }}
-        p.notice.notice--warning(v-else role="note") Text withheld by the metadata-only content policy.
-        fieldset.card.stack.stack--tight(v-if="documentResponse.spans.some(span => span.section_id === section.id)")
-          legend Select exact supporting spans for review-only extraction
-          label.field.field--inline(v-for="span in documentResponse.spans.filter(item => item.section_id === section.id)" :key="span.id" :for="span.id")
-            input(:id="span.id" v-model="selectedSpanIds" type="checkbox" :value="span.id")
-            span.field
-              strong “{{ span.text }}”
-              small.muted {{ span.id }} · local [{{ span.start }}, {{ span.end }}) · source [{{ span.source_offset }}, {{ span.source_end }})
-      .grid
-        section.stack.stack--tight
-          h4 PubTator annotations
-          p.muted(v-if="!documentResponse.annotations.length") No annotations in this document response.
-          ul
-            li(v-for="annotation in documentResponse.annotations" :key="annotation.id") {{ annotation.annotation_type }} · {{ spanById.get(annotation.span_id)?.text }} · {{ annotation.normalized_id ?? 'unresolved' }}
-        section.stack.stack--tight
-          h4 PubTator relations
-          p.muted(v-if="!documentResponse.relations.length") No machine relation in this document response.
-          ul
-            li(v-for="relation in documentResponse.relations" :key="relation.id") {{ annotationLabel(relation.subject_annotation_id) }} {{ relation.relation_type.replaceAll('_', ' ') }} {{ annotationLabel(relation.object_annotation_id) }} · confidence {{ relation.confidence }}
-
-      form.stack(aria-label="Candidate extraction" @submit.prevent="extractCandidate")
-        .notice.notice--warning.stack.stack--tight(role="note")
-          strong Unreviewed, not trusted knowledge
-          p Ollama output is a review-only candidate. It cannot enter the atlas or trusted release through this workbench.
-        Field(id="candidate-instruction" label="Extraction instruction")
-          textarea#candidate-instruction(v-model="instruction" maxlength="2000" rows="3")
-        p {{ selectedSpanIds.length }} exact span{{ selectedSpanIds.length === 1 ? '' : 's' }} selected.
-        div
-          button.button(type="submit" :disabled="!canExtract") {{ candidateState === 'extracting' ? 'Generating candidate…' : 'Extract unreviewed candidate' }}
-      div(role="status")
-        p.notice(v-if="candidateState === 'extracting' || candidateState === 'loading'") {{ candidateState === 'extracting' ? 'Generating an unreviewed candidate from the selected spans…' : 'Loading the unreviewed candidate…' }}
-      .notice.notice--danger.stack.stack--tight(v-if="candidateState === 'generation-unavailable'" role="alert")
-        strong Ollama generation unavailable; no candidate was created
-        p {{ candidateMessage }}
-        button.button.button--secondary(type="button" @click="extractCandidate") Retry candidate generation
-      .notice.notice--danger(v-else-if="candidateState === 'failed'" role="alert") {{ candidateMessage }}
-      article.card.stack.stack--tight(v-else-if="selectedCandidate")
-        strong Unreviewed, not trusted knowledge
-        h4 {{ selectedCandidate.subject }} · {{ selectedCandidate.relation }} · {{ selectedCandidate.object }}
-        p Model {{ selectedCandidate.model }} · {{ selectedCandidate.id }}
-        p Candidate release {{ selectedCandidate.release_id }} · sha256:{{ selectedCandidate.release_digest }}
-        p Supporting spans: {{ selectedCandidate.span_ids.join(', ') }}
-        p Unresolved: {{ selectedCandidate.unresolved_entities.join(', ') || 'none declared' }}
-        p Missing context: {{ selectedCandidate.missing_context.join(', ') || 'none declared' }}
-
-    Panel(title-id="candidate-queue-title" title="Unreviewed candidate workspace" :level="3")
-      p.notice.notice--warning Every record below is unreviewed, not trusted knowledge, and stored outside immutable evidence releases.
-      p.muted(v-if="!candidates.length") No unreviewed candidates have been persisted in this workspace.
+    Panel(title="Unreviewed candidate workspace" title-id="candidate-queue-title" :level="3")
+      Notice(tone="warning") Every record below is unreviewed, not trusted knowledge, and stored outside immutable evidence releases.
+      EmptyState(v-if="!candidates.length") No unreviewed candidates have been persisted in this workspace.
       ul.plain-list.stack.stack--tight(v-else)
         li(v-for="candidate in candidates" :key="candidate.id")
           button.card(type="button" @click="openCandidate(candidate.id)")

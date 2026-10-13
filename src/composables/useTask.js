@@ -4,12 +4,14 @@
 //
 //   const load = useTask()
 //   await load.run(async ({ signal, fresh }) => {
-//     workspace.value = fresh(await loadWorkspace(signal))   // dropped if superseded
-//   }, { fail: (error) => { message.value = errorMessage(error, 'Could not load.') } })
+//     return fresh(await loadWorkspace(signal))        // ends the run if superseded
+//   }, { done: (workspace) => { ... }, fail: (error) => { ... } })
 //
 // `run` aborts the previous run of the same task first. A superseded, aborted or
-// unmounted run never calls `done` or `fail`, and `fresh(value)` after an await
-// ends it (it returns the value while the run is still the latest).
+// unmounted run never calls `done` or `fail`; `fresh(value)` after an await
+// returns the value while the run is still the latest and ends it otherwise.
+// Prefer returning the result and committing it in `done`: everything the run
+// changes (data and state) then appears in one step.
 import { onBeforeUnmount } from 'vue'
 
 const STALE = Symbol('stale')
@@ -32,7 +34,7 @@ export function useTask() {
     controller = undefined
   }
 
-  function run(work, { done, fail, settled } = {}) {
+  function run(work, { done, fail } = {}) {
     cancel()
     const mine = epoch
     const current = () => mine === epoch
@@ -42,7 +44,6 @@ export function useTask() {
       if (!current()) throw STALE
       return value
     }
-    const finish = () => { if (current()) settled?.() }
     let pending
     try {
       pending = Promise.resolve(work({ signal: request.signal, fresh, current }))
@@ -52,11 +53,9 @@ export function useTask() {
     return pending.then(
       (value) => {
         if (current()) done?.(value)
-        finish()
         return value
       },
       (error) => {
-        finish()
         if (error === STALE || isAbort(error) || !current()) return undefined
         if (!fail) throw error
         fail(error)

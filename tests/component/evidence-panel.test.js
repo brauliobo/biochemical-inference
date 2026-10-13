@@ -51,7 +51,7 @@ describe('EvidencePanel', () => {
     await fireEvent.click(span)
     await fireEvent.click(screen.getByRole('button', { name: 'Extract unreviewed candidate' }))
 
-    expect(await screen.findByText(/MTHFR phosphorylation · increases sensitivity to · SAM inhibition/)).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: /MTHFR phosphorylation · increases sensitivity to · SAM inhibition/ })).toBeTruthy()
     expect(screen.getAllByText(/Unreviewed, not trusted knowledge/i).length).toBeGreaterThan(1)
     expect(screen.getByText(/cannot enter the atlas or trusted release/)).toBeTruthy()
     expect(screen.getAllByText(/mthfr-evidence-v1.0.0 · sha256:93662849/).length).toBeGreaterThan(0)
