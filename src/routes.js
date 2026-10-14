@@ -5,8 +5,11 @@
 // line here. Views read route params with useRoute() from './router.js'.
 //
 //   { name, path, title, load }   path segments starting with ":" are params
+import { dashRoutes } from './views/dash/routes.js'
+
 export const routes = [
-  { name: 'home', path: '/', title: 'Home', load: () => import('./views/HomeView.vue') },
+  { name: 'home', path: '/', title: 'Home', load: () => import('./views/home/HomeView.vue') },
+  ...dashRoutes,
   { name: 'kb-hub', path: '/kb', title: 'Knowledge base', load: () => import('./views/kb/KbHubView.vue') },
   { name: 'kbMap', path: '/kb/map', title: 'Knowledge map', load: () => import('./views/kb/KbMapView.vue') },
   // Guided paths must stay above /kb/:type, which would read "paths" as an entity type.

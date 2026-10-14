@@ -27,14 +27,13 @@ describe('home', () => {
   it('explains the topic, warns it is not medical advice and offers the start-here path', async () => {
     await open('/')
     await screen.findByRole('heading', { name: 'Browse by kind' })
-    expect(h1().textContent).toMatch(/Methylation biochemistry/)
+    expect(h1().textContent).toMatch(/Methylation, visualised/)
     expect(within(main()).getByRole('note').textContent).toMatch(/not medical advice/i)
-    expect(headings(2)).toEqual(expect.arrayContaining(['Start here', 'What is methylation?', 'Browse by kind', 'Claims audit', 'How sure are we?', 'Workbenches']))
+    expect(headings(2)).toEqual(expect.arrayContaining(['Questions this site answers', 'Guided paths', 'Start here', 'Browse by kind', 'Claims audit']))
     const start = within(screen.getByRole('heading', { name: 'Start here' }).closest('section')).getAllByRole('link')
     expect(start.map((link) => link.textContent)).toEqual(START_HERE.map((step) => step.name))
     expect(start.every((link) => link.getAttribute('href').startsWith('#/kb'))).toBe(true)
     expect(screen.getByRole('searchbox')).toBeTruthy()
-    expect(within(main()).getByRole('link', { name: 'About the workbenches' }).getAttribute('href')).toBe('#/workbench')
   })
 
   it('shows an entry point with a count for every entity type once the data has loaded', async () => {

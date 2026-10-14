@@ -25,10 +25,10 @@ describe('app shell', () => {
     expect(screen.getByRole('main')).toBeTruthy()
     expect(screen.getByRole('contentinfo').textContent).toMatch(/not medical advice/i)
     expect(screen.getByRole('link', { name: 'Skip to main content' }).getAttribute('href')).toBe('#main')
-    expect(await screen.findByRole('heading', { level: 1, name: /Methylation biochemistry/ })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 1, name: /Methylation, visualised/ })).toBeTruthy()
     expect(document.title).toBe('Home · Biochemical Inference')
     // class on <RouterLink> falls through to its root <a>
-    expect(screen.getByRole('link', { name: 'Browse the knowledge base' }).classList.contains('button')).toBe(true)
+    expect(screen.getByRole('link', { name: 'Simulate it: methylation balance' }).classList.contains('button')).toBe(true)
   })
 
   it('moves focus to main from the skip link without changing the route', async () => {
