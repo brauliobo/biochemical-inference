@@ -39,6 +39,7 @@ a.chip--caution:where(:link, :visited) { color: var(--color-warning-text); }
 .evidence-strip { gap: var(--space-stack) var(--space-stack-loose); }
 .evidence-scale {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-cluster-tight);
   margin: 0;
   padding: 0;
@@ -125,6 +126,11 @@ a.species:hover { background: var(--color-surface-sunken); }
   gap: var(--space-cluster-tight) var(--space-cluster);
   font-weight: var(--weight-strong);
 }
+.equation-graphic__enzymes a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--target-min) * 0.6);
+}
 .equation-graphic__svg {
   inline-size: calc(var(--target-min) * 2);
   block-size: auto;
@@ -132,7 +138,12 @@ a.species:hover { background: var(--color-surface-sunken); }
 }
 .equation-graphic--compact .species { padding: var(--space-cluster-tight) var(--space-inset-tight); font-size: var(--text-small); }
 .equation-graphic--compact .species__n { font-size: var(--text-body); }
-.equation-graphic--compact .equation-graphic__svg { inline-size: calc(var(--target-min) * 1.4); }
+.equation-graphic--compact .equation-graphic__enzymes a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--target-min) * 0.6);
+}
+.equation-graphic__svg { inline-size: calc(var(--target-min) * 1.4); }
 
 /* ---- Signed effects ---- */
 .sign {
@@ -259,3 +270,9 @@ a.species:hover { background: var(--color-surface-sunken); }
 .atlas-side { min-inline-size: 0; }
 
 .atlas-graph .viz-graph { max-block-size: calc(var(--target-min) * 20); }
+
+/* Visually hidden text is absolutely positioned: give scroll boxes a containing block so it cannot widen the page. */
+.data-table, .scroll-x, .equation-graphic { position: relative; }
+
+/* A long unbreakable term in a title (N-methyltransferase) wraps instead of widening a narrow screen. */
+h1 { overflow-wrap: anywhere; }

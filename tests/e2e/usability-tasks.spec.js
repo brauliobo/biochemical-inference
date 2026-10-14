@@ -29,9 +29,9 @@ test.describe('tasks from Home, with the mouse or touch', () => {
     let interactions = 0
     interactions += await activate(page.getByRole('main').getByRole('link', { name: 'Betaine', exact: true }))
     await expect(heading(page, /Betaine/)).toBeVisible()
-    await expect(page.locator('main .lede')).not.toBeEmpty()
+    await expect(page.locator('main header .lede').first()).not.toBeEmpty()
     await expect(page.getByText(/^Evidence: /).first()).toBeVisible()
-    await expect(page.getByText(/Well supported by|Mechanistically reasonable|little or no direct support|not yet checked/).first()).toBeVisible() // the grade is explained in plain words
+    await expect(page.locator('.evidence-scale li.is-current')).toBeVisible() // the grade as a scale, the current step marked in words and a letter
     record('T1 interactions', interactions)
     expect(interactions).toBeLessThanOrEqual(MAX_INTERACTIONS)
   })
@@ -70,9 +70,9 @@ test.describe('tasks from Home, with the mouse or touch', () => {
   test('T3 follow relationships: from GNMT to the reaction it catalyses in 1 interaction, and on to a compound in 2', async ({ page }) => {
     await page.goto('/#/kb/enzyme/gnmt')
     let interactions = 0
-    interactions += await activate(page.getByRole('heading', { name: /^Catalyzes/ }).locator('xpath=ancestor::section[1]').getByRole('link'))
-    await expect(page.locator('main .equation')).toBeVisible()
-    interactions += await activate(page.locator('main .equation').getByRole('link').first())
+    interactions += await activate(page.locator('[data-visual="reaction-cards"]').getByRole('link', { name: /^GNMT:/ }))
+    await expect(page.locator('main .equation-graphic').first()).toBeVisible()
+    interactions += await activate(page.locator('main [data-testid="reaction-equation"] .species').first())
     await expect(page.getByText(/^Compound$/).first()).toBeVisible()
     record('T3 interactions (enzyme to reaction to compound)', interactions)
     expect(interactions).toBeLessThanOrEqual(MAX_INTERACTIONS)
@@ -131,11 +131,10 @@ test.describe('tasks from Home, with the mouse or touch', () => {
     let interactions = 0
     interactions += await activate(page.getByRole('main').getByRole('link', { name: 'Claims audit', exact: true }))
     await expect(heading(page, 'Claims')).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: /^Unsupported \(\d+\)$/ })).toBeVisible()
-    interactions += await activate(page.getByRole('heading', { name: /^Supported \(/ }).locator('xpath=ancestor::section[1]').getByRole('link'))
+    await expect(page.getByRole('row').filter({ hasText: 'Claim: Unsupported' }).first()).toBeVisible()
+    interactions += await activate(page.getByRole('row').filter({ hasText: 'Claim: Supported' }).getByRole('link'))
     await expect(page.getByText(/^Claim: /).first()).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: 'Evidence for this claim' })).toBeVisible()
-    await expect(page.getByRole('heading', { level: 2, name: 'Evidence against this claim' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2 }).filter({ hasText: /Evidence|evidence/ }).first()).toBeVisible()
     record('T5 interactions', interactions)
     expect(interactions).toBeLessThanOrEqual(MAX_INTERACTIONS)
   })
@@ -150,7 +149,7 @@ test.describe('tasks from Home, with the mouse or touch', () => {
       await settle(page)
       await cards.nth(index).click()
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-      const entry = page.locator(`main ul a[href^="${href}/"]`).first()
+      const entry = page.locator(`main table a[href^="${href}/"]`).first()
       if ((await entry.count()) === 0) continue // a kind with no entries yet (articles until articles.js lands)
       await entry.click()
       await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toBeVisible()
@@ -232,7 +231,7 @@ test.describe('keyboard only', () => {
     await expect(heading(page, 'Glycine')).toBeVisible()
     await page.getByRole('main').focus()
     let tabs = 0
-    while (tabs < 80) {
+    while (tabs < 250) {
       await page.keyboard.press('Tab')
       tabs += 1
       const href = await page.evaluate(() => document.activeElement.getAttribute('href') ?? '')

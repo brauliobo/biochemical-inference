@@ -19,6 +19,16 @@ const ROUTES = [
   '/#/kb/state/undermethylation',
   '/#/kb/claim/belching-mostly-swallowed-air',
   '/#/kb/compound/glycine?to=outcome%3Abelching',
+  '/#/kb/compound/glycine',
+  '/#/kb/compound/choline',
+  '/#/kb/pathway/methionine-cycle',
+  '/#/kb/disease/lpr',
+  '/#/kb/intervention/glycine-powder',
+  '/#/atlas',
+  '/#/atlas/causal',
+  '/#/atlas/causal?focus=outcome:belching',
+  '/#/atlas/network',
+  '/#/atlas/search?q=gnmt',
   '/#/kb/map',
   '/#/kb/map?id=compound%3Aglycine',
   '/#/kb/paths',
@@ -38,6 +48,7 @@ const ROUTES = [
 
 for (const colorScheme of ['light', 'dark']) {
   test(`has no WCAG 2.2 AA violations on any shell route (${colorScheme})`, async ({ page }) => {
+    test.setTimeout(300_000) // about 60 routes, several with maps and graphs
     await page.emulateMedia({ colorScheme })
     for (const route of ROUTES) {
       await page.goto(route)
