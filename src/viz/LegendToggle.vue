@@ -20,6 +20,6 @@ const emit = defineEmits(['toggle'])
 <template lang="pug">
 .viz-legend(role="group" :aria-label="label")
   button.viz-toggle(v-for="item in items" :key="item.id" type="button" :aria-pressed="!hidden.includes(item.id)" :data-series="item.id" @click="emit('toggle', item.id)")
-    Swatch(:look="item.look" :kind="item.kind || 'line'" :tone="item.tone || ''" :dashed="Boolean(item.dashed)")
+    Swatch(:look="item.look" :kind="item.kind || 'line'" :tone="item.tone || ''" :dashed="Boolean(item.dashed)" :node="item.node || 'rounded'" :sign="item.sign || 'neutral'" :hypothesis="Boolean(item.hypothesis)")
     span.viz-toggle__label {{ item.label }}
 </template>

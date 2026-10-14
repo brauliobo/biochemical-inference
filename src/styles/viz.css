@@ -145,7 +145,7 @@
 
 /* The readout under a chart keeps its height so the page does not jump. */
 .viz-readout {
-  min-block-size: calc(var(--target-min) * 1.6);
+  min-block-size: calc(var(--target-min) * 1.25);
   padding: var(--space-inset-tight) var(--space-inset);
   border-radius: var(--radius-control);
   background: var(--color-surface-sunken);
@@ -292,4 +292,334 @@
 .viz-segmented__option input:focus-visible + span {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+/* ---- Range bar (RangeBar): regions are patterned as well as coloured ---- */
+.viz-region--below {
+  fill: var(--color-warning-surface);
+  stroke: var(--color-warning-border);
+  stroke-width: var(--border-width);
+}
+.viz-region--within,
+.viz-region--no-limit {
+  fill: var(--color-success-surface);
+  stroke: var(--color-success-border);
+  stroke-width: var(--border-width);
+}
+.viz-region--no-limit { stroke-dasharray: 4 3; }
+.viz-region--above {
+  fill: var(--color-danger-surface);
+  stroke: var(--color-danger-border);
+  stroke-width: var(--border-width);
+}
+.viz-hatch {
+  stroke: var(--color-danger-border);
+  stroke-width: var(--border-width);
+}
+.viz-dots { fill: var(--color-warning-border); }
+.viz-bracket {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: var(--border-width-strong);
+}
+.viz-ref-marker {
+  fill: var(--color-text);
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width);
+}
+.viz-ref-marker--ul {
+  fill: none;
+  stroke: var(--color-danger-border);
+  stroke-width: var(--border-width-accent);
+}
+.viz-user {
+  stroke: var(--color-text);
+  stroke-width: var(--border-width-strong);
+  stroke-dasharray: 3 3;
+}
+.viz-user-mark {
+  fill: var(--color-accent);
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width-strong);
+}
+.viz-status {
+  display: grid;
+  gap: var(--space-cluster-tight);
+  margin: 0;
+  font-size: var(--text-small);
+}
+.viz-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  font-size: var(--text-small);
+}
+
+/* ---- Stacked bar (StackedBar) ---- */
+.viz-seg {
+  fill: var(--viz-color);
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width);
+  cursor: pointer;
+}
+.viz-seg__text {
+  fill: var(--color-text-inverse);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+  pointer-events: none;
+}
+.viz-whisker {
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-accent);
+}
+.viz-dot {
+  fill: var(--viz-color);
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width-strong);
+}
+.viz-key--button {
+  min-block-size: var(--target-min);
+  padding-inline: var(--space-control-inline);
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-raised);
+  text-align: start;
+}
+.viz-key--button:hover { background: var(--color-surface-sunken); }
+
+/* ---- Sparkline ---- */
+.viz-spark-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  vertical-align: middle;
+}
+.viz-spark {
+  display: inline-block;
+  inline-size: calc(var(--target-min) * 2.5);
+  block-size: var(--icon-size);
+  overflow: visible;
+}
+.viz-spark__line {
+  fill: none;
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-strong);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.viz-spark__band {
+  fill: var(--viz-color);
+  fill-opacity: 0.2;
+}
+.viz-spark__dot {
+  fill: var(--viz-color);
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width);
+}
+.viz-spark__value {
+  font-family: var(--font-code);
+  font-size: var(--text-small);
+}
+
+/* ---- Heatmap and matrix ---- */
+.viz-heat-scroll {
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+.viz-heat {
+  inline-size: auto;
+  min-inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: var(--border-width);
+  font-size: var(--text-small);
+}
+.viz-heat th,
+.viz-heat td {
+  padding: var(--space-cluster-tight) var(--space-inset-tight);
+  border: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+.viz-heat thead th {
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+  vertical-align: bottom;
+}
+.viz-heat tbody th,
+.viz-heat tfoot th {
+  text-align: start;
+  white-space: nowrap;
+}
+.viz-heat__corner {
+  text-align: start;
+  font-weight: var(--weight-body);
+}
+.viz-heat__cell {
+  min-inline-size: var(--target-min);
+  min-block-size: var(--target-min);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.viz-heat__cell:focus-visible {
+  outline-offset: calc(-1 * var(--focus-ring-width));
+  position: relative;
+}
+.viz-heat__cell:hover { box-shadow: inset 0 0 0 var(--border-width-strong) var(--color-text); }
+.viz-heat__cell--diagonal { box-shadow: inset 0 0 0 var(--border-width-strong) var(--color-text-muted); }
+.viz-heat__total {
+  background: var(--color-surface-sunken);
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+.viz-bin-none { background: var(--color-surface-sunken); color: var(--color-text-muted); }
+.viz-bin-s1 { background: var(--color-viz-seq-1); color: var(--color-viz-seq-1-on); }
+.viz-bin-s2 { background: var(--color-viz-seq-2); color: var(--color-viz-seq-2-on); }
+.viz-bin-s3 { background: var(--color-viz-seq-3); color: var(--color-viz-seq-3-on); }
+.viz-bin-s4 { background: var(--color-viz-seq-4); color: var(--color-viz-seq-4-on); }
+.viz-bin-s5 { background: var(--color-viz-seq-5); color: var(--color-viz-seq-5-on); }
+.viz-bin-s6 { background: var(--color-viz-seq-6); color: var(--color-viz-seq-6-on); }
+.viz-bin-n3 { background: var(--color-viz-div-n3); color: var(--color-viz-div-n3-on); }
+.viz-bin-n2 { background: var(--color-viz-div-n2); color: var(--color-viz-div-n2-on); }
+.viz-bin-n1 { background: var(--color-viz-div-n1); color: var(--color-viz-div-n1-on); }
+.viz-bin-z { background: var(--color-viz-div-0); color: var(--color-viz-div-0-on); }
+.viz-bin-p1 { background: var(--color-viz-div-p1); color: var(--color-viz-div-p1-on); }
+.viz-bin-p2 { background: var(--color-viz-div-p2); color: var(--color-viz-div-p2-on); }
+.viz-bin-p3 { background: var(--color-viz-div-p3); color: var(--color-viz-div-p3-on); }
+.viz-key__chip {
+  display: inline-block;
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  line-height: var(--icon-size);
+  text-align: center;
+}
+
+/* ---- Timeline ---- */
+.viz-lane {
+  fill: var(--color-surface-sunken);
+  fill-opacity: 0.55;
+}
+.viz-dot-mark {
+  cursor: pointer;
+}
+.viz-dot-mark.is-active {
+  stroke: var(--color-text);
+  stroke-width: var(--border-width-strong);
+}
+.viz-dot-mark.viz-mark--open.is-active { stroke: var(--viz-color); stroke-width: var(--border-width-accent); }
+.viz-key__text { min-inline-size: 0; }
+.viz-key--button { max-inline-size: 100%; }
+
+/* ---- Layered graph (LayeredGraph) ---- */
+.viz-graph {
+  max-block-size: calc(var(--target-min) * 14);
+  overflow: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+.viz-gsvg { display: block; }
+.viz-gsvg--natural { max-inline-size: none; }
+.viz-gsvg--fit {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+.viz-tier {
+  fill: var(--color-surface-sunken);
+  fill-opacity: 0.6;
+}
+.viz-tier__label {
+  fill: var(--color-text-muted);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* Edges: colour, end marker (drawn in the component), label chip and dash for a hypothesis. */
+.viz-edge--increase { --viz-color: var(--color-edge-increase); }
+.viz-edge--decrease { --viz-color: var(--color-edge-decrease); }
+.viz-edge--mitigate { --viz-color: var(--color-edge-mitigate); }
+.viz-edge--aggravate { --viz-color: var(--color-edge-aggravate); }
+.viz-edge--neutral { --viz-color: var(--color-edge-neutral); }
+.viz-edge {
+  fill: none;
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-strong);
+  stroke-linecap: round;
+}
+.viz-edge--hyp { stroke-dasharray: 6 5; }
+.viz-edge-end {
+  fill: none;
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-strong);
+  stroke-linejoin: round;
+}
+.viz-edge-end--filled { fill: var(--viz-color); }
+.viz-chip-bg {
+  fill: var(--color-surface-raised);
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width);
+  rx: 9;
+}
+.viz-chip-text {
+  fill: var(--color-text);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-strong);
+}
+.viz-swatch__head { fill: none; stroke: var(--viz-color); stroke-width: var(--border-width-strong); }
+.viz-swatch__head--filled { fill: var(--viz-color); }
+.viz-swatch__node {
+  fill: var(--color-surface-raised);
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-strong);
+}
+g.is-up > .viz-edge,
+g.is-down > .viz-edge { stroke-width: var(--border-width-accent); }
+g.is-dim { opacity: 0.2; }
+
+/* Nodes */
+.viz-gnode { cursor: pointer; }
+.viz-node {
+  fill: var(--color-surface-raised);
+  stroke: var(--viz-color);
+  stroke-width: var(--border-width-strong);
+}
+.viz-gnode:hover .viz-node,
+.viz-gnode.is-focus .viz-node { fill: var(--color-surface-sunken); }
+.viz-gnode.is-selected .viz-node {
+  stroke-width: var(--border-width-accent);
+  fill: var(--color-selection);
+}
+.viz-gnode.is-up .viz-node { stroke-dasharray: 3 2; }
+.viz-node__text {
+  fill: var(--color-text);
+  font-size: var(--text-small);
+  pointer-events: none;
+}
+.viz-ring {
+  fill: none;
+  stroke: var(--color-focus-ring);
+  stroke-width: var(--focus-ring-width);
+}
+.viz-badge {
+  fill: var(--color-surface-raised);
+  stroke: var(--viz-grade);
+  stroke-width: var(--border-width-strong);
+}
+.viz-badge__text {
+  fill: var(--color-text);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-heading);
+  pointer-events: none;
+}
+.viz-grade-established { --viz-grade: var(--color-grade-established); }
+.viz-grade-plausible { --viz-grade: var(--color-grade-plausible); }
+.viz-grade-speculative { --viz-grade: var(--color-grade-speculative); }
+.viz-grade-conversation { --viz-grade: var(--color-grade-conversation); }
+.viz-chip-button {
+  min-block-size: var(--target-min);
+  padding-inline: var(--space-control-inline);
+  font-size: var(--text-small);
 }

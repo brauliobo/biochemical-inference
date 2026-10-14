@@ -55,6 +55,10 @@ describe('chart colour roles', () => {
         expect(contrast(colour(token, scheme), colour(`${token}-on`, scheme))).toBeGreaterThanOrEqual(TEXT)
       })
 
+      it.each(SERIES)('%s carries inverse text (segment labels) at 4.5:1', (token) => {
+        expect(contrast(colour(token, scheme), colour('--color-text-inverse', scheme))).toBeGreaterThanOrEqual(TEXT)
+      })
+
       it('keeps the eight series distinct from each other', () => {
         const values = SERIES.map((token) => colour(token, scheme))
         expect(new Set(values).size).toBe(values.length)

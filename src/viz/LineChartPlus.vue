@@ -62,7 +62,7 @@ const model = computed(() => buildLineModel({
   hidden: hidden.value
 }))
 const drawOrder = computed(() => [...model.value.lines.filter((line) => line.baseline), ...model.value.lines.filter((line) => !line.baseline)])
-const legendItems = computed(() => props.series.map((entry, index) => ({ id: entry.id, label: entry.label, look: seriesLook(entry.look ?? index), dashed: Boolean(entry.baseline) })))
+const legendItems = computed(() => props.series.map((entry, index) => ({ id: entry.id, label: entry.label, look: entry.baseline ? { ...seriesLook(entry.look ?? index), shape: '' } : seriesLook(entry.look ?? index), dashed: Boolean(entry.baseline) })))
 const summaryText = computed(() => props.summary || describeLines({ x: props.x, series: props.series, events: props.events, bands: props.bands, refLines: props.refLines, xUnit: props.xUnit, unit: props.unit }))
 const readout = computed(() => (active.value < 0 ? null : readoutAt({ x: props.x, series: props.series, events: props.events, bands: props.bands, hidden: hidden.value, xUnit: props.xUnit, unit: props.unit, index: active.value })))
 const crossX = computed(() => (active.value < 0 ? 0 : model.value.xScale(props.x[active.value])))
@@ -178,8 +178,7 @@ ChartFrame(:id="id" :title="title" :summary="summaryText" :table-label="tableLab
       span.muted(v-else) {{ hint }}
   template(#legend)
     LegendToggle(:items="legendItems" :hidden="hidden" @toggle="toggle")
-    button.viz-toggle(v-if="allowLog && model.logAllowed" type="button" :aria-pressed="logOn" @click="logOn = !logOn")
-      span.viz-toggle__label Log scale
+    button.button.button--secondary(v-if="allowLog && model.logAllowed" type="button" :aria-pressed="logOn" @click="logOn = !logOn") Log scale
   template(#table)
     table
       caption {{ title }}: sampled values

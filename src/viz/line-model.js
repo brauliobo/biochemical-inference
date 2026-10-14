@@ -5,6 +5,7 @@
 //   series: [{ id, label, values, lower?, upper?, baseline?, unit? }]   x: [0, 0.5, ...]
 //   events: [{ x, label }]   bands: [{ from, to, label }]   refLines: [{ value, label }]
 import { extentOf, formatNumber, logTicks, niceTicks, nearestIndex, sampleEvenly, scaleFor, textWidth, truncate, withUnit } from './scale.js'
+import { stagger } from './labels.js'
 import { isOpenMarker, markerPath, seriesLook } from './shapes.js'
 
 export const EVENT_ROW_HEIGHT = 14
@@ -34,20 +35,6 @@ function yDomain({ series, bands, refLines, yMin, yMax, type }) {
   if (yMin === undefined && low >= 0 && low < high * 0.4) low = 0
   const ticks = niceTicks(yMin ?? low, yMax ?? high, 5)
   return { min: yMin ?? ticks.min, max: yMax ?? ticks.max, ticks: ticks.ticks.filter((tick) => tick >= (yMin ?? ticks.min) - 1e-9 && tick <= (yMax ?? ticks.max) + 1e-9) }
-}
-
-function place(items, { pad = 6, rowLimit = MAX_EVENT_ROWS, right, fontSize = 12 }) {
-  const ends = []
-  return items.map((item, order) => {
-    const width = textWidth(item.text, fontSize)
-    const anchor = item.pos + width > right ? 'end' : 'start'
-    const from = anchor === 'start' ? item.pos : item.pos - width
-    const to = anchor === 'start' ? item.pos + width : item.pos
-    let row = ends.findIndex((end) => end + pad < from)
-    if (row === -1) row = ends.length < rowLimit ? ends.length : order % rowLimit
-    ends[row] = Math.max(to, ends[row] ?? -Infinity)
-    return { ...item, anchor, row }
-  })
 }
 
 function linePath(points) {
@@ -84,9 +71,9 @@ export function buildLineModel({ x, series, events = [], bands = [], refLines = 
   const bottom = height - 44
   const xScale = scaleFor({ domain: [xExtent[0], xExtent[1]], range: [left, right] })
 
-  const placed = place(
+  const placed = stagger(
     [...events].sort((a, b) => a.x - b.x).map((event) => ({ ...event, text: truncate(event.label, 34), pos: xScale(event.x) })),
-    { right: right - 4 }
+    { right: right - 4, rowLimit: MAX_EVENT_ROWS }
   )
   const rows = placed.length ? Math.max(...placed.map((event) => event.row)) + 1 : 0
   const top = 12 + rows * EVENT_ROW_HEIGHT
