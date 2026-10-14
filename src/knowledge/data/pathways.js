@@ -789,7 +789,15 @@ export default [
       { rel: "interacts-with", to: "pathway:choline-oxidation", note: "Released choline is a substrate of choline dehydrogenase" },
       { rel: "decreases", to: "compound:phosphatidylcholine" },
       { rel: "increases", to: "compound:choline" },
-      { rel: "associated-with", to: "intervention:alpha-gpc-supplement", note: "Glycerophosphocholine is an intermediate of the deacylation route; handling of supplemental alpha-GPC is not shown" }
+      { rel: "associated-with", to: "intervention:alpha-gpc-supplement", note: "Glycerophosphocholine is an intermediate of the deacylation route; handling of supplemental alpha-GPC is not shown" },
+      {
+        rel: "increases",
+        to: "compound:acetylcholine",
+        note: "Released choline can enter acetylcholine synthesis; how much of the acetylcholine pool depends on PC turnover is the conversation hypothesis.",
+        hypothesis: true,
+        claim: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
+        strength: "weak"
+      }
     ],
     refs: [
       "article:zaccheo-2004-nte-phosphatidylcholine-deacylation",

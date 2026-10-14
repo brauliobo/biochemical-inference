@@ -28,7 +28,7 @@ const layout = {
     { id: 'compound:taurocholic-acid', kind: 'compound', x: 900, y: 500, label: 'Taurocholate', group: 'bile' },
     { id: 'reaction:bsh-glycocholate-deconjugation', kind: 'reaction', x: 1100, y: 170, label: 'BSH (bacterial)', group: 'gut' },
     { id: 'intervention:glycine-powder', kind: 'intervention', x: 900, y: 90, label: 'Glycine powder', group: 'gut' },
-    { id: 'intervention:taurine-supplement', kind: 'intervention', x: 900, y: 650, label: 'Taurine supplement', group: 'liver' }
+    { id: 'intervention:taurine-supplement', kind: 'intervention', x: 900, y: 650, label: 'Taurine supplement' }
   ],
   // Relations that are not reactions: drawn dashed. sign follows the knowledge-base edge.
   links: [

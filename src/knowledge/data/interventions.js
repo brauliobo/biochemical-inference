@@ -687,7 +687,8 @@ export default [
       { rel: "mitigates", to: "disease:esophagitis", note: "First-line healing therapy for erosive oesophagitis." },
       { rel: "mitigates", to: "disease:functional-dyspepsia", note: "First-line for epigastric pain syndrome; small benefit." },
       { rel: "causes", to: "state:acid-suppression" },
-      { rel: "decreases", to: "compound:hydrochloric-acid", note: "Covalent block of the H+/K+-ATPase suppresses secretion for 24 hours or more.", strength: "strong" }
+      { rel: "decreases", to: "compound:hydrochloric-acid", note: "Covalent block of the H+/K+-ATPase suppresses secretion for 24 hours or more.", strength: "strong" },
+      { rel: "decreases", to: "enzyme:h-k-atpase", note: "Acid-activated PPIs bind the proton pump covalently and inactivate it until new pumps are made.", strength: "strong" }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid", "article:katz-2022-acg-gerd-guideline"]
   },

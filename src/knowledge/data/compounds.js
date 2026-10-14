@@ -434,7 +434,8 @@ export default [
       },
       { rel: "increases", to: "enzyme:cbs", note: "Allosteric activator: routes homocysteine to transsulfuration when SAM is high.", strength: "strong" },
       { rel: "decreases", to: "enzyme:mthfr", note: "Allosteric inhibition by SAM binding to the regulatory domain.", strength: "strong" },
-      { rel: "decreases", to: "enzyme:bhmt", note: "SAM inhibits BHMT in liver (feedback on remethylation).", strength: "moderate" }
+      { rel: "decreases", to: "enzyme:bhmt", note: "SAM inhibits BHMT in liver (feedback on remethylation).", strength: "moderate" },
+      { rel: "increases", to: "enzyme:dnmt", note: "SAM is the methyl donor of the DNA methyltransferases.", strength: "moderate" }
     ]
   },
   {
@@ -455,7 +456,14 @@ export default [
       { rel: "precursor-of", to: "compound:homocysteine" },
       { rel: "associated-with", to: "state:undermethylation", note: "Raised SAH (low SAM:SAH) is the biochemical definition of impaired methylation capacity" },
       { rel: "decreases", to: "enzyme:hnmt", note: "Product inhibition by SAH, as for most methyltransferases." },
-      { rel: "decreases", to: "enzyme:comt", note: "Product inhibition by SAH, as for most methyltransferases." }
+      { rel: "decreases", to: "enzyme:comt", note: "Product inhibition by SAH, as for most methyltransferases." },
+      { rel: "decreases", to: "enzyme:dnmt", note: "Product inhibition; in mice a rise in SAH, more than a fall in SAM, tracked tissue DNA hypomethylation.", strength: "moderate" },
+      {
+        rel: "decreases",
+        to: "outcome:global-dna-methylation",
+        note: "Mouse data (a SAH rise predicted hypomethylation); human tissue data are sparse and plasma SAH is only a surrogate.",
+        strength: "weak"
+      }
     ]
   },
   {
@@ -608,7 +616,8 @@ export default [
     facts: { formula: "C5H10N2O3", molarMass: "146.14 g/mol", chebi: "CHEBI:18050" },
     relations: [
       { rel: "precursor-of", to: "compound:ammonia", note: "Via glutaminase" },
-      { rel: "precursor-of", to: "compound:gaba", note: "Glutamate-GABA cycle" }
+      { rel: "precursor-of", to: "compound:gaba", note: "Glutamate-GABA cycle" },
+      { rel: "precursor-of", to: "compound:glutamate", note: "Glutaminase" }
     ],
     refs: ["article:shao-2008-osl-taurine-glutamine-arginine"]
   },
@@ -917,7 +926,8 @@ export default [
     relations: [
       { rel: "substrate-of", to: "enzyme:pdxk" },
       { rel: "precursor-of", to: "compound:plp" },
-      { rel: "part-of", to: "compound:vitamin-b6" }
+      { rel: "part-of", to: "compound:vitamin-b6" },
+      { rel: "precursor-of", to: "compound:pyridoxine-5-phosphate", note: "Phosphorylated by PDXK" }
     ],
     refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
@@ -1262,7 +1272,14 @@ export default [
       { rel: "causes", to: "outcome:belching", note: "Through distension and TLESR when produced or swallowed in bulk", claim: "claim:acid-bicarbonate-reaction-gives-co2-belching", strength: "moderate" },
       { rel: "product-of", to: "enzyme:glycine-cleavage-system" },
       { rel: "product-of", to: "enzyme:h-pylori-urease" },
-      { rel: "product-of", to: "enzyme:carbonic-anhydrase", note: "H2CO3 dehydration" }
+      { rel: "product-of", to: "enzyme:carbonic-anhydrase", note: "H2CO3 dehydration" },
+      {
+        rel: "increases",
+        to: "outcome:co2-gastric-distension",
+        note: "Gas in the lumen distends it; the CO2 volume produced after a glycine dose is not established.",
+        claim: "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        strength: "moderate"
+      }
     ],
     refs: ["article:stanghellini-2016-rome-iv-gastroduodenal"]
   },
@@ -1332,7 +1349,15 @@ export default [
     facts: { formula: "C3H9NO", molarMass: "75.11 g/mol", chebi: "CHEBI:15724", pubchem: "CID 1145", hmdb: "HMDB0000925" },
     relations: [
       { rel: "associated-with", to: "system:gut-microbiota" },
-      { rel: "associated-with", to: "compound:phosphatidylcholine", note: "Dietary precursor route" }
+      { rel: "associated-with", to: "compound:phosphatidylcholine", note: "Dietary precursor route" },
+      {
+        rel: "increases",
+        to: "disease:cardiovascular-disease",
+        note: "Association in cohorts and animal work; causality and the effect of lowering TMAO are contested.",
+        hypothesis: true,
+        claim: "claim:above-ul-tmao-endothelial-stress",
+        strength: "weak"
+      }
     ],
     refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd", "article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },

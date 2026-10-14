@@ -174,7 +174,8 @@ export default [
       { rel: "measured-by", to: "outcome:urinary-tma-tmao-ratio" },
       { rel: "increases", to: "compound:trimethylamine" },
       { rel: "associated-with", to: "state:choline-excess" },
-      { rel: "associated-with", to: "system:gut-microbiota" }
+      { rel: "associated-with", to: "system:gut-microbiota" },
+      { rel: "manifests-as", to: "outcome:urinary-tma-tmao-ratio", note: "Urinary TMA is raised relative to TMAO when FMO3 is deficient." }
     ],
     refs: ["article:mackay-2011-trimethylaminuria"]
   },

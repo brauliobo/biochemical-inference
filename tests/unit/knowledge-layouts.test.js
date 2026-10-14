@@ -6,9 +6,10 @@ import { describe, expect, it } from 'vitest'
 import entities from '../../src/knowledge/data/index.js'
 import quant from '../../src/knowledge/data/quant.js'
 import { buildGraph } from '../../src/knowledge/graph.js'
+import { edgeSign } from '../../src/knowledge/relations.js'
 import { LAYOUTS, LAYOUT_IDS, loadLayout } from '../../src/viz/layouts/index.js'
 import { COMPOUND_HEIGHT, REACTION_SIZE, boxesOverlap, closestPair, findOverlaps, nodeBox, nodeWidth, outOfBounds } from '../../src/viz/layouts/geometry.js'
-import { CURRENCY_IDS, LAYOUT_DIR, checkLayout, deriveLayout, indexEntities, layoutNames, pathwayReactions, renderGenerated, replaceGenerated } from '../../scripts/build-layout.js'
+import { CURRENCY_IDS, LAYOUT_DIR, checkLayout, deriveLayout, indexEntities, layoutNames, pathwayReactions, renderGenerated, replaceGenerated } from '../../scripts/layout-build.js'
 
 const byId = indexEntities(entities)
 const graph = buildGraph(entities)
@@ -70,12 +71,13 @@ describe.each(layouts)('layout %s', (id, layout) => {
     expect(layout.viewBox.height).toBeGreaterThanOrEqual(700)
   })
 
-  it('draws a node inside the group it names', () => {
+  it('draws a node inside the group box it names (label-only groups have no box)', () => {
     const groups = new Map(layout.groups.map((group) => [group.id, group]))
     expect(groups.size).toBe(layout.groups.length)
     for (const node of layout.nodes.filter((item) => item.group)) {
       const group = groups.get(node.group)
       expect(group, `${node.id} names group ${node.group}`).toBeTruthy()
+      if (group.width === undefined) continue // a label-only group has no box
       const inside = node.x >= group.x && node.x <= group.x + group.width && node.y >= group.y && node.y <= group.y + group.height
       expect(inside, `${node.id} at ${node.x},${node.y} outside group ${node.group}`).toBe(true)
     }
@@ -139,6 +141,21 @@ describe.each(layouts)('layout %s', (id, layout) => {
       const key = `${link.from}|${link.to}`
       expect(seen.has(key), key).toBe(false)
       seen.add(key)
+    }
+  })
+
+  it('draws only links that the knowledge base states as signed edges (a reaction stands for its enzymes)', () => {
+    // a link end that is a reaction also matches the enzymes that catalyse it
+    const ends = (nodeId) => {
+      const found = new Set([nodeId])
+      if (byId.get(nodeId).type === 'reaction') for (const edge of graph.incoming(nodeId)) if (edge.rel === 'catalyzes') found.add(edge.from)
+      return found
+    }
+    for (const link of layout.links ?? []) {
+      const sources = ends(link.from)
+      const targets = ends(link.to)
+      const edge = graph.edges.find((item) => sources.has(item.from) && targets.has(item.to) && edgeSign(item) === link.sign)
+      expect(edge, `${link.from} -> ${link.to} (${link.sign}) has no matching signed edge`).toBeTruthy()
     }
   })
 

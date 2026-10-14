@@ -27,6 +27,7 @@ const layout = {
     { id: 'choline-route', label: 'Choline-derived route and the GNMT sarcosine loop', x: 40, y: 350, width: 580, height: 230 },
     { id: 'sinks', label: 'Sinks', x: 790, y: 300, width: 450, height: 460 },
     { id: 'gut', label: 'Gut bacteria (speculative)', x: 790, y: 50, width: 450, height: 220 },
+    { id: 'bile', label: 'Bile-acid conjugation and deconjugation', x: 470, y: 600, width: 340, height: 180 },
     { id: 'diet', label: 'Intake', x: 40, y: 620, width: 200, height: 150 }
   ],
   nodes: [
@@ -37,8 +38,8 @@ const layout = {
     { id: 'compound:3-phosphoserine', kind: 'compound', x: 490, y: 100, label: '3-PSer', group: 'serine' },
     { id: 'reaction:psph-phosphoserine-hydrolysis', kind: 'reaction', x: 590, y: 100, label: 'PSPH', group: 'serine' },
     { id: 'compound:serine', kind: 'compound', x: 700, y: 100, label: 'Serine', group: 'serine' },
-    { id: 'reaction:shmt-serine-glycine-interconversion', kind: 'reaction', x: 700, y: 250, label: 'SHMT', group: 'serine' },
-    { id: 'compound:glycine', kind: 'compound', x: 700, y: 420, label: 'Glycine', group: 'choline-route' },
+    { id: 'reaction:shmt-serine-glycine-interconversion', kind: 'reaction', x: 700, y: 250, label: 'SHMT' },
+    { id: 'compound:glycine', kind: 'compound', x: 700, y: 420, label: 'Glycine' },
     { id: 'compound:choline', kind: 'compound', x: 130, y: 400, label: 'Choline' },
     { id: 'compound:dimethylglycine', kind: 'compound', x: 130, y: 520, label: 'DMG', group: 'choline-route' },
     { id: 'reaction:dmgdh-dimethylglycine-demethylation', kind: 'reaction', x: 250, y: 520, label: 'DMGDH', group: 'choline-route' },
@@ -55,10 +56,10 @@ const layout = {
     { id: 'reaction:collagen-chain-assembly', kind: 'reaction', x: 900, y: 650, label: 'Collagen assembly', group: 'sinks' },
     { id: 'compound:proline', kind: 'compound', x: 1040, y: 640, label: 'Proline', group: 'sinks' },
     { id: 'compound:collagen', kind: 'compound', x: 1150, y: 700, label: 'Collagen', group: 'sinks' },
-    { id: 'reaction:baat-glycine-conjugation', kind: 'reaction', x: 640, y: 650, label: 'BAAT (bile)', group: 'sinks' },
-    { id: 'compound:choloyl-coa', kind: 'compound', x: 520, y: 700, label: 'Choloyl-CoA', group: 'sinks' },
-    { id: 'compound:glycocholic-acid', kind: 'compound', x: 700, y: 740, label: 'Glycocholate', group: 'sinks' },
-    { id: 'reaction:bsh-glycocholate-deconjugation', kind: 'reaction', x: 790, y: 560, label: 'BSH (gut)', group: 'sinks' },
+    { id: 'reaction:baat-glycine-conjugation', kind: 'reaction', x: 640, y: 650, label: 'BAAT (bile)', group: 'bile' },
+    { id: 'compound:choloyl-coa', kind: 'compound', x: 520, y: 700, label: 'Choloyl-CoA', group: 'bile' },
+    { id: 'compound:glycocholic-acid', kind: 'compound', x: 700, y: 740, label: 'Glycocholate', group: 'bile' },
+    { id: 'reaction:bsh-glycocholate-deconjugation', kind: 'reaction', x: 770, y: 650, label: 'BSH (gut)', group: 'bile' },
     { id: 'reaction:bacterial-glycine-reductase', kind: 'reaction', x: 880, y: 160, label: 'Glycine reductase', group: 'gut' },
     { id: 'compound:acetyl-phosphate', kind: 'compound', x: 1040, y: 160, label: 'Acetyl-P', group: 'gut' },
     { id: 'reaction:bacterial-glycine-cleavage', kind: 'reaction', x: 880, y: 230, label: 'Bacterial cleavage', group: 'gut' },
@@ -67,7 +68,7 @@ const layout = {
   ],
   // Relations that are not reactions: drawn dashed, '-' in red. sign follows the knowledge-base edge.
   links: [
-    { from: 'compound:choline', to: 'compound:dimethylglycine', sign: '+', label: 'CHDH, BADH, BHMT' },
+    { from: 'compound:choline', to: 'compound:glycine', sign: '+', label: 'via betaine, DMG, sarcosine' },
     { from: 'intervention:glycine-powder', to: 'compound:glycine', sign: '+' },
     { from: 'intervention:collagen-peptides', to: 'compound:glycine', sign: '+' }
   ]

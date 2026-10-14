@@ -9,7 +9,7 @@ const layout = {
   viewBox: { width: 1280, height: 800 },
   pathways: ['pathway:gastric-acid-secretion', 'pathway:acid-bicarbonate-neutralisation', 'pathway:h-pylori-urease-activity'],
   groups: [
-    { id: 'pump', label: 'Parietal cell proton pump', x: 60, y: 96, width: 260, height: 110 },
+    { id: 'pump', label: 'Parietal cell proton pump', x: 60, y: 24, width: 260, height: 182 },
     { id: 'carbonic', label: 'Carbonic acid steps (uncatalysed or carbonic anhydrase)', x: 100, y: 236, width: 900, height: 250 },
     { id: 'secretion', label: 'Secretion and neutralisation (mirror reactions)', x: 300, y: 516, width: 700, height: 250 },
     { id: 'pylori', label: 'H. pylori urease', x: 1070, y: 96, width: 190, height: 360 },

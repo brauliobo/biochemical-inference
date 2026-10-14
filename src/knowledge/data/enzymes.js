@@ -80,8 +80,7 @@ export default [
         strength: "strong"
       },
       { rel: "decreases", to: "compound:sam", note: "Three SAM per phosphatidylcholine, one of the largest methyl sinks.", claim: "claim:pemt-consumes-three-sam", strength: "strong" },
-      { rel: "increases", to: "compound:sah", note: "Three SAH per phosphatidylcholine." }
-    ]
+      { rel: "increases", to: "compound:sah", note: "Three SAH per phosphatidylcholine." }    ]
   },
   {
     id: "enzyme:bhmt",
