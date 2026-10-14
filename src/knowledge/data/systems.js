@@ -17,7 +17,13 @@ export default [
       { rel: "increases", to: "pathway:gastric-acid-secretion" },
       { rel: "interacts-with", to: "system:enteric-nervous-system" },
       { rel: "associated-with", to: "state:gastric-dysmotility" },
-      { rel: "associated-with", to: "system:cardiac-autonomic-control" }
+      { rel: "associated-with", to: "system:cardiac-autonomic-control" },
+      {
+        rel: "mitigates",
+        to: "state:gastric-dysmotility",
+        note: "Vagal efferents drive antral contraction and pyloric relaxation; vagal damage delays emptying. Tone within the normal range is not shown to matter.",
+        strength: "moderate"
+      }
     ],
     refs: ["article:browning-2014-vagal-control-gi", "article:gordan-2015-autonomic-cardiovascular-control"]
   },
@@ -175,7 +181,8 @@ export default [
       { rel: "increases", to: "compound:bicarbonate" },
       { rel: "decreases", to: "compound:hydrochloric-acid", note: "Neutralises acid in the duodenal lumen." },
       { rel: "associated-with", to: "system:duodenum" },
-      { rel: "associated-with", to: "outcome:co2-gastric-distension" }
+      { rel: "associated-with", to: "outcome:co2-gastric-distension" },
+      { rel: "increases", to: "pathway:acid-bicarbonate-neutralisation", note: "Pancreatic and biliary bicarbonate neutralise duodenal acid.", strength: "moderate" }
     ],
     refs: ["article:allen-2005-mucus-bicarbonate-barrier"]
   },

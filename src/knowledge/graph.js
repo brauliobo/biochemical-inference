@@ -12,7 +12,7 @@
 // buildGraph never throws on bad references: it records them (dangling, duplicates,
 // malformedMentions) so validation can report them, and leaves them out of the adjacency data.
 import { TYPE_IDS } from './types.js'
-import { inverseOf, isAuthorable, labelFor, relationInfo } from './relations.js'
+import { EDGE_FIELDS, edgeSign, inverseOf, isAuthorable, labelFor, relationInfo } from './relations.js'
 import { extractMentions } from './mentions.js'
 
 const EMPTY = Object.freeze([])
@@ -48,7 +48,9 @@ function edgeKey({ from, rel, to }) {
 
 function* declaredEdges(entity) {
   for (const [index, item] of (entity.relations ?? []).entries()) {
-    yield { from: entity.id, rel: item.rel, to: item.to, note: item.note, origin: 'declared', kind: 'relation', owner: entity.id, path: `relations[${index}]` }
+    const extra = {}
+    for (const field of EDGE_FIELDS) if (item[field] !== undefined) extra[field] = item[field]
+    yield { from: entity.id, rel: item.rel, to: item.to, note: item.note, ...extra, origin: 'declared', kind: 'relation', owner: entity.id, path: `relations[${index}]` }
   }
 }
 
@@ -72,9 +74,20 @@ function* derivedEdges(entity) {
   yield* derive(reaction.enzymes, 'enzymes', 'catalyzes')
 }
 
+/** Causal-model properties of an edge (sign, hypothesis, claim, strength), only those that are set. */
+function causalProps(edge) {
+  const props = {}
+  const sign = edgeSign(edge)
+  if (sign) props.sign = sign
+  if (edge.hypothesis !== undefined) props.hypothesis = edge.hypothesis
+  if (edge.claim !== undefined) props.claim = edge.claim
+  if (edge.strength !== undefined) props.strength = edge.strength
+  return props
+}
+
 function linkViews(edge) {
   const symmetric = relationInfo(edge.rel).symmetric
-  const base = edge.note === undefined ? { origin: edge.origin } : { note: edge.note, origin: edge.origin }
+  const base = { ...(edge.note === undefined ? {} : { note: edge.note }), origin: edge.origin, ...causalProps(edge) }
   const forward = { rel: edge.rel, label: labelFor(edge.rel), direction: symmetric ? 'sym' : 'out', other: edge.to, ...base }
   const reverseRel = inverseOf(edge.rel)
   const reverse = { rel: reverseRel, label: labelFor(reverseRel), direction: symmetric ? 'sym' : 'in', other: edge.from, ...base }
@@ -117,10 +130,15 @@ export function buildGraph(input = []) {
       dangling.push({ owner, target: missing, kind, rel: rest.rel, path })
       return
     }
+    if (rest.claim !== undefined && byId.get(rest.claim)?.type !== 'claim') {
+      dangling.push({ owner, target: rest.claim, kind: 'claim', rel: rest.rel, path: `${path}.claim` })
+      delete rest.claim
+    }
     const key = edgeKey(rest)
     if (seen.has(key)) return
     seen.add(key)
-    const edge = deepFreeze(rest.note === undefined ? { from: rest.from, rel: rest.rel, to: rest.to, origin: rest.origin } : rest)
+    const { note, ...withoutNote } = rest
+    const edge = deepFreeze(note === undefined ? withoutNote : rest)
     edges.push(edge)
     pushTo(outgoing, edge.from, edge)
     pushTo(incoming, edge.to, edge)

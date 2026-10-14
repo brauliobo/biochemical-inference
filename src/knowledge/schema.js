@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { TYPE_IDS } from './types.js'
 import { EVIDENCE_KEYS, CLAIM_STATUS_KEYS, CLAIM_SOURCES } from './evidence.js'
 import { idType, isId } from './ids.js'
-import { AUTHORABLE_RELATIONS, isRelation, relationInfo } from './relations.js'
+import { AUTHORABLE_RELATIONS, EDGE_SIGNS, EDGE_STRENGTHS, intrinsicSign, isRelation, relationInfo } from './relations.js'
 
 const oneOf = (values) => values.join(' | ')
 const text = (what) => z.string({ required_error: `${what} is required`, invalid_type_error: `${what} must be a string` })
@@ -28,11 +28,27 @@ const relationName = text('rel').superRefine((value, ctx) => {
   ctx.addIssue({ code: 'custom', message: `${hint}. Allowed: ${oneOf(AUTHORABLE_RELATIONS)}` })
 })
 
+// sign / hypothesis / claim / strength turn a relation into a causal-model edge:
+//   sign        '+' | '-' on relations that carry no sign of their own (associated-with, interacts-with, ...)
+//   hypothesis  true when the edge is proposed, not established; it must name the claim that asserts it
+//   claim       claim:<slug> that asserts this edge (its status says how far the edge is supported)
+//   strength    how strong the effect is believed to be: weak | moderate | strong
 const relation = z.object({
   rel: relationName,
   to: idField('relation target'),
-  note: text('note').optional()
-}).strict()
+  note: text('note').optional(),
+  sign: z.enum(EDGE_SIGNS, { errorMap: () => ({ message: `sign must be one of ${oneOf(EDGE_SIGNS)}` }) }).optional(),
+  hypothesis: z.boolean({ invalid_type_error: 'hypothesis must be a boolean' }).optional(),
+  claim: idField('claim', 'claim').optional(),
+  strength: z.enum(EDGE_STRENGTHS, { errorMap: () => ({ message: `strength must be one of ${oneOf(EDGE_STRENGTHS)}` }) }).optional()
+}).strict().superRefine((item, ctx) => {
+  if (item.sign !== undefined && intrinsicSign(item.rel) !== null) {
+    ctx.addIssue({ code: 'custom', path: ['sign'], message: `'${item.rel}' already means '${intrinsicSign(item.rel)}'; drop the explicit sign` })
+  }
+  if (item.hypothesis === true && item.claim === undefined) {
+    ctx.addIssue({ code: 'custom', path: ['claim'], message: 'a hypothesis edge must name the claim that asserts it (claim: \'claim:...\')' })
+  }
+})
 
 const participant = z.object({
   id: idField('participant id', 'compound'),

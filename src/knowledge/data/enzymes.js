@@ -35,10 +35,11 @@ export default [
       { rel: "interacts-with", to: "compound:5-mthf", note: "5-MTHF polyglutamate binds and inhibits GNMT (established)" },
       { rel: "mitigates", to: "state:overmethylation", note: "disposes of surplus SAM methyl groups" },
       { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: bolus free glycine over-recruits GNMT and drains SAM; human evidence lacking" },
-      { rel: "decreases", to: "compound:sam", note: "Spends SAM on methylating glycine; the hepatic methyl-sink reaction." },
+      { rel: "decreases", to: "compound:sam", note: "Spends SAM on methylating glycine; the hepatic methyl-sink reaction.", claim: "claim:gnmt-methyl-sink-valve", strength: "strong" },
       { rel: "decreases", to: "compound:glycine", note: "Glycine is its methyl acceptor." },
       { rel: "increases", to: "compound:sah", note: "Co-product of every methylation." },
-      { rel: "measured-by", to: "outcome:sarcosine-elevation", note: "Sarcosine is the product; it is raised when GNMT flux is high or sarcosine clearance is impaired." }
+      { rel: "measured-by", to: "outcome:sarcosine-elevation", note: "Sarcosine is the product; it is raised when GNMT flux is high or sarcosine clearance is impaired." },
+      { rel: "increases", to: "compound:sarcosine", note: "Product of glycine methylation.", strength: "strong" }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link"]
   },
@@ -70,8 +71,16 @@ export default [
       { rel: "part-of", to: "pathway:pemt-pc-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "consumes 3 SAM per PC" },
       { rel: "associated-with", to: "state:undermethylation", note: "low SAM limits PEMT output; weak link from PC to vagal acetylcholine is conversation-proposed" },
-      { rel: "interacts-with", to: "enzyme:chpt1", note: "parallel route to PC (CDP-choline) compensates when PEMT is limited" }
-    ]
+      { rel: "interacts-with", to: "enzyme:chpt1", note: "parallel route to PC (CDP-choline) compensates when PEMT is limited" },
+      {
+        rel: "increases",
+        to: "compound:phosphatidylcholine",
+        note: "Hepatic de novo route to phosphatidylcholine; the CDP-choline route runs in parallel.",
+        claim: "claim:pemt-consumes-three-sam",
+        strength: "strong"
+      },
+      { rel: "decreases", to: "compound:sam", note: "Three SAM per phosphatidylcholine, one of the largest methyl sinks.", claim: "claim:pemt-consumes-three-sam", strength: "strong" },
+      { rel: "increases", to: "compound:sah", note: "Three SAH per phosphatidylcholine." }    ]
   },
   {
     id: "enzyme:bhmt",
@@ -101,7 +110,11 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "folate-independent remethylation" },
       { rel: "part-of", to: "pathway:choline-oxidation", note: "first methyl-donating step of betaine catabolism" },
       { rel: "mitigates", to: "state:undermethylation", note: "regenerates methionine/SAM from homocysteine without folate or B12 (plausible; supplement trials mixed)" },
-      { rel: "interacts-with", to: "enzyme:mtr", note: "parallel remethylation route" }
+      { rel: "interacts-with", to: "enzyme:mtr", note: "parallel remethylation route" },
+      { rel: "decreases", to: "compound:homocysteine", note: "Folate- and B12-independent remethylation, mainly in liver and kidney.", strength: "strong" },
+      { rel: "increases", to: "compound:methionine", strength: "strong" },
+      { rel: "decreases", to: "compound:betaine" },
+      { rel: "increases", to: "compound:dimethylglycine", note: "Co-product; first step of betaine methyl loss on the way to glycine." }
     ]
   },
   {
@@ -158,7 +171,9 @@ export default [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:methionine-cycle", note: "supplies the methyl donor 5-MTHF" },
       { rel: "interacts-with", to: "compound:sam", note: "SAM is an allosteric inhibitor (established)" },
-      { rel: "associated-with", to: "state:undermethylation", note: "reduced-activity variants can lower remethylation, mainly when folate is low" }
+      { rel: "associated-with", to: "state:undermethylation", note: "reduced-activity variants can lower remethylation, mainly when folate is low" },
+      { rel: "increases", to: "compound:5-mthf", strength: "strong" },
+      { rel: "decreases", to: "compound:5-10-methylene-thf" }
     ]
   },
   {
@@ -188,7 +203,11 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "only enzyme that releases THF from 5-MTHF" },
       { rel: "interacts-with", to: "compound:methylcobalamin", note: "cofactor / methyl carrier" },
-      { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" }
+      { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" },
+      { rel: "decreases", to: "compound:homocysteine", strength: "strong" },
+      { rel: "increases", to: "compound:methionine", strength: "strong" },
+      { rel: "decreases", to: "compound:5-mthf", note: "Uses 5-methyl-THF as methyl donor; the reaction that traps folate as 5-MTHF when B12 is short." },
+      { rel: "increases", to: "compound:thf" }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -217,7 +236,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "keeps methionine synthase active" },
       { rel: "interacts-with", to: "enzyme:mtr", note: "binds and reactivates MTR" },
-      { rel: "interacts-with", to: "compound:sam", note: "methyl donor for reactivation" }
+      { rel: "interacts-with", to: "compound:sam", note: "methyl donor for reactivation" },
+      { rel: "increases", to: "compound:methylcobalamin", note: "Reactivates cob(II)alamin by reductive methylation with SAM." }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -303,7 +323,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "sets SAM:SAH methylation index" },
-      { rel: "associated-with", to: "state:undermethylation", note: "elevated homocysteine pushes equilibrium toward SAH and lowers the SAM:SAH ratio" }
+      { rel: "associated-with", to: "state:undermethylation", note: "elevated homocysteine pushes equilibrium toward SAH and lowers the SAM:SAH ratio" },
+      { rel: "decreases", to: "compound:sah", strength: "strong" },
+      { rel: "increases", to: "compound:homocysteine" }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -332,7 +354,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "interacts-with", to: "compound:magnesium", note: "required divalent cation" },
-      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; product SAH inhibits" }
+      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; product SAH inhibits" },
+      { rel: "decreases", to: "compound:sam", note: "A small methyl sink; dopamine, catecholamine and oestrogen metabolism." },
+      { rel: "increases", to: "compound:sah" }
     ],
     refs: ["article:meiser-2013-dopamine-metabolism"]
   },
@@ -364,7 +388,9 @@ export default [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "interacts-with", to: "compound:sam", note: "allosteric activator" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "low PLP lowers CBS flux; post-methionine-load homocysteine is a functional marker" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "low PLP lowers CBS flux; post-methionine-load homocysteine is a functional marker" },
+      { rel: "decreases", to: "compound:homocysteine", strength: "strong" },
+      { rel: "increases", to: "compound:cystathionine" }
     ],
     refs: ["article:morris-2017-cbs-deficiency-guidelines", "article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -394,7 +420,9 @@ export default [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "supplies cysteine" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "cystathionine rises when PLP is limiting" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "cystathionine rises when PLP is limiting" },
+      { rel: "decreases", to: "compound:cystathionine" },
+      { rel: "increases", to: "compound:cysteine" }
     ],
     refs: ["article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -621,7 +649,10 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route", note: "choline-derived glycine" },
-      { rel: "part-of", to: "pathway:folate-cycle", note: "donates one-carbon unit to mitochondrial THF" }
+      { rel: "part-of", to: "pathway:folate-cycle", note: "donates one-carbon unit to mitochondrial THF" },
+      { rel: "decreases", to: "compound:dimethylglycine" },
+      { rel: "increases", to: "compound:sarcosine" },
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "The methyl carbon enters the folate pool." }
     ],
     refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
@@ -650,7 +681,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route" },
-      { rel: "interacts-with", to: "enzyme:gnmt", note: "shared metabolite sarcosine; recaptures GNMT-derived methyl as one-carbon unit" }
+      { rel: "interacts-with", to: "enzyme:gnmt", note: "shared metabolite sarcosine; recaptures GNMT-derived methyl as one-carbon unit" },
+      { rel: "decreases", to: "compound:sarcosine", note: "Also recaptures the sarcosine made by GNMT." },
+      { rel: "increases", to: "compound:glycine", note: "Final step of the choline-derived glycine route." }
     ],
     refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
@@ -680,7 +713,9 @@ export default [
     },
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
-      { rel: "interacts-with", to: "enzyme:choline-kinase", note: "competes for the free choline pool" }
+      { rel: "interacts-with", to: "enzyme:choline-kinase", note: "competes for the free choline pool" },
+      { rel: "decreases", to: "compound:choline", note: "Mitochondrial oxidation, the first step to betaine." },
+      { rel: "increases", to: "compound:betaine-aldehyde" }
     ]
   },
   {
@@ -708,7 +743,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "ALDH7A1 deficiency traps PLP via P6C (pyridoxine-dependent epilepsy)" },
-      { rel: "interacts-with", to: "compound:plp", note: "inactivated by P6C when the enzyme is deficient" }
+      { rel: "interacts-with", to: "compound:plp", note: "inactivated by P6C when the enzyme is deficient" },
+      { rel: "increases", to: "compound:betaine", note: "Betaine aldehyde dehydrogenase step." }
     ],
     refs: ["article:reactome-choline-catabolism"]
   },
@@ -854,7 +890,11 @@ export default [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "reduced activity variants or low SAM may slow intracellular clearance (plausible)" },
-      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; SAH-inhibited" }
+      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; SAH-inhibited" },
+      { rel: "decreases", to: "compound:histamine", note: "Intracellular ring N-methylation; the only histamine-clearing route in brain.", claim: "claim:hnmt-needs-sam", strength: "strong" },
+      { rel: "decreases", to: "compound:sam", note: "One SAM per histamine methylated; a small methyl sink." },
+      { rel: "increases", to: "compound:sah" },
+      { rel: "increases", to: "compound:methylhistamine" }
     ]
   },
   {
@@ -882,7 +922,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "low DAO activity is the proposed mechanism; contested" },
-      { rel: "interacts-with", to: "enzyme:hnmt", note: "complementary extracellular vs intracellular clearance" }
+      { rel: "interacts-with", to: "enzyme:hnmt", note: "complementary extracellular vs intracellular clearance" },
+      { rel: "decreases", to: "compound:histamine", note: "Extracellular oxidative deamination in gut and kidney; not SAM-dependent.", strength: "strong" }
     ]
   },
 
@@ -1369,7 +1410,9 @@ export default [
     },
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis", note: "rate-limiting first step" },
-      { rel: "interacts-with", to: "compound:creatine", note: "end-product repression of expression" }
+      { rel: "interacts-with", to: "compound:creatine", note: "end-product repression of expression" },
+      { rel: "decreases", to: "compound:glycine", note: "Glycine is the amidino acceptor; creatine synthesis is a continuing glycine sink." },
+      { rel: "increases", to: "compound:guanidinoacetate" }
     ],
     refs: ["article:brosnan-2007-creatine-review"]
   },
@@ -1398,7 +1441,16 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "large SAM consumer; share debated" },
-      { rel: "associated-with", to: "state:undermethylation", note: "consumes SAM; creatine supplementation spares methyl groups (plausible)" }
+      { rel: "associated-with", to: "state:undermethylation", note: "consumes SAM; creatine supplementation spares methyl groups (plausible)" },
+      {
+        rel: "decreases",
+        to: "compound:sam",
+        note: "One SAM per creatine made; creatine synthesis is one of the largest methyl sinks (share debated).",
+        claim: "claim:gnmt-methyl-sink-valve",
+        strength: "strong"
+      },
+      { rel: "increases", to: "compound:sah", note: "Co-product of the methylation of guanidinoacetate." },
+      { rel: "increases", to: "compound:creatine" }
     ],
     refs: ["article:brosnan-2007-creatine-review"]
   },
@@ -1710,7 +1762,8 @@ export default [
       { rel: "catalyzes", to: "reaction:glycine-cleavage-system" },
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "decreases", to: "compound:glycine", note: "Main catabolic route" },
-      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Provides one-carbon units to the folate pool" }
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Provides one-carbon units to the folate pool" },
+      { rel: "increases", to: "compound:carbon-dioxide" }
     ],
     refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation", "article:applegarth-2004-glycine-encephalopathy"]
   },
@@ -1737,7 +1790,9 @@ export default [
       { rel: "catalyzes", to: "reaction:shmt-serine-glycine-interconversion" },
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:glycine-serine-route" },
-      { rel: "increases", to: "compound:glycine", note: "Main endogenous source, from serine" }
+      { rel: "increases", to: "compound:glycine", note: "Main endogenous source, from serine" },
+      { rel: "decreases", to: "compound:serine" },
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Carries the serine beta-carbon into the folate pool." }
     ],
     refs: ["article:reactome-folate-pterine-metabolism", "article:parra-2018-vitamin-b6-metabolism"]
   },
@@ -1809,6 +1864,9 @@ export default [
       gene: "NNMT",
       ec: "2.1.1.1",
       uniprot: "P40261",
+      rhea: "RHEA:23884",
+      reactome: "R-HSA-5359451",
+      kegg: "ec:2.1.1.1",
       compartment: "cytosol",
       tissue: "liver (highest), adipose tissue, kidney; overexpressed in several cancers",
       cofactors: "SAM (methyl donor)"
@@ -1816,11 +1874,11 @@ export default [
     relations: [
       { rel: "increases", to: "compound:1-methylnicotinamide" },
       { rel: "increases", to: "compound:sah", note: "Co-product of every methylation" },
-      { rel: "decreases", to: "compound:sam", note: "Methyl donor consumed" },
+      { rel: "decreases", to: "compound:sam", note: "Methyl donor consumed", claim: "claim:niacin-drains-methyl-groups", strength: "weak" },
       { rel: "decreases", to: "compound:nicotinamide" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" }
     ],
-    refs: ["article:pissios-2017-nnmt-methyl-sink"]
+    refs: ["article:pissios-2017-nnmt-methyl-sink", "article:rhea-2022"]
   },
   {
     id: "enzyme:carns1",
@@ -1876,5 +1934,368 @@ export default [
     },
     relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
     refs: ["article:carreras-1995-thymidylate-synthase", "article:ducker-2017-one-carbon-metabolism"]
+  },
+{
+    id: "enzyme:dhfr",
+    type: "enzyme",
+    name: "Dihydrofolate reductase (DHFR)",
+    aliases: ["DHFR", "di-hidrofolato redutase", "dihidrofolato redutase", "tetrahydrofolate dehydrogenase", "DHFR humana"],
+    summary: "NADPH-dependent enzyme that reduces dihydrofolate to tetrahydrofolate, recycling the folate spent by thymidylate synthase and doing the first reduction of synthetic folic acid.",
+    body: [
+      "DHFR reduces [[compound:dhf]] to [[compound:thf]] using [[compound:nadph]] ([[reaction:dhfr-dihydrofolate-reduction]]). It is the step that recycles the folate that [[enzyme:tyms]] oxidises when it makes dTMP, and UniProt describes DHFR as part of the de novo thymidylate synthesis complex with [[enzyme:shmt1]] and TYMS, which gathers at replication forks during S phase. It is also the route by which synthetic [[compound:folic-acid]] is first reduced to enter the folate cycle ([[article:bailey-2009-dhfr-slow-human-liver]]).",
+      "The enzyme is the classic target of antifolate drugs such as methotrexate. Reactome records the human reactions of the protein as the reduction of folic acid to DHF (R-HSA-9709098) and lists the paralogue DHFR2 as catalyst of its DHF-to-THF record (R-HSA-197972), whereas UniProt and Rhea attach the DHF-to-THF reaction to DHFR itself."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "DHFR",
+      ec: "1.5.1.3",
+      uniprot: "P00374",
+      rhea: "RHEA:15009",
+      reactome: "R-HSA-9709098; R-HSA-197972",
+      kegg: "ec:1.5.1.3",
+      compartment: "cytosol; also mitochondria and nucleus (S and G2/M phases)",
+      tissue: "widely expressed, including brain and blood",
+      cofactors: "NADPH (co-substrate)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "increases", to: "compound:thf" },
+      { rel: "decreases", to: "compound:dhf" },
+      { rel: "interacts-with", to: "enzyme:tyms", note: "Members of the nuclear de novo thymidylate synthesis complex with SHMT1 (UniProt)" },
+      { rel: "associated-with", to: "intervention:folic-acid-supplement", note: "First reduction of folic acid; activity in human liver is low and variable (six donors)" }
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:bailey-2009-dhfr-slow-human-liver", "article:ducker-2017-one-carbon-metabolism"]
+  },
+  {
+    id: "enzyme:aldh1l1",
+    type: "enzyme",
+    name: "Cytosolic 10-formyltetrahydrofolate dehydrogenase (ALDH1L1; FDH)",
+    aliases: ["ALDH1L1", "FDH", "10-FTHFDH", "10-formil-THF desidrogenase", "aldeído desidrogenase 1 L1", "formiltetraidrofolato desidrogenase"],
+    summary: "Liver-rich cytosolic enzyme that oxidises 10-formyl-THF to THF and CO2 with NADP+, draining one-carbon units from the folate pool as carbon dioxide.",
+    body: [
+      "ALDH1L1 converts [[compound:10-formyl-thf]] to [[compound:thf]] and [[compound:carbon-dioxide]], reducing [[compound:nadp]] to [[compound:nadph]] ([[reaction:aldh1l1-10-formyl-thf-oxidation]]). It competes with the formyl-consuming steps of purine synthesis ([[enzyme:gart]], [[enzyme:atic]]) for the same folate form, and it is a route by which one-carbon units are lost from the pool ([[pathway:folate-cycle]]).",
+      "The protein has 902 residues and Reactome draws it as a tetramer. UniProt also notes a possible NADP+-dependent aldehyde dehydrogenase activity (by similarity) and lists high expression in liver, pancreas and kidney. A mitochondrial homologue, ALDH1L2, exists and is not modelled here."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "ALDH1L1",
+      ec: "1.5.1.6",
+      uniprot: "O75891",
+      rhea: "RHEA:10180",
+      reactome: "R-HSA-6808496",
+      kegg: "ec:1.5.1.6",
+      compartment: "cytosol",
+      tissue: "liver, pancreas, kidney (highest)",
+      cofactors: "NADP+ (co-substrate)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "decreases", to: "compound:10-formyl-thf" },
+      { rel: "increases", to: "compound:thf" },
+      { rel: "interacts-with", to: "enzyme:mthfd1", note: "Drains the 10-formyl-THF that MTHFD1 produces" },
+      { rel: "interacts-with", to: "enzyme:gart", note: "Competition for 10-formyl-THF" }
+    ],
+    refs: ["article:reactome-folate-pterine-metabolism", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:gart",
+    type: "enzyme",
+    name: "Trifunctional purine biosynthetic protein adenosine-3 (GART; GAR transformylase)",
+    aliases: ["GART", "GAR transformilase", "GARS-AIRS-GART", "proteína trifuncional da síntese de purinas", "fosforribosilglicinamida formiltransferase", "transformilase de GAR"],
+    summary: "Trifunctional human protein of de novo purine synthesis; its formyltransferase domain moves a formyl group from 10-formyl-THF onto GAR, giving FGAR.",
+    body: [
+      "GART carries three activities of the pathway to IMP: a glycine ligase (EC 6.3.4.13) that forms [[compound:gar]], the formyltransferase (EC 2.1.2.2) that turns it into [[compound:fgar]] with [[compound:10-formyl-thf]] ([[reaction:gart-gar-formylation]]), and an AIR synthase (EC 6.3.3.1) two steps later. Only the folate-dependent step is written as a reaction on this site.",
+      "It is one of two folate-dependent enzymes of the pathway, the other being [[enzyme:atic]]; both are components of the purinosome clusters seen when purine demand is high ([[article:pedley-2017-purinosome]], [[pathway:nucleotide-synthesis]]). The purine ring takes its glycine unit at the first of GART's steps, so the pathway uses [[compound:glycine]] as well as folate."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "GART",
+      ec: "2.1.2.2; 6.3.4.13; 6.3.3.1",
+      uniprot: "P22102",
+      rhea: "RHEA:15053",
+      reactome: "R-HSA-73813",
+      kegg: "ec:2.1.2.2",
+      compartment: "cytosol",
+      cofactors: "10-formyl-THF (co-substrate); Mg2+/Mn2+ (ligase and cyclo-ligase steps)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "decreases", to: "compound:10-formyl-thf", note: "Uses one formyl group per IMP" },
+      { rel: "increases", to: "compound:thf" },
+      { rel: "interacts-with", to: "enzyme:atic", note: "Consecutive folate-dependent enzymes, co-localised in purinosome clusters" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:atic",
+    type: "enzyme",
+    name: "Bifunctional purine biosynthesis protein ATIC (AICAR transformylase / IMP cyclohydrolase)",
+    aliases: ["ATIC", "AICAR transformilase", "IMP ciclo-hidrolase", "AICARFT/IMPCHase", "PURH", "proteína bifuncional ATIC"],
+    summary: "Bifunctional enzyme that finishes purine synthesis: formylates AICAR with 10-formyl-THF to FAICAR, then cyclises FAICAR to IMP, releasing water.",
+    body: [
+      "ATIC catalyses the last two steps of the pathway to [[compound:imp]] on one polypeptide: the transformylase uses [[compound:10-formyl-thf]] to convert [[compound:aicar]] to [[compound:faicar]] ([[reaction:atic-aicar-formylation]]), and the cyclohydrolase closes FAICAR into IMP ([[reaction:atic-imp-cyclohydrolase]]). UniProt notes that the transformylase can also use 10-formyldihydrofolate.",
+      "As the second formyl-consuming step it is a second link between the folate pool and DNA and RNA building blocks ([[pathway:nucleotide-synthesis]], [[article:pedley-2017-purinosome]]). Like [[enzyme:gart]], it is exposed to the same folate shortages that slow thymidylate synthesis ([[state:folate-trap]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "ATIC",
+      ec: "2.1.2.3; 3.5.4.10",
+      uniprot: "P31939",
+      rhea: "RHEA:22192; RHEA:18445",
+      reactome: "R-HSA-73798; R-HSA-73797",
+      kegg: "ec:2.1.2.3; ec:3.5.4.10",
+      compartment: "cytosol",
+      tissue: "heart, brain, placenta, lung, liver, skeletal muscle, kidney, pancreas",
+      cofactors: "10-formyl-THF (co-substrate)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "decreases", to: "compound:10-formyl-thf" },
+      { rel: "increases", to: "compound:thf" },
+      { rel: "increases", to: "compound:imp", note: "Cyclohydrolase step forms IMP" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:dnmt",
+    type: "enzyme",
+    name: "DNA (cytosine-5)-methyltransferases (DNMT; DNMT1, DNMT3A and DNMT3B)",
+    aliases: ["DNMT", "DNA metiltransferases", "DNMT1/DNMT3A/DNMT3B", "metiltransferases do DNA", "DNA citosina metiltransferase", "metilação do DNA"],
+    summary: "Family entry for the SAM-dependent enzymes that methylate DNA cytosine: DNMT1 maintains patterns on hemimethylated DNA, DNMT3A and DNMT3B set new ones; DNMT3L is an inactive activator.",
+    body: [
+      "All three catalytic members use [[compound:sam]] to put a methyl group on carbon 5 of cytosine in DNA, producing [[compound:sah]] ([[reaction:dnmt-dna-cytosine-methylation]]). [[enzyme:dnmt1]] prefers hemimethylated DNA and copies the pattern onto the new strand after replication; [[enzyme:dnmt3a]] and [[enzyme:dnmt3b]] methylate unmethylated DNA and are required for the patterns laid down in development ([[article:okano-1999-dnmt3a-dnmt3b-de-novo]]). DNMT3L has no catalytic activity itself and speeds up the two de novo enzymes; Reactome therefore draws their reactions as DNMT3A:DNMT3L and DNMT3B:DNMT3L complexes.",
+      "Every methylation also yields SAH, an inhibitor of methyltransferases, so the SAM:SAH ratio of the methyl budget bears on all of them ([[pathway:methyl-budget]]). In mice a rise in SAH tracked tissue DNA hypomethylation ([[article:caudill-2001-sah-dna-methylation]]); whether ordinary dietary changes move genomic methylation in people is a separate and less settled question ([[outcome:global-dna-methylation]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "DNMT1; DNMT3A; DNMT3B",
+      ec: "2.1.1.37",
+      uniprot: "P26358; Q9Y6K1; Q9UBC3",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334151; R-HSA-5334152; R-HSA-5334097",
+      kegg: "ec:2.1.1.37",
+      compartment: "nucleus (chromatin)",
+      tissue: "ubiquitous; DNMT3A and DNMT3B high in fetal tissues",
+      cofactors: "SAM (methyl donor); DNMT3L (catalytically inactive activator of DNMT3A and DNMT3B)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:dnmt-dna-cytosine-methylation" },
+      { rel: "part-of", to: "pathway:methyl-budget", note: "A minor SAM sink compared with PEMT, GAMT and GNMT" },
+      { rel: "decreases", to: "compound:sam" },
+      { rel: "increases", to: "compound:sah", note: "Co-product of every methylation; also an inhibitor of the enzyme family" },
+      { rel: "increases", to: "outcome:global-dna-methylation" }
+    ],
+    refs: ["article:okano-1999-dnmt3a-dnmt3b-de-novo", "article:caudill-2001-sah-dna-methylation", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:dnmt1",
+    type: "enzyme",
+    name: "DNA (cytosine-5)-methyltransferase 1 (DNMT1)",
+    aliases: ["DNMT1", "metiltransferase de manutenção", "maintenance DNA methyltransferase", "DNA metiltransferase 1", "DNMT1 humana"],
+    summary: "Maintenance DNA methyltransferase: copies CpG methylation onto the new strand after replication by preferring hemimethylated DNA.",
+    body: [
+      "DNMT1 methylates cytosine in CpG sites, favouring hemimethylated DNA, and is recruited to replication foci in S phase, where it restores the pattern on the daughter strand; this is how methylation marks are passed on through cell divisions (UniProt, [[enzyme:dnmt]]). Reactome describes the step with the partner UHRF1 bound to chromatin carrying a hemimethylated site.",
+      "Each methyl comes from [[compound:sam]] and leaves [[compound:sah]] behind ([[reaction:dnmt-dna-cytosine-methylation]]). The enzyme is the maintenance counterpart of the de novo enzymes [[enzyme:dnmt3a]] and [[enzyme:dnmt3b]]."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "DNMT1",
+      ec: "2.1.1.37",
+      uniprot: "P26358",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334151",
+      kegg: "ec:2.1.1.37",
+      compartment: "nucleus (chromatin; replication foci in S phase)",
+      tissue: "ubiquitous; highest in fetal tissues, heart, kidney, placenta",
+      cofactors: "SAM (methyl donor)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methyl-budget" },
+      { rel: "decreases", to: "compound:sam" },
+      { rel: "increases", to: "compound:sah" },
+      { rel: "interacts-with", to: "enzyme:dnmt3b", note: "UniProt: DNMT3B acts in association with DNMT1 at some targets" }
+    ],
+    refs: ["article:okano-1999-dnmt3a-dnmt3b-de-novo", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:dnmt3a",
+    type: "enzyme",
+    name: "DNA (cytosine-5)-methyltransferase 3A (DNMT3A)",
+    aliases: ["DNMT3A", "metiltransferase de novo", "de novo DNA methyltransferase", "DNA metiltransferase 3A"],
+    summary: "De novo DNA methyltransferase that methylates previously unmethylated DNA, including non-CpG sites, and is required for the methylation patterns set during development.",
+    body: [
+      "DNMT3A establishes methylation on DNA that does not yet carry it, in CpG and some non-CpG contexts, and is required for genome-wide de novo methylation in development ([[article:okano-1999-dnmt3a-dnmt3b-de-novo]], [[enzyme:dnmt]]). Reactome draws its reaction as the DNMT3A:DNMT3L complex on chromatin; DNMT3L is catalytically inactive and activates the enzyme.",
+      "The methyl donor is [[compound:sam]] and the co-product [[compound:sah]] ([[reaction:dnmt-dna-cytosine-methylation]]). The partner enzyme [[enzyme:dnmt1]] then maintains the pattern through replication."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "DNMT3A",
+      ec: "2.1.1.37",
+      uniprot: "Q9Y6K1",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334152",
+      kegg: "ec:2.1.1.37",
+      compartment: "nucleus (chromatin); some cytoplasm",
+      tissue: "highest in fetal tissues, skeletal muscle, heart; lower elsewhere",
+      cofactors: "SAM (methyl donor); DNMT3L (inactive activator)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methyl-budget" },
+      { rel: "decreases", to: "compound:sam" },
+      { rel: "increases", to: "compound:sah" },
+      { rel: "interacts-with", to: "enzyme:dnmt3b", note: "Paralogues with partly overlapping de novo function" }
+    ],
+    refs: ["article:okano-1999-dnmt3a-dnmt3b-de-novo", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:dnmt3b",
+    type: "enzyme",
+    name: "DNA (cytosine-5)-methyltransferase 3B (DNMT3B)",
+    aliases: ["DNMT3B", "DNA metiltransferase 3B", "metiltransferase de novo 3B", "síndrome ICF"],
+    summary: "De novo DNA methyltransferase needed for methylation of centromeric repeats; human DNMT3B mutations cause ICF syndrome.",
+    body: [
+      "DNMT3B shares the de novo function of [[enzyme:dnmt3a]] but also has non-overlapping targets: in mouse cells it is specifically required for methylation of centromeric minor satellite repeats, and mutations of the human gene cause ICF syndrome, a developmental disorder with hypomethylation of pericentromeric repeats ([[article:okano-1999-dnmt3a-dnmt3b-de-novo]]).",
+      "Like the other family members it transfers a methyl group from [[compound:sam]] to cytosine in DNA ([[reaction:dnmt-dna-cytosine-methylation]], [[enzyme:dnmt]]); Reactome draws the reaction as the DNMT3B:DNMT3L complex."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "DNMT3B",
+      ec: "2.1.1.37",
+      uniprot: "Q9UBC3",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334097",
+      kegg: "ec:2.1.1.37",
+      compartment: "nucleus",
+      tissue: "ubiquitous; highest in fetal liver, heart, kidney, placenta",
+      cofactors: "SAM (methyl donor); DNMT3L (inactive activator)"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methyl-budget" },
+      { rel: "decreases", to: "compound:sam" },
+      { rel: "increases", to: "compound:sah" }
+    ],
+    refs: ["article:okano-1999-dnmt3a-dnmt3b-de-novo", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:pld",
+    type: "enzyme",
+    name: "Phospholipase D (PLD1 and PLD2)",
+    aliases: ["PLD", "PLD1", "PLD2", "fosfolipase D", "fosfolipase D1", "fosfolipase D2", "fosfatidilcolina fosfolipase D"],
+    summary: "Family entry for the two human phosphatidylcholine-specific phospholipases D, which cleave choline off PC to leave phosphatidic acid, a signalling lipid.",
+    body: [
+      "PLD1 and PLD2 hydrolyse the head group of [[compound:phosphatidylcholine]], releasing free [[compound:choline]] and [[compound:phosphatidic-acid]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]); UniProt describes both as selective for phosphatidylcholine. PLD1 sits mostly on perinuclear, Golgi, endoplasmic reticulum and late endosome membranes and PLD2 at the plasma membrane (UniProt locations, largely by similarity to the mouse proteins; [[article:peng-2012-mammalian-pld]]).",
+      "Most of the interest in the enzyme concerns the phosphatidic acid it makes as a signal. The choline it releases is a by-product that can be re-phosphorylated by [[enzyme:choline-kinase]] or oxidised, but how much of cellular free choline comes from this route is not settled here ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "PLD1; PLD2",
+      ec: "3.1.4.4",
+      uniprot: "Q13393; O14939",
+      rhea: "RHEA:14445",
+      reactome: "R-HSA-1483182",
+      kegg: "ec:3.1.4.4",
+      compartment: "membranes: ER, Golgi, late endosomes (PLD1); plasma membrane (PLD2)",
+      tissue: "PLD1 pancreas, heart, brain, placenta, spleen, uterus, small intestine; PLD2 ubiquitous"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:pld-phosphatidylcholine-hydrolysis" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "decreases", to: "compound:phosphatidylcholine" },
+      { rel: "increases", to: "compound:choline" },
+      { rel: "increases", to: "compound:phosphatidic-acid" }
+    ],
+    refs: ["article:peng-2012-mammalian-pld", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:gpcpd1",
+    type: "enzyme",
+    name: "Glycerophosphocholine phosphodiesterase 1 (GPCPD1; EDI3)",
+    aliases: ["GPCPD1", "EDI3", "GDE5", "glicerofosfocolina fosfodiesterase", "GDPD6", "fosfodiesterase de glicerofosfocolina"],
+    summary: "Cytosolic phosphodiesterase that cleaves glycerophosphocholine into choline and glycerol 3-phosphate, releasing the choline of the water-soluble phosphatidylcholine breakdown product.",
+    body: [
+      "GPCPD1 hydrolyses [[compound:glycerophosphocholine]] to free [[compound:choline]] and [[compound:glycerol-3-phosphate]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]). Purified recombinant EDI3 protein (the paper's name for GPCPD1) cleaves GPC to those two products, and silencing it in human breast cancer cells raised the GPC to phosphocholine ratio ([[article:stewart-2012-edi3-gpc-phosphodiesterase]]). UniProt reports a strong preference for GPC and weak activity on glycerophosphoethanolamine, annotated by similarity to the mouse enzyme. Reactome also has a parallel record for a related enzyme, GDPD5 (R-HSA-6814132), so GPCPD1 may not be the only route.",
+      "Glycerophosphocholine is also the molecule sold as the supplement [[intervention:alpha-gpc-supplement]]. This enzyme is the obvious intracellular route for turning it into choline, but whether that happens to supplemental GPC in people was not tested in the sources used here. The name EDI3 refers to the same gene (NCBI Gene 56261)."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "GPCPD1",
+      ec: "3.1.4.2",
+      uniprot: "Q9NPB8",
+      rhea: "RHEA:16061",
+      reactome: "R-HSA-1483116",
+      kegg: "ec:3.1.4.2",
+      compartment: "cytosol",
+      tissue: "widely expressed; highest in spinal cord",
+      cofactors: "Mg2+ (by similarity to the mouse enzyme)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:gpcpd1-glycerophosphocholine-hydrolysis" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "decreases", to: "compound:glycerophosphocholine" },
+      { rel: "increases", to: "compound:choline" },
+      { rel: "associated-with", to: "intervention:alpha-gpc-supplement", note: "The enzyme's substrate is the alpha-GPC molecule; cleavage of supplemental GPC in vivo is not shown" }
+    ],
+    refs: ["article:stewart-2012-edi3-gpc-phosphodiesterase", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:pla2g4a",
+    type: "enzyme",
+    name: "Cytosolic phospholipase A2 alpha (PLA2G4A; cPLA2alpha)",
+    aliases: ["PLA2G4A", "cPLA2", "cPLA2 alfa", "fosfolipase A2 citosólica", "fosfolipase A2 do grupo IVA", "GIVA PLA2"],
+    summary: "Calcium-dependent phospholipase A2 that removes the sn-2 fatty acid, often arachidonate, from phosphatidylcholine, and also has lysophospholipase activity; it feeds lipid-mediator synthesis.",
+    body: [
+      "PLA2G4A hydrolyses the sn-2 ester of [[compound:phosphatidylcholine]], giving [[compound:lysophosphatidylcholine]] and a [[compound:fatty-acid]] ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]); UniProt describes a strong preference for arachidonoyl at sn-2, which makes the released arachidonate the precursor for eicosanoids ([[article:leslie-2015-cytosolic-pla2]]). Calcium drives its movement from the cytosol to membranes.",
+      "UniProt also lists a lysophospholipase activity (EC 3.1.1.5) for the same protein, which would take LPC on to glycerophosphocholine (Rhea RHEA:15177); the reaction on this site ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]) is written mainly for [[enzyme:pnpla6]], to which Reactome and the cell-line data assign that step, with PLA2G4A listed as a further annotated catalyst ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "PLA2G4A",
+      ec: "3.1.1.4; 3.1.1.5",
+      uniprot: "P47712",
+      rhea: "RHEA:15801; RHEA:15177",
+      reactome: "R-HSA-111883",
+      kegg: "ec:3.1.1.4; ec:3.1.1.5",
+      compartment: "cytosol; calcium-dependent translocation to Golgi, nuclear envelope and ER membranes",
+      tissue: "macrophages, neutrophils, fibroblasts, lung endothelium, platelets",
+      cofactors: "Ca2+ (membrane binding and activation)"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:pla2g4a-phosphatidylcholine-deacylation" },
+      { rel: "catalyzes", to: "reaction:pnpla6-lysophosphatidylcholine-deacylation", note: "UniProt lysophospholipase annotation; Reactome assigns this step to PNPLA6" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "decreases", to: "compound:phosphatidylcholine" },
+      { rel: "increases", to: "compound:lysophosphatidylcholine" }
+    ],
+    refs: ["article:leslie-2015-cytosolic-pla2", "article:rhea-2022"]
+  },
+  {
+    id: "enzyme:pnpla6",
+    type: "enzyme",
+    name: "Patatin-like phospholipase domain-containing protein 6 (PNPLA6; neuropathy target esterase)",
+    aliases: ["PNPLA6", "NTE", "neuropathy target esterase", "esterase alvo de neuropatia", "lisofosfolipase PNPLA6", "fosfolipase B"],
+    summary: "Endoplasmic-reticulum lysophospholipase that strips the last fatty acid from lysophosphatidylcholine, producing glycerophosphocholine; it makes the deacylation route to GPC.",
+    body: [
+      "PNPLA6 deacylates intracellular phosphatidylcholine to glycerophosphocholine at both the sn-1 and sn-2 positions; in cell lines, extra NTE raised the labelled GPC made from choline and reduced NTE lowered it ([[article:zaccheo-2004-nte-phosphatidylcholine-deacylation]]). The reaction written here is the last of the two acyl removals, [[compound:lysophosphatidylcholine]] to [[compound:glycerophosphocholine]] and a [[compound:fatty-acid]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]).",
+      "The same paper describes NTE as originally identified by its reaction with organophosphates that damage nerve axons, and as central to membrane lipid homeostasis by balancing PC synthesis with its degradation. The GPC it forms is then cleaved by [[enzyme:gpcpd1]] ([[pathway:phosphatidylcholine-catabolism]]). Reactome also assigns the same reaction to the related enzyme PNPLA7."
+    ],
+    evidence: "established",
+    facts: {
+      gene: "PNPLA6",
+      ec: "3.1.1.5",
+      uniprot: "Q8IY17",
+      rhea: "RHEA:15177",
+      reactome: "R-HSA-6814254",
+      kegg: "ec:3.1.1.5",
+      compartment: "endoplasmic reticulum membrane",
+      tissue: "brain, placenta, kidney, neurons, skeletal muscle"
+    },
+    relations: [
+      { rel: "catalyzes", to: "reaction:pnpla6-lysophosphatidylcholine-deacylation" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "decreases", to: "compound:lysophosphatidylcholine" },
+      { rel: "increases", to: "compound:glycerophosphocholine" },
+      { rel: "interacts-with", to: "enzyme:gpcpd1", note: "Makes the GPC that GPCPD1 cleaves" }
+    ],
+    refs: ["article:zaccheo-2004-nte-phosphatidylcholine-deacylation", "article:rhea-2022"]
   }
 ]

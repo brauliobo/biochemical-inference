@@ -39,7 +39,47 @@ export default [
       { rel: "increases", to: "compound:glutathione", note: "Glycine is a substrate of glutathione synthetase; with cysteine it restored glutathione synthesis in older adults in one small study." },
       { rel: "part-of", to: "compound:elastin" },
       { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia", note: "Glycine accumulates because the cleavage system is defective." },
-      { rel: "causes", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep in small trials." }
+      { rel: "causes", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep in small trials." },
+      {
+        rel: "increases",
+        to: "enzyme:gnmt",
+        note: "Glycine is the methyl acceptor of GNMT; whether a few grams raise hepatic GNMT flux in people is untested.",
+        hypothesis: true,
+        claim: "claim:glycine-gnmt-depletes-sam-in-undermethylated",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:gastrin",
+        note: "Conversation claim that free glycine acts on G cells; human studies saw more acid output without a change in serum gastrin.",
+        hypothesis: true,
+        claim: "claim:free-glycine-stimulates-gastrin",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "outcome:elevated-gastric-ph",
+        note: "Glycine is amphoteric and can buffer a lightly acidic stomach transiently; a few grams are small beside post-meal acid output.",
+        hypothesis: true,
+        claim: "claim:glycine-buffers-gastric-acid",
+        strength: "weak"
+      },
+      {
+        rel: "aggravates",
+        to: "state:duodenogastric-reflux",
+        note: "Conversation claim that a glycine overload shifts bile conjugation toward irritating reflux; the 1959 human study found no shift with glycine, and hepatic taurine availability governs the ratio.",
+        hypothesis: true,
+        claim: "claim:glycine-overload-shifts-bile-conjugation-and-reflux",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "pathway:gut-bacterial-glycine-fates",
+        note: "Free glycine reaching proximal bacteria could feed Stickland reduction or bacterial glycine cleavage; clinical relevance after oral glycine is conversation-only.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:mudd-2007-methyl-balance", "article:bannai-2012-glycine-sleep"]
   },
@@ -133,7 +173,8 @@ export default [
       { rel: "mitigates", to: "state:hyperhomocysteinemia", note: "Lowers plasma homocysteine, including at low doses; anhydrous betaine is a prescription treatment in classical homocystinuria." },
       { rel: "decreases", to: "outcome:elevated-homocysteine", note: "Randomised studies show lowering of fasting and post-methionine-load homocysteine." },
       { rel: "mitigates", to: "disease:cbs-deficiency", note: "Established treatment for classical homocystinuria; it raises methionine, which is monitored." },
-      { rel: "increases", to: "compound:methionine", note: "BHMT remethylates homocysteine to methionine." }
+      { rel: "increases", to: "compound:methionine", note: "BHMT remethylates homocysteine to methionine." },
+      { rel: "increases", to: "enzyme:bhmt", note: "Betaine is the methyl donor of BHMT.", strength: "strong" }
     ],
     refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
@@ -193,7 +234,29 @@ export default [
       { rel: "mitigates", to: "disease:choline-deficiency", note: "Repletion corrects the deficiency syndrome." },
       { rel: "mitigates", to: "outcome:hepatic-steatosis", note: "Steatosis from choline deficiency (for example on parenteral nutrition) reverses with repletion." },
       { rel: "mitigates", to: "state:methyl-donor-depletion", note: "Supplies betaine for BHMT and, indirectly, SAM." },
-      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Choline is the substrate for gut TMA; dietary restriction is part of management." }
+      { rel: "aggravates", to: "disease:trimethylaminuria", note: "Choline is the substrate for gut TMA; dietary restriction is part of management." },
+      {
+        rel: "increases",
+        to: "compound:acetylcholine",
+        note: "Choline is the substrate of choline acetyltransferase; whether supply limits acetylcholine output in adults with adequate intake is not shown.",
+        hypothesis: true,
+        claim: "claim:choline-supplies-nocturnal-vagal-brake",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:glycine",
+        note: "One mole of choline can yield at most one mole of glycine (13.9 g choline per 10 g glycine at 100 % conversion), and most choline goes to phosphatidylcholine.",
+        claim: "claim:choline-betaine-glycine-route",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:methionine",
+        note: "Through betaine and BHMT; the contribution depends on folate-dependent remethylation being limited.",
+        claim: "claim:choline-betaine-glycine-route",
+        strength: "moderate"
+      }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri", "article:zeisel-2009-choline-essential-nutrient"]
   },
@@ -214,7 +277,17 @@ export default [
       { rel: "product-of", to: "pathway:kennedy-pathway" },
       { rel: "part-of", to: "system:bile", note: "Biliary phospholipid" },
       { rel: "precursor-of", to: "compound:choline", note: "Reservoir released by phospholipases" },
-      { rel: "precursor-of", to: "compound:glycerophosphocholine", note: "Deacylation product" }
+      { rel: "precursor-of", to: "compound:glycerophosphocholine", note: "Deacylation product" },
+      {
+        rel: "increases",
+        to: "compound:choline",
+        note: "Phospholipases release choline from phosphatidylcholine; the claim that PEMT-derived PC is the choline pool for acetylcholine is partly supported.",
+        hypothesis: true,
+        claim: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
+        strength: "weak"
+      },
+      { rel: "precursor-of", to: "compound:lysophosphatidylcholine", note: "PLA2 deacylation (cytosolic PLA2 alpha)" },
+      { rel: "precursor-of", to: "compound:phosphatidic-acid", note: "PLD hydrolysis releases choline" }
     ],
     refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd"]
   },
@@ -306,7 +379,23 @@ export default [
       { rel: "increases", to: "pathway:gastric-acid-secretion", note: "Via M3 receptors on parietal and ECL cells" },
       { rel: "associated-with", to: "system:vagal-tone" },
       { rel: "increases", to: "system:gastric-physiology", note: "Antral contraction and emptying" },
-      { rel: "associated-with", to: "system:lower-esophageal-sphincter" }
+      { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
+      {
+        rel: "increases",
+        to: "system:vagal-tone",
+        note: "Conversation chain: lower acetylcholine supply lowers vagal output. Vagal efferents are cholinergic, but a supply limit on tone is a hypothesis.",
+        hypothesis: true,
+        claim: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "pathway:muscarinic-m2-vagal-brake",
+        note: "Acetylcholine is the transmitter of the M2 brake on the sinoatrial node; nocturnal dependence on choline supply is the claimed part.",
+        hypothesis: true,
+        claim: "claim:choline-supplies-nocturnal-vagal-brake",
+        strength: "weak"
+      }
     ]
   },
   {
@@ -328,7 +417,25 @@ export default [
       { rel: "substrate-of", to: "enzyme:pemt" },
       { rel: "substrate-of", to: "enzyme:hnmt" },
       { rel: "part-of", to: "pathway:methionine-cycle" },
-      { rel: "precursor-of", to: "compound:sah" }
+      { rel: "precursor-of", to: "compound:sah" },
+      {
+        rel: "increases",
+        to: "enzyme:pemt",
+        note: "SAM is the methyl donor (three per phosphatidylcholine); how far a fall in SAM lowers PEMT output in vivo is uncertain.",
+        claim: "claim:pemt-consumes-three-sam",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "enzyme:hnmt",
+        note: "HNMT uses SAM as its only methyl donor; whether SAM is limiting for histamine clearance in vivo is not shown.",
+        claim: "claim:hnmt-needs-sam",
+        strength: "moderate"
+      },
+      { rel: "increases", to: "enzyme:cbs", note: "Allosteric activator: routes homocysteine to transsulfuration when SAM is high.", strength: "strong" },
+      { rel: "decreases", to: "enzyme:mthfr", note: "Allosteric inhibition by SAM binding to the regulatory domain.", strength: "strong" },
+      { rel: "decreases", to: "enzyme:bhmt", note: "SAM inhibits BHMT in liver (feedback on remethylation).", strength: "moderate" },
+      { rel: "increases", to: "enzyme:dnmt", note: "SAM is the methyl donor of the DNA methyltransferases.", strength: "moderate" }
     ]
   },
   {
@@ -347,7 +454,16 @@ export default [
       { rel: "product-of", to: "enzyme:gnmt" },
       { rel: "substrate-of", to: "enzyme:ahcy" },
       { rel: "precursor-of", to: "compound:homocysteine" },
-      { rel: "associated-with", to: "state:undermethylation", note: "Raised SAH (low SAM:SAH) is the biochemical definition of impaired methylation capacity" }
+      { rel: "associated-with", to: "state:undermethylation", note: "Raised SAH (low SAM:SAH) is the biochemical definition of impaired methylation capacity" },
+      { rel: "decreases", to: "enzyme:hnmt", note: "Product inhibition by SAH, as for most methyltransferases." },
+      { rel: "decreases", to: "enzyme:comt", note: "Product inhibition by SAH, as for most methyltransferases." },
+      { rel: "decreases", to: "enzyme:dnmt", note: "Product inhibition; in mice a rise in SAH, more than a fall in SAM, tracked tissue DNA hypomethylation.", strength: "moderate" },
+      {
+        rel: "decreases",
+        to: "outcome:global-dna-methylation",
+        note: "Mouse data (a SAH rise predicted hypomethylation); human tissue data are sparse and plasma SAH is only a surrogate.",
+        strength: "weak"
+      }
     ]
   },
   {
@@ -367,7 +483,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:mtr" },
       { rel: "substrate-of", to: "enzyme:bhmt" },
       { rel: "substrate-of", to: "enzyme:cbs" },
-      { rel: "measured-by", to: "intervention:homocysteine-mma-testing" }
+      { rel: "measured-by", to: "intervention:homocysteine-mma-testing" },
+      { rel: "increases", to: "compound:sah", note: "AHCY equilibrium favours SAH synthesis, so accumulating homocysteine raises SAH and lowers the SAM:SAH ratio.", strength: "moderate" }
     ]
   },
   {
@@ -386,7 +503,8 @@ export default [
       { rel: "substrate-of", to: "enzyme:mat" },
       { rel: "product-of", to: "enzyme:mtr" },
       { rel: "product-of", to: "enzyme:bhmt" },
-      { rel: "precursor-of", to: "compound:sam" }
+      { rel: "precursor-of", to: "compound:sam" },
+      { rel: "increases", to: "compound:sam", note: "MAT converts methionine to SAM with ATP.", strength: "strong" }
     ],
     refs: ["article:mudd-2007-methyl-balance", "article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -498,7 +616,8 @@ export default [
     facts: { formula: "C5H10N2O3", molarMass: "146.14 g/mol", chebi: "CHEBI:18050" },
     relations: [
       { rel: "precursor-of", to: "compound:ammonia", note: "Via glutaminase" },
-      { rel: "precursor-of", to: "compound:gaba", note: "Glutamate-GABA cycle" }
+      { rel: "precursor-of", to: "compound:gaba", note: "Glutamate-GABA cycle" },
+      { rel: "precursor-of", to: "compound:glutamate", note: "Glutaminase" }
     ],
     refs: ["article:shao-2008-osl-taurine-glutamine-arginine"]
   },
@@ -537,7 +656,10 @@ export default [
       { rel: "substrate-of", to: "enzyme:dao" },
       { rel: "increases", to: "pathway:gastric-acid-secretion", note: "H2 receptor on parietal cells" },
       { rel: "associated-with", to: "disease:histamine-intolerance" },
-      { rel: "part-of", to: "pathway:histamine-degradation" }
+      { rel: "part-of", to: "pathway:histamine-degradation" },
+      { rel: "precursor-of", to: "compound:methylhistamine", note: "HNMT product (N-tau-methylhistamine), which is inactive at histamine receptors." },
+      { rel: "increases", to: "state:histamine-excess", note: "Load beyond degradation capacity defines the state." },
+      { rel: "increases", to: "pathway:histamine-receptor-signalling" }
     ]
   },
   {
@@ -664,7 +786,7 @@ export default [
     aliases: ["ácido fólico", "pteroylglutamic acid", "vitamin B9 synthetic"],
     summary: "Oxidised synthetic folate used in fortification and supplements; requires slow human DHFR for activation and can appear unmetabolised in plasma at higher doses.",
     body: [
-      "Folic acid is not a natural cofactor. After absorption it must be reduced to DHF and THF by dihydrofolate reductase, an activity that is low and variable in human liver (Bailey and Ayling 2009), so doses above roughly 200-400 micrograms can leave unmetabolised folic acid in circulation. The health significance of this is unresolved. Folic acid binds folate receptor alpha with high affinity, which is the basis of the speculation that it might compete with reduced folates; direct clinical evidence of impaired methylation is lacking, so treat that claim as plausible but unproven.",
+      "Folic acid is not a natural cofactor. After absorption it must be reduced to DHF and THF by dihydrofolate reductase ([[enzyme:dhfr]]), an activity that is low and variable in human liver (Bailey and Ayling 2009), so doses above roughly 200-400 micrograms can leave unmetabolised folic acid in circulation. The health significance of this is unresolved. Folic acid binds folate receptor alpha with high affinity, which is the basis of the speculation that it might compete with reduced folates; direct clinical evidence of impaired methylation is lacking, so treat that claim as plausible but unproven.",
       "Established facts: 400 micrograms preconception prevents neural-tube defects; fortification reduced their incidence; large doses can mask the haematological sign of B12 deficiency. UL is 1000 micrograms/day for folic acid (IOM and EU). Methotrexate and some antiepileptics antagonise folate metabolism. See [[intervention:folic-acid-supplement]]."
     ],
     evidence: "established",
@@ -804,7 +926,8 @@ export default [
     relations: [
       { rel: "substrate-of", to: "enzyme:pdxk" },
       { rel: "precursor-of", to: "compound:plp" },
-      { rel: "part-of", to: "compound:vitamin-b6" }
+      { rel: "part-of", to: "compound:vitamin-b6" },
+      { rel: "precursor-of", to: "compound:pyridoxine-5-phosphate", note: "Phosphorylated by PDXK" }
     ],
     refs: ["article:parra-2018-vitamin-b6-metabolism", "article:ueland-2015-b6-biomarkers"]
   },
@@ -821,10 +944,10 @@ export default [
     evidence: "established",
     facts: { formula: "C8H10NO6P", molarMass: "247.14 g/mol", chebi: "CHEBI:18405", pubchem: "CID 1051", hmdb: "HMDB0001491" },
     relations: [
-      { rel: "cofactor-of", to: "enzyme:gad" },
-      { rel: "cofactor-of", to: "enzyme:shmt" },
-      { rel: "cofactor-of", to: "enzyme:glycine-cleavage-system" },
-      { rel: "cofactor-of", to: "enzyme:cbs" },
+      { rel: "cofactor-of", to: "enzyme:gad", sign: "+", claim: "claim:p5p-gad-gaba-relieves-anxiety", strength: "strong" },
+      { rel: "cofactor-of", to: "enzyme:shmt", sign: "+", claim: "claim:shmt-gcs-need-plp", strength: "strong" },
+      { rel: "cofactor-of", to: "enzyme:glycine-cleavage-system", sign: "+", claim: "claim:shmt-gcs-need-plp", strength: "strong" },
+      { rel: "cofactor-of", to: "enzyme:cbs", sign: "+", strength: "strong" },
       { rel: "product-of", to: "enzyme:pdxk" },
       { rel: "part-of", to: "compound:vitamin-b6" }
     ]
@@ -884,7 +1007,7 @@ export default [
       { rel: "precursor-of", to: "compound:nicotinamide" },
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses; methyl sink effect" },
       { rel: "interacts-with", to: "compound:sam", note: "Via NNMT consumption of nicotinamide" },
-      { rel: "aggravates", to: "state:undermethylation", note: "NNMT uses SAM to methylate nicotinamide, so gram doses add a dose-dependent methyl load; relevance at ordinary doses is not established." },
+      { rel: "aggravates", to: "state:undermethylation", note: "NNMT uses SAM to methylate nicotinamide, so gram doses add a dose-dependent methyl load; relevance at ordinary doses is not established.", hypothesis: true, claim: "claim:niacin-drains-methyl-groups", strength: "weak" },
       { rel: "mitigates", to: "state:overmethylation", note: "Proposed to drain methyl groups through NNMT; the mechanism is real but its use for this purpose is unvalidated." },
       { rel: "aggravates", to: "state:methyl-donor-depletion", note: "Nicotinamide is cleared by NNMT using SAM." }
     ]
@@ -903,7 +1026,14 @@ export default [
     relations: [
       { rel: "precursor-of", to: "compound:1-methylnicotinamide" },
       { rel: "interacts-with", to: "compound:sam", note: "Consumed as methyl acceptor via NNMT" },
-      { rel: "part-of", to: "compound:niacin" }
+      { rel: "part-of", to: "compound:niacin" },
+      {
+        rel: "increases",
+        to: "enzyme:nnmt",
+        note: "Substrate-driven: NNMT methylates the excess nicotinamide for urinary excretion.",
+        claim: "claim:niacin-drains-methyl-groups",
+        strength: "moderate"
+      }
     ],
     refs: ["article:pissios-2017-nnmt-methyl-sink", "article:chen-2015-nicotinamide-skin-cancer"]
   },
@@ -938,9 +1068,8 @@ export default [
     facts: { formula: "C4H9N3O2", molarMass: "131.13 g/mol", chebi: "CHEBI:16919", pubchem: "CID 586", hmdb: "HMDB0000064", "dosing-range": "3-5 g/day monohydrate", pathway: "pathway:creatine-synthesis" },
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
-      { rel: "decreases", to: "compound:glycine", note: "Synthesis uses glycine" },
-      { rel: "decreases", to: "compound:sam", note: "Large methyl consumer" }
-    ],
+      { rel: "decreases", to: "enzyme:gatm", note: "Feedback repression of AGAT expression; the basis for creatine supplements sparing glycine and methyl groups.", strength: "moderate" },
+      { rel: "precursor-of", to: "compound:creatinine", note: "Spontaneous cyclisation, about 1.5-2 % of the pool per day" }    ],
     refs: ["article:stead-2006-methyl-balance-reevaluation", "article:mudd-2007-methyl-balance"]
   },
   {
@@ -1089,7 +1218,22 @@ export default [
       { rel: "product-of", to: "pathway:gastric-acid-secretion" },
       { rel: "increases", to: "compound:pepsin", note: "Activation of pepsinogen" },
       { rel: "aggravates", to: "disease:peptic-ulcer" },
-      { rel: "decreases", to: "disease:sibo", note: "Bacterial barrier; evidence moderate" }
+      { rel: "decreases", to: "disease:sibo", note: "Bacterial barrier; evidence moderate" },
+      {
+        rel: "increases",
+        to: "pathway:migrating-motor-complex",
+        note: "Acid reaching the duodenum is proposed to trigger secretin and motilin release; the evidence is animal and indirect.",
+        hypothesis: true,
+        claim: "claim:acid-drives-secretin-motilin-mmc",
+        strength: "weak"
+      },
+      {
+        rel: "aggravates",
+        to: "state:post-ulcer-mucosal-recovery",
+        note: "Acid on regenerating mucosa delays comfort and healing; the reason betaine HCl is avoided after an ulcer.",
+        claim: "claim:betaine-hcl-contraindicated-post-ulcer",
+        strength: "moderate"
+      }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control", "article:martinsen-2005-gastric-acid-barrier", "article:fordtran-1973-gastric-buffer-meal"]
   },
@@ -1125,10 +1269,17 @@ export default [
     evidence: "established",
     facts: { formula: "CO2", molarMass: "44.01 g/mol", chebi: "CHEBI:16526", pubchem: "CID 280" },
     relations: [
-      { rel: "causes", to: "outcome:belching", note: "Through distension and TLESR when produced or swallowed in bulk" },
+      { rel: "causes", to: "outcome:belching", note: "Through distension and TLESR when produced or swallowed in bulk", claim: "claim:acid-bicarbonate-reaction-gives-co2-belching", strength: "moderate" },
       { rel: "product-of", to: "enzyme:glycine-cleavage-system" },
       { rel: "product-of", to: "enzyme:h-pylori-urease" },
-      { rel: "product-of", to: "enzyme:carbonic-anhydrase", note: "H2CO3 dehydration" }
+      { rel: "product-of", to: "enzyme:carbonic-anhydrase", note: "H2CO3 dehydration" },
+      {
+        rel: "increases",
+        to: "outcome:co2-gastric-distension",
+        note: "Gas in the lumen distends it; the CO2 volume produced after a glycine dose is not established.",
+        claim: "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        strength: "moderate"
+      }
     ],
     refs: ["article:stanghellini-2016-rome-iv-gastroduodenal"]
   },
@@ -1198,7 +1349,15 @@ export default [
     facts: { formula: "C3H9NO", molarMass: "75.11 g/mol", chebi: "CHEBI:15724", pubchem: "CID 1145", hmdb: "HMDB0000925" },
     relations: [
       { rel: "associated-with", to: "system:gut-microbiota" },
-      { rel: "associated-with", to: "compound:phosphatidylcholine", note: "Dietary precursor route" }
+      { rel: "associated-with", to: "compound:phosphatidylcholine", note: "Dietary precursor route" },
+      {
+        rel: "increases",
+        to: "disease:cardiovascular-disease",
+        note: "Association in cohorts and animal work; causality and the effect of lowering TMAO are contested.",
+        hypothesis: true,
+        claim: "claim:above-ul-tmao-endothelial-stress",
+        strength: "weak"
+      }
     ],
     refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd", "article:koeth-2013-carnitine-tmao-atherosclerosis"]
   },

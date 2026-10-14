@@ -1999,5 +1999,478 @@ export default [
     },
     relations: [{ rel: "part-of", to: "pathway:nucleotide-synthesis" }],
     refs: ["article:rhea-2022", "article:carreras-1995-thymidylate-synthase"]
+  },
+{
+    id: "reaction:dhfr-dihydrofolate-reduction",
+    type: "reaction",
+    name: "DHFR: DHF + NADPH + H+ -> THF + NADP+",
+    aliases: ["DHF + NADPH → THF + NADP+", "redução do di-hidrofolato", "redução do dihidrofolato", "DHFR"],
+    summary: "NADPH-dependent reduction of dihydrofolate to tetrahydrofolate, regenerating the folate that thymidylate synthase consumes.",
+    body: [
+      "[[compound:dhf]] + [[compound:nadph]] + H+ -> [[compound:thf]] + [[compound:nadp]], catalysed by [[enzyme:dhfr]]. It returns the folate oxidised in [[reaction:tyms-thymidylate-synthesis]] to the pool from which [[enzyme:shmt]] can reload it with one-carbon units ([[pathway:folate-cycle]]).",
+      "Rhea master RHEA:15009 is written in the opposite, oxidative direction (THF + NADP+ -> DHF + NADPH + H+); RHEA:15011 is this physiological direction, and it is the id Reactome cross-references. Reactome's record of the step (R-HSA-197972) names the paralogue DHFR2 as catalyst, whereas UniProt assigns the reaction to DHFR (P00374)."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "1.5.1.3",
+      rhea: "RHEA:15011",
+      "rhea-master": "RHEA:15009",
+      reactome: "R-HSA-197972",
+      compartment: "cytosol",
+      direction: "reductive (physiological direction)"
+    },
+    reaction: {
+      reactants: [{ id: "compound:dhf", n: 1 }, { id: "compound:nadph", n: 1 }, { id: "compound:proton", n: 1 }],
+      products: [{ id: "compound:thf", n: 1 }, { id: "compound:nadp", n: 1 }],
+      ec: "1.5.1.3",
+      rhea: "RHEA:15011",
+      reactome: "R-HSA-197972",
+      compartment: "cytosol",
+      enzymes: ["enzyme:dhfr"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "interacts-with", to: "reaction:tyms-thymidylate-synthesis", note: "Regenerates the folate that thymidylate synthase oxidises" }
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism", "article:bailey-2009-dhfr-slow-human-liver"]
+  },
+  {
+    id: "reaction:aldh1l1-10-formyl-thf-oxidation",
+    type: "reaction",
+    name: "ALDH1L1: 10-formyl-THF + NADP+ + H2O -> THF + CO2 + NADPH + H+",
+    aliases: ["10-formil-THF → THF + CO2", "oxidação do 10-formil-tetraidrofolato", "10-formil-THF desidrogenase", "perda de unidades de carbono como CO2"],
+    summary: "NADP+-dependent oxidation of 10-formyl-THF to tetrahydrofolate and carbon dioxide, a route that removes one-carbon units from the folate pool.",
+    body: [
+      "[[compound:10-formyl-thf]] + [[compound:nadp]] + [[compound:water]] -> [[compound:thf]] + [[compound:carbon-dioxide]] + [[compound:nadph]] + H+, catalysed by [[enzyme:aldh1l1]]. The formyl carbon leaves as CO2 and the folate is freed to take up another one-carbon unit ([[pathway:folate-cycle]]).",
+      "Rhea RHEA:10180 is written in this direction. Reactome's record (R-HSA-6808496) uses the polyglutamylated folate forms (10-formyl-THFPG and THFPG), the form folates take inside cells, so its participants differ from the monoglutamate shown here."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "1.5.1.6",
+      rhea: "RHEA:10180",
+      reactome: "R-HSA-6808496",
+      compartment: "cytosol",
+      direction: "oxidative decarboxylation of the formyl group"
+    },
+    reaction: {
+      reactants: [{ id: "compound:10-formyl-thf", n: 1 }, { id: "compound:nadp", n: 1 }, { id: "compound:water", n: 1 }],
+      products: [
+        { id: "compound:thf", n: 1 },
+        { id: "compound:carbon-dioxide", n: 1 },
+        { id: "compound:nadph", n: 1 },
+        { id: "compound:proton", n: 1 }
+      ],
+      ec: "1.5.1.6",
+      rhea: "RHEA:10180",
+      reactome: "R-HSA-6808496",
+      compartment: "cytosol",
+      enzymes: ["enzyme:aldh1l1"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "interacts-with", to: "reaction:gart-gar-formylation", note: "Competes with purine synthesis for 10-formyl-THF" }
+    ],
+    refs: ["article:rhea-2022", "article:reactome-folate-pterine-metabolism", "article:ducker-2017-one-carbon-metabolism"]
+  },
+  {
+    id: "reaction:gart-gar-formylation",
+    type: "reaction",
+    name: "GART: GAR + 10-formyl-THF -> FGAR + THF + H+",
+    aliases: ["GAR + 10-formil-THF → FGAR + THF", "formilação do GAR", "GAR transformilase", "transformilase de GAR"],
+    summary: "First folate-dependent step of de novo purine synthesis: a formyl group moves from 10-formyl-THF onto glycinamide ribonucleotide.",
+    body: [
+      "[[compound:gar]] + [[compound:10-formyl-thf]] -> [[compound:fgar]] + [[compound:thf]] + H+, catalysed by the formyltransferase domain of [[enzyme:gart]]. The formyl carbon ends up as C8 of the purine ring ([[pathway:nucleotide-synthesis]]).",
+      "Rhea master RHEA:15053 is written in this direction; the directional ids are RHEA:15054 (this direction) and RHEA:15055 (reverse). The tetrahydrofolate released goes back to the folate pool ([[pathway:folate-cycle]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.2.2",
+      rhea: "RHEA:15053",
+      reactome: "R-HSA-73813",
+      compartment: "cytosol",
+      direction: "biosynthetic direction"
+    },
+    reaction: {
+      reactants: [{ id: "compound:gar", n: 1 }, { id: "compound:10-formyl-thf", n: 1 }],
+      products: [{ id: "compound:fgar", n: 1 }, { id: "compound:thf", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "2.1.2.2",
+      rhea: "RHEA:15053",
+      reactome: "R-HSA-73813",
+      compartment: "cytosol",
+      enzymes: ["enzyme:gart"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "part-of", to: "pathway:folate-cycle", note: "Consumes 10-formyl-THF" }
+    ],
+    refs: ["article:rhea-2022", "article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism"]
+  },
+  {
+    id: "reaction:atic-aicar-formylation",
+    type: "reaction",
+    name: "ATIC: AICAR + 10-formyl-THF -> FAICAR + THF",
+    aliases: ["AICAR + 10-formil-THF → FAICAR + THF", "formilação do AICAR", "AICAR transformilase", "transformilase de AICAR"],
+    summary: "Second folate-dependent step of de novo purine synthesis: ATIC moves a formyl group from 10-formyl-THF onto AICAR, giving FAICAR.",
+    body: [
+      "[[compound:aicar]] + [[compound:10-formyl-thf]] -> [[compound:faicar]] + [[compound:thf]], catalysed by the transformylase domain of [[enzyme:atic]]. The formyl carbon becomes C2 of the purine ring, so each IMP takes two folate carbons in total, one here and one in [[reaction:gart-gar-formylation]] ([[pathway:nucleotide-synthesis]]).",
+      "Rhea master RHEA:22192 is written in this direction (RHEA:22193 is the directional id Reactome cross-references). No proton appears in the Rhea equation. UniProt also lists a variant using 10-formyldihydrofolate as formyl donor (RHEA:59144)."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.2.3",
+      rhea: "RHEA:22192",
+      reactome: "R-HSA-73798",
+      compartment: "cytosol",
+      direction: "biosynthetic direction"
+    },
+    reaction: {
+      reactants: [{ id: "compound:aicar", n: 1 }, { id: "compound:10-formyl-thf", n: 1 }],
+      products: [{ id: "compound:faicar", n: 1 }, { id: "compound:thf", n: 1 }],
+      ec: "2.1.2.3",
+      rhea: "RHEA:22192",
+      reactome: "R-HSA-73798",
+      compartment: "cytosol",
+      enzymes: ["enzyme:atic"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "part-of", to: "pathway:folate-cycle", note: "Consumes 10-formyl-THF" },
+      { rel: "interacts-with", to: "reaction:atic-imp-cyclohydrolase", note: "Consecutive steps on one protein" }
+    ],
+    refs: ["article:rhea-2022", "article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism"]
+  },
+  {
+    id: "reaction:atic-imp-cyclohydrolase",
+    type: "reaction",
+    name: "ATIC: FAICAR -> IMP + H2O",
+    aliases: ["FAICAR → IMP + H2O", "IMP ciclo-hidrolase", "ciclização do FAICAR", "inosinicase"],
+    summary: "Final step of de novo purine synthesis: ATIC's cyclohydrolase closes the formylated imidazole of FAICAR into the second ring of inosine monophosphate, releasing water.",
+    body: [
+      "[[compound:faicar]] -> [[compound:imp]] + [[compound:water]], catalysed by the cyclohydrolase domain of [[enzyme:atic]]. IMP is the first complete purine nucleotide and the precursor of [[compound:amp]] and GMP ([[pathway:nucleotide-synthesis]]).",
+      "Rhea master RHEA:18445 is written in the opposite direction (IMP + H2O = FAICAR); RHEA:18447 is the biosynthetic direction used here and the id Reactome cross-references. No folate takes part in this step, but it is only reached if the preceding formylation ([[reaction:atic-aicar-formylation]]) has taken place."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "3.5.4.10",
+      rhea: "RHEA:18447",
+      "rhea-master": "RHEA:18445",
+      reactome: "R-HSA-73797",
+      compartment: "cytosol",
+      direction: "biosynthetic direction (cyclisation with loss of water)"
+    },
+    reaction: {
+      reactants: [{ id: "compound:faicar", n: 1 }],
+      products: [{ id: "compound:imp", n: 1 }, { id: "compound:water", n: 1 }],
+      ec: "3.5.4.10",
+      rhea: "RHEA:18447",
+      reactome: "R-HSA-73797",
+      compartment: "cytosol",
+      enzymes: ["enzyme:atic"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "interacts-with", to: "reaction:atic-aicar-formylation", note: "Consecutive steps on one protein" }
+    ],
+    refs: ["article:rhea-2022", "article:pedley-2017-purinosome"]
+  },
+  {
+    id: "reaction:nnmt-nicotinamide-methylation",
+    type: "reaction",
+    name: "NNMT: nicotinamide + SAM -> 1-methylnicotinamide + SAH",
+    aliases: ["nicotinamida + SAMe → 1-metilnicotinamida + SAH", "metilação da nicotinamida", "NNMT", "depuração da vitamina B3"],
+    summary: "SAM-dependent methylation of nicotinamide to 1-methylnicotinamide, the main way excess vitamin B3 is cleared and a small methyl sink.",
+    body: [
+      "[[compound:nicotinamide]] + [[compound:sam]] -> [[compound:1-methylnicotinamide]] + [[compound:sah]], catalysed by [[enzyme:nnmt]]. The methylated product is excreted in urine; the reaction is the biochemical basis of the idea that large niacin or nicotinamide doses consume methyl groups ([[claim:niacin-drains-methyl-groups]], [[pathway:methyl-budget]]).",
+      "Rhea RHEA:23884 is written in this direction and has no proton: SAM and 1-methylnicotinamide are both cations, so charge balances without one. How much methyl loss this causes at supplement doses in people is not established ([[article:pissios-2017-nnmt-methyl-sink]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.1",
+      rhea: "RHEA:23884",
+      reactome: "R-HSA-5359451",
+      compartment: "cytosol",
+      direction: "SAM-driven methylation"
+    },
+    reaction: {
+      reactants: [{ id: "compound:nicotinamide", n: 1 }, { id: "compound:sam", n: 1 }],
+      products: [{ id: "compound:1-methylnicotinamide", n: 1 }, { id: "compound:sah", n: 1 }],
+      ec: "2.1.1.1",
+      rhea: "RHEA:23884",
+      reactome: "R-HSA-5359451",
+      compartment: "cytosol",
+      enzymes: ["enzyme:nnmt"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" },
+      { rel: "associated-with", to: "claim:niacin-drains-methyl-groups", note: "Mechanism behind the claim; human magnitude not established" },
+      { rel: "associated-with", to: "intervention:niacin-nicotinamide-supplement" }
+    ],
+    refs: ["article:rhea-2022", "article:pissios-2017-nnmt-methyl-sink"]
+  },
+  {
+    id: "reaction:dnmt-dna-cytosine-methylation",
+    type: "reaction",
+    name: "DNMT: DNA cytosine + SAM -> DNA 5-methylcytosine + SAH + H+",
+    aliases: ["DNA citosina + SAMe → 5-metilcitosina + SAH", "metilação do DNA", "metilação da citosina no DNA", "DNMT"],
+    summary: "SAM-dependent transfer of a methyl group to carbon 5 of a cytosine in DNA, producing 5-methylcytosine; the chemical step of DNA methylation.",
+    body: [
+      "[[compound:dna-cytosine]] + [[compound:sam]] -> [[compound:dna-5-methylcytosine]] + [[compound:sah]] + H+, catalysed by [[enzyme:dnmt1]] (maintenance) and [[enzyme:dnmt3a]] and [[enzyme:dnmt3b]] (de novo); the family is described at [[enzyme:dnmt]]. The DNA participants are class-level bookkeeping nodes for residues of a polymer, like [[compound:hydrogen-acceptor]], so no heavy-atom balance can be tested for this reaction.",
+      "The reaction spends one methyl group per mark. In the methyl budget this is a minor sink compared with phosphatidylcholine, creatine and glycine methylation ([[pathway:methyl-budget]]), but it makes SAH like every methylation does. Rhea RHEA:13681 is written in this direction; Reactome has one record per enzyme complex (R-HSA-5334151, R-HSA-5334152, R-HSA-5334097), none with a Rhea cross-reference."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.37",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334151; R-HSA-5334152; R-HSA-5334097",
+      compartment: "nucleoplasm",
+      direction: "SAM-driven methylation"
+    },
+    reaction: {
+      reactants: [{ id: "compound:dna-cytosine", n: 1 }, { id: "compound:sam", n: 1 }],
+      products: [{ id: "compound:dna-5-methylcytosine", n: 1 }, { id: "compound:sah", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "2.1.1.37",
+      rhea: "RHEA:13681",
+      reactome: "R-HSA-5334151; R-HSA-5334152; R-HSA-5334097",
+      compartment: "nucleoplasm",
+      enzymes: ["enzyme:dnmt1", "enzyme:dnmt3a", "enzyme:dnmt3b"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methyl-budget", note: "A minor SAM sink" },
+      { rel: "associated-with", to: "outcome:global-dna-methylation" }
+    ],
+    refs: ["article:rhea-2022", "article:okano-1999-dnmt3a-dnmt3b-de-novo", "article:caudill-2001-sah-dna-methylation"]
+  },
+  {
+    id: "reaction:pld-phosphatidylcholine-hydrolysis",
+    type: "reaction",
+    name: "PLD: phosphatidylcholine + H2O -> phosphatidic acid + choline + H+",
+    aliases: ["PC + H2O → PA + colina + H+", "hidrólise da fosfatidilcolina pela fosfolipase D", "fosfolipase D", "liberação de colina da PC"],
+    summary: "Phospholipase D cleaves the phosphodiester bond between phosphatidic acid and choline in phosphatidylcholine, releasing free choline and leaving the signalling lipid phosphatidic acid.",
+    body: [
+      "[[compound:phosphatidylcholine]] + [[compound:water]] -> [[compound:phosphatidic-acid]] + [[compound:choline]] + H+, catalysed by [[enzyme:pld]] (PLD1 and PLD2). The acyl chains are generic and are not changed by the reaction, so it balances at the level of head groups; no formula is stored for the lipids and the atom test skips it.",
+      "Rhea master RHEA:14445 is written in this direction (RHEA:14446 is the directional id); Reactome calls the record 'PC is hydrolyzed to PA and choline by PLD1/2' (R-HSA-1483182). UniProt lists the same reaction for both proteins ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "3.1.4.4",
+      rhea: "RHEA:14445",
+      reactome: "R-HSA-1483182",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (choline)",
+      direction: "hydrolysis"
+    },
+    reaction: {
+      reactants: [{ id: "compound:phosphatidylcholine", n: 1 }, { id: "compound:water", n: 1 }],
+      products: [{ id: "compound:phosphatidic-acid", n: 1 }, { id: "compound:choline", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "3.1.4.4",
+      rhea: "RHEA:14445",
+      reactome: "R-HSA-1483182",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (choline)",
+      enzymes: ["enzyme:pld"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "interacts-with", to: "reaction:choline-kinase-phosphocholine", note: "Released choline can be re-phosphorylated" }
+    ],
+    refs: ["article:rhea-2022", "article:peng-2012-mammalian-pld"]
+  },
+  {
+    id: "reaction:gpcpd1-glycerophosphocholine-hydrolysis",
+    type: "reaction",
+    name: "GPCPD1: glycerophosphocholine + H2O -> glycerol 3-phosphate + choline + H+",
+    aliases: ["GPC + H2O → glicerol-3-fosfato + colina + H+", "hidrólise da glicerofosfocolina", "alfa-GPC → colina", "GPCPD1"],
+    summary: "GPCPD1 hydrolyses glycerophosphocholine to choline and glycerol 3-phosphate, the final step that frees choline from the deacylation route.",
+    body: [
+      "[[compound:glycerophosphocholine]] + [[compound:water]] -> [[compound:glycerol-3-phosphate]] + [[compound:choline]] + H+, catalysed by [[enzyme:gpcpd1]]. It releases the water-soluble head group of phosphatidylcholine as free choline after the two acyl chains have been removed ([[reaction:pla2g4a-phosphatidylcholine-deacylation]], [[reaction:pnpla6-lysophosphatidylcholine-deacylation]]; [[pathway:phosphatidylcholine-catabolism]]).",
+      "Rhea master RHEA:16061 is written in this direction (RHEA:16062 is the directional id Reactome cross-references). Reactome (R-HSA-1483116) and UniProt both annotate GPCPD1 for it, and the enzyme was shown to carry out the reaction in human cancer cells ([[article:stewart-2012-edi3-gpc-phosphodiesterase]]). Reactome also has a parallel record for the related enzyme GDPD5 (R-HSA-6814132)."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "3.1.4.2",
+      rhea: "RHEA:16061",
+      reactome: "R-HSA-1483116",
+      compartment: "cytosol",
+      direction: "hydrolysis"
+    },
+    reaction: {
+      reactants: [{ id: "compound:glycerophosphocholine", n: 1 }, { id: "compound:water", n: 1 }],
+      products: [{ id: "compound:glycerol-3-phosphate", n: 1 }, { id: "compound:choline", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "3.1.4.2",
+      rhea: "RHEA:16061",
+      reactome: "R-HSA-1483116",
+      compartment: "cytosol",
+      enzymes: ["enzyme:gpcpd1"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "interacts-with", to: "reaction:pnpla6-lysophosphatidylcholine-deacylation", note: "Uses the GPC this step makes" }
+    ],
+    refs: ["article:rhea-2022", "article:stewart-2012-edi3-gpc-phosphodiesterase"]
+  },
+  {
+    id: "reaction:pla2g4a-phosphatidylcholine-deacylation",
+    type: "reaction",
+    name: "PLA2G4A: phosphatidylcholine + H2O -> lysophosphatidylcholine + fatty acid + H+",
+    aliases: ["PC + H2O → LPC + ácido graxo + H+", "desacilação da fosfatidilcolina", "fosfolipase A2 citosólica", "PC → lisofosfatidilcolina"],
+    summary: "Phospholipase A2 removes the fatty acid at the sn-2 position of phosphatidylcholine, giving lysophosphatidylcholine and a free fatty acid, often arachidonate.",
+    body: [
+      "[[compound:phosphatidylcholine]] + [[compound:water]] -> [[compound:lysophosphatidylcholine]] + [[compound:fatty-acid]] + H+, catalysed by [[enzyme:pla2g4a]]. The acyl chains are generic; Reactome's record (R-HSA-111883) is the arachidonoyl instance and names the released acid as arachidonate. The lipids have no stored formula, so the atom test skips the reaction.",
+      "Rhea master RHEA:15801 is written in this direction. This is the first of two acyl removals of the deacylation route; the second is [[reaction:pnpla6-lysophosphatidylcholine-deacylation]] ([[pathway:phosphatidylcholine-catabolism]]). Other phospholipases A2 catalyse the same chemistry, among them the pancreatic enzyme that digests dietary PC ([[article:nilsson-2019-choline-phospholipid-digestion]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "3.1.1.4",
+      rhea: "RHEA:15801",
+      reactome: "R-HSA-111883",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (fatty acid)",
+      direction: "hydrolysis"
+    },
+    reaction: {
+      reactants: [{ id: "compound:phosphatidylcholine", n: 1 }, { id: "compound:water", n: 1 }],
+      products: [{ id: "compound:lysophosphatidylcholine", n: 1 }, { id: "compound:fatty-acid", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "3.1.1.4",
+      rhea: "RHEA:15801",
+      reactome: "R-HSA-111883",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (fatty acid)",
+      enzymes: ["enzyme:pla2g4a"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" },
+      { rel: "interacts-with", to: "reaction:pnpla6-lysophosphatidylcholine-deacylation", note: "Makes the LPC that PNPLA6 deacylates" }
+    ],
+    refs: ["article:rhea-2022", "article:leslie-2015-cytosolic-pla2"]
+  },
+  {
+    id: "reaction:pnpla6-lysophosphatidylcholine-deacylation",
+    type: "reaction",
+    name: "PNPLA6: lysophosphatidylcholine + H2O -> glycerophosphocholine + fatty acid + H+",
+    aliases: ["LPC + H2O → GPC + ácido graxo + H+", "lisofosfolipase", "desacilação da lisofosfatidilcolina", "LPC → glicerofosfocolina"],
+    summary: "Lysophospholipase step that removes the last fatty acid from lysophosphatidylcholine, producing glycerophosphocholine, the water-soluble precursor of free choline.",
+    body: [
+      "[[compound:lysophosphatidylcholine]] + [[compound:water]] -> [[compound:glycerophosphocholine]] + [[compound:fatty-acid]] + H+, catalysed by [[enzyme:pnpla6]]. Reactome (R-HSA-6814254) and UniProt assign this reaction to PNPLA6; UniProt also lists it for [[enzyme:pla2g4a]] (its lysophospholipase activity), and Reactome has parallel records for PNPLA7 and other enzymes.",
+      "Rhea master RHEA:15177 is written in this direction (RHEA:15178 is the directional id). Together with the preceding [[reaction:pla2g4a-phosphatidylcholine-deacylation]] it converts phosphatidylcholine to glycerophosphocholine, which [[enzyme:gpcpd1]] then cleaves ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]], [[pathway:phosphatidylcholine-catabolism]]). In mammalian cell lines the conversion of PC to GPC depended on NTE ([[article:zaccheo-2004-nte-phosphatidylcholine-deacylation]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "3.1.1.5",
+      rhea: "RHEA:15177",
+      reactome: "R-HSA-6814254",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (GPC)",
+      direction: "hydrolysis"
+    },
+    reaction: {
+      reactants: [{ id: "compound:lysophosphatidylcholine", n: 1 }, { id: "compound:water", n: 1 }],
+      products: [{ id: "compound:glycerophosphocholine", n: 1 }, { id: "compound:fatty-acid", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "3.1.1.5",
+      rhea: "RHEA:15177",
+      reactome: "R-HSA-6814254",
+      compartment: "endoplasmic reticulum membrane (lipid), cytosol (GPC)",
+      enzymes: ["enzyme:pnpla6", "enzyme:pla2g4a"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" }
+    ],
+    refs: ["article:rhea-2022", "article:zaccheo-2004-nte-phosphatidylcholine-deacylation"]
+  },
+  {
+    id: "reaction:creatine-cyclisation",
+    type: "reaction",
+    name: "Creatine -> creatinine + H2O (spontaneous, non-enzymatic)",
+    aliases: ["creatina → creatinina + água", "ciclização espontânea da creatina", "formação de creatinina", "perda diária de creatina", "creatine degradation"],
+    summary: "Creatine closes into the ring of creatinine with loss of water without an enzyme; this slow, continuous loss is what endogenous synthesis and diet replace each day.",
+    body: [
+      "[[compound:creatine]] -> [[compound:creatinine]] + [[compound:water]]. In the body this is a spontaneous cyclisation, not an enzymatic step; phosphocreatine converts to creatinine and phosphate in the same way ([[article:brosnan-2007-creatine-review]], [[article:brosnan-2011-metabolic-burden-creatine-synthesis]]). The loss is usually quoted as roughly 1.5-2 % of the creatine pool per day, about 2 g of creatinine per day in a young adult man (less in women and older people, who have less muscle), and it is the demand that [[pathway:creatine-synthesis]] and dietary creatine meet ([[article:wyss-2000-creatine-creatinine-metabolism]]).",
+      "What is and is not enzyme-catalysed: Rhea lists this chemistry only as RHEA:14533, creatinine + H2O = creatine, under EC 3.5.2.10 (creatininase), written in the hydrolytic direction. That enzyme is bacterial; the only reviewed UniProt entry with EC 3.5.2.10 is crnA from Pseudomonas putida, and there is no human protein with that EC. So no enzyme is listed for this reaction in humans; RHEA:14535 is Rhea's id for the direction shown here. Reactome likewise models the sister reaction, phosphocreatine to creatinine and phosphate (R-HSA-71287), with no catalyst."
+    ],
+    evidence: "established",
+    facts: {
+      rhea: "RHEA:14535",
+      "rhea-master": "RHEA:14533",
+      compartment: "cytosol (muscle, brain and other creatine-containing cells)",
+      catalysis: "non-enzymatic in humans; Rhea EC 3.5.2.10 (creatininase) is bacterial",
+      direction: "net flow toward creatinine, which leaves in urine"
+    },
+    reaction: {
+      reactants: [{ id: "compound:creatine", n: 1 }],
+      products: [{ id: "compound:creatinine", n: 1 }, { id: "compound:water", n: 1 }],
+      rhea: "RHEA:14535",
+      compartment: "cytosol"
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:creatine-synthesis", note: "The continuous loss that synthesis replaces" },
+      { rel: "associated-with", to: "intervention:creatine-supplement" },
+      { rel: "associated-with", to: "pathway:methyl-budget", note: "Replacing the lost creatine is a major SAM sink" }
+    ],
+    refs: [
+      "article:wyss-2000-creatine-creatinine-metabolism",
+      "article:brosnan-2007-creatine-review",
+      "article:brosnan-2011-metabolic-burden-creatine-synthesis",
+      "article:rhea-2022"
+    ]
+  },
+  {
+    id: "reaction:mtr-methylcobalamin-demethylation",
+    type: "reaction",
+    name: "MTR (first half): methylcobalamin + homocysteine -> cob(I)alamin + methionine + H+",
+    aliases: ["MeCbl + Hcy → cob(I)alamina + Met", "demetilação da metilcobalamina", "metionina sintase, primeira metade", "transferência de CH3 da MeCbl para homocisteína"],
+    summary: "First half of the methionine synthase cycle: enzyme-bound methylcobalamin hands its methyl group to homocysteine, forming methionine and leaving cob(I)alamin.",
+    body: [
+      "[[compound:methylcobalamin]] + [[compound:homocysteine]] -> [[compound:cob-i-alamin]] + [[compound:methionine]] + H+, catalysed by [[enzyme:mtr]]. Reactome describes the step with the cobalamin bound in an MTRR:MTR complex (R-HSA-174374, 'MTR transfers CH3 from MeCbl to HCYS'). The second half, [[reaction:mtr-cob-i-alamin-methylation]], restores methylcobalamin from [[compound:5-mthf]].",
+      "The proton is bookkeeping: with the formulas stored for methylcobalamin and cob(I)alamin, hydrogens and charge balance only if one H+ is written, and it cancels against the proton consumed in the second half. Neither Rhea nor Reactome has a separate record for either half; the sum of the two halves is the single reaction [[reaction:mtr-methionine-synthase]] (Rhea RHEA:11172 / RHEA:11173)."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.13",
+      reactome: "R-HSA-174374",
+      compartment: "cytosol",
+      direction: "half-reaction of the methyl-transfer cycle"
+    },
+    reaction: {
+      reactants: [{ id: "compound:methylcobalamin", n: 1 }, { id: "compound:homocysteine", n: 1 }],
+      products: [{ id: "compound:cob-i-alamin", n: 1 }, { id: "compound:methionine", n: 1 }, { id: "compound:proton", n: 1 }],
+      ec: "2.1.1.13",
+      reactome: "R-HSA-174374",
+      compartment: "cytosol",
+      enzymes: ["enzyme:mtr"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methionine-cycle" },
+      { rel: "part-of", to: "reaction:mtr-methionine-synthase", note: "One of the two halves of the overall reaction" },
+      { rel: "interacts-with", to: "reaction:mtr-cob-i-alamin-methylation", note: "Second half of the cycle" },
+      { rel: "interacts-with", to: "reaction:mtrr-cobalamin-reactivation", note: "MTRR repairs the cob(II)alamin that escapes from cob(I)alamin" }
+    ],
+    refs: ["article:wolthers-2007-methionine-synthase-reductase-complex", "article:selhub-1999-homocysteine-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "reaction:mtr-cob-i-alamin-methylation",
+    type: "reaction",
+    name: "MTR (second half): 5-methyl-THF + cob(I)alamin + H+ -> THF + methylcobalamin",
+    aliases: ["5-MTHF + cob(I)alamina → THF + MeCbl", "metilação da cob(I)alamina", "metionina sintase, segunda metade", "transferência de CH3 do 5-MTHF para a cobalamina"],
+    summary: "Second half of the methionine synthase cycle: cob(I)alamin takes the methyl group of 5-methyl-THF, releasing THF and regenerating methylcobalamin.",
+    body: [
+      "[[compound:5-mthf]] + [[compound:cob-i-alamin]] + H+ -> [[compound:thf]] + [[compound:methylcobalamin]], catalysed by [[enzyme:mtr]]. Reactome describes it with the cobalamin bound in the MTRR:MTR complex (R-HSA-3149539, 'MTR transfers CH3 group from 5-methyl-THF to cob(I)alamin'). This is the step that releases [[compound:thf]] from 5-MTHF, which is why a B12 shortage traps folate as 5-MTHF ([[state:folate-trap]], [[pathway:folate-cycle]]).",
+      "As in the first half ([[reaction:mtr-methylcobalamin-demethylation]]), the proton is bookkeeping so that hydrogens and charge balance with the stored formulas; the two halves sum to [[reaction:mtr-methionine-synthase]]. When cob(I)alamin is oxidised instead of methylated, the enzyme is inactivated until [[enzyme:mtrr]] reactivates it ([[reaction:mtrr-cobalamin-reactivation]])."
+    ],
+    evidence: "established",
+    facts: {
+      ec: "2.1.1.13",
+      reactome: "R-HSA-3149539",
+      compartment: "cytosol",
+      direction: "half-reaction of the methyl-transfer cycle"
+    },
+    reaction: {
+      reactants: [{ id: "compound:5-mthf", n: 1 }, { id: "compound:cob-i-alamin", n: 1 }, { id: "compound:proton", n: 1 }],
+      products: [{ id: "compound:thf", n: 1 }, { id: "compound:methylcobalamin", n: 1 }],
+      ec: "2.1.1.13",
+      reactome: "R-HSA-3149539",
+      compartment: "cytosol",
+      enzymes: ["enzyme:mtr"]
+    },
+    relations: [
+      { rel: "part-of", to: "pathway:methionine-cycle" },
+      { rel: "part-of", to: "pathway:folate-cycle" },
+      { rel: "part-of", to: "reaction:mtr-methionine-synthase", note: "One of the two halves of the overall reaction" },
+      { rel: "interacts-with", to: "reaction:mtr-methylcobalamin-demethylation", note: "First half of the cycle" }
+    ],
+    refs: ["article:wolthers-2007-methionine-synthase-reductase-complex", "article:selhub-1999-homocysteine-metabolism", "article:rhea-2022"]
   }
 ]

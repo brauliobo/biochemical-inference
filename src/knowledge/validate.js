@@ -1,10 +1,11 @@
 // Knowledge base validation, shared by scripts/kb-validate.js and the unit tests.
 // Pure: raw entity array in, report object out. Errors fail the build; warnings do not.
 import { TYPES } from './types.js'
-import { allowedPair, describeAllowed } from './relations.js'
+import { allowedPair, describeAllowed, edgeSign } from './relations.js'
 import { checkEntity } from './schema.js'
 import { buildGraph, connectedComponents } from './graph.js'
 import { PATH_RULES, checkPaths } from './guided-paths.js'
+import { QUANT_RULES, checkQuant } from './quant-validate.js'
 
 export const RULES = Object.freeze({
   schema: { severity: 'error', title: 'Schema violations' },
@@ -13,6 +14,9 @@ export const RULES = Object.freeze({
   'dangling-ref': { severity: 'error', title: 'Refs pointing at missing articles' },
   'dangling-mention': { severity: 'error', title: 'Body mentions of missing entities' },
   'dangling-reaction': { severity: 'error', title: 'Reaction participants or enzymes that do not exist' },
+  'dangling-claim': { severity: 'error', title: 'Edge claims that do not exist or are not claims' },
+  'sign-conflict': { severity: 'error', title: 'Entity pairs joined by both a raising and a lowering edge' },
+  'edge-claim-status': { severity: 'error', title: "Edges asserted by an 'unsupported' claim that are not marked as hypotheses" },
   'malformed-mention': { severity: 'error', title: 'Malformed [[...]] mentions' },
   'relation-type-pair': { severity: 'error', title: 'Relations between disallowed entity types' },
   'self-relation': { severity: 'error', title: 'Relations from an entity to itself' },
@@ -23,12 +27,13 @@ export const RULES = Object.freeze({
   'established-no-ref': { severity: 'error', title: "Entities graded 'established' without a reference" },
   'type-coverage': { severity: 'error', title: 'Entity types with no entities' },
   ...PATH_RULES,
+  ...QUANT_RULES,
   'claim-flagged-no-evidence': { severity: 'warning', title: 'Flagged claims with no evidence yet' },
   'unverified-article': { severity: 'warning', title: 'Articles not yet verified' }
 })
 
-const DANGLING_RULE = { relation: 'dangling-relation', ref: 'dangling-ref', mention: 'dangling-mention', reaction: 'dangling-reaction' }
-const DANGLING_WHAT = { relation: 'relation target', ref: 'ref', mention: 'mention', reaction: 'reaction participant' }
+const DANGLING_RULE = { relation: 'dangling-relation', ref: 'dangling-ref', mention: 'dangling-mention', reaction: 'dangling-reaction', claim: 'dangling-claim' }
+const DANGLING_WHAT = { relation: 'relation target', ref: 'ref', mention: 'mention', reaction: 'reaction participant', claim: 'edge claim' }
 const RULE_ORDER = Object.keys(RULES)
 const MEMBER_PREVIEW = 8
 
@@ -38,8 +43,10 @@ const isEvidenceLink = (link) => link.rel === 'has-evidence' || link.rel === 'ha
  * validateKnowledge(rawEntities, { paths }) -> { ok, counts, errors, warnings }
  * `paths` (optional) is the guided-path list from data/paths.js; when given, every path is checked
  * against the graph (schema, duplicate ids, steps that do not resolve).
+ * `quant` (optional) is the structured-quantity list from data/quant.js; when given, every record is
+ * checked (see quant-validate.js).
  */
-export function validateKnowledge(rawEntities, { paths } = {}) {
+export function validateKnowledge(rawEntities, { paths, quant } = {}) {
   const issues = []
   const add = (rule, id, message, path = '') => issues.push({ rule, severity: RULES[rule].severity, id, path, message })
 
@@ -74,12 +81,34 @@ export function validateKnowledge(rawEntities, { paths } = {}) {
   // 3. relations
   for (const edge of graph.edges) {
     if (edge.from === edge.to) add('self-relation', edge.from, `relation '${edge.rel}' points at the entity itself`)
+    if (edge.claim !== undefined && graph.get(edge.claim)?.status === 'unsupported' && edge.hypothesis !== true) {
+      add('edge-claim-status', edge.from, `'${edge.rel}' to ${edge.to} cites unsupported claim ${edge.claim}; mark the edge hypothesis: true`)
+    }
     if (edge.origin !== 'declared') continue
     const fromType = graph.get(edge.from).type
     const toType = graph.get(edge.to).type
     if (!allowedPair(edge.rel, fromType, toType)) {
       add('relation-type-pair', edge.from, `'${edge.rel}' to ${edge.to} links ${fromType} -> ${toType}, but allowed is ${describeAllowed(edge.rel)}`)
     }
+  }
+
+  // 3b. signed edges must not contradict each other
+  const signs = new Map()
+  for (const edge of graph.edges) {
+    const sign = edgeSign(edge)
+    if (!sign) continue
+    const key = `${edge.from}|${edge.to}`
+    const found = signs.get(key)
+    if (!found) signs.set(key, { signs: new Set([sign]), rels: [edge.rel] })
+    else {
+      found.signs.add(sign)
+      found.rels.push(edge.rel)
+    }
+  }
+  for (const [key, found] of signs) {
+    if (found.signs.size < 2) continue
+    const [from, to] = key.split('|')
+    add('sign-conflict', from, `both raises and lowers ${to} (${found.rels.join(', ')}); keep the one the evidence supports`)
   }
 
   // 4. connectivity
@@ -116,12 +145,18 @@ export function validateKnowledge(rawEntities, { paths } = {}) {
   // 7. guided paths
   if (paths !== undefined) for (const item of checkPaths(paths, graph)) issues.push(item)
 
+  // 8. structured quantities
+  if (quant !== undefined) {
+    for (const item of checkQuant(quant, graph)) add(item.rule, item.id, item.message, item.path)
+  }
+
   return finish(issues, {
     entities: graph.stats.entities,
     byType: Object.fromEntries(TYPES.map((type) => [type.id, graph.byType.get(type.id).length])),
     edges: { total: graph.stats.edges, declared: graph.stats.declared, derived: graph.stats.derived },
     mentions: graph.stats.mentions,
-    ...(Array.isArray(paths) ? { paths: paths.length } : {})
+    ...(Array.isArray(paths) ? { paths: paths.length } : {}),
+    ...(Array.isArray(quant) ? { quant: quant.length } : {})
   })
 }
 
@@ -138,7 +173,7 @@ export function formatReport(report) {
   const lines = ['Knowledge base validation', '']
   const types = Object.entries(counts.byType).map(([type, count]) => `${type} ${count}`).join(', ')
   lines.push(`Entities: ${counts.entities}${types ? ` (${types})` : ''}`)
-  lines.push(`Relations: ${counts.edges.total} (${counts.edges.declared} declared, ${counts.edges.derived} derived); body mentions: ${counts.mentions}${counts.paths === undefined ? '' : `; guided paths: ${counts.paths}`}`, '')
+  lines.push(`Relations: ${counts.edges.total} (${counts.edges.declared} declared, ${counts.edges.derived} derived); body mentions: ${counts.mentions}${counts.paths === undefined ? '' : `; guided paths: ${counts.paths}`}${counts.quant === undefined ? '' : `; quantities: ${counts.quant}`}`, '')
   const section = (label, items) => {
     if (!items.length) return
     lines.push(`${label} (${items.length})`)

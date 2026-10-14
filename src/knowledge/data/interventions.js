@@ -16,14 +16,30 @@ export default [
     facts: { "dosing-range": "3 g before bed (sleep trials); 3-10 g/day in collagen-oriented use; psychiatric trials use far higher", ul: "None established", forms: "Free-form L-glycine powder; glycinate chelates deliver less" },
     relations: [
       { rel: "increases", to: "compound:glycine" },
-      { rel: "increases", to: "compound:sarcosine", note: "Via GNMT; extent in humans unmeasured" },
-      { rel: "causes", to: "outcome:belching", note: "Anecdotal GI complaint in some users; mechanism unresolved" },
+      { rel: "increases", to: "compound:sarcosine", note: "Via GNMT; extent in humans unmeasured", hypothesis: true, claim: "claim:glycine-gnmt-depletes-sam-in-undermethylated", strength: "weak" },
+      { rel: "causes", to: "outcome:belching", note: "Anecdotal GI complaint in some users; mechanism unresolved", hypothesis: true, claim: "claim:glycine-powder-low-dose-belching-reports", strength: "weak" },
       { rel: "mitigates", to: "outcome:night-waking", note: "Sleep-quality trials at 3 g; modest evidence" },
       { rel: "interacts-with", to: "enzyme:gnmt" },
       { rel: "contraindicated-in", to: "disease:nonketotic-hyperglycinemia", note: "Adds to an already pathological glycine load." },
       { rel: "increases", to: "outcome:improved-sleep-quality", note: "About 3 g before bed improved subjective sleep quality in small trials from one research group." },
       { rel: "causes", to: "outcome:glycine-intolerance", note: "Dose-related GI complaints (nausea, bloating, belching) in a subset of users." },
-      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia" }
+      { rel: "aggravates", to: "disease:nonketotic-hyperglycinemia" },
+      {
+        rel: "aggravates",
+        to: "state:undermethylation",
+        note: "Conversation chain: bolus glycine over-recruits GNMT and drains SAM; no human data on SAM or SAM:SAH after oral glycine.",
+        hypothesis: true,
+        claim: "claim:glycine-gnmt-depletes-sam-in-undermethylated",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:gastrin",
+        note: "As for glycine itself: proposed, not shown for serum gastrin.",
+        hypothesis: true,
+        claim: "claim:free-glycine-stimulates-gastrin",
+        strength: "weak"
+      }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link", "article:bannai-2012-glycine-sleep", "article:kawai-2015-glycine-sleep-nmda"]
   },
@@ -43,9 +59,17 @@ export default [
       { rel: "increases", to: "compound:glycine" },
       { rel: "increases", to: "compound:hydroxyproline" },
       { rel: "increases", to: "pathway:collagen-synthesis", note: "Substrate supply; clinical benefit modest" },
-      { rel: "causes", to: "outcome:belching", note: "Reported by some users; mechanism unresolved" },
+      { rel: "causes", to: "outcome:belching", note: "Reported by some users; mechanism unresolved", hypothesis: true, claim: "claim:collagen-peptides-excess-gastrin-delay-emptying", strength: "weak" },
       { rel: "increases", to: "compound:oxalate", note: "Raises urinary oxalate via hydroxyproline" },
-      { rel: "mitigates", to: "disease:osteoarthritis", note: "Mixed small trials." }
+      { rel: "mitigates", to: "disease:osteoarthritis", note: "Mixed small trials." },
+      {
+        rel: "increases",
+        to: "compound:gastrin",
+        note: "Conversation claim that marginal peptic digestion of proline-rich peptides stimulates excess gastrin.",
+        hypothesis: true,
+        claim: "claim:collagen-peptides-excess-gastrin-delay-emptying",
+        strength: "weak"
+      }
     ],
     refs: ["article:iwai-2005-collagen-peptides-blood", "article:clark-2008-collagen-hydrolysate", "article:knight-2006-hydroxyproline-oxalate"]
   },
@@ -96,7 +120,7 @@ export default [
     aliases: ["TMG", "betaína anidra", "trimethylglycine supplement", "Cystadane"],
     summary: "Neutral zwitterionic betaine used to lower homocysteine (prescription 6 g/day in homocystinuria) or as a methyl donor; unlike betaine HCl it does not acidify the stomach.",
     body: [
-      "Anhydrous [[compound:betaine]] donates a methyl group to [[compound:homocysteine]] via [[enzyme:bhmt]] (liver and kidney), forming [[compound:methionine]] and [[compound:dimethylglycine]], and thereafter feeds [[compound:glycine]] and the folate one-carbon pool ([[pathway:choline-oxidation]]). Doses: 1.5-6 g/day lowers fasting Hcy by roughly 10-20 % in healthy subjects (Olthof 2003); 6 g/day in two doses is the approved homocystinuria regimen; 15-20 g/day was tested in fatty liver trials. The EU recognises a claim for 1.5 g/day contributing to normal homocysteine metabolism.",
+      "Anhydrous [[compound:betaine]] donates a methyl group to [[compound:homocysteine]] via [[enzyme:bhmt]] (liver and kidney), forming [[compound:methionine]] and [[compound:dimethylglycine]], and thereafter feeds [[compound:glycine]] and the folate one-carbon pool ([[pathway:choline-oxidation]]). Doses: 1.5-6 g/day lowers fasting Hcy by roughly 10-20 % in healthy subjects (Olthof 2003); 6 g/day in two doses is the approved homocystinuria regimen; 15-20 g/day was tested in fatty liver trials. The EU authorises the claim 'betaine contributes to normal homocysteine metabolism' for foods with at least 500 mg of betaine per portion, with the label stating that the effect needs 1.5 g/day (and that more than 4 g/day may raise blood cholesterol; [[article:efsa-2011-betaine-homocysteine-claim]]).",
       "Cautions: doses of 4-6 g can raise LDL cholesterol and triglycerides modestly; large amounts cause nausea, diarrhoea and a fishy odour; in CBS-deficient homocystinuria monitor methionine (cerebral oedema has been reported with hypermethioninaemia). Betaine anhydrous contains no chloride and is not an acid, so the burning attributed to betaine HCl is not expected, though individual intolerance can occur. Betaine's role in the 'choline to glycine' chain is stoichiometrically real, but supplemental doses of 3-6 g (26-51 mmol) contribute only about 1.9-3.8 g glycine at best ([[intervention:betaine-hcl]] is a different product)."
     ],
     evidence: "established",
@@ -105,9 +129,10 @@ export default [
       { rel: "increases", to: "compound:betaine" },
       { rel: "decreases", to: "compound:homocysteine" },
       { rel: "interacts-with", to: "enzyme:bhmt" },
-      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12" },
+      { rel: "mitigates", to: "state:undermethylation", note: "Plausible: supports remethylation independent of folate/B12", claim: "claim:choline-betaine-glycine-route" },
       { rel: "mitigates", to: "disease:mthfr-deficiency", note: "Betaine is part of the treatment of the severe inherited form." },
-      { rel: "mitigates", to: "state:methyl-donor-depletion" }
+      { rel: "mitigates", to: "state:methyl-donor-depletion" },
+      { rel: "increases", to: "enzyme:bhmt", note: "Direct BHMT substrate, with no acidifying effect.", claim: "claim:betaine-anhydrous-not-acidifying", strength: "strong" }
     ],
     refs: ["article:olthof-2003-betaine-low-dose-homocysteine"]
   },
@@ -132,11 +157,19 @@ export default [
       { rel: "mitigates", to: "state:hypochlorhydria", note: "Transient pH effect only; clinical value unproven" },
       { rel: "contraindicated-in", to: "disease:gastritis", note: "Acid on inflamed lining; convention and mechanism, not trial evidence." },
       { rel: "contraindicated-in", to: "disease:esophagitis" },
-      { rel: "aggravates", to: "disease:peptic-ulcer", note: "Acid on a broken lining; mechanistic and conventional caution, no trial." },
+      { rel: "aggravates", to: "disease:peptic-ulcer", note: "Acid on a broken lining; mechanistic and conventional caution, no trial.", claim: "claim:betaine-hcl-contraindicated-post-ulcer", strength: "moderate" },
       { rel: "aggravates", to: "disease:gerd", note: "Adds acid to the refluxate; no trial." },
       { rel: "aggravates", to: "disease:lpr", note: "Adds acid to the refluxate; no trial." },
       { rel: "aggravates", to: "disease:gastritis", note: "Acid on inflamed lining; burning after a dose is a reason to stop." },
-      { rel: "aggravates", to: "disease:esophagitis" }
+      { rel: "aggravates", to: "disease:esophagitis" },
+      {
+        rel: "aggravates",
+        to: "state:post-ulcer-mucosal-recovery",
+        note: "Releases about 6.5 mmol H+ per gram; burning after a dose on a healing lining is a stop signal.",
+        hypothesis: true,
+        claim: "claim:betaine-hcl-contraindicated-post-ulcer",
+        strength: "moderate"
+      }
     ],
     refs: ["article:yago-2013-betaine-hcl-reacidification"]
   },
@@ -160,7 +193,23 @@ export default [
       { rel: "contraindicated-in", to: "disease:trimethylaminuria" },
       { rel: "aggravates", to: "disease:trimethylaminuria", note: "Adds substrate for TMA formation." },
       { rel: "causes", to: "state:choline-excess", note: "Only when the dose exceeds the 3.5 g/day upper level of choline." },
-      { rel: "causes", to: "outcome:cholinergic-excess-symptoms", note: "Only at doses far above the 3.5 g/day upper level." }
+      { rel: "causes", to: "outcome:cholinergic-excess-symptoms", note: "Only at doses far above the 3.5 g/day upper level." },
+      {
+        rel: "mitigates",
+        to: "outcome:night-waking",
+        note: "Conversation claim that choline stopped 2-3 am waking via betaine, BHMT, SAM and HNMT; a personal report, no trial.",
+        hypothesis: true,
+        claim: "claim:choline-fixed-night-waking-via-bhmt-hnmt",
+        strength: "weak"
+      },
+      {
+        rel: "mitigates",
+        to: "outcome:tachycardia",
+        note: "Same claim, and the acetylcholine (vagal brake) route; no trial.",
+        hypothesis: true,
+        claim: "claim:choline-supplies-nocturnal-vagal-brake",
+        strength: "weak"
+      }
     ],
     refs: ["article:iom-1998-choline-dri", "article:efsa-2016-choline-dri"]
   },
@@ -258,7 +307,7 @@ export default [
     relations: [
       { rel: "increases", to: "compound:plp" },
       { rel: "mitigates", to: "state:b6-functional-deficiency" },
-      { rel: "increases", to: "compound:gaba", note: "Via GAD; effect size in humans uncertain" },
+      { rel: "increases", to: "compound:gaba", note: "Via GAD; effect size in humans uncertain", hypothesis: true, claim: "claim:p5p-gad-gaba-relieves-anxiety", strength: "weak" },
       { rel: "mitigates", to: "outcome:brain-fog", note: "Anecdotal; plausible" },
       { rel: "mitigates", to: "disease:anxiety-disorder", note: "Weak trial evidence at about 100 mg B6" },
       { rel: "mitigates", to: "disease:vitamin-b6-deficiency", note: "Repletes B6 status; nutritionally adequate forms work equally." }
@@ -272,10 +321,10 @@ export default [
     summary: "Active reduced folate (0.4-1 mg OTC; 7.5-15 mg prescription for depression adjunct) that bypasses DHFR and MTHFR; can mask B12 deficiency.",
     body: [
       "[[compound:5-mthf]] feeds [[enzyme:mtr]] directly for [[compound:homocysteine]] remethylation and independently of the MTHFR C677T variant. It is the preferred supplemental form when folic acid is poorly tolerated or when the genotype is of concern, although plain folic acid raises red-cell folate as well in most people. Evidence for high-dose L-methylfolate as an antidepressant adjunct is mixed (large trials of 15 mg were inconclusive). Established cautions: masking of B12 deficiency, interaction with methotrexate and antiepileptics, and unspecific reports of irritability, insomnia or anxiety at higher doses in sensitive individuals.",
-      "The UL of 1,000 micrograms applies to folic acid, not to natural folate or reduced forms, but no long-term safety data support very high chronic doses. Consider testing [[compound:vitamin-b12]] status first ([[intervention:homocysteine-mma-testing]])."
+      "The 1,000 microgram UL of the IOM and the EU Scientific Committee on Food applies to synthetic folic acid, not to natural folate or reduced forms; the current EFSA limit (2023) of 1,000 micrograms/day covers folic acid and the 5-MTHF salts together ([[article:efsa-2023-folate-ul]]), and no long-term safety data support very high chronic doses. Consider testing [[compound:vitamin-b12]] status first ([[intervention:homocysteine-mma-testing]])."
     ],
     evidence: "established",
-    facts: { "dosing-range": "0.4-1 mg general; 7.5-15 mg prescription (medical food)", ul: "1000 micrograms/day applies to folic acid only", forms: "Calcium salt, glucosamine salt, magnesium salt" },
+    facts: { "dosing-range": "0.4-1 mg general; 7.5-15 mg prescription (medical food)", ul: "1000 micrograms/day: folic acid only for IOM and EU SCF; folic acid and 5-MTHF salts combined for EFSA 2023", forms: "Calcium salt, glucosamine salt, magnesium salt" },
     relations: [
       { rel: "increases", to: "compound:5-mthf" },
       { rel: "decreases", to: "compound:homocysteine" },
@@ -511,7 +560,7 @@ export default [
     facts: { "typical dose": "10-20 mL liquid after meals and at bedtime", composition: "Sodium alginate with sodium bicarbonate and calcium carbonate" },
     relations: [
       { rel: "mitigates", to: "disease:gerd" },
-      { rel: "mitigates", to: "disease:lpr", note: "Plausible; small trials" },
+      { rel: "mitigates", to: "disease:lpr", note: "Plausible; small trials", claim: "claim:alginate-rafts-reduce-lpr", strength: "weak" },
       { rel: "mitigates", to: "outcome:throat-burning" },
       { rel: "aggravates", to: "outcome:belching", note: "CO2 released to float the raft; occasional" }
     ],
@@ -631,13 +680,15 @@ export default [
       { rel: "causes", to: "state:hypochlorhydria" },
       { rel: "mitigates", to: "disease:peptic-ulcer" },
       { rel: "mitigates", to: "disease:gerd" },
-      { rel: "aggravates", to: "disease:sibo", note: "Associated in meta-analysis; mechanism and causality debated" },
+      { rel: "aggravates", to: "disease:sibo", note: "Associated in meta-analysis; mechanism and causality debated", claim: "claim:ppis-cause-sibo", strength: "weak" },
       { rel: "decreases", to: "compound:vitamin-b12", note: "Food-bound B12 absorption falls with long-term use" },
       { rel: "decreases", to: "compound:magnesium", note: "Hypomagnesaemia with long-term use" },
       { rel: "mitigates", to: "disease:lpr", note: "Trial evidence is mixed; benefit is likeliest when typical reflux symptoms coexist." },
       { rel: "mitigates", to: "disease:esophagitis", note: "First-line healing therapy for erosive oesophagitis." },
       { rel: "mitigates", to: "disease:functional-dyspepsia", note: "First-line for epigastric pain syndrome; small benefit." },
-      { rel: "causes", to: "state:acid-suppression" }
+      { rel: "causes", to: "state:acid-suppression" },
+      { rel: "decreases", to: "compound:hydrochloric-acid", note: "Covalent block of the H+/K+-ATPase suppresses secretion for 24 hours or more.", strength: "strong" },
+      { rel: "decreases", to: "enzyme:h-k-atpase", note: "Acid-activated PPIs bind the proton pump covalently and inactivate it until new pumps are made.", strength: "strong" }
     ],
     refs: ["article:lam-2013-ppi-b12-deficiency", "article:cheungpasitporn-2015-ppi-hypomagnesemia", "article:lo-2013-ppi-sibo-meta-analysis", "article:reimer-2009-ppi-rebound-acid", "article:katz-2022-acg-gerd-guideline"]
   },
@@ -773,7 +824,7 @@ export default [
     facts: { dose: "About 1/4 teaspoon NaHCO3 in 100-200 mL water as rinse; do not swallow large amounts" },
     relations: [
       { rel: "mitigates", to: "outcome:throat-burning", note: "Plausible symptom relief; evidence limited" },
-      { rel: "mitigates", to: "disease:lpr", note: "Pepsin denaturation in vitro" },
+      { rel: "mitigates", to: "disease:lpr", note: "Pepsin denaturation in vitro", claim: "claim:alkaline-water-inactivates-pepsin", strength: "weak" },
       { rel: "causes", to: "outcome:belching", note: "If swallowed with acid" }
     ],
     refs: ["article:koufman-2012-alkaline-water-pepsin"]
@@ -811,10 +862,11 @@ export default [
     facts: { "dosing-range": "RDA 14-16 mg; nicotinamide 500-1000 mg in dermatology trials", ul: "35 mg/day total (IOM); 10 mg nicotinic acid, 900 mg nicotinamide (EU SCF)" },
     relations: [
       { rel: "increases", to: "compound:1-methylnicotinamide" },
-      { rel: "decreases", to: "compound:sam", note: "Methyl sink at gram doses" },
+      { rel: "decreases", to: "compound:sam", note: "Methyl sink at gram doses", hypothesis: true, claim: "claim:niacin-drains-methyl-groups", strength: "weak" },
       { rel: "increases", to: "compound:homocysteine", note: "Reported with gram doses" },
-      { rel: "aggravates", to: "state:undermethylation", note: "Gram-dose use consumes SAM via NNMT; a moderate burden, more relevant when folate or methyl status is already low." },
-      { rel: "mitigates", to: "state:overmethylation", note: "Proposed methyl sink via NNMT at gram doses; unvalidated for this indication." }
+      { rel: "aggravates", to: "state:undermethylation", note: "Gram-dose use consumes SAM via NNMT; a moderate burden, more relevant when folate or methyl status is already low.", hypothesis: true, claim: "claim:niacin-drains-methyl-groups", strength: "weak" },
+      { rel: "mitigates", to: "state:overmethylation", note: "Proposed methyl sink via NNMT at gram doses; unvalidated for this indication." },
+      { rel: "increases", to: "compound:nicotinamide", note: "Niacin and nicotinamide both feed the nicotinamide pool." }
     ],
     refs: ["article:boden-2011-aim-high-niacin", "article:chen-2015-nicotinamide-skin-cancer", "article:pissios-2017-nnmt-methyl-sink"]
   },

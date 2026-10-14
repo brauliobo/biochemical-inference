@@ -271,7 +271,8 @@ export default [
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "reduced DAO/HNMT capacity is the proposed mechanism" },
       { rel: "associated-with", to: "outcome:night-waking", note: "conversation-only: nocturnal histamine peak, relieved by choline" },
       { rel: "associated-with", to: "outcome:tachycardia", note: "conversation-only: histamine H1/H2 cardiac effect at night" },
-      { rel: "interacts-with", to: "pathway:methyl-budget", note: "HNMT competes for SAM and is inhibited by SAH" }
+      { rel: "interacts-with", to: "pathway:methyl-budget", note: "HNMT competes for SAM and is inhibited by SAH" },
+      { rel: "decreases", to: "state:histamine-excess", note: "DAO (extracellular) and HNMT (intracellular) clear histamine.", strength: "strong" }
     ]
   },
   {
@@ -344,7 +345,16 @@ export default [
       { rel: "associated-with", to: "outcome:belching", note: "conversation-proposed gas source; magnitude unproven" },
       { rel: "associated-with", to: "system:gastric-physiology" },
       { rel: "associated-with", to: "system:bile", note: "biliary bicarbonate contributes to neutralisation" },
-      { rel: "interacts-with", to: "pathway:gastric-acid-secretion", note: "acid source" }
+      { rel: "interacts-with", to: "pathway:gastric-acid-secretion", note: "acid source" },
+      { rel: "increases", to: "compound:carbon-dioxide", note: "H+ + HCO3- gives H2CO3 and then CO2 + H2O; about 25 mL of gas per mmol at body temperature.", strength: "strong" },
+      {
+        rel: "increases",
+        to: "outcome:co2-gastric-distension",
+        note: "Conversation claim that CO2 formed in the stomach (acid meeting bicarbonate from reflux or swallowed alkali) distends it; chemistry is established, the volume after glycine is not.",
+        hypothesis: true,
+        claim: "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        strength: "weak"
+      }
     ],
     refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase", "article:allen-2005-mucus-bicarbonate-barrier"]
   },
@@ -402,7 +412,7 @@ export default [
     summary: "Kidney AGAT makes guanidinoacetate from arginine and glycine; liver GAMT methylates it with SAM to creatine, consuming one glycine and one methyl group.",
     body: [
       "[[enzyme:gatm]] transfers the amidino group of [[compound:arginine]] to [[compound:glycine]] to give [[compound:guanidinoacetate]] and [[compound:ornithine]] ([[reaction:agat-guanidinoacetate-synthesis]]); [[enzyme:gamt]] methylates it with [[compound:sam]] to [[compound:creatine]] ([[reaction:gamt-creatine-synthesis]]). About 1 g of creatine is made and ~1.7% of the creatine pool is lost per day as creatinine, so the pathway is a continuous glycine and methyl sink. Dietary creatine (meat, supplements) down-regulates AGAT and spares both.",
-      "Older estimates attributed over 70% of SAM-derived methyl groups to creatine synthesis; revisions that account for dietary creatine and for PEMT lowered this, while other analyses still place creatine near half of methyl-group flux. This uncertainty is why the 'methyl budget' is better described as a set of competing sinks than as a settled apportionment ([[pathway:methyl-budget]])."
+      "Older estimates attributed over 70% of SAM-derived methyl groups to creatine synthesis; revisions that account for dietary creatine and for PEMT lowered this, while a later review puts creatine near 40% of the labile methyl groups that SAM provides ([[article:brosnan-2011-metabolic-burden-creatine-synthesis]]). This uncertainty is why the 'methyl budget' is better described as a set of competing sinks than as a settled apportionment ([[pathway:methyl-budget]])."
     ],
     evidence: "established",
     facts: {
@@ -425,7 +435,7 @@ export default [
     summary: "Integrated view of SAM supply (MAT, remethylation) versus its consumers (PEMT, GAMT, GNMT and minor methyltransferases) and of the SAM:SAH ratio that sets methylation capacity.",
     body: [
       "In plain words: think of methyl groups as a budget. Income is dietary methionine plus recycling of homocysteine with folate, B12 or betaine; spending is dozens of methylation reactions, with PEMT, creatine synthesis and GNMT as the big items. SAH, the leftover after each spend, blocks further methylation, so the ratio of SAMe to SAH matters more than SAMe alone. The glycine and choline questions in the source conversation are questions about this budget.",
-      "SAM is supplied by [[enzyme:mat1a]]/[[enzyme:mat2a]] from methionine, itself fed by diet and by remethylation of homocysteine ([[pathway:methionine-cycle]]). It is spent by three large sinks: PEMT (three SAM per phosphatidylcholine; [[pathway:pemt-pc-synthesis]]), GAMT (one SAM per creatine; [[pathway:creatine-synthesis]]) and GNMT, the regulated 'methyl sink' of liver ([[reaction:gnmt-glycine-methylation]]), plus many small consumers such as [[enzyme:comt]], [[enzyme:hnmt]], DNA, histone and RNA methyltransferases. Quantitative shares are debated: classical estimates (Mudd and Poole) gave creatine over 70%, later revisions (Stead et al. 2006) assign PEMT a comparable or larger share, and a rebuttal places creatine near 45%.",
+      "SAM is supplied by [[enzyme:mat1a]]/[[enzyme:mat2a]] from methionine, itself fed by diet and by remethylation of homocysteine ([[pathway:methionine-cycle]]). It is spent by three large sinks: PEMT (three SAM per phosphatidylcholine; [[pathway:pemt-pc-synthesis]]), GAMT (one SAM per creatine; [[pathway:creatine-synthesis]]) and GNMT, the regulated 'methyl sink' of liver ([[reaction:gnmt-glycine-methylation]]), plus many small consumers such as [[enzyme:comt]], [[enzyme:hnmt]], DNA, histone and RNA methyltransferases. Quantitative shares are debated: classical estimates (Mudd and Poole) gave creatine over 70%, later revisions (Stead et al. 2006) assign PEMT a comparable or larger share, and a later review puts creatine near 40% ([[article:brosnan-2011-metabolic-burden-creatine-synthesis]]).",
       "What matters for function is the ratio [[compound:sam]]:[[compound:sah]] (the methylation index), because SAH inhibits methyltransferases and is cleared only as fast as homocysteine and adenosine are removed ([[enzyme:ahcy]]). GNMT is the stabiliser: it burns surplus SAM when 5-MTHF is low, and its product sarcosine is demethylated back to glycine so the carbon is retained ([[enzyme:sardh]]). The terms 'under-methylation' and 'over-methylation' in the source conversation come from an orthomolecular framework; they are not standard diagnoses, and the conversation's claim that supplementing glycine by itself pushes people into SAM depletion is a hypothesis built on GNMT biochemistry that has not been tested in humans.",
       "Practical consequences that do follow from the biochemistry: methyl donors (choline/betaine, methionine, folate, B12) and cofactors (B6, riboflavin, magnesium for MAT and COMT) increase supply, whereas high flux through PEMT, GAMT or GNMT increases demand, and creatine supplementation lowers GAMT demand. Measured plasma SAM and SAH, and homocysteine, are the only direct indices."
     ],
@@ -514,7 +524,23 @@ export default [
       { rel: "associated-with", to: "disease:sibo", note: "conversation-only: overgrowth as the setting for glycine fermentation" },
       { rel: "associated-with", to: "system:gut-microbiota" },
       { rel: "associated-with", to: "outcome:belching", note: "conversation-only mechanism for eructation after glycine or collagen powder" },
-      { rel: "associated-with", to: "state:hypochlorhydria", note: "loss of the acid barrier (PPIs) permits upper-gut colonisation; established as a risk, magnitude debated" }
+      { rel: "associated-with", to: "state:hypochlorhydria", note: "loss of the acid barrier (PPIs) permits upper-gut colonisation; established as a risk, magnitude debated" },
+      {
+        rel: "increases",
+        to: "compound:carbon-dioxide",
+        note: "Glycine cleavage and fermentation release CO2 and ammonia; human relevance after oral glycine is speculative.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:ammonia",
+        note: "Ammonia is the other end product of Stickland reduction and bacterial glycine cleavage.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      }
     ]
   },
   {
@@ -635,15 +661,24 @@ export default [
     evidence: "established",
     facts: { receptors: "H1 (Gq-coupled), H2 (Gs-coupled); H3 and H4 have newer, smaller roles in the heart" },
     relations: [
-      { rel: "causes", to: "outcome:flushing", note: "When histamine release is large." },
+      { rel: "causes", to: "outcome:flushing", note: "When histamine release is large.", claim: "claim:histamine-h1-h2-tachycardia-flushing" },
       {
         rel: "causes",
         to: "outcome:tachycardia",
-        note: "Established in allergy and mast-cell settings; not shown to cause palpitations at normal levels."
-      },
+        note: "Established in allergy and mast-cell settings; not shown to cause palpitations at normal levels.",
+        claim: "claim:histamine-h1-h2-tachycardia-flushing"
+    },
       { rel: "interacts-with", to: "compound:histamine" },
       { rel: "interacts-with", to: "pathway:histamine-degradation", note: "Clearance ends receptor signalling." },
-      { rel: "associated-with", to: "system:cardiac-autonomic-control" }
+      { rel: "associated-with", to: "system:cardiac-autonomic-control" },
+      {
+        rel: "causes",
+        to: "outcome:night-waking",
+        note: "Histamine is a wake-promoting transmitter; the 2-4 am release peak is partly supported.",
+        hypothesis: true,
+        claim: "claim:histamine-peaks-2-4am",
+        strength: "weak"
+      }
     ],
     refs: ["article:hattori-2017-histamine-cardiovascular", "article:maintz-2007-histamine-intolerance"]
   },
@@ -683,7 +718,8 @@ export default [
         rel: "interacts-with",
         to: "intervention:prokinetic-drugs",
         note: "Erythromycin triggers phase III through the motilin receptor."
-      }
+      },
+      { rel: "decreases", to: "disease:sibo", note: "Phase III sweeps residue and bacteria distally; reduced MMC activity is a recognised predisposition.", strength: "moderate" }
     ],
     refs: ["article:deloose-2012-migrating-motor-complex", "article:mondal-2017-duodenal-ph-mmc-motilin"]
   },
@@ -729,6 +765,45 @@ export default [
       "article:pedley-2017-purinosome",
       "article:carreras-1995-thymidylate-synthase",
       "article:stabler-2013-vitamin-b12-deficiency"
+    ]
+  },
+{
+    id: "pathway:phosphatidylcholine-catabolism",
+    type: "pathway",
+    name: "Phosphatidylcholine catabolism: choline release",
+    aliases: ["catabolismo da fosfatidilcolina", "degradação da fosfatidilcolina", "liberação de colina", "hidrólise da fosfatidilcolina", "PC breakdown", "choline release from phosphatidylcholine", "desacilação da fosfatidilcolina"],
+    summary: "Routes by which cells break phosphatidylcholine down and free its choline: direct cleavage by phospholipase D, or deacylation to glycerophosphocholine followed by GPCPD1.",
+    body: [
+      "Phosphatidylcholine is both built and broken down, and this entry groups the breakdown steps. One route is a single cleavage: [[enzyme:pld]] removes choline and leaves [[compound:phosphatidic-acid]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]). The other is stepwise deacylation: [[enzyme:pla2g4a]] removes one fatty acid to give [[compound:lysophosphatidylcholine]] ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]), [[enzyme:pnpla6]] removes the second to give [[compound:glycerophosphocholine]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]), and [[enzyme:gpcpd1]] splits that into [[compound:choline]] and [[compound:glycerol-3-phosphate]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]).",
+      "The freed choline can be re-phosphorylated and returned to phosphatidylcholine by the CDP-choline route ([[pathway:kennedy-pathway]]) or oxidised toward betaine ([[pathway:choline-oxidation]]); in liver, methylation of phosphatidylethanolamine is a second source of the lipid ([[pathway:pemt-pc-synthesis]]). Which fate prevails is cell-specific and was not quantified in the sources used here.",
+      "Reactome has no single pathway with this name. The steps sit in 'Glycerophospholipid catabolism' (R-HSA-6814848, which holds the PNPLA6 step), 'Hydrolysis of LPC' (R-HSA-1483115, which holds the GPCPD1 step) and, for the phospholipase D step, 'Synthesis of PA' (R-HSA-1483166). Digestion of dietary phosphatidylcholine in the gut lumen is a different process with different enzymes ([[article:nilsson-2019-choline-phospholipid-digestion]])."
+    ],
+    evidence: "established",
+    facts: {
+      reactome: "R-HSA-6814848; R-HSA-1483115; R-HSA-1483166",
+      compartment: "endoplasmic reticulum membrane, plasma membrane and cytosol",
+      tissue: "all cells; PNPLA6 in brain, kidney, muscle; PLD1 in pancreas, heart, brain"
+    },
+    relations: [
+      { rel: "interacts-with", to: "pathway:kennedy-pathway", note: "Choline released here can re-enter PC synthesis through choline kinase" },
+      { rel: "interacts-with", to: "pathway:choline-oxidation", note: "Released choline is a substrate of choline dehydrogenase" },
+      { rel: "decreases", to: "compound:phosphatidylcholine" },
+      { rel: "increases", to: "compound:choline" },
+      { rel: "associated-with", to: "intervention:alpha-gpc-supplement", note: "Glycerophosphocholine is an intermediate of the deacylation route; handling of supplemental alpha-GPC is not shown" },
+      {
+        rel: "increases",
+        to: "compound:acetylcholine",
+        note: "Released choline can enter acetylcholine synthesis; how much of the acetylcholine pool depends on PC turnover is the conversation hypothesis.",
+        hypothesis: true,
+        claim: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
+        strength: "weak"
+      }
+    ],
+    refs: [
+      "article:zaccheo-2004-nte-phosphatidylcholine-deacylation",
+      "article:stewart-2012-edi3-gpc-phosphodiesterase",
+      "article:leslie-2015-cytosolic-pla2",
+      "article:peng-2012-mammalian-pld"
     ]
   }
 ]

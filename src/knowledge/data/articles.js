@@ -2495,7 +2495,8 @@ export default [
       "Adequate Intake for adults is 550 mg/day of choline for men and 425 mg/day for women.",
       "The Tolerable Upper Intake Level for adults is 3.5 g/day of choline.",
       "Hypotension was the critical effect; a LOAEL of about 7.5 g/day (from a pilot in seven patients) was divided by an uncertainty factor of 2 because of limited data, and fishy body odor was a secondary consideration.",
-      "No NOAEL could be identified."
+      "No NOAEL could be identified.",
+      "The same volume sets the intakes of the other methylation vitamins: folate RDA 400 micrograms DFE (600 in pregnancy, 500 in lactation) with a 1,000 microgram UL for synthetic folic acid; vitamin B12 RDA 2.4 micrograms with no UL; vitamin B6 RDA 1.3-1.7 mg with a 100 mg UL; riboflavin RDA 1.1-1.3 mg with no UL; niacin RDA 14-16 mg NE with a 35 mg UL for niacin from supplements and fortified foods."
     ],
     "facts": {
       "design": "guideline"
@@ -2524,7 +2525,12 @@ export default [
         "rel": "evidence-for",
         "to": "claim:choline-28-35g-for-10g-glycine",
         "note": "Does not test the arithmetic, but its 3.5 g/day upper level puts 28-35 g/day roughly eight to ten times above the tolerable intake, supporting the practical conclusion."
-      }
+      },
+      { "rel": "evidence-for", "to": "compound:folate", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:vitamin-b12", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:vitamin-b6", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:riboflavin", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:niacin", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." }
     ]
   },
   {
@@ -12107,5 +12113,768 @@ export default [
         "note": "Vagal control of the MMC is restricted to the stomach."
       }
     ]
+  },
+{
+    id: "article:wyss-2000-creatine-creatinine-metabolism",
+    type: "article",
+    name: "Creatine and creatinine metabolism",
+    aliases: ["Wyss 2000", "Wyss & Kaddurah-Daouk 2000"],
+    summary: "Comprehensive review of creatine and creatinine metabolism: biosynthesis and degradation pathways and their regulation, tissue distribution of the enzymes, and links to physiology and disease.",
+    body: [
+      "The standard physiology reference for how [[compound:creatine]] is made, stored and lost as [[compound:creatinine]] ([[reaction:creatine-cyclisation]], [[pathway:creatine-synthesis]]). It covers the creatine kinase system, disturbances of it in disease, and the use of creatine as an ergogenic aid ([[intervention:creatine-supplement]])."
+    ],
+    evidence: "established",
+    authors: ["Wyss M", "Kaddurah-Daouk R"],
+    year: 2000,
+    journal: "Physiological reviews",
+    doi: "10.1152/physrev.2000.80.3.1107",
+    pmid: "10893433",
+    url: "https://doi.org/10.1152/physrev.2000.80.3.1107",
+    verified: true,
+    takeaways: [
+      "The review surveys how creatine is synthesised and broken down, how these steps are regulated, and where the enzymes and metabolites occur across species and tissues.",
+      "It links disturbances of the creatine kinase system to muscle, brain, heart and kidney disease and to cancer.",
+      "Creatine and analogues such as cyclocreatine show protective effects in models of hypoxic, ischaemic, neurodegenerative and muscle damage, and oral creatine is used as an ergogenic aid.",
+      "Some data suggest that creatine and creatinine can be precursors of food mutagens and uremic toxins."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:brosnan-2011-metabolic-burden-creatine-synthesis",
+    type: "article",
+    name: "The metabolic burden of creatine synthesis",
+    aliases: ["Brosnan 2011"],
+    summary: "Review quantifying what creatine synthesis costs: replacing the creatine lost to creatinine (about 2 g/day in young men) uses glycine, arginine and roughly 40% of SAM-derived methyl groups.",
+    body: [
+      "Gives numbers for the loss in [[reaction:creatine-cyclisation]] and for the demand it places on the [[pathway:methyl-budget]] through [[pathway:creatine-synthesis]]. It adds that dietary creatine in omnivores replaces about half of the loss, and that glycine supply is not strained in adults because the amino acid is readily synthesised ([[compound:creatinine]])."
+    ],
+    evidence: "established",
+    authors: ["Brosnan JT", "da Silva RP", "Brosnan ME"],
+    year: 2011,
+    journal: "Amino acids",
+    doi: "10.1007/s00726-011-0853-y",
+    pmid: "21387089",
+    url: "https://doi.org/10.1007/s00726-011-0853-y",
+    verified: true,
+    takeaways: [
+      "Creatine is spontaneously converted to creatinine and excreted, so adults must synthesise creatine to replace it.",
+      "Creatinine loss averages about 2 g (14.6 mmol) per day for 70 kg men aged 20 to 39, and is lower in women and older people because of lower muscle mass.",
+      "In omnivores roughly half of the lost creatine can be replaced by dietary creatine; vegetarians depend almost entirely on endogenous synthesis.",
+      "Creatine synthesis accounts for about 40% of SAM-derived labile methyl groups and uses 20 to 30% of arginine's amidino groups, but does not appear to burden glycine metabolism in adults."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:okano-1999-dnmt3a-dnmt3b-de-novo",
+    type: "article",
+    name: "DNA methyltransferases Dnmt3a and Dnmt3b are essential for de novo methylation and mammalian development",
+    aliases: ["Okano 1999"],
+    summary: "Mouse knockout study: Dnmt3a and Dnmt3b are the de novo DNA methyltransferases needed for development; Dnmt3b covers centromeric repeats, and human DNMT3B is mutated in ICF syndrome.",
+    body: [
+      "Primary evidence for the division of labour between the de novo enzymes [[enzyme:dnmt3a]] and [[enzyme:dnmt3b]] and the maintenance enzyme [[enzyme:dnmt1]] ([[enzyme:dnmt]], [[reaction:dnmt-dna-cytosine-methylation]]). The work is in mouse embryonic stem cells and embryos; the human link is the ICF syndrome mutations."
+    ],
+    evidence: "established",
+    authors: ["Okano M", "Bell DW", "Haber DA", "Li E"],
+    year: 1999,
+    journal: "Cell",
+    doi: "10.1016/s0092-8674(00)81656-6",
+    pmid: "10555141",
+    url: "https://doi.org/10.1016/s0092-8674(00)81656-6",
+    verified: true,
+    takeaways: [
+      "Inactivating both Dnmt3a and Dnmt3b by gene targeting blocked de novo methylation in mouse stem cells and early embryos.",
+      "The same double inactivation did not affect the maintenance of imprinted methylation patterns, which therefore depend on another enzyme.",
+      "The two enzymes also have separate roles: Dnmt3b is specifically needed for methylation of centromeric minor satellite repeats.",
+      "Mutations of human DNMT3B are found in ICF syndrome, a developmental disorder with hypomethylated pericentromeric repeats."
+    ],
+    facts: { design: "animal" }
+  },
+  {
+    id: "article:zaccheo-2004-nte-phosphatidylcholine-deacylation",
+    type: "article",
+    name: "Neuropathy target esterase and its yeast homologue degrade phosphatidylcholine to glycerophosphocholine in living cells",
+    aliases: ["Zaccheo 2004"],
+    summary: "Yeast and mammalian cell-line study showing that neuropathy target esterase catalyses the deacylation of phosphatidylcholine to glycerophosphocholine, balancing PC synthesis with degradation.",
+    body: [
+      "Main source for the deacylation route in [[pathway:phosphatidylcholine-catabolism]] and for [[enzyme:pnpla6]] as the enzyme that makes [[compound:glycerophosphocholine]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]). It uses yeast and cultured mammalian cell lines, not human tissue."
+    ],
+    evidence: "plausible",
+    authors: ["Zaccheo O", "Dinsdale D", "Meacock PA", "Glynn P"],
+    year: 2004,
+    journal: "The Journal of biological chemistry",
+    doi: "10.1074/jbc.M400830200",
+    pmid: "15044461",
+    url: "https://doi.org/10.1074/jbc.M400830200",
+    verified: true,
+    takeaways: [
+      "Cells control phosphatidylcholine levels by balancing synthesis against degradation by deacylation to glycerophosphocholine.",
+      "In yeast and mammalian cells this deacylation is catalysed by neuropathy target esterase (NTE), a protein first found through its reaction with nerve-damaging organophosphates.",
+      "Yeast lacking the NTE homologue were viable but did not convert phosphatidylcholine to glycerophosphocholine; their net choline incorporation into PC was not higher, because choline uptake and CDP-choline formation were reduced.",
+      "In cultured mammalian cells, labelled glycerophosphocholine rose when active NTE was overexpressed and fell when NTE was reduced by RNA interference or organophosphate treatment."
+    ],
+    facts: { design: "in-vitro" }
+  },
+  {
+    id: "article:stewart-2012-edi3-gpc-phosphodiesterase",
+    type: "article",
+    name: "Choline-releasing glycerophosphodiesterase EDI3 drives tumor cell migration and metastasis",
+    aliases: ["Stewart 2012"],
+    summary: "Identifies EDI3 (GPCPD1) as the enzyme that cleaves glycerophosphocholine to choline and glycerol 3-phosphate in human cancer cells and links its expression to migration and relapse.",
+    body: [
+      "Shows with purified recombinant protein and gene silencing that [[enzyme:gpcpd1]] cleaves [[compound:glycerophosphocholine]] to [[compound:choline]] and [[compound:glycerol-3-phosphate]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]). The wider findings concern tumour cell migration and are outside this site's scope."
+    ],
+    evidence: "plausible",
+    authors: ["Stewart JD", "Marchan R", "Lesjak MS", "Lambert J", "Hergenroeder R", "Ellis JK", "Lau CH", "Keun HC", "Schmitz G", "Schiller J", "Eibisch M", "Hedberg C", "Waldmann H", "Lausch E", "Tanner B", "Sehouli J", "Sagemueller J", "Staude H", "Steiner E", "Hengstler JG"],
+    year: 2012,
+    journal: "Proceedings of the National Academy of Sciences of the United States of America",
+    doi: "10.1073/pnas.1117654109",
+    pmid: "22570503",
+    url: "https://doi.org/10.1073/pnas.1117654109",
+    verified: true,
+    takeaways: [
+      "The enzyme that releases choline from glycerophosphocholine, the first step controlling the GPC to phosphocholine ratio, was identified and named EDI3.",
+      "Purified recombinant EDI3 cleaves glycerophosphocholine to glycerol 3-phosphate and choline.",
+      "Silencing EDI3 in MCF-7 breast cancer cells lowered this activity, raised the intracellular GPC to phosphocholine ratio, reduced downstream lipid metabolites and inhibited cell migration through PKC alpha signalling.",
+      "High EDI3 expression was linked to shorter relapse-free survival in endometrial and ovarian cancers."
+    ],
+    facts: { design: "in-vitro", population: "Human cancer cell lines and tumour expression data" }
+  },
+  {
+    id: "article:leslie-2015-cytosolic-pla2",
+    type: "article",
+    name: "Cytosolic phospholipase A2: physiological function and role in disease",
+    aliases: ["Leslie 2015"],
+    summary: "Review of the group IV cytosolic phospholipases A2, focusing on cPLA2 alpha, which releases arachidonic acid and lysophospholipids from membranes and is regulated by calcium and phosphorylation.",
+    body: [
+      "Background for [[enzyme:pla2g4a]] and its products [[compound:lysophosphatidylcholine]] and [[compound:fatty-acid]] ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]). The review concerns lipid-mediator production and disease rather than choline recovery from phosphatidylcholine ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    authors: ["Leslie CC"],
+    year: 2015,
+    journal: "Journal of lipid research",
+    doi: "10.1194/jlr.R057588",
+    pmid: "25838312",
+    url: "https://doi.org/10.1194/jlr.R057588",
+    verified: true,
+    takeaways: [
+      "The group IV family has six intracellular phospholipases A2 (cPLA2 alpha to zeta) with a Ser-Asp catalytic dyad; cPLA2 alpha is the best studied.",
+      "cPLA2 alpha hydrolyses phospholipids to arachidonic acid and lysophospholipids, which are precursors of many bioactive lipids.",
+      "Its activity is controlled by transcription, by calcium rises and by phosphorylation, and it promotes lipid mediator production in many human and rodent cell types.",
+      "Humans with cPLA2 alpha deficiency show more pronounced health effects than mice lacking the enzyme."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:peng-2012-mammalian-pld",
+    type: "article",
+    name: "Mammalian phospholipase D physiological and pathological roles",
+    aliases: ["Peng 2012", "Peng & Frohman 2012"],
+    summary: "Review of mammalian phospholipase D enzymes, which most commonly generate the lipid second messenger phosphatidic acid, and of their roles in cancer, neurons, cardiovascular disease and infection.",
+    body: [
+      "Background for [[enzyme:pld]] as the producer of [[compound:phosphatidic-acid]] from [[compound:phosphatidylcholine]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]). The review emphasises signalling and disease models; it does not quantify the choline that PLD releases ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    authors: ["Peng X", "Frohman MA"],
+    year: 2012,
+    journal: "Acta physiologica (Oxford, England)",
+    doi: "10.1111/j.1748-1716.2011.02298.x",
+    pmid: "21447092",
+    url: "https://doi.org/10.1111/j.1748-1716.2011.02298.x",
+    verified: true,
+    takeaways: [
+      "Phospholipase D is a superfamily of signalling enzymes that most commonly generate the lipid second messenger phosphatidic acid, found from bacteria to humans.",
+      "Most functional insight came from cell models; genetic models now reveal physiological and pathophysiological roles of the mammalian PLD enzymes.",
+      "The review highlights connections of the PLD superfamily to cancer, neuronal pathophysiology, cardiovascular topics, spermatogenesis and infectious disease."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:wolthers-2007-methionine-synthase-reductase-complex",
+    type: "article",
+    name: "Protein interactions in the human methionine synthase-methionine synthase reductase complex and implications for the mechanism of enzyme reactivation",
+    aliases: ["Wolthers 2007"],
+    summary: "Biochemical study of how human methionine synthase reductase binds methionine synthase to regenerate the cob(II)alamin that forms every 200-1000 catalytic cycles back to the active cob(I)alamin state.",
+    body: [
+      "Describes the module structure of human [[enzyme:mtr]], which binds homocysteine, methyltetrahydrofolate, cobalamin and SAM, and the interaction with [[enzyme:mtrr]] that repairs inactive cob(II)alamin. It is the source here for the escape rate from [[compound:cob-i-alamin]] to [[compound:cob-ii-alamin]] ([[reaction:mtr-methylcobalamin-demethylation]], [[reaction:mtr-cob-i-alamin-methylation]], [[reaction:mtrr-cobalamin-reactivation]])."
+    ],
+    evidence: "plausible",
+    authors: ["Wolthers KR", "Scrutton NS"],
+    year: 2007,
+    journal: "Biochemistry",
+    doi: "10.1021/bi700339v",
+    pmid: "17477549",
+    url: "https://doi.org/10.1021/bi700339v",
+    verified: true,
+    takeaways: [
+      "Methionine synthase transfers a methyl group from methyltetrahydrofolate to homocysteine, forming methionine and tetrahydrofolate, with a bound cobalamin cofactor.",
+      "Catalytically inert cob(II)alamin forms about once every 200 to 1000 catalytic cycles and is regenerated to cob(I)alamin by NADPH-dependent methionine synthase reductase.",
+      "The activation domain of methionine synthase binds the FMN domain of the reductase through electrostatic interactions involving conserved lysine residues.",
+      "Electron transfer to cob(II)alamin in the complex is thermodynamically uphill, so reactivation has a substantial energetic barrier."
+    ],
+    facts: { design: "in-vitro" }
+  },
+{
+    id: 'article:iom-1997-magnesium-dri',
+    type: 'article',
+    name: 'Dietary Reference Intakes for Calcium, Phosphorus, Magnesium, Vitamin D, and Fluoride',
+    aliases: ['IOM 1997', 'IOM 1997 magnesium', 'FNB 1997 magnesium DRI', 'IOM DRI magnésio'],
+    summary: 'IOM (1997): magnesium RDA 400-420 mg/day for men and 310-320 mg/day for women; UL 350 mg/day counts supplements and pharmacological agents only, set on osmotic diarrhoea.',
+    body: [
+      'The US and Canadian reference source for [[compound:magnesium]] intake. The RDAs rise slightly with age: 400 mg/day for men aged 19-30 and 420 mg/day from age 31, 310 and 320 mg/day for women. For adults they are derived from magnesium balance data, with an assumed 10 percent coefficient of variation.',
+      'The tolerable upper intake level of 350 mg/day counts only magnesium taken as supplements or other pharmacological agents; magnesium from food and water is excluded because it has not been shown to cause harm. It rests on a lowest-observed-adverse-effect level of about 360 mg/day for mild osmotic diarrhoea with an uncertainty factor close to 1, and the report itself notes that many people tolerate more. The EU committee set a lower figure from a no-effect level ([[article:scf-2001-magnesium-ul]]).'
+    ],
+    evidence: 'established',
+    authors: ['Institute of Medicine Standing Committee on the Scientific Evaluation of Dietary Reference Intakes'],
+    year: 1997,
+    journal: 'National Academies Press (Institute of Medicine, Food and Nutrition Board)',
+    doi: '10.17226/5776',
+    pmid: '23115811',
+    url: 'https://www.nationalacademies.org/read/5776/chapter/8',
+    verified: true,
+    takeaways: [
+      'Magnesium RDAs are 400 mg/day (men 19-30), 420 mg/day (men 31 and older), 310 mg/day (women 19-30) and 320 mg/day (women 31 and older).',
+      'The UL is 350 mg/day of supplemental magnesium for everyone older than 8 years, including pregnancy and lactation, and it does not include magnesium from food or water.',
+      'The critical effect is diarrhoea from the osmotic action of poorly absorbed magnesium salts, with a LOAEL of about 360 mg/day and an uncertainty factor very close to 1.',
+      'Children aged 1-8 years have ULs scaled to 5 mg/kg/day (65 mg/day at 1-3 years, 110 mg/day at 4-8 years); no UL was set for infants, who should get magnesium from food and formula only.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'US RDAs of 310-420 mg/day and the 350 mg/day supplemental upper limit.' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-glycinate', note: 'Reference ceiling for supplemental magnesium of any form; the report does not evaluate glycinate or other chelates.' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-malate', note: 'Same supplemental ceiling of 350 mg/day elemental magnesium; the report does not evaluate malate specifically.' }
+    ]
+  },
+  {
+    id: 'article:scf-2001-magnesium-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Magnesium',
+    aliases: ['SCF 2001 magnesium', 'EU SCF magnesium UL', 'SCF/CS/NUT/UPPLEV/54'],
+    summary: 'EU Scientific Committee on Food set a magnesium UL of 250 mg/day for readily dissociable salts in supplements, water or fortified foods (not food magnesium), based on mild diarrhoea.',
+    body: [
+      'The European counterpart to the US figure in [[article:iom-1997-magnesium-dri]]. The committee derived the limit from a no-observed-adverse-effect level of 250 mg/day for the laxative effect of readily dissociable magnesium salts (chloride, sulphate, aspartate, lactate) and magnesium oxide, with mild diarrhoea appearing at about 360-365 mg/day. It applied an uncertainty factor of 1.0 because many human studies in several life stages were available and the effect is mild, transient and reversible.',
+      'The limit does not cover magnesium naturally present in foods and drinks. It is the source of the 250 mg/day figure quoted for [[compound:magnesium]] supplements in Europe; the US value of 350 mg/day is higher mainly because it is anchored on the lowest effect level rather than a no-effect level. The opinion was expressed on 26 September 2001 and is reproduced in the 2006 EFSA compilation of tolerable upper intake levels.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2001,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/54 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out105_en.pdf',
+    verified: true,
+    takeaways: [
+      'The UL is 250 mg/day of magnesium from readily dissociable salts and magnesium oxide in supplements, water or added to food; magnesium naturally present in foods and beverages is excluded.',
+      'It is derived from a NOAEL of 250 mg/day for laxative effects (mild diarrhoea at about 360-365 mg/day) with an uncertainty factor of 1.0.',
+      'The UL holds for adults, including pregnant and lactating women, and for children from 4 years; no UL could be set for children aged 1-3 years.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'EU upper limit of 250 mg/day for supplemental magnesium (readily dissociable salts).' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-glycinate', note: 'Reference ceiling for supplemental magnesium salts; the opinion does not assess amino acid chelates such as glycinate.' }
+    ]
+  },
+  {
+    id: 'article:scf-2000-folate-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Folate',
+    aliases: ['SCF 2000 folate', 'SCF 2000 folic acid UL', 'EU SCF folic acid UL', 'SCF/CS/NUT/UPPLEV/18'],
+    summary: 'EU Scientific Committee on Food set the folic acid UL at 1 mg/day for adults (200-800 micrograms for children) to avoid masking B12 deficiency; no UL for natural food folates.',
+    body: [
+      'The EU committee reached the same adult ceiling as the US panel for synthetic [[compound:folic-acid]]: 1 mg/day, also valid in pregnancy and lactation. The worry is not folate toxicity as such but vitamin B12 deficiency: high folic acid can hide the anaemia of pernicious anaemia and, in case reports, coincide with progression of neurological damage. Almost all relapse reports involved more than 5 mg/day, and the committee judged that up to 1 mg/day is unlikely to mask the blood picture ([[disease:vitamin-b12-deficiency]]).',
+      'The opinion set no limit for natural reduced folates because it found no evidence of risk from them. Children get lower limits scaled by body weight (200 micrograms/day at 1-3 years up to 800 micrograms/day at 15-17 years). EFSA later revisited folate and kept 1000 micrograms/day for adults while extending the same limit to the combined intake of folic acid and 5-methyltetrahydrofolate salts, so the number quoted for [[intervention:folic-acid-supplement]] is unchanged in Europe.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2000,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/18 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80e_en.pdf',
+    verified: true,
+    takeaways: [
+      'The UL for synthetic folic acid is 1 mg/day for adults, including pregnant and lactating women; the committee found no evidence of risk from natural folates and set no limit for them.',
+      'The critical concern is B12 deficiency: folic acid can mask the haematological signs of pernicious anaemia and neurological relapse was reported mostly at doses above 5 mg/day.',
+      'Child limits scale with body weight: 200 micrograms/day (1-3 years), 300 (4-6), 400 (7-10), 600 (11-14) and 800 (15-17).'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:folic-acid', note: 'EU upper limit of 1 mg/day for synthetic folic acid; agrees with the IOM figure.' },
+      { rel: 'evidence-for', to: 'intervention:folic-acid-supplement', note: 'Safety ceiling for supplemental folic acid; the main risk is masking of vitamin B12 deficiency.' },
+      { rel: 'evidence-for', to: 'disease:vitamin-b12-deficiency', note: 'Source of the masking concern that sets the folic acid upper limit.' }
+    ]
+  },
+  {
+    id: 'article:scf-2002-niacin-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Nicotinic Acid and Nicotinamide (Niacin)',
+    aliases: ['SCF 2002 niacin', 'EU SCF niacin UL', 'SCF/CS/NUT/UPPLEV/39'],
+    summary: 'EU Scientific Committee on Food set separate adult ULs for niacin: 10 mg/day for nicotinic acid (flushing) and 900 mg/day for nicotinamide, neither applicable in pregnancy or lactation.',
+    body: [
+      'Unlike the single US value of 35 mg/day, the EU committee split the vitamin by form. Free [[compound:niacin]] (nicotinic acid) causes flushing at low doses, so its limit is 10 mg/day, derived from occasional flushing at 30 mg/day with an uncertainty factor of 3. [[compound:nicotinamide]] does not flush and shows low toxicity, so its limit is 900 mg/day (12.5 mg/kg body weight), from a no-effect level of about 25 mg/kg/day in diabetes-prevention trials with an uncertainty factor of 2.',
+      'The committee said neither adult limit applies to pregnancy or lactation because data are lacking, nor to supervised use for lipid disorders. It also noted that the form usually used in supplements and fortification is nicotinamide. This is the document behind the EU numbers quoted for [[intervention:niacin-nicotinamide-supplement]] and the reason flushing ([[outcome:flushing]]) is the sentinel endpoint for nicotinic acid.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2002,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/39 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80j_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL for free nicotinic acid is 10 mg/day, based on occasional flushing at 30 mg/day and an uncertainty factor of 3.',
+      'The adult UL for nicotinamide is 900 mg/day (12.5 mg/kg body weight), based on a NOAEL of about 25 mg/kg/day and an uncertainty factor of 2.',
+      'Neither adult value applies during pregnancy or lactation (inadequate data) or to clinically supervised treatment of lipid disorders or diabetes risk.',
+      'Child limits scale by body weight: nicotinic acid 2-8 mg/day and nicotinamide 150-700 mg/day from 1-3 to 15-17 years.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:niacin', note: 'EU upper limit of 10 mg/day for free nicotinic acid, set on flushing.' },
+      { rel: 'evidence-for', to: 'compound:nicotinamide', note: 'EU upper limit of 900 mg/day for nicotinamide, which does not cause flushing.' },
+      { rel: 'evidence-for', to: 'intervention:niacin-nicotinamide-supplement', note: 'Form-specific safety ceilings for supplemental niacin; clinical-dose use is explicitly outside their scope.' },
+      { rel: 'evidence-for', to: 'outcome:flushing', note: 'Flushing is the critical effect used to set the nicotinic acid limit.' }
+    ]
+  },
+  {
+    id: 'article:scf-2003-zinc-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Zinc',
+    aliases: ['SCF 2003 zinc', 'SCF 2002 zinc', 'EU SCF zinc UL', 'SCF/CS/NUT/UPPLEV/62'],
+    summary: 'EU Scientific Committee on Food set the adult zinc UL at 25 mg/day (total intake), from a 50 mg/day no-effect level for copper status; the US value is 40 mg/day.',
+    body: [
+      'The EU limit for [[compound:zinc]] is lower than the US figure in [[article:iom-2001-micronutrients-zinc]] because the committee started from a no-observed-adverse-effect level of 50 mg/day total intake (studies with tightly controlled copper intake showed no change in copper status indicators) and halved it for the small number of subjects, whereas the US panel started from a lowest-effect level of 60 mg/day and divided by 1.5. Both rest on the same end point: zinc interfering with copper status.',
+      'The 25 mg/day applies equally to pregnant and lactating women; children get limits extrapolated on a surface-area basis (7 mg/day at 1-3 years up to 22 mg/day at 15-17 years). The committee also reported that 97.5th percentile total intakes in Europe are close to these limits, which it did not regard as a concern. The opinion was expressed on 5 March 2003; the 2006 EFSA compilation and later EFSA tables cite it as SCF 2002.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2003,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/62 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out177_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL for total zinc intake is 25 mg/day, also for pregnant and lactating women.',
+      'It comes from a NOAEL of 50 mg/day for copper-status indicators in controlled metabolic studies, with an uncertainty factor of 2.',
+      'Child limits are extrapolated by body surface area: 7 mg/day (1-3 years), 10 (4-6), 13 (7-10), 18 (11-14) and 22 (15-17).',
+      'Mean European intakes sit below the UL, and the 97.5th percentile is close to it.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:zinc', note: 'EU upper limit of 25 mg/day total zinc, set on copper status.' },
+      { rel: 'evidence-for', to: 'intervention:zinc-supplement', note: 'Safety ceiling for supplemental zinc in the EU; lower than the 40 mg/day US value.' }
+    ]
+  },
+  {
+    id: 'article:scf-2003-glycyrrhizinic-acid',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on glycyrrhizinic acid and its ammonium salt',
+    aliases: ['SCF 2003 glycyrrhizinic acid', 'SCF 2003 licorice', 'EU SCF glycyrrhizin 100 mg', 'SCF/CS/ADD/EDUL/225'],
+    summary: 'EU Scientific Committee on Food could not set an ADI for glycyrrhizinic acid but kept 100 mg/day as the upper limit for regular intake from all sources, not protective for sensitive subgroups.',
+    body: [
+      'The origin of the often-quoted 100 mg/day ceiling for [[compound:glycyrrhizin]]. The committee had called 100 mg/day a provisional ceiling in 1991; in 2003 it said new human volunteer data strengthened it, but small and short studies still prevented a formal acceptable daily intake. The limit covers intake from all products, including liquorice sweets and foods flavoured with glycyrrhizinic acid or its ammonium salt.',
+      'It warned that the limit may not protect people with low 11-beta-hydroxysteroid dehydrogenase-2 activity, slow gastrointestinal transit, or hypertension and electrolyte or water-balance disorders. Glycyrrhizinic acid in sweets ranged from 0.29 to 7.9 mg/g in German, Belgian and UK products and averaged 1.7 mg/g in a Dutch sample, with liquorice powder and bay liquorice at 18-28 mg/g, so 100 mg corresponds to roughly 13-345 g of sweets and about 60 g at the Dutch mean. That spread is one reason the deglycyrrhizinated form ([[intervention:dgl-licorice]]) is preferred for repeated use. The FAO/WHO expert committee (JECFA, 2004) reached a similar view: 100 mg/day is unlikely to cause adverse effects in most adults.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2003,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/ADD/EDUL/225 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out186_en.pdf',
+    verified: true,
+    takeaways: [
+      'No ADI could be derived for glycyrrhizinic acid or ammonium glycyrrhizinate because the human toxicity studies were too small and short.',
+      'An upper limit of 100 mg/day for regular ingestion from all products was judged sufficiently protective for most of the population.',
+      'Subgroups with reduced 11-beta-HSD2 activity, long gut transit time, hypertension or electrolyte and water-balance problems may not be protected by that limit.',
+      'Measured glycyrrhizinic acid in liquorice confectionery ranged from 0.29 to 7.9 mg/g, with a Dutch mean of 1.7 mg/g; liquorice powder and bay liquorice held 18-28 mg/g.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:glycyrrhizin', note: 'Source of the 100 mg/day ceiling and the confectionery content figures; the ceiling is for regular intake, not a safe dose for sensitive people.' },
+      { rel: 'evidence-for', to: 'intervention:dgl-licorice', note: 'Explains why the glycyrrhizin-free form is preferred for repeated use.' }
+    ]
+  },
+  {
+    id: 'article:efsa-2017-drv-summary',
+    type: 'article',
+    name: 'Dietary Reference Values for nutrients: Summary report',
+    aliases: ['EFSA 2017 DRV summary', 'EFSA DRV summary report', 'EFSA valores de referência 2017'],
+    summary: 'EFSA summary of all its DRV opinions: adult folate PRI 330 micrograms DFE, B12 AI 4, B6 PRI 1.6-1.7 mg, Mg AI 350/300 mg, choline AI 400 mg and phytate-dependent zinc PRIs.',
+    body: [
+      'One document that collects the European dietary reference values for most nutrients discussed in this knowledge base, so the EU numbers can be compared with the US ones in [[article:iom-1998-choline-dri]] and [[article:iom-2001-micronutrients-zinc]]. It restates the values of the individual opinions (such as [[article:efsa-2016-choline-dri]]) and says it is not meant to replace them. It deliberately leaves out tolerable upper intake levels, which were assessed separately.',
+      'Notable choices: folate and riboflavin get population reference intakes, cobalamin and choline only adequate intakes, magnesium adequate intakes that differ by sex, and zinc a table of requirements that depends on how much phytate is eaten (300 to 1,200 mg/day), because phytate lowers zinc absorption. Pregnancy and lactation add increments for zinc and raise the choline, riboflavin and B6 values.'
+    ],
+    evidence: 'established',
+    authors: ['European Food Safety Authority (EFSA)'],
+    year: 2017,
+    journal: 'EFSA Supporting Publications',
+    doi: '10.2903/sp.efsa.2017.e15121',
+    url: 'https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf',
+    verified: true,
+    takeaways: [
+      'For adults the folate PRI is 330 micrograms DFE/day, the cobalamin AI is 4 micrograms/day, the vitamin B6 PRI is 1.7 mg/day (men) and 1.6 mg/day (women), and the riboflavin PRI is 1.6 mg/day.',
+      'The niacin PRI is 1.6 mg niacin equivalents per MJ of energy (average requirement 1.3), and the magnesium AI is 350 mg/day for men and 300 mg/day for women.',
+      'The choline AI is 400 mg/day for adults, 480 in pregnancy and 520 in lactation; no AR or PRI could be derived.',
+      'Adult zinc PRIs rise with dietary phytate (300, 600, 900, 1,200 mg/day): men 9.4, 11.7, 14.0, 16.3 mg/day; women 7.5, 9.3, 11.0, 12.7 mg/day; pregnancy adds 1.6 and lactation 2.9 mg/day.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:choline', note: 'EU adequate intake of 400 mg/day for adults (480 pregnancy, 520 lactation); lower than the US 550/425 mg.' },
+      { rel: 'evidence-for', to: 'compound:folate', note: 'Population reference intake of 330 micrograms DFE/day for adults, below the US RDA of 400.' },
+      { rel: 'evidence-for', to: 'compound:vitamin-b12', note: 'Adequate intake of 4 micrograms/day for adults, higher than the US RDA of 2.4.' },
+      { rel: 'evidence-for', to: 'compound:vitamin-b6', note: 'Population reference intake of 1.7 mg/day (men) and 1.6 mg/day (women).' },
+      { rel: 'evidence-for', to: 'compound:riboflavin', note: 'Population reference intake of 1.6 mg/day for adults of both sexes.' },
+      { rel: 'evidence-for', to: 'compound:niacin', note: 'Population reference intake of 1.6 mg niacin equivalents per MJ.' },
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'Adequate intake of 350 mg/day for men and 300 mg/day for women from all sources.' },
+      { rel: 'evidence-for', to: 'compound:zinc', note: 'Phytate-dependent population reference intakes of 7.5-16.3 mg/day for adults.' }
+    ]
+  },
+  {
+    id: 'article:nih-ods-choline-fact-sheet',
+    type: 'article',
+    name: 'Choline: Fact Sheet for Health Professionals',
+    aliases: ['NIH ODS choline', 'ODS choline fact sheet', 'NIH Office of Dietary Supplements choline'],
+    summary: 'NIH Office of Dietary Supplements summary of choline: IOM adequate intakes, ULs, food contents (liver 356 mg, egg 147 mg per serving), supplement forms and typical doses.',
+    body: [
+      'A practical US government digest of the IOM numbers in [[article:iom-1998-choline-dri]] together with food composition from USDA FoodData Central. It restates the adequate intakes (550 mg/day for men, 425 mg/day for women, 450 in pregnancy, 550 in lactation) and the upper limits for [[compound:choline]], and notes that the Daily Value used on labels is 550 mg.',
+      'The food table is the handiest reference for [[intervention:dietary-choline-sources]]: pan-fried beef liver (3 ounces) provides 356 mg and one hard-boiled large egg 147 mg, ahead of lean beef, soybeans and chicken. For supplements it lists choline bitartrate, phosphatidylcholine and lecithin, typical amounts of 10 to 250 mg, and says no study has compared the bioavailability of these forms. The page is a secondary summary; the primary numbers sit in the IOM report.'
+    ],
+    evidence: 'established',
+    authors: ['National Institutes of Health, Office of Dietary Supplements'],
+    year: 2022,
+    journal: 'NIH Office of Dietary Supplements, Fact Sheet for Health Professionals',
+    url: 'https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/',
+    verified: true,
+    takeaways: [
+      'Adequate Intakes are 550 mg/day for men, 425 mg/day for women (400 mg/day at 14-18 years), 450 mg/day in pregnancy and 550 mg/day in lactation; the label Daily Value is 550 mg.',
+      'Tolerable upper intake levels are based on hypotension and fishy body odour and equal 3,500 mg/day for adults, with lower values for children and adolescents.',
+      'Choline per serving: beef liver pan-fried 3 oz 356 mg, hard-boiled large egg 147 mg, lean braised beef 3 oz 117 mg, roasted soybeans half a cup 107 mg, roasted chicken breast 3 oz 72 mg.',
+      'Supplement forms are choline bitartrate, phosphatidylcholine and lecithin in typical amounts of 10-250 mg; no studies compare the bioavailability of the forms.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:choline', note: 'US adequate intakes and upper limits with food and supplement contents.' },
+      { rel: 'evidence-for', to: 'intervention:dietary-choline-sources', note: 'Food table with choline per serving (liver 356 mg, egg 147 mg).' },
+      { rel: 'evidence-for', to: 'intervention:choline-bitartrate', note: 'Lists bitartrate as a supplement form and states that relative bioavailability of forms has not been compared.' }
+    ]
+  },
+  {
+    id: 'article:fda-cystadane-label',
+    type: 'article',
+    name: 'Cystadane (betaine anhydrous for oral solution) prescribing information',
+    aliases: ['Cystadane label', 'FDA Cystadane', 'Cystadane prescribing information', 'bula Cystadane'],
+    summary: 'FDA label for betaine anhydrous in homocystinuria: 6 g/day as 3 g twice daily for adults, titrated to near-undetectable total homocysteine, up to 20 g/day in some patients.',
+    body: [
+      'The regulatory source for pharmacological [[compound:betaine]] dosing. The product is a prescription treatment to lower elevated homocysteine in homocystinuria caused by CBS deficiency ([[disease:cbs-deficiency]]), MTHFR deficiency ([[disease:mthfr-deficiency]]) or cobalamin cofactor defects. The label concerns this prescription product only: it says nothing about supplement-dose [[intervention:betaine-anhydrous]] or about the acidifying salt [[intervention:betaine-hcl]].',
+      'Adults and children aged 3 and over start at 6 g/day in two 3 g doses; younger children start at 100 mg/kg/day and go up by 50 mg/kg weekly. The dose is raised until plasma total homocysteine is undetectable or small, and some patients have needed up to 20 g/day, although one simulation study suggested little benefit beyond twice-daily dosing and 150 mg/kg/day. The main warning is hypermethioninaemia with reports of cerebral oedema in CBS deficiency, so plasma methionine must stay below 1,000 micromol/L. The most common adverse reactions are nausea and gastrointestinal distress.'
+    ],
+    evidence: 'established',
+    authors: ['Recordati Rare Diseases Inc.'],
+    year: 2024,
+    journal: 'DailyMed, U.S. National Library of Medicine (FDA-approved prescribing information, NDA 020576)',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=31a684d0-cd98-4e46-b43a-ccbd17c41559',
+    verified: true,
+    takeaways: [
+      'Cystadane is indicated to lower elevated homocysteine in homocystinuria (CBS deficiency, MTHFR deficiency, cobalamin cofactor metabolism defects) in adults and children.',
+      'The recommended dose for adults and children aged 3 and over is 6 g/day given as 3 g twice daily; children under 3 start at 100 mg/kg/day divided twice daily and increase weekly by 50 mg/kg.',
+      'Doses are titrated until plasma total homocysteine is undetectable or present only in small amounts; up to 20 g/day has been needed in some patients.',
+      'In CBS deficiency betaine can raise methionine and cerebral oedema has been reported, so plasma methionine is monitored and kept below 1,000 micromol/L.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'intervention:betaine-anhydrous', note: 'Labelled prescription dosing of betaine anhydrous; much higher than supplement doses and meant for homocystinuria.' },
+      { rel: 'evidence-for', to: 'compound:betaine', note: 'Approved therapeutic use and dose range of betaine.' },
+      { rel: 'evidence-for', to: 'disease:cbs-deficiency', note: 'Betaine is an approved treatment, with monitoring of plasma methionine.' }
+    ]
+  },
+  {
+    id: 'article:efsa-2011-betaine-homocysteine-claim',
+    type: 'article',
+    name: 'Scientific Opinion on the substantiation of health claims related to betaine and contribution to normal homocysteine metabolism (ID 4325)',
+    aliases: ['EFSA 2011 betaine', 'EFSA betaine health claim', 'Regulation 432/2012 betaine', 'ID 4325'],
+    summary: 'EFSA opinion behind the EU claim "Betaine contributes to normal homocysteine metabolism": food needs 500 mg betaine per portion and consumers are told the effect comes with 1.5 g/day.',
+    body: [
+      'The EU basis for labelling claims about [[compound:betaine]] and homocysteine. The authorised wording in Commission Regulation (EU) No 432/2012 is "Betaine contributes to normal homocysteine metabolism". It may be used only for food containing at least 500 mg of betaine per quantified portion, and consumers must be told that the beneficial effect is obtained with a daily intake of 1.5 g of betaine and that a daily intake above 4 g may significantly increase blood cholesterol levels.',
+      'The opinion is a labelling assessment, not a treatment guideline: it does not deal with homocystinuria dosing (see [[article:fda-cystadane-label]]) or about acidifying salts. Its reference list consists of short human intervention studies in healthy volunteers, among them Olthof and colleagues ([[article:olthof-2003-betaine-low-dose-homocysteine]]), who tested 1.5, 3 and 6 g/day for six weeks, the same 1.5 g/day level named in the claim conditions.'
+    ],
+    evidence: 'established',
+    authors: ['EFSA Panel on Dietetic Products, Nutrition and Allergies (NDA)'],
+    year: 2011,
+    journal: 'EFSA Journal',
+    doi: '10.2903/j.efsa.2011.2052',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13129986/',
+    verified: true,
+    takeaways: [
+      'The Article 13(1) claim evaluated was betaine and contribution to normal homocysteine metabolism (ID 4325); the opinion was adopted on 28 January 2011 and published on 8 April 2011.',
+      'The claim authorised in Regulation (EU) No 432/2012 reads "Betaine contributes to normal homocysteine metabolism".',
+      'Conditions of use: at least 500 mg of betaine per quantified portion, a statement that the effect is obtained with 1.5 g of betaine daily, and a warning that more than 4 g/day may significantly raise blood cholesterol.',
+      'The references listed in the opinion are human intervention trials in healthy volunteers (Brouwer 2000, Olthof 2003 and 2005, Schwab 2002, 2006 and 2010), not studies in patients.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:betaine', note: 'Authorised EU claim for homocysteine metabolism, with 1.5 g/day as the intake at which the effect is stated and a cholesterol warning above 4 g/day.' },
+      { rel: 'evidence-for', to: 'intervention:betaine-anhydrous', note: 'Regulatory frame for low-dose betaine in foods and supplements in the EU; healthy-volunteer evidence only.' }
+    ]
+  },
+{
+    id: 'article:efsa-2023-folate-ul',
+    type: 'article',
+    name: 'Scientific opinion on the tolerable upper intake level for folate',
+    aliases: ['EFSA 2023 folate UL', 'EFSA 2023 folic acid upper limit', 'EFSA NDA Panel 2023 folate'],
+    summary: 'EFSA kept the SCF folic acid ULs (1000 micrograms/day for adults) but applied them to the combined intake of folic acid and 5-MTHF salts; critical effect is neurological progression in B12 deficiency.',
+    body: [
+      'The current European safety ceiling for supplemental [[compound:folate]]. EFSA reviewed whether excess folate raises the risk of cobalamin-dependent neuropathy, cognitive decline in people with low B12 status, and colorectal or prostate cancer. It found the cancer and cognition evidence insufficient for a causal conclusion and kept the older concern, progression of neurological symptoms in vitamin B12 deficiency, as the critical effect. It therefore retained the SCF numbers of [[article:scf-2000-folate-ul]].',
+      'A main change from the SCF opinion is scope: the limits now apply to the combined intake of [[compound:folic-acid]] and the two authorised 5-methyltetrahydrofolate salts (glucosamine and calcium), so the statement that the limit covers folic acid only is true of the US and SCF values but not of the EU limit for [[intervention:methylfolate-supplement]]. Folate naturally present in food is not counted. EFSA judged it unlikely that Europeans exceed the limits from supplements except regular users of high-dose products. See also [[article:efsa-2022-5-mthf-dietary-folate-equivalents]] for how 5-MTHF is converted to dietary folate equivalents.'
+    ],
+    evidence: 'established',
+    authors: ['EFSA Panel on Nutrition, Novel Foods and Food Allergens (NDA)'],
+    year: 2023,
+    journal: 'EFSA Journal',
+    doi: '10.2903/j.efsa.2023.8353',
+    pmid: '37965303',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10641704/',
+    verified: true,
+    takeaways: [
+      'The critical effect for the folic acid UL is the risk of progression of neurological symptoms in cobalamin-deficient patients; the evidence on cognitive decline, colorectal cancer and prostate cancer was insufficient to conclude on a causal relationship.',
+      'The ULs retained from the SCF are 1000 micrograms/day for adults including pregnant and lactating women, and 200 (1-3 years), 300 (4-6), 400 (7-10), 600 (11-14) and 800 (15-17) micrograms/day for children; a new UL of 200 micrograms/day covers infants aged 4-11 months.',
+      'The ULs apply to the combined intake of folic acid, (6S)-5-methyltetrahydrofolic acid glucosamine salt and L-5-methyltetrahydrofolic acid calcium salt under their authorised conditions of use, not to folate naturally present in foods.',
+      'EFSA considered it unlikely that European populations exceed the ULs from supplemental folate, except regular users of supplements with high doses of folic acid or 5-MTHF salts.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:folic-acid', note: 'EU upper limit of 1000 micrograms/day for adults, unchanged from the SCF value.' },
+      { rel: 'evidence-for', to: 'compound:folate', note: 'Defines the EU supplemental ceiling for folate forms and excludes food folate.' },
+      { rel: 'evidence-for', to: 'intervention:methylfolate-supplement', note: 'The EU limit covers 5-MTHF salts together with folic acid, so methylfolate doses count toward the same 1000 micrograms/day.' },
+      { rel: 'evidence-for', to: 'intervention:folic-acid-supplement', note: 'Current EU ceiling for supplemental folic acid, set on the risk of masking and worsening vitamin B12 deficiency.' }
+    ]
+  },
+  {
+    id: 'article:dressman-1990-upper-gi-ph',
+    type: 'article',
+    name: 'Upper gastrointestinal (GI) pH in young, healthy men and women',
+    aliases: ['Dressman 1990', 'Dressman gastric pH capsule', 'fasting gastric pH 1.7'],
+    summary: 'Heidelberg capsule study in young healthy adults: median fasting gastric pH 1.7; a meal lifts it briefly to a median of 6.7 and it returns to fasting values in under 2 hours.',
+    body: [
+      'A widely used reference for what normal stomach acidity looks like. In the fasted state the median gastric pH was 1.7, which is the strongly acidic baseline produced by [[compound:hydrochloric-acid]] secretion. A standard solid and liquid meal acts as a buffer, so gastric pH rose briefly (median peak 6.7) and drifted back to the fasted value within about two hours as secretion caught up.',
+      'This gives a yardstick for judging claims about low acid ([[state:hypochlorhydria]]) and for the size and timing of any pH rise after food or buffered supplements. In the same subjects the duodenum was near neutral when fasted (median 6.1) and fell to a median of 5.4 after the meal; duodenal pH did not track gastric pH, and neither differed by sex. The study used pH telemetry capsules in healthy volunteers, so it says nothing about people with gastritis or on acid-suppressing drugs.'
+    ],
+    evidence: 'established',
+    authors: ['Dressman JB', 'Berardi RR', 'Dermentzoglou LC', 'Russell TL', 'Schmaltz SP', 'Barnett JL', 'Jarvenpaa KM'],
+    year: 1990,
+    journal: 'Pharmaceutical Research',
+    doi: '10.1023/a:1015827908309',
+    pmid: '2395805',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/2395805/',
+    verified: true,
+    takeaways: [
+      'In fasted young healthy men and women the median gastric pH measured by Heidelberg capsule was 1.7 and the median duodenal pH was 6.1.',
+      'After a standard solid and liquid meal gastric pH climbed briefly to a median peak of 6.7 and then declined gradually back to the fasted value in under 2 hours.',
+      'The meal lowered the median duodenal pH to 5.4, and the postprandial duodenal pH did not return to fasted values within the 4-hour observation period.',
+      'Duodenal pH was not related to gastric pH in either state, and upper GI pH did not depend on sex.'
+    ],
+    facts: { design: 'physiological study (pH telemetry)' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:hydrochloric-acid', note: 'Fasting gastric pH of about 1.7 and the post-meal pH rise and recovery in healthy adults.' },
+      { rel: 'evidence-for', to: 'state:hypochlorhydria', note: 'Healthy reference values (fasting median 1.7, meal peak 6.7 returning within 2 hours) against which a raised gastric pH is judged.' }
+    ]
+  },
+  {
+    id: 'article:schubert-kaunitz-2010-gastric-secretion',
+    type: 'article',
+    name: 'Gastric Secretion (chapter 49, Sleisenger and Fordtran\'s Gastrointestinal and Liver Disease, 9th edition)',
+    aliases: ['Schubert Kaunitz 2010', 'Sleisenger Fordtran gastric secretion', 'Gastric Secretion chapter 49'],
+    summary: 'Textbook chapter on acid secretion: parietal cells secrete HCl at about 160 mM; basal output upper limit about 10 (men) and 5 (women) mmol/h; expected peak acid output 10-60 mmol/h.',
+    body: [
+      'A standard physiology reference for the numbers behind [[compound:hydrochloric-acid]] output. Parietal cells secrete acid at about 160 mM (pH 0.8). Basal acid output, measured over four 15-minute periods, has an upper limit of normal of roughly 10 mmol H+ per hour in men and 5 in women and varies through the day, lowest between 6 and 11 am and highest between 2 and 11 pm.',
+      'After pentagastrin stimulation the expected range is 5 to 50 mmol/h for maximal and 10 to 60 mmol/h for peak acid output, both higher in men and in smokers and tracking parietal cell mass. Output after a meal rises quickly toward the peak value, but the meal first buffers the acid that is secreted. The chapter is a secondary summary of the primary physiology papers and the stated ranges are wide, so single-study means can be lower. The chapter text was read on the Clinical Gate mirror; the bibliographic record (authors, pages, edition) is from Crossref and Open Library.'
+    ],
+    evidence: 'established',
+    authors: ['Schubert ML', 'Kaunitz JD'],
+    year: 2010,
+    journal: 'In: Feldman M, Friedman LS, Brandt LJ, eds. Sleisenger and Fordtran\'s Gastrointestinal and Liver Disease, 9th edition. Saunders/Elsevier, pp. 817-832',
+    doi: '10.1016/b978-1-4160-6189-2.00049-4',
+    verified: true,
+    takeaways: [
+      'Parietal cells secrete hydrochloric acid at a concentration of approximately 160 mM, or pH 0.8.',
+      'The upper limit of normal basal acid output is about 10 mmol H+ per hour in men and 5 mmol H+ per hour in women, with the lowest output in the morning and the highest in the afternoon and evening.',
+      'The expected range is 5-50 mmol H+/h for maximal acid output and 10-60 mmol H+/h for peak acid output after pentagastrin; both are higher in men and smokers and correlate with parietal cell mass.',
+      'Meal-stimulated acid secretion rises rapidly toward the peak acid output, while the meal itself initially buffers the acid; sham feeding alone reaches about half of peak output.'
+    ],
+    facts: { design: 'textbook' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:hydrochloric-acid', note: 'Secreted concentration of about 160 mM and normal basal and peak output ranges.' },
+      { rel: 'evidence-for', to: 'outcome:increased-gastric-acid-output', note: 'Defines the upper limits of normal basal output (10 and 5 mmol/h) and the stimulated range against which hypersecretion is judged.' }
+    ]
+  },
+  {
+    id: 'article:stabler-2004-sam-sah-serum-lcms',
+    type: 'article',
+    name: 'Quantification of serum and urinary S-adenosylmethionine and S-adenosylhomocysteine by stable-isotope-dilution liquid chromatography-mass spectrometry',
+    aliases: ['Stabler and Allen 2004', 'Stabler Allen SAM SAH reference intervals'],
+    summary: 'LC-MS assay of SAM and SAH in 48 volunteers: serum reference intervals SAM 71-168 and SAH 8-26 nmol/L; both metabolites drift in stored samples, so handling must be strict.',
+    body: [
+      'One of the few papers giving reference intervals for circulating [[compound:sam]] and [[compound:sah]] in healthy adults measured by mass spectrometry. The intervals (mean plus or minus 2 SD of log-transformed data) were 71-168 nmol/L for serum SAM and 8-26 nmol/L for serum SAH, which implies a serum SAM:SAH ratio of roughly 3 to 20 and a typical value near 6-8 ([[outcome:low-sam-sah-ratio]]).',
+      'The authors also show how fragile the measurement is: SAM falls and SAH rises in serum and plasma kept at 4 degrees C or room temperature for up to 80 hours, and both are unstable in samples stored beyond two years at -20 degrees C. Urinary SAM:SAH is far higher than the serum or red-cell ratio, so urine is not a proxy for tissue methylation capacity. Values from poorly handled samples are therefore unreliable.'
+    ],
+    evidence: 'established',
+    authors: ['Stabler SP', 'Allen RH'],
+    year: 2004,
+    journal: 'Clinical Chemistry',
+    doi: '10.1373/clinchem.2003.026252',
+    pmid: '14656903',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/14656903/',
+    verified: true,
+    takeaways: [
+      'In 48 volunteers the estimated serum reference intervals were 71-168 nmol/L for SAM and 8-26 nmol/L for SAH.',
+      'Assay imprecision (CV) was about 5% for SAM and 17% for SAH.',
+      'SAM decreased and SAH increased in serum and plasma left for up to 80 hours, and both were unstable in samples stored longer than 2 years at -20 degrees C.',
+      'Fractional excretion of SAM exceeds that of SAH, and the urinary SAM:SAH ratio is much higher than the serum or erythrocyte ratio.'
+    ],
+    facts: { design: 'assay validation with reference intervals', population: 'Healthy volunteers, n=48' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Serum reference interval of 71-168 nmol/L in healthy adults.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Serum reference interval of 8-26 nmol/L in healthy adults.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Gives the normal circulating ranges and the sample-handling pitfalls behind any measured SAM:SAH ratio.' }
+    ]
+  },
+  {
+    id: 'article:gellekink-2005-sam-sah-plasma-lcms',
+    type: 'article',
+    name: 'Stable-isotope dilution liquid chromatography-electrospray injection tandem mass spectrometry method for fast, selective measurement of S-adenosylmethionine and S-adenosylhomocysteine in plasma',
+    aliases: ['Gellekink 2005', 'Gellekink SAM SAH plasma'],
+    summary: 'LC-MS/MS method for plasma SAM and SAH; in controls (mean total homocysteine 11.2 umol/L) plasma SAM was 94.5 and SAH 12.3 nmol/L; immediate acidification prevents SAM degradation.',
+    body: [
+      'A second mass-spectrometry dataset for circulating [[compound:sam]] and [[compound:sah]]. In a group of controls with mean plasma total homocysteine of 11.2 micromol/L, plasma SAM averaged 94.5 nmol/L and SAH 12.3 nmol/L, a ratio near 8, which sits inside the range reported by [[article:stabler-2004-sam-sah-serum-lcms]].',
+      'The method measures both metabolites in plasma with quantification limits of 2.0 nmol/L for SAM and 1.0 nmol/L for SAH, with inter-assay CVs of 3.9% and 8.3%. The practical lesson is that SAM degrades in unacidified plasma, so adding acetic acid at once is needed for trustworthy [[outcome:low-sam-sah-ratio]] readings.'
+    ],
+    evidence: 'established',
+    authors: ['Gellekink H', 'van Oppenraaij-Emmerzaal D', 'van Rooij A', 'Struys EA', 'den Heijer M', 'Blom HJ'],
+    year: 2005,
+    journal: 'Clinical Chemistry',
+    doi: '10.1373/clinchem.2004.046995',
+    pmid: '15919880',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/15919880/',
+    verified: true,
+    takeaways: [
+      'In a group of controls with a mean plasma total homocysteine of 11.2 micromol/L, plasma AdoMet (SAM) was 94.5 nmol/L and AdoHcy (SAH) was 12.3 nmol/L.',
+      'Quantification limits were 2.0 nmol/L for SAM and 1.0 nmol/L for SAH; inter-assay CVs were 3.9% and 8.3% and mean recoveries 94.5% and 96.8%.',
+      'Immediate acidification of plasma with acetic acid prevented the observed degradation of SAM, which is a serious problem in unacidified samples.'
+    ],
+    facts: { design: 'assay validation with control values', population: 'Healthy controls' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 94.5 nmol/L in controls and the need to acidify samples.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 12.3 nmol/L in controls.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Supplies a control plasma ratio of about 8 and the pre-analytical safeguards for measuring it.' }
+    ]
+  },
+  {
+    id: 'article:melnyk-2000-sam-sah-plasma-hplc',
+    type: 'article',
+    name: 'Measurement of plasma and intracellular S-adenosylmethionine and S-adenosylhomocysteine utilizing coulometric electrochemical detection: alterations with plasma homocysteine and pyridoxal 5\'-phosphate concentrations',
+    aliases: ['Melnyk 2000', 'Melnyk SAM SAH HPLC'],
+    summary: 'HPLC method in healthy women (total homocysteine 7.3 umol/L): plasma SAM 156 and SAH 20 nmol/L; higher homocysteine raised SAH and lowered the SAM/SAH ratio.',
+    body: [
+      'An HPLC coulometric method for [[compound:sam]] and [[compound:sah]] from the same research group as [[article:james-2004-autism-sam-sah]]. In healthy adult women with mean total homocysteine of 7.3 micromol/L the mean plasma values were 156 nmol/L for SAM and 20 nmol/L for SAH (ratio about 8).',
+      'In women with raised homocysteine (mean 12.1 micromol/L) plasma SAH rose while SAM did not, and pyridoxal 5\'-phosphate was lower. The plasma SAM/SAH ratio was inversely correlated with homocysteine and directly with the ratio in lymphocytes, which supports using plasma as a rough window on cellular methylation potential ([[outcome:low-sam-sah-ratio]]). Absolute values differ between methods and cohorts (SAM 156 here against 94.5 in [[article:gellekink-2005-sam-sah-plasma-lcms]]), so ratios are best compared within one method. An erratum to the paper was published in Clinical Chemistry 2001;47:612; the values above are those of the indexed abstract.'
+    ],
+    evidence: 'established',
+    authors: ['Melnyk S', 'Pogribna M', 'Pogribny IP', 'Yi P', 'James SJ'],
+    year: 2000,
+    journal: 'Clinical Chemistry',
+    pmid: '10657384',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/10657384/',
+    verified: true,
+    takeaways: [
+      'In healthy adult women with mean total homocysteine of 7.3 micromol/L, mean plasma SAM was 156 nmol/L and SAH was 20 nmol/L.',
+      'In women with higher homocysteine (mean 12.1 micromol/L) plasma SAH was increased but SAM was not, and plasma pyridoxal 5\'-phosphate was reduced.',
+      'The plasma SAM/SAH ratio was inversely correlated with homocysteine (r = 0.73 in magnitude) and directly correlated with the lymphocyte SAM/SAH ratio (r = 0.70).',
+      'The method uses 200 microlitres of plasma, 10^6 lymphocytes or 10 mg of tissue and needs no derivatisation.'
+    ],
+    facts: { design: 'assay validation with cohort comparison', population: 'Healthy adult women with normal and raised homocysteine' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 156 nmol/L in healthy women measured by HPLC.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 20 nmol/L in healthy women, higher when homocysteine is raised.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows the plasma ratio falls with raised homocysteine and tracks the lymphocyte ratio.' }
+    ]
+  },
+  {
+    id: 'article:luka-2006-gnmt-knockout-mouse',
+    type: 'article',
+    name: 'A glycine N-methyltransferase knockout mouse model for humans with deficiency of this enzyme',
+    aliases: ['Luka 2006', 'Luka Gnmt knockout mouse', 'GNMT knockout SAM SAH 300'],
+    summary: 'Gnmt-knockout mice have up to 7-fold more methionine, up to 35-fold more SAM and 3-fold less SAH in liver; the liver SAM/SAH ratio rises from about 3 to about 300.',
+    body: [
+      'The primary source of the numbers quoted for what happens when the GNMT "valve" is removed ([[enzyme:gnmt]], [[claim:gnmt-methyl-sink-valve]]). The mice, made to model the few human cases of GNMT deficiency, lack GNMT protein and activity in the liver. Compared with wild type they had up to a 7-fold increase in free methionine and up to a 35-fold increase in [[compound:sam]], while [[compound:sah]] fell about 3-fold, so the SAM/SAH ratio rose from about 3 to about 300 in liver ([[outcome:low-sam-sah-ratio]]).',
+      'The abstract suggests a significant change in methylation in the liver and other organs where GNMT is expressed. These are tissue values in a knockout mouse, not human plasma values, and they show an extreme high ratio rather than the low-ratio state discussed for undermethylation. The later review [[article:luka-2009-gnmt-sam-regulation]] restates the same experiment in nmol per gram of liver.'
+    ],
+    evidence: 'established',
+    authors: ['Luka Z', 'Capdevila A', 'Mato JM', 'Wagner C'],
+    year: 2006,
+    journal: 'Transgenic Research',
+    doi: '10.1007/s11248-006-0008-1',
+    pmid: '16779654',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/16779654/',
+    verified: true,
+    takeaways: [
+      'Homozygous Gnmt-deficient mice had no GNMT protein or activity in the liver.',
+      'Compared with wild type, free methionine rose up to 7-fold and SAM up to 35-fold, while SAH fell significantly (3-fold).',
+      'The liver SAM/SAH ratio rose from 3 in wild-type mice to 300 in homozygous knockout mice.',
+      'The authors infer a possible significant change in methylation in the liver and other organs where GNMT is expressed.'
+    ],
+    facts: { design: 'knockout mouse', population: 'Gnmt-/- and wild-type mice, liver' },
+    relations: [
+      { rel: 'evidence-for', to: 'enzyme:gnmt', note: 'Loss of GNMT raises liver SAM about 35-fold and the SAM/SAH ratio from about 3 to about 300.' },
+      { rel: 'evidence-for', to: 'claim:gnmt-methyl-sink-valve', note: 'Direct experimental support that GNMT removes surplus SAM; mouse liver data.' },
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Up to 35-fold SAM accumulation in knockout liver.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows how far the tissue SAM/SAH ratio can swing (the high end), in mouse liver only.' }
+    ]
+  },
+  {
+    id: 'article:scf-2000-vitamin-b6-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Vitamin B6',
+    aliases: ['SCF 2000 vitamin B6', 'SCF 2000 B6 UL', 'EU SCF B6 25 mg', 'SCF/CS/NUT/UPPLEV/16'],
+    summary: 'EU Scientific Committee on Food set the vitamin B6 UL at 25 mg/day for adults (5-20 mg for children) on peripheral neurotoxicity; EFSA lowered it to 12 mg/day in 2023.',
+    body: [
+      'The earlier European ceiling for [[compound:vitamin-b6]], expressed on 19 October 2000. The committee judged that severe toxicity occurs at 500 mg/day or more and that minor neurological symptoms may appear at 100 mg/day or more after long use. It started from the average intake of about 100 mg/day in the Dalton and Dalton (1987) study, whose dose-response data come largely from women with premenstrual syndrome, halved it because that intake corresponds to a possible effect level for long-term use, and halved it again for gaps in the database, arriving at 25 mg/day.',
+      'The same value was applied to pregnancy and lactation, with child limits scaled by body weight. EFSA revised the figure downward to 12 mg/day in [[article:efsa-2023-b6-ul]], so this opinion explains older European labels. The US value of 100 mg/day, set in the IOM report behind [[article:iom-1998-choline-dri]], is four times higher because it rests on a no-effect level of 200 mg/day. The endpoint for both is neurotoxicity of high-dose [[compound:pyridoxine]].'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2000,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/16 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80c_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL is 25 mg/day vitamin B6, also for pregnant and lactating women.',
+      'It is derived from an intake of about 100 mg/day associated with a possible effect on long-term use, divided by 2 for that reason and by 2 again for deficiencies in the database.',
+      'Severe toxicity was seen at 500 mg/day or more, and minor neurological symptoms may occur at 100 mg/day or more taken for long periods.',
+      'Child limits are 5 mg/day (1-3 years), 7 (4-6), 10 (7-10), 15 (11-14) and 20 (15-17).'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:vitamin-b6', note: 'Former EU upper limit of 25 mg/day, now replaced by EFSA 12 mg/day.' },
+      { rel: 'evidence-for', to: 'compound:pyridoxine', note: 'Neurotoxicity of high-dose pyridoxine is the basis of the limit.' }
+    ]
+  },
+  {
+    id: 'article:cdc-nhanes-mma-lab-manual',
+    type: 'article',
+    name: 'Laboratory Procedure Manual: Methylmalonic acid (MMA), serum, LC-MS/MS (NHANES 2013-2014, method 4010.03)',
+    aliases: ['CDC NHANES MMA manual', 'NHANES methylmalonic acid method', 'serum MMA reference range 73-271'],
+    summary: 'CDC NHANES serum MMA method: normal 73-271 nmol/L (mean +/-2 SD) or 53-376 nmol/L (+/-3 SD), citing Allen 1990; values above 2,000 nmol/L fit B12 deficiency; renal impairment raises MMA.',
+    body: [
+      'A laboratory manual rather than a clinical study, used here because it states the serum reference range for [[compound:methylmalonic-acid]] with its source. Normal values were first defined as mean plus or minus 3 SD (53-376 nmol/L) and are now more often given as mean plus or minus 2 SD (73-271 nmol/L), both attributed to Allen and colleagues (Am J Hematol 1990;34:90-8, PubMed 2339683). The range applies to serum; other matrices and laboratories differ.',
+      'The manual adds that MMA above 2,000 nmol/L is considered representative of vitamin B12 deficiency ([[disease:vitamin-b12-deficiency]]), that raised values must be read with caution because impaired kidney function, especially in older people, also raises MMA, and that there is no scientific consensus on cutoffs for subclinical deficiency. This is the practical background to [[intervention:homocysteine-mma-testing]]. The NHANES 2013-2014 cycle used this method to produce the MMA data file.'
+    ],
+    evidence: 'established',
+    authors: ['Centers for Disease Control and Prevention, Division of Laboratory Sciences, Nutritional Biomarkers Branch'],
+    year: 2013,
+    journal: 'CDC NHANES Laboratory Procedure Manual (method no. 4010.03)',
+    url: 'https://wwwn.cdc.gov/nchs/data/nhanes/public/2013/labmethods/MMA_H_MET.pdf',
+    verified: true,
+    takeaways: [
+      'The serum MMA reference range is 73-271 nmol/L (0.073-0.271 micromol/L) as mean +/- 2 SD, or 53-376 nmol/L as mean +/- 3 SD, citing Allen et al. 1990.',
+      'MMA values above 2,000 nmol/L are considered representative of vitamin B12 deficiency.',
+      'Elevated MMA should be interpreted with caution because impaired renal function, particularly in older persons, also raises it.',
+      'There is no scientific consensus on cutoff values for low vitamin B12 status, particularly subclinical deficiency.'
+    ],
+    facts: { design: 'database' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:methylmalonic-acid', note: 'Serum reference range of 73-271 nmol/L (mean +/- 2 SD) and its caveats.' },
+      { rel: 'evidence-for', to: 'intervention:homocysteine-mma-testing', note: 'States how MMA results are interpreted (reference range, 2,000 nmol/L, renal confounding).' },
+      { rel: 'evidence-for', to: 'disease:vitamin-b12-deficiency', note: 'MMA above 2,000 nmol/L is taken as representative of B12 deficiency; mild rises are non-specific.' }
+    ]
   }
-];
+]
