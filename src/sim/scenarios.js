@@ -36,7 +36,7 @@ export const scenarios = [
     description: 'Continuous extra glycine intake of 10 g/day from hour 8 (about 140 mg/kg/day). Compare with Tan 2025 (100 mg/kg/day for 14 d: tHcy +0.6 uM).',
     stages: [base(), after('glycine 10 g/day', 64, { controls: { glycineLoad: 10 } })],
     expected: [{ observable: 'gly', direction: 'up' }, { observable: 'tHcy', direction: 'small change', note: 'human data: +0.6 uM (n.s. to small)' }],
-    evidence: { status: 'hypothesis', summary: 'Plasma glycine rise is supported by chronic-dosing studies; the methyl-pool response is a prediction.', refs: ['article:tan-2025-glycine-supplement-obesity-hcy', 'article:olsson-2025-glycine-alcohol-use-disorder'] }
+    evidence: { status: 'hypothesis', summary: 'Plasma glycine rise is supported by chronic-dosing studies; the methyl-pool response is a prediction (no human SAM/SAH data after glycine).', refs: ['article:tan-2025-glycine-supplement-obesity-hcy', 'article:olsson-2025-glycine-alcohol-use-disorder'] }
   },
   ...[[0.5, '500 mg'], [2, '2 g']].map(([g, name]) => ({
     id: `choline-${name.replace(' ', '')}`, label: `Choline ${name} (single oral dose)`, group: 'choline', observables: ['cho', 'bet', 'bet_p', 'dmg', 'bhmt', 'hcy', 'tHcy', 'sam'],
