@@ -15,7 +15,7 @@ import { SCORING, buildEvidenceModel, dumbbellRows, statusCounts } from '../../s
 import { expectAccessible } from '../helpers/axe.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
 
-// Big pages (465 markers, 65 table rows) and axe: slow on a loaded machine.
+// Big pages (hundreds of markers, 65 table rows) and axe: slow on a loaded machine.
 vi.setConfig({ testTimeout: 120000 })
 
 const model = buildEvidenceModel(graph)
@@ -149,9 +149,12 @@ describe('CoverageMap', () => {
 describe('LiteratureTimeline', () => {
   it('shows every article, then narrows by topic and by year', async () => {
     const { container } = mountVapor(LiteratureTimeline, { props: { articles: model.articles } })
-    expect(container.querySelectorAll('.viz-dot-mark')).toHaveLength(465)
+    expect(model.articles.length).toBeGreaterThan(0)
+    expect(container.querySelectorAll('.viz-dot-mark')).toHaveLength(model.articles.length)
+    const histamine = model.articles.filter((article) => article.topic === 'histamine').length
+    expect(histamine).toBeGreaterThan(0)
     await fireEvent.change(container.querySelector('#ev-tl-topic'), { target: { value: 'histamine' } })
-    expect(container.querySelectorAll('.viz-dot-mark')).toHaveLength(24)
+    expect(container.querySelectorAll('.viz-dot-mark')).toHaveLength(histamine)
     await fireEvent.change(container.querySelector('#ev-tl-topic'), { target: { value: '' } })
     await fireEvent.input(container.querySelector('#ev-tl-from'), { target: { value: '2020' } })
     const recent = container.querySelectorAll('.viz-dot-mark').length

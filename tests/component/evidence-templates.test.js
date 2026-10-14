@@ -7,7 +7,7 @@ import ClaimTemplate from '../../src/views/kb/templates/ClaimTemplate.vue'
 import { expectAccessible } from '../helpers/axe.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
 
-// Big pages (465 markers, 65 table rows) and axe: slow on a loaded machine.
+// Big pages (hundreds of markers, 65 table rows) and axe: slow on a loaded machine.
 vi.setConfig({ testTimeout: 120000 })
 
 const claims = graph.byType.get('claim')
@@ -90,8 +90,8 @@ describe('ClaimTemplate', () => {
 })
 
 describe('ArticleTemplate', () => {
-  it('renders all 465 articles without an exception, each with one heading, a citation and what it informs', () => {
-    expect(articles.length).toBeGreaterThanOrEqual(465)
+  it('renders every article without an exception, each with one heading, a citation and what it informs', () => {
+    expect(articles.length).toBeGreaterThan(0)
     for (const article of articles) {
       const result = render(ArticleTemplate, { id: article.id })
       expect(result.headings, article.id).toBe(1)

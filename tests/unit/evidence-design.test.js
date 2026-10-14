@@ -85,7 +85,7 @@ describe('normalizeDesign', () => {
 
   it('gives every article in the dataset one of the canonical classes (no "unclassified")', () => {
     const articles = graph.byType.get('article')
-    expect(articles.length).toBeGreaterThanOrEqual(465)
+    expect(articles.length).toBeGreaterThan(0)
     const bad = articles.filter((article) => !DESIGN_IDS.includes(normalizeDesign(article.facts?.design))).map((article) => `${article.id}: ${article.facts?.design}`)
     expect(bad).toEqual([])
   })

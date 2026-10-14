@@ -111,10 +111,19 @@ test('keyboard only: sort the audit by contradicting articles and open the first
 })
 
 test('the literature filters and pages are reachable and shareable by URL', async ({ page }) => {
+  // The article count comes from the data, so read it from the page instead of hard-coding it.
+  const status = page.locator('main').getByRole('status').first()
+  const counts = async () => {
+    const [, shown, total] = (await status.textContent()).match(/Showing (\d+) of (\d+) articles/)
+    return { shown: Number(shown), total: Number(total) }
+  }
   await page.goto('/#/evidence/literature?design=meta-analysis')
-  await expect(page.locator('main').getByRole('status').first()).toHaveText(/Showing 17 of 465 articles/)
+  await expect(status).toHaveText(/Showing \d+ of \d+ articles/)
+  const filtered = await counts()
+  expect(filtered.shown).toBeGreaterThan(0)
+  expect(filtered.shown).toBeLessThan(filtered.total)
   await page.getByLabel('Study design', { exact: true }).selectOption('')
-  await expect(page.locator('main').getByRole('status').first()).toHaveText(/Showing 465 of 465 articles/)
+  await expect(status).toHaveText(`Showing ${filtered.total} of ${filtered.total} articles`)
   await expect(page).toHaveURL(/#\/evidence\/literature$/)
   await page.getByRole('button', { name: 'Next' }).click()
   await expect(page).toHaveURL(/page=2/)
@@ -126,5 +135,5 @@ test('the coverage heatmap opens the literature for a topic and design', async (
   await cell.focus()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/#\/evidence\/literature\?topic=histamine&design=meta-analysis/)
-  await expect(page.locator('main').getByRole('status').first()).toHaveText(/Showing 0 of 465 articles/)
+  await expect(page.locator('main').getByRole('status').first()).toHaveText(/Showing 0 of \d+ articles/)
 })

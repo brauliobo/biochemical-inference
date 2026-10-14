@@ -1,11 +1,13 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../../src/App.vue'
+import { graph } from '../../src/knowledge/index.js'
+import { buildEvidenceModel } from '../../src/kb/evidence.js'
 import { navigate } from '../../src/router.js'
 import { expectAccessible } from '../helpers/axe.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
 
-// Big pages (465 markers, 65 table rows) and axe: slow on a loaded machine.
+// Big pages (hundreds of markers, 65 table rows) and axe: slow on a loaded machine.
 vi.setConfig({ testTimeout: 120000 })
 
 beforeEach(() => {
@@ -83,16 +85,20 @@ describe('claims audit', () => {
 })
 
 describe('literature', () => {
+  const evidence = buildEvidenceModel(graph)
+  const total = evidence.articles.length
+  const metaAnalyses = evidence.articles.filter((article) => article.design === 'meta-analysis').length
+
   it('lists the articles as a dot plot table and filters them', async () => {
     await open('/evidence/literature')
     await within(main()).findByLabelText('Title, author or journal', {}, slow)
     const rows = () => main().querySelectorAll('.ev-table tbody tr').length
     await waitFor(() => expect(rows()).toBe(60), slow)
     expect(main().querySelector('.ev-yearaxis__dot')).toBeTruthy()
-    expect(within(main()).getByRole('status').textContent).toBe('Showing 465 of 465 articles')
+    expect(within(main()).getByRole('status').textContent).toBe(`Showing ${total} of ${total} articles`)
     await fireEvent.change(within(main()).getByLabelText('Study design'), { target: { value: 'meta-analysis' } })
-    await waitFor(() => expect(within(main()).getAllByRole('status')[0].textContent).toMatch(/Showing 17 of 465/), slow)
-    expect(rows()).toBe(17)
+    await waitFor(() => expect(within(main()).getAllByRole('status')[0].textContent).toMatch(new RegExp(`Showing ${metaAnalyses} of ${total}`)), slow)
+    expect(rows()).toBe(metaAnalyses)
   }, TEST_TIMEOUT)
 
   it('pages through the table', async () => {
