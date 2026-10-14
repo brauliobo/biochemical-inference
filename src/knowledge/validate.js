@@ -16,6 +16,7 @@ export const RULES = Object.freeze({
   'dangling-reaction': { severity: 'error', title: 'Reaction participants or enzymes that do not exist' },
   'dangling-claim': { severity: 'error', title: 'Edge claims that do not exist or are not claims' },
   'sign-conflict': { severity: 'error', title: 'Entity pairs joined by both a raising and a lowering edge' },
+  'edge-claim-status': { severity: 'error', title: "Edges asserted by an 'unsupported' claim that are not marked as hypotheses" },
   'malformed-mention': { severity: 'error', title: 'Malformed [[...]] mentions' },
   'relation-type-pair': { severity: 'error', title: 'Relations between disallowed entity types' },
   'self-relation': { severity: 'error', title: 'Relations from an entity to itself' },
@@ -80,6 +81,9 @@ export function validateKnowledge(rawEntities, { paths, quant } = {}) {
   // 3. relations
   for (const edge of graph.edges) {
     if (edge.from === edge.to) add('self-relation', edge.from, `relation '${edge.rel}' points at the entity itself`)
+    if (edge.claim !== undefined && graph.get(edge.claim)?.status === 'unsupported' && edge.hypothesis !== true) {
+      add('edge-claim-status', edge.from, `'${edge.rel}' to ${edge.to} cites unsupported claim ${edge.claim}; mark the edge hypothesis: true`)
+    }
     if (edge.origin !== 'declared') continue
     const fromType = graph.get(edge.from).type
     const toType = graph.get(edge.to).type

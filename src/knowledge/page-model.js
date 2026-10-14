@@ -33,6 +33,13 @@ function referenceItem(article, stance) {
   return { ...brief(article), stance, citation: formatCitation(article), authors, year, journal, doi, pmid, url, verified, takeaways: takeaways ?? [] }
 }
 
+/** Causal-model fields of a link (sign, hypothesis, claim, strength), only those that are set. */
+function causalFields(link) {
+  const fields = {}
+  for (const key of ['sign', 'hypothesis', 'claim', 'strength']) if (link[key] !== undefined) fields[key] = link[key]
+  return fields
+}
+
 function relationGroups(graph, id) {
   const groups = new Map()
   const references = []
@@ -48,7 +55,7 @@ function relationGroups(graph, id) {
       groups.set(link.label, group)
     }
     if (group.items.some((item) => item.id === other.id)) continue
-    group.items.push({ ...brief(other), ...(link.note ? { note: link.note } : {}), origin: link.origin })
+    group.items.push({ ...brief(other), ...(link.note ? { note: link.note } : {}), origin: link.origin, ...causalFields(link) })
   }
   const sorted = [...groups.values()].sort((a, b) => relationOrder(a.rel) - relationOrder(b.rel))
   for (const group of sorted) group.items.sort(byName)
