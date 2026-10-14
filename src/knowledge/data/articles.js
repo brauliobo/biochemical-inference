@@ -8749,6 +8749,11 @@ export default [
         "rel": "evidence-against",
         "to": "claim:pyroluria-causes-b6-zinc-deficiency",
         "note": "Systematic review found no robust evidence that elevated urinary HPL increases B6 or zinc loss, and no placebo-controlled treatment trials."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:undermethylated-have-functional-b6-deficiency",
+        "note": "Covers the pyrrole half of the claim only: no robust link between elevated HPL and functional B6 shortfall. Nothing here addresses under-methylation as such."
       }
     ]
   },
@@ -8811,6 +8816,11 @@ export default [
         "rel": "evidence-for",
         "to": "claim:pyroluria-causes-b6-zinc-deficiency",
         "note": "Cohort data from proponents: urinary HPL correlated inversely with red-cell B6 activity and zinc; these are associations in mixed patient groups, not independent confirmation."
+      },
+      {
+        "rel": "evidence-for",
+        "to": "claim:undermethylated-have-functional-b6-deficiency",
+        "note": "Proponent-side correlation of HPL with low red-cell B6 activity (pyrrole half of the claim only); not independent confirmation and silent on under-methylation."
       }
     ]
   },
@@ -9270,6 +9280,11 @@ export default [
         "rel": "evidence-against",
         "to": "state:gastric-dysmotility",
         "note": "PPI use did not produce measurable gastric dysmotility in this short study."
+      },
+      {
+        "rel": "evidence-against",
+        "to": "claim:higher-ph-delays-les-closure-and-pylorus",
+        "note": "Indirect: a week of omeprazole, which raises gastric pH for most of the day, left emptying half-time unchanged in healthy volunteers. It did not measure LES closure or pyloric opening."
       }
     ]
   },
