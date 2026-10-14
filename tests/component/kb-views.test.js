@@ -224,8 +224,18 @@ describe('/kb/:type/:slug entity page', () => {
     const model = page('claim:glycine-gnmt-depletes-sam-in-undermethylated')
     expect(within(main()).getByText(model.claim.statement)).toBeTruthy()
     expect(within(main()).getAllByText(`Claim: ${model.claim.status.label}`).length).toBeGreaterThan(0)
-    expect(headings(2)).toEqual(expect.arrayContaining(['The claim', 'Evidence for this claim', 'Evidence against this claim']))
-    if (model.references.length === 0) expect(within(main()).getByText(/No supporting source is recorded yet/)).toBeTruthy()
+    // The claim page is the evidence ClaimTemplate: a verdict, the balance, why, and the articles for and against.
+    expect(headings(2)).toEqual(expect.arrayContaining(['Verdict', 'Evidence balance', 'Why this verdict', 'Articles for and against']))
+    expect(model.references.length).toBeGreaterThan(0)
+    expect(within(main()).queryByText(/\(no source recorded\)/)).toBeNull()
+  })
+
+  it('warns that a claim with no recorded source has none', async () => {
+    const id = graph.byType.get('claim').map((claim) => claim.id).find((claimId) => page(claimId).references.length === 0)
+    expect(id, 'at least one claim has no source').toBeTruthy()
+    await open(`/kb/${id.replace(':', '/')}`)
+    expect(within(main()).getByText(/\(no source recorded\)/)).toBeTruthy()
+    expect(within(main()).getByText('No article recorded')).toBeTruthy()
   })
 
   it('offers a labelled path to another entity, deep-linkable through ?to=', async () => {
