@@ -12306,5 +12306,299 @@ export default [
       "Electron transfer to cob(II)alamin in the complex is thermodynamically uphill, so reactivation has a substantial energetic barrier."
     ],
     facts: { design: "in-vitro" }
+  },
+{
+    id: 'article:iom-1997-magnesium-dri',
+    type: 'article',
+    name: 'Dietary Reference Intakes for Calcium, Phosphorus, Magnesium, Vitamin D, and Fluoride',
+    aliases: ['IOM 1997', 'IOM 1997 magnesium', 'FNB 1997 magnesium DRI', 'IOM DRI magnésio'],
+    summary: 'IOM (1997): magnesium RDA 400-420 mg/day for men and 310-320 mg/day for women; UL 350 mg/day counts supplements and pharmacological agents only, set on osmotic diarrhoea.',
+    body: [
+      'The US and Canadian reference source for [[compound:magnesium]] intake. The RDAs rise slightly with age: 400 mg/day for men aged 19-30 and 420 mg/day from age 31, 310 and 320 mg/day for women. For adults they are derived from magnesium balance data, with an assumed 10 percent coefficient of variation.',
+      'The tolerable upper intake level of 350 mg/day counts only magnesium taken as supplements or other pharmacological agents; magnesium from food and water is excluded because it has not been shown to cause harm. It rests on a lowest-observed-adverse-effect level of about 360 mg/day for mild osmotic diarrhoea with an uncertainty factor close to 1, and the report itself notes that many people tolerate more. The EU committee set a lower figure from a no-effect level ([[article:scf-2001-magnesium-ul]]).'
+    ],
+    evidence: 'established',
+    authors: ['Institute of Medicine Standing Committee on the Scientific Evaluation of Dietary Reference Intakes'],
+    year: 1997,
+    journal: 'National Academies Press (Institute of Medicine, Food and Nutrition Board)',
+    doi: '10.17226/5776',
+    pmid: '23115811',
+    url: 'https://www.nationalacademies.org/read/5776/chapter/8',
+    verified: true,
+    takeaways: [
+      'Magnesium RDAs are 400 mg/day (men 19-30), 420 mg/day (men 31 and older), 310 mg/day (women 19-30) and 320 mg/day (women 31 and older).',
+      'The UL is 350 mg/day of supplemental magnesium for everyone older than 8 years, including pregnancy and lactation, and it does not include magnesium from food or water.',
+      'The critical effect is diarrhoea from the osmotic action of poorly absorbed magnesium salts, with a LOAEL of about 360 mg/day and an uncertainty factor very close to 1.',
+      'Children aged 1-8 years have ULs scaled to 5 mg/kg/day (65 mg/day at 1-3 years, 110 mg/day at 4-8 years); no UL was set for infants, who should get magnesium from food and formula only.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'US RDAs of 310-420 mg/day and the 350 mg/day supplemental upper limit.' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-glycinate', note: 'Reference ceiling for supplemental magnesium of any form; the report does not evaluate glycinate or other chelates.' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-malate', note: 'Same supplemental ceiling of 350 mg/day elemental magnesium; the report does not evaluate malate specifically.' }
+    ]
+  },
+  {
+    id: 'article:scf-2001-magnesium-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Magnesium',
+    aliases: ['SCF 2001 magnesium', 'EU SCF magnesium UL', 'SCF/CS/NUT/UPPLEV/54'],
+    summary: 'EU Scientific Committee on Food set a magnesium UL of 250 mg/day for readily dissociable salts in supplements, water or fortified foods (not food magnesium), based on mild diarrhoea.',
+    body: [
+      'The European counterpart to the US figure in [[article:iom-1997-magnesium-dri]]. The committee derived the limit from a no-observed-adverse-effect level of 250 mg/day for the laxative effect of readily dissociable magnesium salts (chloride, sulphate, aspartate, lactate) and magnesium oxide, with mild diarrhoea appearing at about 360-365 mg/day. It applied an uncertainty factor of 1.0 because many human studies in several life stages were available and the effect is mild, transient and reversible.',
+      'The limit does not cover magnesium naturally present in foods and drinks. It is the source of the 250 mg/day figure quoted for [[compound:magnesium]] supplements in Europe; the US value of 350 mg/day is higher mainly because it is anchored on the lowest effect level rather than a no-effect level. The opinion was expressed on 26 September 2001 and is reproduced in the 2006 EFSA compilation of tolerable upper intake levels.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2001,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/54 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out105_en.pdf',
+    verified: true,
+    takeaways: [
+      'The UL is 250 mg/day of magnesium from readily dissociable salts and magnesium oxide in supplements, water or added to food; magnesium naturally present in foods and beverages is excluded.',
+      'It is derived from a NOAEL of 250 mg/day for laxative effects (mild diarrhoea at about 360-365 mg/day) with an uncertainty factor of 1.0.',
+      'The UL holds for adults, including pregnant and lactating women, and for children from 4 years; no UL could be set for children aged 1-3 years.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'EU upper limit of 250 mg/day for supplemental magnesium (readily dissociable salts).' },
+      { rel: 'evidence-for', to: 'intervention:magnesium-glycinate', note: 'Reference ceiling for supplemental magnesium salts; the opinion does not assess amino acid chelates such as glycinate.' }
+    ]
+  },
+  {
+    id: 'article:scf-2000-folate-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Folate',
+    aliases: ['SCF 2000 folate', 'SCF 2000 folic acid UL', 'EU SCF folic acid UL', 'SCF/CS/NUT/UPPLEV/18'],
+    summary: 'EU Scientific Committee on Food set the folic acid UL at 1 mg/day for adults (200-800 micrograms for children) to avoid masking B12 deficiency; no UL for natural food folates.',
+    body: [
+      'The EU committee reached the same adult ceiling as the US panel for synthetic [[compound:folic-acid]]: 1 mg/day, also valid in pregnancy and lactation. The worry is not folate toxicity as such but vitamin B12 deficiency: high folic acid can hide the anaemia of pernicious anaemia and, in case reports, coincide with progression of neurological damage. Almost all relapse reports involved more than 5 mg/day, and the committee judged that up to 1 mg/day is unlikely to mask the blood picture ([[disease:vitamin-b12-deficiency]]).',
+      'The opinion set no limit for natural reduced folates because it found no evidence of risk from them. Children get lower limits scaled by body weight (200 micrograms/day at 1-3 years up to 800 micrograms/day at 15-17 years). EFSA later revisited folate and kept 1000 micrograms/day for adults while extending the same limit to the combined intake of folic acid and 5-methyltetrahydrofolate salts, so the number quoted for [[intervention:folic-acid-supplement]] is unchanged in Europe.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2000,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/18 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80e_en.pdf',
+    verified: true,
+    takeaways: [
+      'The UL for synthetic folic acid is 1 mg/day for adults, including pregnant and lactating women; the committee found no evidence of risk from natural folates and set no limit for them.',
+      'The critical concern is B12 deficiency: folic acid can mask the haematological signs of pernicious anaemia and neurological relapse was reported mostly at doses above 5 mg/day.',
+      'Child limits scale with body weight: 200 micrograms/day (1-3 years), 300 (4-6), 400 (7-10), 600 (11-14) and 800 (15-17).'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:folic-acid', note: 'EU upper limit of 1 mg/day for synthetic folic acid; agrees with the IOM figure.' },
+      { rel: 'evidence-for', to: 'intervention:folic-acid-supplement', note: 'Safety ceiling for supplemental folic acid; the main risk is masking of vitamin B12 deficiency.' },
+      { rel: 'evidence-for', to: 'disease:vitamin-b12-deficiency', note: 'Source of the masking concern that sets the folic acid upper limit.' }
+    ]
+  },
+  {
+    id: 'article:scf-2002-niacin-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Nicotinic Acid and Nicotinamide (Niacin)',
+    aliases: ['SCF 2002 niacin', 'EU SCF niacin UL', 'SCF/CS/NUT/UPPLEV/39'],
+    summary: 'EU Scientific Committee on Food set separate adult ULs for niacin: 10 mg/day for nicotinic acid (flushing) and 900 mg/day for nicotinamide, neither applicable in pregnancy or lactation.',
+    body: [
+      'Unlike the single US value of 35 mg/day, the EU committee split the vitamin by form. Free [[compound:niacin]] (nicotinic acid) causes flushing at low doses, so its limit is 10 mg/day, derived from occasional flushing at 30 mg/day with an uncertainty factor of 3. [[compound:nicotinamide]] does not flush and shows low toxicity, so its limit is 900 mg/day (12.5 mg/kg body weight), from a no-effect level of about 25 mg/kg/day in diabetes-prevention trials with an uncertainty factor of 2.',
+      'The committee said neither adult limit applies to pregnancy or lactation because data are lacking, nor to supervised use for lipid disorders. It also noted that the form usually used in supplements and fortification is nicotinamide. This is the document behind the EU numbers quoted for [[intervention:niacin-nicotinamide-supplement]] and the reason flushing ([[outcome:flushing]]) is the sentinel endpoint for nicotinic acid.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2002,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/39 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80j_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL for free nicotinic acid is 10 mg/day, based on occasional flushing at 30 mg/day and an uncertainty factor of 3.',
+      'The adult UL for nicotinamide is 900 mg/day (12.5 mg/kg body weight), based on a NOAEL of about 25 mg/kg/day and an uncertainty factor of 2.',
+      'Neither adult value applies during pregnancy or lactation (inadequate data) or to clinically supervised treatment of lipid disorders or diabetes risk.',
+      'Child limits scale by body weight: nicotinic acid 2-8 mg/day and nicotinamide 150-700 mg/day from 1-3 to 15-17 years.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:niacin', note: 'EU upper limit of 10 mg/day for free nicotinic acid, set on flushing.' },
+      { rel: 'evidence-for', to: 'compound:nicotinamide', note: 'EU upper limit of 900 mg/day for nicotinamide, which does not cause flushing.' },
+      { rel: 'evidence-for', to: 'intervention:niacin-nicotinamide-supplement', note: 'Form-specific safety ceilings for supplemental niacin; clinical-dose use is explicitly outside their scope.' },
+      { rel: 'evidence-for', to: 'outcome:flushing', note: 'Flushing is the critical effect used to set the nicotinic acid limit.' }
+    ]
+  },
+  {
+    id: 'article:scf-2003-zinc-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Zinc',
+    aliases: ['SCF 2003 zinc', 'SCF 2002 zinc', 'EU SCF zinc UL', 'SCF/CS/NUT/UPPLEV/62'],
+    summary: 'EU Scientific Committee on Food set the adult zinc UL at 25 mg/day (total intake), from a 50 mg/day no-effect level for copper status; the US value is 40 mg/day.',
+    body: [
+      'The EU limit for [[compound:zinc]] is lower than the US figure in [[article:iom-2001-micronutrients-zinc]] because the committee started from a no-observed-adverse-effect level of 50 mg/day total intake (studies with tightly controlled copper intake showed no change in copper status indicators) and halved it for the small number of subjects, whereas the US panel started from a lowest-effect level of 60 mg/day and divided by 1.5. Both rest on the same end point: zinc interfering with copper status.',
+      'The 25 mg/day applies equally to pregnant and lactating women; children get limits extrapolated on a surface-area basis (7 mg/day at 1-3 years up to 22 mg/day at 15-17 years). The committee also reported that 97.5th percentile total intakes in Europe are close to these limits, which it did not regard as a concern. The opinion was expressed on 5 March 2003; the 2006 EFSA compilation and later EFSA tables cite it as SCF 2002.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2003,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/62 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out177_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL for total zinc intake is 25 mg/day, also for pregnant and lactating women.',
+      'It comes from a NOAEL of 50 mg/day for copper-status indicators in controlled metabolic studies, with an uncertainty factor of 2.',
+      'Child limits are extrapolated by body surface area: 7 mg/day (1-3 years), 10 (4-6), 13 (7-10), 18 (11-14) and 22 (15-17).',
+      'Mean European intakes sit below the UL, and the 97.5th percentile is close to it.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:zinc', note: 'EU upper limit of 25 mg/day total zinc, set on copper status.' },
+      { rel: 'evidence-for', to: 'intervention:zinc-supplement', note: 'Safety ceiling for supplemental zinc in the EU; lower than the 40 mg/day US value.' }
+    ]
+  },
+  {
+    id: 'article:scf-2003-glycyrrhizinic-acid',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on glycyrrhizinic acid and its ammonium salt',
+    aliases: ['SCF 2003 glycyrrhizinic acid', 'SCF 2003 licorice', 'EU SCF glycyrrhizin 100 mg', 'SCF/CS/ADD/EDUL/225'],
+    summary: 'EU Scientific Committee on Food could not set an ADI for glycyrrhizinic acid but kept 100 mg/day as the upper limit for regular intake from all sources, not protective for sensitive subgroups.',
+    body: [
+      'The origin of the often-quoted 100 mg/day ceiling for [[compound:glycyrrhizin]]. The committee had called 100 mg/day a provisional ceiling in 1991; in 2003 it said new human volunteer data strengthened it, but small and short studies still prevented a formal acceptable daily intake. The limit covers intake from all products, including liquorice sweets and foods flavoured with glycyrrhizinic acid or its ammonium salt.',
+      'It warned that the limit may not protect people with low 11-beta-hydroxysteroid dehydrogenase-2 activity, slow gastrointestinal transit, or hypertension and electrolyte or water-balance disorders. Glycyrrhizinic acid in sweets ranged from 0.29 to 7.9 mg/g in German, Belgian and UK products and averaged 1.7 mg/g in a Dutch sample, with liquorice powder and bay liquorice at 18-28 mg/g, so 100 mg corresponds to roughly 13-345 g of sweets and about 60 g at the Dutch mean. That spread is one reason the deglycyrrhizinated form ([[intervention:dgl-licorice]]) is preferred for repeated use. The FAO/WHO expert committee (JECFA, 2004) reached a similar view: 100 mg/day is unlikely to cause adverse effects in most adults.'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2003,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/ADD/EDUL/225 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out186_en.pdf',
+    verified: true,
+    takeaways: [
+      'No ADI could be derived for glycyrrhizinic acid or ammonium glycyrrhizinate because the human toxicity studies were too small and short.',
+      'An upper limit of 100 mg/day for regular ingestion from all products was judged sufficiently protective for most of the population.',
+      'Subgroups with reduced 11-beta-HSD2 activity, long gut transit time, hypertension or electrolyte and water-balance problems may not be protected by that limit.',
+      'Measured glycyrrhizinic acid in liquorice confectionery ranged from 0.29 to 7.9 mg/g, with a Dutch mean of 1.7 mg/g; liquorice powder and bay liquorice held 18-28 mg/g.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:glycyrrhizin', note: 'Source of the 100 mg/day ceiling and the confectionery content figures; the ceiling is for regular intake, not a safe dose for sensitive people.' },
+      { rel: 'evidence-for', to: 'intervention:dgl-licorice', note: 'Explains why the glycyrrhizin-free form is preferred for repeated use.' }
+    ]
+  },
+  {
+    id: 'article:efsa-2017-drv-summary',
+    type: 'article',
+    name: 'Dietary Reference Values for nutrients: Summary report',
+    aliases: ['EFSA 2017 DRV summary', 'EFSA DRV summary report', 'EFSA valores de referência 2017'],
+    summary: 'EFSA summary of all its DRV opinions: adult folate PRI 330 micrograms DFE, B12 AI 4, B6 PRI 1.6-1.7 mg, Mg AI 350/300 mg, choline AI 400 mg and phytate-dependent zinc PRIs.',
+    body: [
+      'One document that collects the European dietary reference values for most nutrients discussed in this knowledge base, so the EU numbers can be compared with the US ones in [[article:iom-1998-choline-dri]] and [[article:iom-2001-micronutrients-zinc]]. It restates the values of the individual opinions (such as [[article:efsa-2016-choline-dri]]) and says it is not meant to replace them. It deliberately leaves out tolerable upper intake levels, which were assessed separately.',
+      'Notable choices: folate and riboflavin get population reference intakes, cobalamin and choline only adequate intakes, magnesium adequate intakes that differ by sex, and zinc a table of requirements that depends on how much phytate is eaten (300 to 1,200 mg/day), because phytate lowers zinc absorption. Pregnancy and lactation add increments for zinc and raise the choline, riboflavin and B6 values.'
+    ],
+    evidence: 'established',
+    authors: ['European Food Safety Authority (EFSA)'],
+    year: 2017,
+    journal: 'EFSA Supporting Publications',
+    doi: '10.2903/sp.efsa.2017.e15121',
+    url: 'https://www.efsa.europa.eu/sites/default/files/2017_09_DRVs_summary_report.pdf',
+    verified: true,
+    takeaways: [
+      'For adults the folate PRI is 330 micrograms DFE/day, the cobalamin AI is 4 micrograms/day, the vitamin B6 PRI is 1.7 mg/day (men) and 1.6 mg/day (women), and the riboflavin PRI is 1.6 mg/day.',
+      'The niacin PRI is 1.6 mg niacin equivalents per MJ of energy (average requirement 1.3), and the magnesium AI is 350 mg/day for men and 300 mg/day for women.',
+      'The choline AI is 400 mg/day for adults, 480 in pregnancy and 520 in lactation; no AR or PRI could be derived.',
+      'Adult zinc PRIs rise with dietary phytate (300, 600, 900, 1,200 mg/day): men 9.4, 11.7, 14.0, 16.3 mg/day; women 7.5, 9.3, 11.0, 12.7 mg/day; pregnancy adds 1.6 and lactation 2.9 mg/day.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:choline', note: 'EU adequate intake of 400 mg/day for adults (480 pregnancy, 520 lactation); lower than the US 550/425 mg.' },
+      { rel: 'evidence-for', to: 'compound:folate', note: 'Population reference intake of 330 micrograms DFE/day for adults, below the US RDA of 400.' },
+      { rel: 'evidence-for', to: 'compound:vitamin-b12', note: 'Adequate intake of 4 micrograms/day for adults, higher than the US RDA of 2.4.' },
+      { rel: 'evidence-for', to: 'compound:vitamin-b6', note: 'Population reference intake of 1.7 mg/day (men) and 1.6 mg/day (women).' },
+      { rel: 'evidence-for', to: 'compound:riboflavin', note: 'Population reference intake of 1.6 mg/day for adults of both sexes.' },
+      { rel: 'evidence-for', to: 'compound:niacin', note: 'Population reference intake of 1.6 mg niacin equivalents per MJ.' },
+      { rel: 'evidence-for', to: 'compound:magnesium', note: 'Adequate intake of 350 mg/day for men and 300 mg/day for women from all sources.' },
+      { rel: 'evidence-for', to: 'compound:zinc', note: 'Phytate-dependent population reference intakes of 7.5-16.3 mg/day for adults.' }
+    ]
+  },
+  {
+    id: 'article:nih-ods-choline-fact-sheet',
+    type: 'article',
+    name: 'Choline: Fact Sheet for Health Professionals',
+    aliases: ['NIH ODS choline', 'ODS choline fact sheet', 'NIH Office of Dietary Supplements choline'],
+    summary: 'NIH Office of Dietary Supplements summary of choline: IOM adequate intakes, ULs, food contents (liver 356 mg, egg 147 mg per serving), supplement forms and typical doses.',
+    body: [
+      'A practical US government digest of the IOM numbers in [[article:iom-1998-choline-dri]] together with food composition from USDA FoodData Central. It restates the adequate intakes (550 mg/day for men, 425 mg/day for women, 450 in pregnancy, 550 in lactation) and the upper limits for [[compound:choline]], and notes that the Daily Value used on labels is 550 mg.',
+      'The food table is the handiest reference for [[intervention:dietary-choline-sources]]: pan-fried beef liver (3 ounces) provides 356 mg and one hard-boiled large egg 147 mg, ahead of lean beef, soybeans and chicken. For supplements it lists choline bitartrate, phosphatidylcholine and lecithin, typical amounts of 10 to 250 mg, and says no study has compared the bioavailability of these forms. The page is a secondary summary; the primary numbers sit in the IOM report.'
+    ],
+    evidence: 'established',
+    authors: ['National Institutes of Health, Office of Dietary Supplements'],
+    year: 2022,
+    journal: 'NIH Office of Dietary Supplements, Fact Sheet for Health Professionals',
+    url: 'https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/',
+    verified: true,
+    takeaways: [
+      'Adequate Intakes are 550 mg/day for men, 425 mg/day for women (400 mg/day at 14-18 years), 450 mg/day in pregnancy and 550 mg/day in lactation; the label Daily Value is 550 mg.',
+      'Tolerable upper intake levels are based on hypotension and fishy body odour and equal 3,500 mg/day for adults, with lower values for children and adolescents.',
+      'Choline per serving: beef liver pan-fried 3 oz 356 mg, hard-boiled large egg 147 mg, lean braised beef 3 oz 117 mg, roasted soybeans half a cup 107 mg, roasted chicken breast 3 oz 72 mg.',
+      'Supplement forms are choline bitartrate, phosphatidylcholine and lecithin in typical amounts of 10-250 mg; no studies compare the bioavailability of the forms.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:choline', note: 'US adequate intakes and upper limits with food and supplement contents.' },
+      { rel: 'evidence-for', to: 'intervention:dietary-choline-sources', note: 'Food table with choline per serving (liver 356 mg, egg 147 mg).' },
+      { rel: 'evidence-for', to: 'intervention:choline-bitartrate', note: 'Lists bitartrate as a supplement form and states that relative bioavailability of forms has not been compared.' }
+    ]
+  },
+  {
+    id: 'article:fda-cystadane-label',
+    type: 'article',
+    name: 'Cystadane (betaine anhydrous for oral solution) prescribing information',
+    aliases: ['Cystadane label', 'FDA Cystadane', 'Cystadane prescribing information', 'bula Cystadane'],
+    summary: 'FDA label for betaine anhydrous in homocystinuria: 6 g/day as 3 g twice daily for adults, titrated to near-undetectable total homocysteine, up to 20 g/day in some patients.',
+    body: [
+      'The regulatory source for pharmacological [[compound:betaine]] dosing. The product is a prescription treatment to lower elevated homocysteine in homocystinuria caused by CBS deficiency ([[disease:cbs-deficiency]]), MTHFR deficiency ([[disease:mthfr-deficiency]]) or cobalamin cofactor defects. The label concerns this prescription product only: it says nothing about supplement-dose [[intervention:betaine-anhydrous]] or about the acidifying salt [[intervention:betaine-hcl]].',
+      'Adults and children aged 3 and over start at 6 g/day in two 3 g doses; younger children start at 100 mg/kg/day and go up by 50 mg/kg weekly. The dose is raised until plasma total homocysteine is undetectable or small, and some patients have needed up to 20 g/day, although one simulation study suggested little benefit beyond twice-daily dosing and 150 mg/kg/day. The main warning is hypermethioninaemia with reports of cerebral oedema in CBS deficiency, so plasma methionine must stay below 1,000 micromol/L. The most common adverse reactions are nausea and gastrointestinal distress.'
+    ],
+    evidence: 'established',
+    authors: ['Recordati Rare Diseases Inc.'],
+    year: 2024,
+    journal: 'DailyMed, U.S. National Library of Medicine (FDA-approved prescribing information, NDA 020576)',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=31a684d0-cd98-4e46-b43a-ccbd17c41559',
+    verified: true,
+    takeaways: [
+      'Cystadane is indicated to lower elevated homocysteine in homocystinuria (CBS deficiency, MTHFR deficiency, cobalamin cofactor metabolism defects) in adults and children.',
+      'The recommended dose for adults and children aged 3 and over is 6 g/day given as 3 g twice daily; children under 3 start at 100 mg/kg/day divided twice daily and increase weekly by 50 mg/kg.',
+      'Doses are titrated until plasma total homocysteine is undetectable or present only in small amounts; up to 20 g/day has been needed in some patients.',
+      'In CBS deficiency betaine can raise methionine and cerebral oedema has been reported, so plasma methionine is monitored and kept below 1,000 micromol/L.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'intervention:betaine-anhydrous', note: 'Labelled prescription dosing of betaine anhydrous; much higher than supplement doses and meant for homocystinuria.' },
+      { rel: 'evidence-for', to: 'compound:betaine', note: 'Approved therapeutic use and dose range of betaine.' },
+      { rel: 'evidence-for', to: 'disease:cbs-deficiency', note: 'Betaine is an approved treatment, with monitoring of plasma methionine.' }
+    ]
+  },
+  {
+    id: 'article:efsa-2011-betaine-homocysteine-claim',
+    type: 'article',
+    name: 'Scientific Opinion on the substantiation of health claims related to betaine and contribution to normal homocysteine metabolism (ID 4325)',
+    aliases: ['EFSA 2011 betaine', 'EFSA betaine health claim', 'Regulation 432/2012 betaine', 'ID 4325'],
+    summary: 'EFSA opinion behind the EU claim "Betaine contributes to normal homocysteine metabolism": food needs 500 mg betaine per portion and consumers are told the effect comes with 1.5 g/day.',
+    body: [
+      'The EU basis for labelling claims about [[compound:betaine]] and homocysteine. The authorised wording in Commission Regulation (EU) No 432/2012 is "Betaine contributes to normal homocysteine metabolism". It may be used only for food containing at least 500 mg of betaine per quantified portion, and consumers must be told that the beneficial effect is obtained with a daily intake of 1.5 g of betaine and that a daily intake above 4 g may significantly increase blood cholesterol levels.',
+      'The opinion is a labelling assessment, not a treatment guideline: it does not deal with homocystinuria dosing (see [[article:fda-cystadane-label]]) or about acidifying salts. Its reference list consists of short human intervention studies in healthy volunteers, among them Olthof and colleagues ([[article:olthof-2003-betaine-low-dose-homocysteine]]), who tested 1.5, 3 and 6 g/day for six weeks, the same 1.5 g/day level named in the claim conditions.'
+    ],
+    evidence: 'established',
+    authors: ['EFSA Panel on Dietetic Products, Nutrition and Allergies (NDA)'],
+    year: 2011,
+    journal: 'EFSA Journal',
+    doi: '10.2903/j.efsa.2011.2052',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13129986/',
+    verified: true,
+    takeaways: [
+      'The Article 13(1) claim evaluated was betaine and contribution to normal homocysteine metabolism (ID 4325); the opinion was adopted on 28 January 2011 and published on 8 April 2011.',
+      'The claim authorised in Regulation (EU) No 432/2012 reads "Betaine contributes to normal homocysteine metabolism".',
+      'Conditions of use: at least 500 mg of betaine per quantified portion, a statement that the effect is obtained with 1.5 g of betaine daily, and a warning that more than 4 g/day may significantly raise blood cholesterol.',
+      'The references listed in the opinion are human intervention trials in healthy volunteers (Brouwer 2000, Olthof 2003 and 2005, Schwab 2002, 2006 and 2010), not studies in patients.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:betaine', note: 'Authorised EU claim for homocysteine metabolism, with 1.5 g/day as the intake at which the effect is stated and a cholesterol warning above 4 g/day.' },
+      { rel: 'evidence-for', to: 'intervention:betaine-anhydrous', note: 'Regulatory frame for low-dose betaine in foods and supplements in the EU; healthy-volunteer evidence only.' }
+    ]
   }
 ]
