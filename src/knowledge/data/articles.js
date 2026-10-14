@@ -12143,13 +12143,19 @@ export default [
     id: "article:brosnan-2011-metabolic-burden-creatine-synthesis",
     type: "article",
     name: "The metabolic burden of creatine synthesis",
-    aliases: ["Brosnan 2011"],
+    aliases: [
+      "Brosnan 2011"
+    ],
     summary: "Review quantifying what creatine synthesis costs: replacing the creatine lost to creatinine (about 2 g/day in young men) uses glycine, arginine and roughly 40% of SAM-derived methyl groups.",
     body: [
       "Gives numbers for the loss in [[reaction:creatine-cyclisation]] and for the demand it places on the [[pathway:methyl-budget]] through [[pathway:creatine-synthesis]]. It adds that dietary creatine in omnivores replaces about half of the loss, and that glycine supply is not strained in adults because the amino acid is readily synthesised ([[compound:creatinine]])."
     ],
     evidence: "established",
-    authors: ["Brosnan JT", "da Silva RP", "Brosnan ME"],
+    authors: [
+      "Brosnan JT",
+      "da Silva RP",
+      "Brosnan ME"
+    ],
     year: 2011,
     journal: "Amino acids",
     doi: "10.1007/s00726-011-0853-y",
@@ -12160,9 +12166,40 @@ export default [
       "Creatine is spontaneously converted to creatinine and excreted, so adults must synthesise creatine to replace it.",
       "Creatinine loss averages about 2 g (14.6 mmol) per day for 70 kg men aged 20 to 39, and is lower in women and older people because of lower muscle mass.",
       "In omnivores roughly half of the lost creatine can be replaced by dietary creatine; vegetarians depend almost entirely on endogenous synthesis.",
-      "Creatine synthesis accounts for about 40% of SAM-derived labile methyl groups and uses 20 to 30% of arginine's amidino groups, but does not appear to burden glycine metabolism in adults."
+      "Creatine synthesis accounts for about 40% of SAM-derived labile methyl groups and uses 20 to 30% of arginine's amidino groups, but does not appear to burden glycine metabolism in adults.",
+      "Synthesis accounts for about 40% of labile SAM methyl groups, lower than the older >70% figure but still a major demand."
     ],
-    facts: { design: "review" }
+    facts: {
+      design: "review",
+      population: "Human metabolism, narrative review"
+    },
+    relations: [
+      {
+        rel: "evidence-for",
+        to: "pathway:creatine-synthesis",
+        note: "Quantifies the methyl, arginine and glycine demand of creatine synthesis."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:creatine",
+        note: "Creatinine loss ~14.6 mmol/day, half replaced by diet."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sam",
+        note: "About 40% of SAM methyl groups."
+      },
+      {
+        rel: "evidence-for",
+        to: "enzyme:gamt",
+        note: "GAMT is the SAM-consuming step."
+      },
+      {
+        rel: "evidence-for",
+        to: "intervention:creatine-supplement",
+        note: "Dietary or supplemental creatine reduces the endogenous synthesis burden."
+      }
+    ]
   },
   {
     id: "article:okano-1999-dnmt3a-dnmt3b-de-novo",
@@ -12698,126 +12735,232 @@ export default [
     ]
   },
   {
-    id: 'article:stabler-2004-sam-sah-serum-lcms',
-    type: 'article',
-    name: 'Quantification of serum and urinary S-adenosylmethionine and S-adenosylhomocysteine by stable-isotope-dilution liquid chromatography-mass spectrometry',
-    aliases: ['Stabler and Allen 2004', 'Stabler Allen SAM SAH reference intervals'],
-    summary: 'LC-MS assay of SAM and SAH in 48 volunteers: serum reference intervals SAM 71-168 and SAH 8-26 nmol/L; both metabolites drift in stored samples, so handling must be strict.',
-    body: [
-      'One of the few papers giving reference intervals for circulating [[compound:sam]] and [[compound:sah]] in healthy adults measured by mass spectrometry. The intervals (mean plus or minus 2 SD of log-transformed data) were 71-168 nmol/L for serum SAM and 8-26 nmol/L for serum SAH, which implies a serum SAM:SAH ratio of roughly 3 to 20 and a typical value near 6-8 ([[outcome:low-sam-sah-ratio]]).',
-      'The authors also show how fragile the measurement is: SAM falls and SAH rises in serum and plasma kept at 4 degrees C or room temperature for up to 80 hours, and both are unstable in samples stored beyond two years at -20 degrees C. Urinary SAM:SAH is far higher than the serum or red-cell ratio, so urine is not a proxy for tissue methylation capacity. Values from poorly handled samples are therefore unreliable.'
+    id: "article:stabler-2004-sam-sah-serum-lcms",
+    type: "article",
+    name: "Quantification of serum and urinary S-adenosylmethionine and S-adenosylhomocysteine by stable-isotope-dilution liquid chromatography-mass spectrometry",
+    aliases: [
+      "Stabler and Allen 2004",
+      "Stabler Allen SAM SAH reference intervals"
     ],
-    evidence: 'established',
-    authors: ['Stabler SP', 'Allen RH'],
+    summary: "LC-MS assay of SAM and SAH in 48 volunteers: serum reference intervals SAM 71-168 and SAH 8-26 nmol/L; both metabolites drift in stored samples, so handling must be strict.",
+    body: [
+      "One of the few papers giving reference intervals for circulating [[compound:sam]] and [[compound:sah]] in healthy adults measured by mass spectrometry. The intervals (mean plus or minus 2 SD of log-transformed data) were 71-168 nmol/L for serum SAM and 8-26 nmol/L for serum SAH, which implies a serum SAM:SAH ratio of roughly 3 to 20 and a typical value near 6-8 ([[outcome:low-sam-sah-ratio]]).",
+      "The authors also show how fragile the measurement is: SAM falls and SAH rises in serum and plasma kept at 4 degrees C or room temperature for up to 80 hours, and both are unstable in samples stored beyond two years at -20 degrees C. Urinary SAM:SAH is far higher than the serum or red-cell ratio, so urine is not a proxy for tissue methylation capacity. Values from poorly handled samples are therefore unreliable."
+    ],
+    evidence: "established",
+    authors: [
+      "Stabler SP",
+      "Allen RH"
+    ],
     year: 2004,
-    journal: 'Clinical Chemistry',
-    doi: '10.1373/clinchem.2003.026252',
-    pmid: '14656903',
-    url: 'https://pubmed.ncbi.nlm.nih.gov/14656903/',
+    journal: "Clinical Chemistry",
+    doi: "10.1373/clinchem.2003.026252",
+    pmid: "14656903",
+    url: "https://pubmed.ncbi.nlm.nih.gov/14656903/",
     verified: true,
     takeaways: [
-      'In 48 volunteers the estimated serum reference intervals were 71-168 nmol/L for SAM and 8-26 nmol/L for SAH.',
-      'Assay imprecision (CV) was about 5% for SAM and 17% for SAH.',
-      'SAM decreased and SAH increased in serum and plasma left for up to 80 hours, and both were unstable in samples stored longer than 2 years at -20 degrees C.',
-      'Fractional excretion of SAM exceeds that of SAH, and the urinary SAM:SAH ratio is much higher than the serum or erythrocyte ratio.'
+      "In 48 volunteers the estimated serum reference intervals were 71-168 nmol/L for SAM and 8-26 nmol/L for SAH.",
+      "Assay imprecision (CV) was about 5% for SAM and 17% for SAH.",
+      "SAM decreased and SAH increased in serum and plasma left for up to 80 hours, and both were unstable in samples stored longer than 2 years at -20 degrees C.",
+      "Fractional excretion of SAM exceeds that of SAH, and the urinary SAM:SAH ratio is much higher than the serum or erythrocyte ratio."
     ],
-    facts: { design: 'assay validation with reference intervals', population: 'Healthy volunteers, n=48' },
+    facts: {
+      design: "assay validation with reference intervals",
+      population: "Healthy volunteers, n=48"
+    },
     relations: [
-      { rel: 'evidence-for', to: 'compound:sam', note: 'Serum reference interval of 71-168 nmol/L in healthy adults.' },
-      { rel: 'evidence-for', to: 'compound:sah', note: 'Serum reference interval of 8-26 nmol/L in healthy adults.' },
-      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Gives the normal circulating ranges and the sample-handling pitfalls behind any measured SAM:SAH ratio.' }
+      {
+        rel: "evidence-for",
+        to: "compound:sam",
+        note: "Serum reference interval of 71-168 nmol/L in healthy adults."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sah",
+        note: "Serum reference interval of 8-26 nmol/L in healthy adults."
+      },
+      {
+        rel: "evidence-for",
+        to: "outcome:low-sam-sah-ratio",
+        note: "Gives the normal circulating ranges and the sample-handling pitfalls behind any measured SAM:SAH ratio."
+      }
     ]
   },
   {
-    id: 'article:gellekink-2005-sam-sah-plasma-lcms',
-    type: 'article',
-    name: 'Stable-isotope dilution liquid chromatography-electrospray injection tandem mass spectrometry method for fast, selective measurement of S-adenosylmethionine and S-adenosylhomocysteine in plasma',
-    aliases: ['Gellekink 2005', 'Gellekink SAM SAH plasma'],
-    summary: 'LC-MS/MS method for plasma SAM and SAH; in controls (mean total homocysteine 11.2 umol/L) plasma SAM was 94.5 and SAH 12.3 nmol/L; immediate acidification prevents SAM degradation.',
-    body: [
-      'A second mass-spectrometry dataset for circulating [[compound:sam]] and [[compound:sah]]. In a group of controls with mean plasma total homocysteine of 11.2 micromol/L, plasma SAM averaged 94.5 nmol/L and SAH 12.3 nmol/L, a ratio near 8, which sits inside the range reported by [[article:stabler-2004-sam-sah-serum-lcms]].',
-      'The method measures both metabolites in plasma with quantification limits of 2.0 nmol/L for SAM and 1.0 nmol/L for SAH, with inter-assay CVs of 3.9% and 8.3%. The practical lesson is that SAM degrades in unacidified plasma, so adding acetic acid at once is needed for trustworthy [[outcome:low-sam-sah-ratio]] readings.'
+    id: "article:gellekink-2005-sam-sah-plasma-lcms",
+    type: "article",
+    name: "Stable-isotope dilution liquid chromatography-electrospray injection tandem mass spectrometry method for fast, selective measurement of S-adenosylmethionine and S-adenosylhomocysteine in plasma",
+    aliases: [
+      "Gellekink 2005",
+      "Gellekink SAM SAH plasma"
     ],
-    evidence: 'established',
-    authors: ['Gellekink H', 'van Oppenraaij-Emmerzaal D', 'van Rooij A', 'Struys EA', 'den Heijer M', 'Blom HJ'],
+    summary: "LC-MS/MS method for plasma SAM and SAH; in controls (mean total homocysteine 11.2 umol/L) plasma SAM was 94.5 and SAH 12.3 nmol/L; immediate acidification prevents SAM degradation.",
+    body: [
+      "A second mass-spectrometry dataset for circulating [[compound:sam]] and [[compound:sah]]. In a group of controls with mean plasma total homocysteine of 11.2 micromol/L, plasma SAM averaged 94.5 nmol/L and SAH 12.3 nmol/L, a ratio near 8, which sits inside the range reported by [[article:stabler-2004-sam-sah-serum-lcms]].",
+      "The method measures both metabolites in plasma with quantification limits of 2.0 nmol/L for SAM and 1.0 nmol/L for SAH, with inter-assay CVs of 3.9% and 8.3%. The practical lesson is that SAM degrades in unacidified plasma, so adding acetic acid at once is needed for trustworthy [[outcome:low-sam-sah-ratio]] readings."
+    ],
+    evidence: "established",
+    authors: [
+      "Gellekink H",
+      "van Oppenraaij-Emmerzaal D",
+      "van Rooij A",
+      "Struys EA",
+      "den Heijer M",
+      "Blom HJ"
+    ],
     year: 2005,
-    journal: 'Clinical Chemistry',
-    doi: '10.1373/clinchem.2004.046995',
-    pmid: '15919880',
-    url: 'https://pubmed.ncbi.nlm.nih.gov/15919880/',
+    journal: "Clinical Chemistry",
+    doi: "10.1373/clinchem.2004.046995",
+    pmid: "15919880",
+    url: "https://pubmed.ncbi.nlm.nih.gov/15919880/",
     verified: true,
     takeaways: [
-      'In a group of controls with a mean plasma total homocysteine of 11.2 micromol/L, plasma AdoMet (SAM) was 94.5 nmol/L and AdoHcy (SAH) was 12.3 nmol/L.',
-      'Quantification limits were 2.0 nmol/L for SAM and 1.0 nmol/L for SAH; inter-assay CVs were 3.9% and 8.3% and mean recoveries 94.5% and 96.8%.',
-      'Immediate acidification of plasma with acetic acid prevented the observed degradation of SAM, which is a serious problem in unacidified samples.'
+      "In a group of controls with a mean plasma total homocysteine of 11.2 micromol/L, plasma AdoMet (SAM) was 94.5 nmol/L and AdoHcy (SAH) was 12.3 nmol/L.",
+      "Quantification limits were 2.0 nmol/L for SAM and 1.0 nmol/L for SAH; inter-assay CVs were 3.9% and 8.3% and mean recoveries 94.5% and 96.8%.",
+      "Immediate acidification of plasma with acetic acid prevented the observed degradation of SAM, which is a serious problem in unacidified samples.",
+      "The assay measures both metabolites in a single run with stable-isotope internal standards."
     ],
-    facts: { design: 'assay validation with control values', population: 'Healthy controls' },
+    facts: {
+      design: "assay validation with control values",
+      population: "Healthy controls"
+    },
     relations: [
-      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 94.5 nmol/L in controls and the need to acidify samples.' },
-      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 12.3 nmol/L in controls.' },
-      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Supplies a control plasma ratio of about 8 and the pre-analytical safeguards for measuring it.' }
+      {
+        rel: "evidence-for",
+        to: "compound:sam",
+        note: "Plasma SAM of 94.5 nmol/L in controls and the need to acidify samples."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sah",
+        note: "Plasma SAH of 12.3 nmol/L in controls."
+      },
+      {
+        rel: "evidence-for",
+        to: "outcome:low-sam-sah-ratio",
+        note: "Supplies a control plasma ratio of about 8 and the pre-analytical safeguards for measuring it."
+      }
     ]
   },
   {
-    id: 'article:melnyk-2000-sam-sah-plasma-hplc',
-    type: 'article',
-    name: 'Measurement of plasma and intracellular S-adenosylmethionine and S-adenosylhomocysteine utilizing coulometric electrochemical detection: alterations with plasma homocysteine and pyridoxal 5\'-phosphate concentrations',
-    aliases: ['Melnyk 2000', 'Melnyk SAM SAH HPLC'],
-    summary: 'HPLC method in healthy women (total homocysteine 7.3 umol/L): plasma SAM 156 and SAH 20 nmol/L; higher homocysteine raised SAH and lowered the SAM/SAH ratio.',
-    body: [
-      'An HPLC coulometric method for [[compound:sam]] and [[compound:sah]] from the same research group as [[article:james-2004-autism-sam-sah]]. In healthy adult women with mean total homocysteine of 7.3 micromol/L the mean plasma values were 156 nmol/L for SAM and 20 nmol/L for SAH (ratio about 8).',
-      'In women with raised homocysteine (mean 12.1 micromol/L) plasma SAH rose while SAM did not, and pyridoxal 5\'-phosphate was lower. The plasma SAM/SAH ratio was inversely correlated with homocysteine and directly with the ratio in lymphocytes, which supports using plasma as a rough window on cellular methylation potential ([[outcome:low-sam-sah-ratio]]). Absolute values differ between methods and cohorts (SAM 156 here against 94.5 in [[article:gellekink-2005-sam-sah-plasma-lcms]]), so ratios are best compared within one method. An erratum to the paper was published in Clinical Chemistry 2001;47:612; the values above are those of the indexed abstract.'
+    id: "article:melnyk-2000-sam-sah-plasma-hplc",
+    type: "article",
+    name: "Measurement of plasma and intracellular S-adenosylmethionine and S-adenosylhomocysteine utilizing coulometric electrochemical detection: alterations with plasma homocysteine and pyridoxal 5'-phosphate concentrations",
+    aliases: [
+      "Melnyk 2000",
+      "Melnyk SAM SAH HPLC"
     ],
-    evidence: 'established',
-    authors: ['Melnyk S', 'Pogribna M', 'Pogribny IP', 'Yi P', 'James SJ'],
+    summary: "HPLC method in healthy women (total homocysteine 7.3 umol/L): plasma SAM 156 and SAH 20 nmol/L; higher homocysteine raised SAH and lowered the SAM/SAH ratio.",
+    body: [
+      "An HPLC coulometric method for [[compound:sam]] and [[compound:sah]] from the same research group as [[article:james-2004-autism-sam-sah]]. In healthy adult women with mean total homocysteine of 7.3 micromol/L the mean plasma values were 156 nmol/L for SAM and 20 nmol/L for SAH (ratio about 8).",
+      "In women with raised homocysteine (mean 12.1 micromol/L) plasma SAH rose while SAM did not, and pyridoxal 5'-phosphate was lower. The plasma SAM/SAH ratio was inversely correlated with homocysteine and directly with the ratio in lymphocytes, which supports using plasma as a rough window on cellular methylation potential ([[outcome:low-sam-sah-ratio]]). Absolute values differ between methods and cohorts (SAM 156 here against 94.5 in [[article:gellekink-2005-sam-sah-plasma-lcms]]), so ratios are best compared within one method. An erratum to the paper was published in Clinical Chemistry 2001;47:612; the values above are those of the indexed abstract."
+    ],
+    evidence: "established",
+    authors: [
+      "Melnyk S",
+      "Pogribna M",
+      "Pogribny IP",
+      "Yi P",
+      "James SJ"
+    ],
     year: 2000,
-    journal: 'Clinical Chemistry',
-    pmid: '10657384',
-    url: 'https://pubmed.ncbi.nlm.nih.gov/10657384/',
+    journal: "Clinical Chemistry",
+    pmid: "10657384",
+    url: "https://pubmed.ncbi.nlm.nih.gov/10657384/",
     verified: true,
     takeaways: [
-      'In healthy adult women with mean total homocysteine of 7.3 micromol/L, mean plasma SAM was 156 nmol/L and SAH was 20 nmol/L.',
-      'In women with higher homocysteine (mean 12.1 micromol/L) plasma SAH was increased but SAM was not, and plasma pyridoxal 5\'-phosphate was reduced.',
-      'The plasma SAM/SAH ratio was inversely correlated with homocysteine (r = 0.73 in magnitude) and directly correlated with the lymphocyte SAM/SAH ratio (r = 0.70).',
-      'The method uses 200 microlitres of plasma, 10^6 lymphocytes or 10 mg of tissue and needs no derivatisation.'
+      "In healthy adult women with mean total homocysteine of 7.3 micromol/L, mean plasma SAM was 156 nmol/L and SAH was 20 nmol/L.",
+      "In women with higher homocysteine (mean 12.1 micromol/L) plasma SAH was increased but SAM was not, and plasma pyridoxal 5'-phosphate was reduced.",
+      "The plasma SAM/SAH ratio was inversely correlated with homocysteine (r = 0.73 in magnitude) and directly correlated with the lymphocyte SAM/SAH ratio (r = 0.70).",
+      "The method uses 200 microlitres of plasma, 10^6 lymphocytes or 10 mg of tissue and needs no derivatisation."
     ],
-    facts: { design: 'assay validation with cohort comparison', population: 'Healthy adult women with normal and raised homocysteine' },
+    facts: {
+      design: "assay validation with cohort comparison",
+      population: "Healthy adult women with normal and raised homocysteine"
+    },
     relations: [
-      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 156 nmol/L in healthy women measured by HPLC.' },
-      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 20 nmol/L in healthy women, higher when homocysteine is raised.' },
-      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows the plasma ratio falls with raised homocysteine and tracks the lymphocyte ratio.' }
+      {
+        rel: "evidence-for",
+        to: "compound:sam",
+        note: "Plasma SAM of 156 nmol/L in healthy women measured by HPLC."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sah",
+        note: "Plasma SAH of 20 nmol/L in healthy women, higher when homocysteine is raised."
+      },
+      {
+        rel: "evidence-for",
+        to: "outcome:low-sam-sah-ratio",
+        note: "Shows the plasma ratio falls with raised homocysteine and tracks the lymphocyte ratio."
+      }
     ]
   },
   {
-    id: 'article:luka-2006-gnmt-knockout-mouse',
-    type: 'article',
-    name: 'A glycine N-methyltransferase knockout mouse model for humans with deficiency of this enzyme',
-    aliases: ['Luka 2006', 'Luka Gnmt knockout mouse', 'GNMT knockout SAM SAH 300'],
-    summary: 'Gnmt-knockout mice have up to 7-fold more methionine, up to 35-fold more SAM and 3-fold less SAH in liver; the liver SAM/SAH ratio rises from about 3 to about 300.',
-    body: [
-      'The primary source of the numbers quoted for what happens when the GNMT "valve" is removed ([[enzyme:gnmt]], [[claim:gnmt-methyl-sink-valve]]). The mice, made to model the few human cases of GNMT deficiency, lack GNMT protein and activity in the liver. Compared with wild type they had up to a 7-fold increase in free methionine and up to a 35-fold increase in [[compound:sam]], while [[compound:sah]] fell about 3-fold, so the SAM/SAH ratio rose from about 3 to about 300 in liver ([[outcome:low-sam-sah-ratio]]).',
-      'The abstract suggests a significant change in methylation in the liver and other organs where GNMT is expressed. These are tissue values in a knockout mouse, not human plasma values, and they show an extreme high ratio rather than the low-ratio state discussed for undermethylation. The later review [[article:luka-2009-gnmt-sam-regulation]] restates the same experiment in nmol per gram of liver.'
+    id: "article:luka-2006-gnmt-knockout-mouse",
+    type: "article",
+    name: "A glycine N-methyltransferase knockout mouse model for humans with deficiency of this enzyme",
+    aliases: [
+      "Luka 2006",
+      "Luka Gnmt knockout mouse",
+      "GNMT knockout SAM SAH 300"
     ],
-    evidence: 'established',
-    authors: ['Luka Z', 'Capdevila A', 'Mato JM', 'Wagner C'],
+    summary: "Gnmt-knockout mice have up to 7-fold more methionine, up to 35-fold more SAM and 3-fold less SAH in liver; the liver SAM/SAH ratio rises from about 3 to about 300.",
+    body: [
+      "The primary source of the numbers quoted for what happens when the GNMT \"valve\" is removed ([[enzyme:gnmt]], [[claim:gnmt-methyl-sink-valve]]). The mice, made to model the few human cases of GNMT deficiency, lack GNMT protein and activity in the liver. Compared with wild type they had up to a 7-fold increase in free methionine and up to a 35-fold increase in [[compound:sam]], while [[compound:sah]] fell about 3-fold, so the SAM/SAH ratio rose from about 3 to about 300 in liver ([[outcome:low-sam-sah-ratio]]).",
+      "The abstract suggests a significant change in methylation in the liver and other organs where GNMT is expressed. These are tissue values in a knockout mouse, not human plasma values, and they show an extreme high ratio rather than the low-ratio state discussed for undermethylation. The later review [[article:luka-2009-gnmt-sam-regulation]] restates the same experiment in nmol per gram of liver."
+    ],
+    evidence: "established",
+    authors: [
+      "Luka Z",
+      "Capdevila A",
+      "Mato JM",
+      "Wagner C"
+    ],
     year: 2006,
-    journal: 'Transgenic Research',
-    doi: '10.1007/s11248-006-0008-1',
-    pmid: '16779654',
-    url: 'https://pubmed.ncbi.nlm.nih.gov/16779654/',
+    journal: "Transgenic Research",
+    doi: "10.1007/s11248-006-0008-1",
+    pmid: "16779654",
+    url: "https://pubmed.ncbi.nlm.nih.gov/16779654/",
     verified: true,
     takeaways: [
-      'Homozygous Gnmt-deficient mice had no GNMT protein or activity in the liver.',
-      'Compared with wild type, free methionine rose up to 7-fold and SAM up to 35-fold, while SAH fell significantly (3-fold).',
-      'The liver SAM/SAH ratio rose from 3 in wild-type mice to 300 in homozygous knockout mice.',
-      'The authors infer a possible significant change in methylation in the liver and other organs where GNMT is expressed.'
+      "Homozygous Gnmt-deficient mice had no GNMT protein or activity in the liver.",
+      "Compared with wild type, free methionine rose up to 7-fold and SAM up to 35-fold, while SAH fell significantly (3-fold).",
+      "The liver SAM/SAH ratio rose from 3 in wild-type mice to 300 in homozygous knockout mice.",
+      "The authors infer a possible significant change in methylation in the liver and other organs where GNMT is expressed.",
+      "Wild-type liver SAM was about 37 nmol/g; the knockout accumulated about 1334 nmol/g.",
+      "Liver SAH fell (12-15 to 3-5 nmol/g) and methionine rose from roughly 100 to 700 nmol/g."
     ],
-    facts: { design: 'knockout mouse', population: 'Gnmt-/- and wild-type mice, liver' },
+    facts: {
+      design: "knockout mouse",
+      population: "Gnmt-/- and wild-type mice, liver"
+    },
     relations: [
-      { rel: 'evidence-for', to: 'enzyme:gnmt', note: 'Loss of GNMT raises liver SAM about 35-fold and the SAM/SAH ratio from about 3 to about 300.' },
-      { rel: 'evidence-for', to: 'claim:gnmt-methyl-sink-valve', note: 'Direct experimental support that GNMT removes surplus SAM; mouse liver data.' },
-      { rel: 'evidence-for', to: 'compound:sam', note: 'Up to 35-fold SAM accumulation in knockout liver.' },
-      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows how far the tissue SAM/SAH ratio can swing (the high end), in mouse liver only.' }
+      {
+        rel: "evidence-for",
+        to: "enzyme:gnmt",
+        note: "Loss of GNMT raises liver SAM about 35-fold and the SAM/SAH ratio from about 3 to about 300."
+      },
+      {
+        rel: "evidence-for",
+        to: "claim:gnmt-methyl-sink-valve",
+        note: "Direct experimental support that GNMT removes surplus SAM; mouse liver data."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sam",
+        note: "Up to 35-fold SAM accumulation in knockout liver."
+      },
+      {
+        rel: "evidence-for",
+        to: "outcome:low-sam-sah-ratio",
+        note: "Shows how far the tissue SAM/SAH ratio can swing (the high end), in mouse liver only."
+      },
+      {
+        rel: "evidence-for",
+        to: "compound:sah",
+        note: "Hepatic SAH falls to 3-5 nmol/g."
+      }
     ]
   },
   {
