@@ -2495,7 +2495,8 @@ export default [
       "Adequate Intake for adults is 550 mg/day of choline for men and 425 mg/day for women.",
       "The Tolerable Upper Intake Level for adults is 3.5 g/day of choline.",
       "Hypotension was the critical effect; a LOAEL of about 7.5 g/day (from a pilot in seven patients) was divided by an uncertainty factor of 2 because of limited data, and fishy body odor was a secondary consideration.",
-      "No NOAEL could be identified."
+      "No NOAEL could be identified.",
+      "The same volume sets the intakes of the other methylation vitamins: folate RDA 400 micrograms DFE (600 in pregnancy, 500 in lactation) with a 1,000 microgram UL for synthetic folic acid; vitamin B12 RDA 2.4 micrograms with no UL; vitamin B6 RDA 1.3-1.7 mg with a 100 mg UL; riboflavin RDA 1.1-1.3 mg with no UL; niacin RDA 14-16 mg NE with a 35 mg UL for niacin from supplements and fortified foods."
     ],
     "facts": {
       "design": "guideline"
@@ -2524,7 +2525,12 @@ export default [
         "rel": "evidence-for",
         "to": "claim:choline-28-35g-for-10g-glycine",
         "note": "Does not test the arithmetic, but its 3.5 g/day upper level puts 28-35 g/day roughly eight to ten times above the tolerable intake, supporting the practical conclusion."
-      }
+      },
+      { "rel": "evidence-for", "to": "compound:folate", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:vitamin-b12", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:vitamin-b6", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:riboflavin", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." },
+      { "rel": "evidence-for", "to": "compound:niacin", "note": "Reference intakes (RDA) and, where set, the tolerable upper level of this volume." }
     ]
   },
   {
