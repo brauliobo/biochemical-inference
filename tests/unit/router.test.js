@@ -71,6 +71,9 @@ describe('linkState', () => {
     expect(linkState('/kb/enzymes', '/kb', true)).toBe('true')
     expect(linkState('/kb/enzymes', '/kb')).toBeUndefined()
     expect(linkState('/kb2', '/kb', true)).toBeUndefined()
+    expect(linkState('/dash/glycine', '/dashboards', true, ['/dash'])).toBe('true')
+    expect(linkState('/dashboards', '/dashboards', true, ['/dash'])).toBe('page')
+    expect(linkState('/dashboard-x/a', '/dashboards', true, ['/dash'])).toBeUndefined()
   })
 
   it('never marks home as an ancestor', () => {

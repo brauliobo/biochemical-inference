@@ -43,10 +43,12 @@ export function resolveRoute(path, table = routes) {
 }
 
 // aria-current value for a link: "page" on the exact route; with `section`
-// (navigation links) also "true" on any descendant route; else undefined.
-export function linkState(currentPath, to, section = false) {
+// (navigation links) also "true" on any descendant route; `also` lists further
+// path prefixes that belong to the same section (the dashboards index is
+// /dashboards but each dashboard is /dash/<id>); else undefined.
+export function linkState(currentPath, to, section = false, also = []) {
   if (currentPath === to) return 'page'
-  if (section && to !== '/' && currentPath.startsWith(`${to}/`)) return 'true'
+  if (section && to !== '/' && [to, ...also].some((base) => currentPath.startsWith(`${base}/`))) return 'true'
   return undefined
 }
 
