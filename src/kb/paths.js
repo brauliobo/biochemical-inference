@@ -27,6 +27,14 @@ export function guidedPathPath(id, step) {
   return step ? `${base}?step=${step}` : base
 }
 
+/** The atlas: /atlas (type matrix), /atlas/causal, /atlas/network, /atlas/search. `query` values that are empty are left out. */
+export const ATLAS_PATH = '/atlas'
+export function atlasPath(view = '', query = {}) {
+  const base = view ? `${ATLAS_PATH}/${view}` : ATLAS_PATH
+  const text = new URLSearchParams(Object.entries(query).filter(([, value]) => value !== '' && value !== undefined && value !== null && value !== false)).toString()
+  return text ? `${base}?${text}` : base
+}
+
 /** The claims audit is the claim listing, which groups claims by status. */
 export const CLAIMS_AUDIT_PATH = typePath('claim')
 

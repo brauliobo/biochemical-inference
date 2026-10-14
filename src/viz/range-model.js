@@ -1,7 +1,7 @@
 // Geometry and text of the dose/limit chart (RangeBar). Pure functions.
 //
 //   rows: [{ id, label, markers: [{ kind: 'ai'|'rda'|'ear'|'pri'|'ul', value }],
-//            typical?: { from, to, label? }, noUl?: true, noUlNote?: 'EFSA: insufficient data' }]
+//            typical?: { from, to, label? }, noUl?: true, noUlNote?: 'EFSA: insufficient data', doseOnly?: true }]
 import { markerPath } from './shapes.js'
 import { formatNumber, niceTicks, scaleFor, withUnit } from './scale.js'
 import { stagger } from './labels.js'
@@ -100,7 +100,7 @@ export function buildRangeModel({ rows, width = 640, min = 0, max, value, unit =
       }),
       typical: row.typical ? { x1: x(row.typical.from), x2: x(row.typical.to), label: row.typical.label ?? 'Typical supplement dose', from: row.typical.from, to: row.typical.to } : null,
       noUl,
-      noUlText: 'No upper limit established',
+      noUlText: row.doseOnly ? '' : 'No upper limit established',
       status: statusFor(row, value, unit)
     }
   })
@@ -124,7 +124,7 @@ export function buildRangeModel({ rows, width = 640, min = 0, max, value, unit =
 export function describeRanges({ rows, unit = '', value }) {
   const sentences = rows.map((row) => {
     const parts = [...(row.markers ?? [])].sort((a, b) => a.value - b.value).map((m) => `${KINDS[m.kind]?.label ?? m.kind} ${withUnit(m.value, unit)}`)
-    if (limitsOf(row).noUl) parts.push(row.noUlNote ? `no upper limit established (${row.noUlNote})` : 'no upper limit established')
+    if (limitsOf(row).noUl && !row.doseOnly) parts.push(row.noUlNote ? `no upper limit established (${row.noUlNote})` : 'no upper limit established')
     if (row.typical) parts.push(`${row.typical.label ?? 'typical dose'} ${formatNumber(row.typical.from)} to ${withUnit(row.typical.to, unit)}`)
     return `${row.label}: ${parts.join(', ')}.`
   })
@@ -146,7 +146,7 @@ export function rangeTable({ rows, unit = '', value }) {
         ...kinds.map((kind) => {
           const marker = (row.markers ?? []).find((m) => m.kind === kind)
           if (marker) return formatNumber(marker.value)
-          return kind === 'ul' ? (row.noUlNote ? `none established (${row.noUlNote})` : 'none established') : 'not set'
+          return kind === 'ul' ? (row.doseOnly ? 'not shown' : row.noUlNote ? `none established (${row.noUlNote})` : 'none established') : 'not set'
         }),
         row.typical ? `${formatNumber(row.typical.from)} to ${formatNumber(row.typical.to)}` : 'not shown',
         ...(value === undefined || value === null ? [] : [statusFor(row, value, unit).text])

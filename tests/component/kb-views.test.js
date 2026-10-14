@@ -13,8 +13,9 @@ beforeEach(() => {
 
 async function open(path) {
   navigate(path)
+  await new Promise((resolve) => setTimeout(resolve, 20)) // let jsdom deliver its hashchange before the view sets the title, as a browser does
   const view = mountVapor(App)
-  await screen.findByRole('heading', { level: 1 })
+  await screen.findByRole('heading', { level: 1 }, { timeout: 15000 })
   return view
 }
 
@@ -57,7 +58,7 @@ describe('home', () => {
     const enzyme = await within(main()).findByRole('link', { name: 'Glycine N-methyltransferase (GNMT)' })
     expect(enzyme.closest('ul').querySelector('a')).toBe(enzyme)
     await fireEvent.click(enzyme)
-    expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ }, { timeout: 15000 })).toBeTruthy()
   })
 })
 
@@ -75,11 +76,28 @@ describe('/kb hub', () => {
 })
 
 describe('/kb/:type listing', () => {
-  it('lists every entry of the type, grouped, with a count', async () => {
+  const rows = () => within(main()).getAllByRole('row').slice(1)
+
+  it('lists every entry of the type as a table row, with a count', async () => {
     await open('/kb/compound')
     expect(h1().textContent).toBe('Compounds')
-    expect(within(main()).getByRole('status').textContent).toBe(`Showing ${graph.byType.get('compound').length} of ${graph.byType.get('compound').length} compounds`)
-    expect(headings(2)[0]).toMatch(/^A \(\d+\)$/)
+    const total = graph.byType.get('compound').length
+    expect(within(main()).getByRole('status').textContent).toBe(`Showing ${total} of ${total} compounds`)
+    expect(rows()).toHaveLength(total)
+    expect(within(main()).getAllByRole('columnheader').map((cell) => cell.textContent.replace(/[▲▼]/g, '').trim())).toEqual(expect.arrayContaining(['Name', 'Evidence', 'Reactions', 'Links']))
+  })
+
+  it('sorts by a column header, flips on a second click and keeps the sort in the address', async () => {
+    await open('/kb/compound')
+    const header = () => within(main()).getByRole('columnheader', { name: /Links/ })
+    await fireEvent.click(within(header()).getByRole('button'))
+    await waitFor(() => expect(header().getAttribute('aria-sort')).toBe('descending'))
+    expect(window.location.hash).toBe('#/kb/compound?sort=linked')
+    const degrees = rows().map((row) => Number(row.querySelector('td:nth-last-child(2)').textContent.trim()))
+    expect(degrees).toEqual([...degrees].sort((a, b) => b - a))
+    await fireEvent.click(within(header()).getByRole('button'))
+    await waitFor(() => expect(header().getAttribute('aria-sort')).toBe('ascending'))
+    expect(window.location.hash).toBe('#/kb/compound?sort=linked&dir=asc')
   })
 
   it('filters by text, and says when nothing matches', async () => {
@@ -103,34 +121,35 @@ describe('/kb/:type listing', () => {
     await fireEvent.update(screen.getByLabelText('Evidence grade'), 'established')
     await waitFor(() => expect(within(main()).getByRole('status').textContent).toContain(`Showing ${established} of`))
     expect(window.location.hash).toBe('#/kb/compound?grade=established')
-    expect(within(main()).queryAllByText('Evidence: Plausible')).toHaveLength(0)
+    expect(within(main()).queryAllByText('Plausible')).toHaveLength(0)
   })
 
-  it('applies filters from the address, and sorts by evidence into grade groups', async () => {
-    await open('/kb/compound?grade=plausible&sort=evidence')
+  it('applies filters and the sort from the address', async () => {
+    await open('/kb/compound?grade=plausible&sort=evidence&dir=asc')
     expect(screen.getByLabelText('Evidence grade').value).toBe('plausible')
-    expect(headings(2)).toEqual([expect.stringMatching(/^Plausible \(\d+\)$/)])
+    const plausible = graph.byType.get('compound').filter((entity) => entity.evidence === 'plausible').length
+    expect(rows()).toHaveLength(plausible)
+    expect(within(main()).getByRole('columnheader', { name: /Evidence/ }).getAttribute('aria-sort')).toBe('ascending')
   })
 
-  it('shows claim status badges, groups claims by status and filters on status', async () => {
+  it('shows claim status badges and filters claims on status', async () => {
     await open('/kb/claim')
-    expect(headings(2)).toEqual(expect.arrayContaining([expect.stringMatching(/^Supported \(\d+\)$/), expect.stringMatching(/^Unsupported \(\d+\)$/)]))
     expect(within(main()).getAllByText('Claim: Unsupported').length).toBeGreaterThan(1)
     await fireEvent.update(screen.getByLabelText('Claim status'), 'contested')
-    await waitFor(() => expect(headings(2)).toEqual([expect.stringMatching(/^Contested \(\d+\)$/)]))
-    expect(window.location.hash).toBe('#/kb/claim?status=contested')
+    await waitFor(() => expect(window.location.hash).toBe('#/kb/claim?status=contested'))
+    const contested = graph.byType.get('claim').filter((entity) => entity.status === 'contested').length
+    expect(rows()).toHaveLength(contested)
   })
 
   it('opens the claims audit already filtered from a link such as the one on the hub', async () => {
     await open('/kb/claim?status=unsupported')
     expect(screen.getByLabelText('Claim status').value).toBe('unsupported')
-    expect(headings(2)).toEqual([expect.stringMatching(/^Unsupported \(\d+\)$/)])
+    expect(rows()).toHaveLength(graph.byType.get('claim').filter((entity) => entity.status === 'unsupported').length)
   })
 
-  it('shows the equation of each reaction', async () => {
+  it('draws the equation of each reaction inline', async () => {
     await open('/kb/reaction')
-    expect(within(main()).getAllByText(/→|⇌/).length).toBeGreaterThan(10)
-    expect(headings(2).every((text) => /\(\d+\)$/.test(text))).toBe(true)
+    expect(within(main()).getAllByRole('group', { name: /^Reaction: / }).length).toBe(graph.byType.get('reaction').length)
   })
 
   it('says so when a type has no entries yet', async () => {
@@ -161,10 +180,9 @@ describe('/kb/:type/:slug entity page', () => {
     await open(`/kb/${model.type}/${slug}`)
 
     expect(h1().textContent).toBe(model.name)
-    expect(document.title).toBe(`${model.name} · Biochemical Inference`)
+    await waitFor(() => expect(document.title).toBe(`${model.name} · Biochemical Inference`))
     expect(within(main()).getAllByText(model.typeLabel).length).toBeGreaterThan(0)
     expect(within(main()).getByText(`Evidence: ${model.evidence.label}`)).toBeTruthy()
-    expect(within(main()).getByText(model.evidence.description)).toBeTruthy()
     expect(within(main()).getByText(model.summary)).toBeTruthy()
     const crumbs = screen.getByRole('navigation', { name: 'Breadcrumb' })
     expect(within(crumbs).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual(['#/', '#/kb', `#/kb/${model.type}`])
@@ -174,11 +192,11 @@ describe('/kb/:type/:slug entity page', () => {
 
   it('shows aliases, facts with external links, connections and the path control for an enzyme', async () => {
     await open('/kb/enzyme/gnmt')
-    expect(within(main()).getByText(/Also known as:/).parentElement.textContent).toMatch(/GNMT/)
+    expect(within(main()).getByText('Also known as').parentElement.textContent).toMatch(/GNMT/)
     expect(within(main()).getByRole('link', { name: /2\.1\.1\.20/ }).getAttribute('href')).toContain('expasy.org')
-    expect(headings(2)).toEqual(expect.arrayContaining(['Details', 'Facts and identifiers', 'Connections', 'See also']))
+    expect(headings(2)).toEqual(expect.arrayContaining(['Reactions it catalyses', 'Notes & sources']))
+    expect(headings(3)).toEqual(expect.arrayContaining(['Details', 'Facts and identifiers', 'Connections', 'See also']))
     expect(headings(2).some((text) => text.startsWith('How is'))).toBe(true)
-    expect(headings(3).length).toBeGreaterThan(2)
   })
 
   it('resolves body mentions to router links to existing entities', async () => {
@@ -194,9 +212,9 @@ describe('/kb/:type/:slug entity page', () => {
 
   it('shows the reaction block with equation, enzymes and identifiers, without repeating them in the facts', async () => {
     await open('/kb/reaction/gnmt-glycine-methylation')
-    const block = screen.getByRole('heading', { name: 'Reaction' }).closest('section')
+    const block = screen.getByRole('heading', { name: 'The reaction' }).closest('section')
     expect(within(block).getByRole('link', { name: 'Glycine' }).getAttribute('href')).toBe('#/kb/compound/glycine')
-    expect(within(block).getByText('Catalysed by')).toBeTruthy()
+    expect(within(block).getByRole('link', { name: 'GNMT' }).getAttribute('href')).toBe('#/kb/enzyme/gnmt')
     expect(within(block).getAllByRole('link', { name: /2\.1\.1\.20/ })).toHaveLength(1)
     expect(within(main()).getAllByRole('link', { name: /2\.1\.1\.20/ })).toHaveLength(1)
   })

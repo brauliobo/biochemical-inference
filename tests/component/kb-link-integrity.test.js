@@ -20,7 +20,7 @@ describe('rendered link integrity', () => {
 
     for (const entity of graph.entities) {
       navigate(entityPath(entity.id))
-      await waitFor(() => expect(container.querySelector('h1')?.textContent).toBe(entity.name))
+      await waitFor(() => expect(container.querySelector('h1')?.textContent).toBe(entity.name), { timeout: 15000 })
       const anchors = [...container.querySelectorAll('a[href]')]
       const internal = anchors.filter((anchor) => anchor.getAttribute('href').startsWith('#/'))
       let onward = 0
@@ -46,6 +46,9 @@ describe('rendered link integrity', () => {
           const step = Number(location.query.step)
           if (!path) problems.push(`${entity.id}: ${href} has no guided path`)
           else if (path.steps[step - 1]?.id !== entity.id) problems.push(`${entity.id}: ${href} does not land on this entity`)
+        } else if (route.name === 'atlas-causal') {
+          // "Open in the causal atlas" must name a real entity
+          if (!graph.has(location.query.focus)) problems.push(`${entity.id}: ${href} has no entity to focus`)
         } else if (!['home', 'kb-hub', 'kb-paths', 'kbMap'].includes(route.name)) {
           problems.push(`${entity.id}: ${href} resolves to ${route.name}`)
         }

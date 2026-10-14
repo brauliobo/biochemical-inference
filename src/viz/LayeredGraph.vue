@@ -27,6 +27,9 @@ import { edgeSign, endMarker, gradeStyle, GRADE_STYLES, shapePath, SIGN_IDS, SIG
 // neighbours as buttons. Type, sign and hypothesis toggles filter the graph, and
 // the text alternative is an adjacency list.
 //
+// An edge may carry `claimStatus` (supported, partly-supported, contested, unsupported): a hypothesis edge is then
+// coloured by how far its claim is supported (the dash and the label still say "hypothesis").
+//
 // Events: `select` (node object, on click or Enter) and `focus-node` (on keyboard move).
 const selected = defineModel('selected', { type: String, default: '' })
 const props = defineProps({
@@ -117,6 +120,7 @@ const drawEdges = computed(() => layout.value.edges.map((route) => {
     head,
     sign,
     hypothesis,
+    status: hypothesis && edge.claimStatus ? edge.claimStatus : '',
     state,
     text,
     chip: text && props.showEdgeLabels ? { x: route.labelAt.x - chipWidth / 2, y: route.labelAt.y - 9, w: chipWidth, tx: route.labelAt.x, ty: route.labelAt.y + 4 } : null,
@@ -227,7 +231,7 @@ ChartFrame(:id="id" :title="title" :summary="summaryText" :table-label="tableLab
           rect.viz-tier(v-if="tier.index % 2 === 0 && direction !== 'LR'" x="0" :y="tier.from" :width="layout.width" :height="tier.to - tier.from")
           text.viz-tier__label(v-if="tier.name && direction === 'LR'" :x="tier.center" y="16" text-anchor="middle") {{ tier.name }}
           text.viz-tier__label(v-if="tier.name && direction !== 'LR'" x="8" :y="tier.from + 14") {{ tier.name }}
-        g(v-for="edge in drawEdges" :key="`edge-${edge.key}`" :class="[`viz-edge--${edge.sign}`, `is-${edge.state || 'plain'}`]")
+        g(v-for="edge in drawEdges" :key="`edge-${edge.key}`" :class="[`viz-edge--${edge.sign}`, `is-${edge.state || 'plain'}`, edge.status ? `viz-status--${edge.status}` : '']")
           path.viz-edge(:class="{ 'viz-edge--hyp': edge.hypothesis }" :d="edge.d")
             title {{ edge.title }}
           path.viz-edge-end(:class="{ 'viz-edge-end--filled': edge.head.filled }" :d="edge.head.d")
