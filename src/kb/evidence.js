@@ -9,6 +9,12 @@
 import { CLAIM_STATUS_KEYS, EVIDENCE_GRADES, EVIDENCE_KEYS, claimStatusInfo } from '../knowledge/evidence.js'
 import { TYPES } from '../knowledge/types.js'
 
+// ------------------------------------------------------------------ routes
+
+export const EVIDENCE_PATH = '/evidence'
+export const CLAIMS_PATH = `${EVIDENCE_PATH}/claims`
+export const LITERATURE_PATH = `${EVIDENCE_PATH}/literature`
+
 // ------------------------------------------------------------------ study designs
 
 /**
@@ -299,6 +305,11 @@ export function buildEvidenceModel(graph) {
 // ------------------------------------------------------------------ aggregates
 
 export const STATUS_ORDER = Object.freeze(['supported', 'partly-supported', 'unsupported', 'contested'])
+
+/** Marker look (viz series slot) of each claim status: a shape and colour, so status is never colour alone. */
+export const STATUS_LOOK = Object.freeze({ supported: 2, 'partly-supported': 0, unsupported: 1, contested: 3 })
+/** Marker looks of the two stances: supports is a blue circle, contradicts a vermillion square. */
+export const STANCE_LOOK = Object.freeze({ supports: 0, contradicts: 1 })
 
 /** [{ status, label, tone, count, share }] in display order. */
 export function statusCounts(claims) {

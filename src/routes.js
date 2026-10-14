@@ -16,7 +16,12 @@ export const routes = [
   { name: 'kb-entity', path: '/kb/:type/:slug', title: 'Knowledge base', load: () => import('./views/kb/KbEntityView.vue') },
   { name: 'workbench-index', path: '/workbench', title: 'Workbenches', load: () => import('./views/WorkbenchIndexView.vue') },
   { name: 'workbench', path: '/workbench/:name', title: 'Workbench', load: () => import('./views/WorkbenchView.vue') },
-  { name: 'dev-viz', path: '/dev/viz', title: 'Chart components', load: () => import('./views/dev/VizGallery.vue') }
+  { name: 'dev-viz', path: '/dev/viz', title: 'Chart components', load: () => import('./views/dev/VizGallery.vue') },
+  { name: 'evidence', path: '/evidence', title: 'Evidence', load: () => import('./views/evidence/EvidenceOverviewView.vue') },
+  { name: 'evidence-claims', path: '/evidence/claims', title: 'Claims audit', load: () => import('./views/evidence/EvidenceClaimsView.vue') },
+  { name: 'evidence-literature', path: '/evidence/literature', title: 'Literature', load: () => import('./views/evidence/EvidenceLiteratureView.vue') },
+  { name: 'evidence-claim', path: '/evidence/claim/:slug', title: 'Claim', load: () => import('./views/evidence/EvidenceTemplateView.vue') },
+  { name: 'evidence-article', path: '/evidence/article/:slug', title: 'Article', load: () => import('./views/evidence/EvidenceTemplateView.vue') }
 ]
 
 export const notFoundRoute = {
