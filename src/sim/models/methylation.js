@@ -141,13 +141,15 @@ function fluxPlan(ref, kin, st) {
   const samUse = T.gnmt + 3 * T.pemt + T.gamt + T.dnmt + T.mto + T.nnmt
   T.mat1 = 0.7757 * samUse; T.mat3 = samUse - T.mat1
   T.ahcy_r = pl.ahcyRev; T.ahcy_f = samUse + T.ahcy_r
-  T.hcy_exp = pl.hcyExp; T.bhmt = pl.bhmt; T.cbs = pl.cbs
+  T.hcy_exp = pl.hcyExp; T.bhmt = pl.bhmt
+  // feasibility of a sampled partition: methionine synthase keeps at least 10% of the SAM flux
+  T.cbs = Math.min(pl.cbs, samUse - T.bhmt - T.hcy_exp - Math.max(5, 0.1 * samUse))
   T.mtr = samUse - T.bhmt - T.cbs - T.hcy_exp
   T.cth = T.cbs; T.cys_out = T.cth
   T.met_in = samUse - T.mtr - T.bhmt
   // plasma tHcy: hepatic export + extra-hepatic production (50:50, assumed) are removed by kidney (25%) and
   // extra-hepatic B12/folate-dependent remethylation (75%, assumed): the extra-hepatic arm makes tHcy B12-sensitive
-  T.hcy_p_ms = 0.15 * ref.hcy_p
+  T.hcy_p_ms = Math.max(0.15 * ref.hcy_p, T.hcy_exp * st.rho_hcy - kin.k_hcy_p_out * ref.hcy_p + 0.1)
   T.hcy_ext = T.hcy_p_ms + kin.k_hcy_p_out * ref.hcy_p - T.hcy_exp * st.rho_hcy
   // folate / one-carbon
   T.fol_loss = kin.k_fol_loss * (ref.thf + ref.ch2thf + ref.mthf + ref.f10 + ref.dhf); T.fol_in = T.fol_loss
@@ -157,7 +159,8 @@ function fluxPlan(ref, kin, st) {
   T.dmg_out = kin.k_dmg_out * ref.dmg; T.sar_out = kin.k_sar_out * ref.sar
   T.dmgdh = T.bhmt - T.dmg_out; T.sardh = T.gnmt + T.dmgdh - T.sar_out
   const mtdNet = (T.shmt_f - T.shmt_r) + T.gcs + T.dmgdh + T.sardh - T.mthfr - T.ts - L('ch2thf')
-  T.ftd = pl.ftd; T.pur = pl.pur; T.fts = T.ftd + T.pur + L('f10') - mtdNet
+  T.ftd = pl.ftd; T.pur = Math.max(pl.pur, mtdNet - T.ftd - L('f10') + 2) // formyl-THF sinks must absorb the net MTHFD1 flux
+  T.fts = T.ftd + T.pur + L('f10') - mtdNet
   T.mtd_f = Math.max(pl.mtdF, mtdNet * 1.2); T.mtd_r = T.mtd_f - mtdNet
   // glycine / serine
   T.gly_use = kin.k_gly_use * ref.gly; T.gly_efl = kin.k_gly_efl * ref.gly
@@ -338,6 +341,7 @@ export function buildMethylationModel(options = {}) {
     kin[id] = v
     parameters.push({ id, value: v, low: Math.min(low, v), high: Math.max(high, v), unit, confidence: CONF[conf] })
   }
+  ref.mna = (0.075 * S0) / kin.k_mna_out // MNA is exported at k_mna_out: its steady level follows the baseline NNMT flux
   const T = fluxPlan(ref, kin, st)
   const reactions = assemble(st)
   const scaleIds = []
@@ -371,16 +375,19 @@ export function buildMethylationModel(options = {}) {
   const draft = compileModel(model)
   const sys = draft.bind()
   const f = sys.fluxes(0, Float64Array.from(draft.y0))
+  const calibration = {}
   for (const { pid, rx } of scaleIds) {
     const target = T[rx.target ?? rx.id]
     const unit = f[draft.reactionIndex.get(rx.id)]
     const p = parameters.find((q) => q.id === pid)
     if (target === undefined) throw new Error(`methylation: no flux target for ${rx.id}`)
     if (!(unit > 0)) throw new Error(`methylation: reaction ${rx.id} has zero flux at the reference state`)
+    if (!(target > 0)) throw new Error(`methylation: infeasible flux plan (target ${target} for ${rx.id})`)
     p.value = target / unit; p.low = p.value; p.high = p.value
     p.source = 'calibrated'; p.unit = (rx.unit ?? p.unit)
+    calibration[pid] = { reaction: rx.id, targetFlux: target }
   }
-  model.reference = { fluxes: T, state: ref, satf: SATF, struct: st }
+  model.reference = { fluxes: T, state: ref, satf: SATF, struct: st, calibration }
   return model
 }
 

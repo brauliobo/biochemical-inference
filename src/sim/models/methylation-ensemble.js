@@ -13,7 +13,7 @@ import { compiledFor, runScenario } from './methylation-run.js'
 
 /** Ranges of the structural / reference-state constants that are not in KIN or PLAN: [low, high]. */
 export const STRUCT_RANGES = {
-  loadScale: [3, 15], vd_gly: [30, 80], vd_bet: [20, 40], dose_met: [0.006, 0.025], dose_cho: [0.02, 0.12], dose_nic: [0.012, 0.05]
+  loadScale: [3, 8], vd_gly: [30, 80], vd_bet: [20, 40], dose_met: [0.006, 0.025], dose_cho: [0.02, 0.12], dose_nic: [0.012, 0.05]
 }
 export const REF_RANGES = { gly: [600, 4000], bet: [830, 1490], ser: [250, 900], cho: [71, 97], dmg: [29, 67], sar: [11, 29] }
 
@@ -63,6 +63,7 @@ export function methylationEnsemble(options) {
     let run = null
     try {
       model = getModel(variants, opts)
+      if (steadyResidual(model) > 1e-6) throw new Error('reference state is not a steady state')
       run = runScenario(scenario, { model, rtol, atol: 1e-6, samplesPerHour })
     } catch (e) { run = null }
     if (!run || !run.ok) { failures += 1; continue }
@@ -89,6 +90,15 @@ export function methylationEnsemble(options) {
     }
   }
   return { n, ok: members.length, failures, seed, members, summary, ms: performance.now() - t0, space }
+}
+
+/** Max relative |dy/dt| of the free species at the reference state (0 for a calibrated model). */
+export function steadyResidual(model) {
+  const c = compiledFor(model)
+  const d = c.bind().derivative(0, Float64Array.from(c.y0))
+  let r = 0
+  c.names.forEach((n, i) => { if (!c.fixed[i]) r = Math.max(r, Math.abs(d[i]) / (Math.abs(c.y0[i]) + 1e-6)) })
+  return r
 }
 
 /** Index of the last sample of the first stage (the pre-intervention baseline). */
