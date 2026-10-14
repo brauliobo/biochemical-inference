@@ -3220,7 +3220,7 @@ export default {
       "high": 0.168,
       "compartment": "plasma",
       "role": "variable",
-      "source": "article:stabler-2004-sam-sah-lcms",
+      "source": "article:stabler-2004-sam-sah-serum-lcms",
       "ontologyId": "compound:sam",
       "alternatives": {
         "stabler2004_serum_ref_interval_uM": "0.071-0.168",
@@ -3237,7 +3237,7 @@ export default {
       "high": 0.026,
       "compartment": "plasma",
       "role": "variable",
-      "source": "article:stabler-2004-sam-sah-lcms",
+      "source": "article:stabler-2004-sam-sah-serum-lcms",
       "ontologyId": "compound:sah",
       "alternatives": {
         "stabler2004_serum_ref_interval_uM": "0.008-0.026",
@@ -4256,7 +4256,7 @@ export default {
       "access": "full text + supplementary PDF"
     },
     {
-      "articleId": "article:stabler-2004-sam-sah-lcms",
+      "articleId": "article:stabler-2004-sam-sah-serum-lcms",
       "status": "new in articles-sim-1.js",
       "access": "abstract only (PubMed), or secondhand"
     },
