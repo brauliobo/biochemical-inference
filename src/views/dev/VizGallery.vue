@@ -5,6 +5,7 @@ import Panel from '../../ui/Panel.vue'
 import Heatmap from '../../viz/Heatmap.vue'
 import LayeredGraph from '../../viz/LayeredGraph.vue'
 import LineChartPlus from '../../viz/LineChartPlus.vue'
+import MetabolicMap from '../../viz/MetabolicMap.vue'
 import Matrix from '../../viz/Matrix.vue'
 import RangeBar from '../../viz/RangeBar.vue'
 import ScenarioPicker from '../../viz/ScenarioPicker.vue'
@@ -13,6 +14,7 @@ import Sparkline from '../../viz/Sparkline.vue'
 import StackedBar from '../../viz/StackedBar.vue'
 import Timeline from '../../viz/Timeline.vue'
 import { changeHeatSample, gradeHeatSample, matrixSample, rangeSample, sharesSample, sparkSample, timelineSample } from '../../viz/samples/charts.js'
+import { methylationMap, methylationValues } from '../../viz/samples/methylation.js'
 import { causalSample } from '../../viz/samples/causal.js'
 import { timecourseSample } from '../../viz/samples/timecourse.js'
 
@@ -28,6 +30,9 @@ const timeline = timelineSample()
 const spark = sparkSample()
 const causal = causalSample()
 const chosen = ref('')
+const layout = methylationMap()
+const levels = methylationValues()
+const mapChoice = ref('')
 
 const intake = ref(1200)
 const dose = ref(5)
@@ -69,6 +74,8 @@ const note = (text) => { picked.value = text }
     Timeline(id="g-timeline" title="Articles by year and design (sample)" :items="timeline.items" :groups="timeline.groups")
   Panel(title="Layered causal graph" title-id="viz-graph")
     LayeredGraph(id="g-graph" title="From an intervention to an outcome (sample)" :nodes="causal.nodes" :edges="causal.edges" :tier-names="causal.tierNames" v-model:selected="chosen")
+  Panel(title="Metabolic map" title-id="viz-map")
+    MetabolicMap(id="g-map" title="Methionine and folate cycles (sample layout)" :map="layout" :flux="levels.flux" :concentration="levels.concentration" conc-unit="uM" flux-unit="umol/h" v-model:selected="mapChoice")
   Panel(title="Controls" title-id="viz-controls")
     .grid
       SliderField(id="g-dose" label="Glycine dose" unit="g" :min="0" :max="10" :step="0.5" v-model="dose" hint="Sample slider")

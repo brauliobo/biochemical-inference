@@ -623,3 +623,88 @@ g.is-dim { opacity: 0.2; }
   padding-inline: var(--space-control-inline);
   font-size: var(--text-small);
 }
+
+/* ---- Metabolic map (MetabolicMap) ---- */
+.viz-bin-s1 { --viz-bin: var(--color-viz-seq-1); --viz-on: var(--color-viz-seq-1-on); }
+.viz-bin-s2 { --viz-bin: var(--color-viz-seq-2); --viz-on: var(--color-viz-seq-2-on); }
+.viz-bin-s3 { --viz-bin: var(--color-viz-seq-3); --viz-on: var(--color-viz-seq-3-on); }
+.viz-bin-s4 { --viz-bin: var(--color-viz-seq-4); --viz-on: var(--color-viz-seq-4-on); }
+.viz-bin-s5 { --viz-bin: var(--color-viz-seq-5); --viz-on: var(--color-viz-seq-5-on); }
+.viz-bin-s6 { --viz-bin: var(--color-viz-seq-6); --viz-on: var(--color-viz-seq-6-on); }
+.viz-flux-1 { --viz-ec: var(--color-viz-flux-1); }
+.viz-flux-2 { --viz-ec: var(--color-viz-flux-2); }
+.viz-flux-3 { --viz-ec: var(--color-viz-flux-3); }
+
+.viz-map {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+.viz-msvg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 80vh;
+}
+.viz-mgroup {
+  fill: var(--color-surface-sunken);
+  fill-opacity: 0.55;
+  stroke: var(--color-border-strong);
+  stroke-width: var(--border-width);
+  stroke-dasharray: 2 4;
+}
+.viz-medge {
+  fill: none;
+  stroke: var(--viz-ec, var(--color-border-strong));
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.viz-medge--catalysis { stroke-dasharray: 2 3; stroke: var(--color-text-muted); }
+.viz-mhead { fill: var(--viz-ec, var(--color-border-strong)); }
+.viz-stoich { font-weight: var(--weight-strong); fill: var(--color-text); }
+.viz-mnode { cursor: pointer; }
+.viz-mnode__shape {
+  fill: var(--viz-bin, var(--color-surface-raised));
+  stroke: var(--color-text-muted);
+  stroke-width: var(--border-width-strong);
+}
+.viz-mnode--reaction .viz-mnode__shape { fill: var(--color-text); stroke: var(--color-surface-raised); stroke-width: var(--border-width); }
+.viz-mnode--pool .viz-mnode__shape { stroke-dasharray: 5 3; fill: var(--color-surface-sunken); }
+.viz-mkey { fill: var(--color-surface-raised); }
+.viz-mnode__text {
+  fill: var(--viz-on, var(--color-text));
+  font-size: var(--text-small);
+  pointer-events: none;
+}
+.viz-mnode__enzyme {
+  fill: var(--color-text-muted);
+  font-size: var(--text-caption);
+  font-style: italic;
+  paint-order: stroke;
+  stroke: var(--color-surface-raised);
+  stroke-width: var(--border-width-accent);
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.viz-value { fill: var(--color-text); font-family: var(--font-code); }
+.viz-mnode:hover .viz-mnode__shape,
+.viz-mnode.is-selected .viz-mnode__shape { stroke: var(--color-accent); stroke-width: var(--border-width-accent); }
+.viz-mnode__ring {
+  fill: none;
+  stroke: var(--color-focus-ring);
+  stroke-width: var(--focus-ring-width);
+}
+.viz-msvg g.is-dim { opacity: 0.22; }
+
+/* Optional flow animation: dashes travel along reactions; never under reduced motion. */
+@keyframes viz-flow { to { stroke-dashoffset: -28; } }
+.viz-map--flow .viz-medge--moving:not(.viz-medge--catalysis) {
+  stroke-dasharray: 8 6;
+  animation: viz-flow calc(var(--motion-slow) * 4) linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .viz-map--flow .viz-medge--moving { animation: none; stroke-dasharray: none; }
+}
