@@ -906,7 +906,7 @@ export default [
     "takeaways": [
       "Cloned from a human kidney library; the protein is 292 amino acids and 84% identical to rat kidney HNMT.",
       "Human renal cortical, purified renal and transfected-cell HNMT had Km(histamine) 20, 13 and 14 uM and Km(AdoMet) about 2, 3 and 6 uM.",
-      "The work set the stage for the HNMT polymorphism that explains the genetic control of red-cell activity."
+      "The cloning was a first step toward determining the molecular basis of the genetic polymorphism that controls red-cell HNMT activity."
     ],
     "facts": {
       "design": "enzymology",
@@ -1106,7 +1106,7 @@ export default [
     "takeaways": [
       "A randomised trial in patients with peripheral arterial disease combining niacin with folic acid.",
       "During titration of niacin from 100 to 1000 mg/day, tHcy rose 17%; at 18 weeks the niacin arm was up 55% against a 7% fall with placebo.",
-      "Folic acid supplementation lowered homocysteine, pointing to a methyl-group demand effect of niacin.",
+      "The authors note that homocysteine can be lowered by folic acid and call for studies of B-vitamin supplementation in people taking long-term niacin; a methyl-group demand mechanism is an interpretation, not a finding.",
       "SAM and SAH were not measured."
     ],
     "facts": {
@@ -1212,7 +1212,7 @@ export default [
     "takeaways": [
       "A validated method and reference intervals for plasma SAM, SAH and their ratio.",
       "Earlier LC-MS/MS and HPLC studies report SAM 73.5-120 nM and SAH 12.7-46.5 nM.",
-      "The ratio is stable even when absolute values differ with pre-analytical handling."
+      "The comparison table shows SAM:SAH ratios of about 2.2-7.4 across earlier studies, so absolute values and ratios both depend on method and cohort."
     ],
     "facts": {
       "design": "analytical method",
@@ -1796,9 +1796,9 @@ export default [
     "url": "https://doi.org/10.1002/humu.21560",
     "verified": true,
     "takeaways": [
-      "Kinetic constants of the human enzyme were measured with the wild type and 40 mutants.",
+      "Kinetic constants (Table 2) were measured for the recombinant human wild type and 12 missense mutants found in congenital myasthenic syndrome patients.",
       "Km for choline is 257 +/- 32 uM and Km for acetyl-CoA 11.9 +/- 0.8 uM.",
-      "The table units were inferred from the stated kcat/Km value."
+      "The wild-type kcat is 195 +/- 5 per second."
     ],
     "facts": {
       "design": "enzymology",
@@ -1940,7 +1940,7 @@ export default [
     "takeaways": [
       "Betaine is an osmolyte and methyl donor; its plasma concentration is affected by diet, sex and renal function.",
       "Reference intervals: women 20-60 uM, men 25-75 uM; DMG usually under 10 uM.",
-      "Renal clearance is low (under 5%), so plasma betaine is regulated mainly by metabolism."
+      "Urinary betaine excretion is minimal even after a large dose (normally under 35 mmol/mol creatinine), so plasma betaine is governed mainly by diet and metabolism."
     ],
     "facts": {
       "design": "review",
@@ -2207,7 +2207,7 @@ export default [
     "takeaways": [
       "26 pregnant and 21 non-pregnant women were compared on 480 or 930 mg/day choline for 12 weeks.",
       "Higher intake raised metabolites 12-46%.",
-      "Pregnancy diverts choline toward the fetus and phosphatidylcholine and away from oxidation."
+      "Pregnant women had higher choline but lower betaine, DMG and sarcosine, a pattern consistent with choline being diverted from oxidation toward fetal and phospholipid use (an interpretation beyond the abstract)."
     ],
     "facts": {
       "design": "RCT",
@@ -2656,9 +2656,10 @@ export default [
     "url": "https://doi.org/10.1016/j.foodchem.2013.08.122",
     "verified": true,
     "takeaways": [
-      "Betaine content of foods and meal patterns were reviewed.",
-      "Wheat bran, wheat germ and spinach are rich sources; typical Western intake is about 131 mg/day.",
-      "Cereal products contribute most of the dietary betaine."
+      "Betaine and free choline were measured by LC-MS/MS in a wide range of commercial cereal foods and fractions.",
+      "Whole grain wheat and its fractions were the best common source of betaine; the pseudocereal quinoa was highest at 3900 ug/g.",
+      "Cereals provide about 60-67% of betaine in Western diets and 20-40% in South-East Asian diets.",
+      "Average intake was 131 mg/day, well below the doses used in betaine intervention studies for lowering homocysteine."
     ],
     "facts": {
       "design": "review",
@@ -5877,7 +5878,7 @@ export default [
     "aliases": [
       "Hoad 2015"
     ],
-    "summary": "MRI in 24 healthy volunteers after a mixed meal: gastric secretion volume 64 mL at 15 min and 110 mL at 75 min, a mean net increase of 52 mL over the first hour.",
+    "summary": "MRI in 24 healthy volunteers after a mixed meal: gastric secretion volume 64 mL at 15 min and 110 mL at 75 min, a mean increase of 52 mL per subject over that hour.",
     "body": [
       "Postprandial gastric secretion volume."
     ],
@@ -5902,9 +5903,9 @@ export default [
     "url": "https://doi.org/10.1088/0031-9155/60/3/1367",
     "verified": true,
     "takeaways": [
-      "Gastric content was separated into meal and secretion by MRI.",
-      "The net rise in content was 52 +/- 29 mL over 60 minutes.",
-      "Secretion volume is larger than emptying removes in the first hour."
+      "Gastric content was separated into meal and secretion by MRI T1 mapping of meal dilution, and meal volumes agreed with gamma scintigraphy.",
+      "Secretion volumes after a mixed meal were 64 +/- 51 mL at 15 min and 110 +/- 40 mL at 75 min.",
+      "The mean increase in secretion volume between the two time points was 52 +/- 29 mL (full-text result, not in the abstract); secretion rose in all subjects but one."
     ],
     "facts": {
       "design": "imaging study",
@@ -5914,7 +5915,7 @@ export default [
       {
         "rel": "evidence-for",
         "to": "system:gastric-physiology",
-        "note": "Net secretion ~52 mL/h after a meal."
+        "note": "Post-meal secretion volume rises by about 52 mL over an hour."
       },
       {
         "rel": "evidence-for",
