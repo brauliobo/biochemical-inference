@@ -25,7 +25,7 @@ const rows = computed(() => props.items.map((item) => {
   const isClaim = item.id.startsWith('claim:')
   return {
     key: item.id,
-    text: item.label ?? (entity ? shortName(entity.name) : slug(item.id)),
+    text: item.label ?? (entity ? (isClaim ? entity.name : shortName(entity.name)) : slug(item.id)),
     href: isClaim ? claimPath(item.id) : item.id.startsWith('article:') ? articlePath(item.id) : entityPath(item.id),
     grade: entity?.evidence ?? '',
     status: isClaim && entity ? statusInfo(entity.status) : null,

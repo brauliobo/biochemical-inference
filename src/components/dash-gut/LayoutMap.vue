@@ -27,7 +27,7 @@ const props = defineProps({
 })
 const layout = shallowRef(null)
 const failed = ref(false)
-loadLayout(props.layoutId).then((loaded) => { layout.value = loaded }).catch(() => { failed.value = true })
+loadLayout(props.layoutId).then((loaded) => { if (loaded) layout.value = loaded; else failed.value = true }).catch(() => { failed.value = true })
 loadKnowledge()
 const selected = ref('')
 const names = (id) => {
