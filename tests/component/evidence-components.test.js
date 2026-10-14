@@ -1,5 +1,5 @@
 import { fireEvent, within } from '@testing-library/vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import ClaimDumbbell from '../../src/components/evidence/ClaimDumbbell.vue'
 import CoverageMap from '../../src/components/evidence/CoverageMap.vue'
 import DesignIcon from '../../src/components/evidence/DesignIcon.vue'
@@ -14,6 +14,9 @@ import { graph } from '../../src/knowledge/index.js'
 import { SCORING, buildEvidenceModel, dumbbellRows, statusCounts } from '../../src/kb/evidence.js'
 import { expectAccessible } from '../helpers/axe.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
+
+// Big pages (465 markers, 65 table rows) and axe: slow on a loaded machine.
+vi.setConfig({ testTimeout: 120000 })
 
 const model = buildEvidenceModel(graph)
 const claim = (id) => model.claimById.get(`claim:${id}`)

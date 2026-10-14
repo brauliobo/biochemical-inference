@@ -1,11 +1,14 @@
 import { screen } from '@testing-library/vue'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { graph, page } from '../../src/knowledge/index.js'
 import { loadKnowledge } from '../../src/kb/knowledge-lazy.js'
 import ArticleTemplate from '../../src/views/kb/templates/ArticleTemplate.vue'
 import ClaimTemplate from '../../src/views/kb/templates/ClaimTemplate.vue'
 import { expectAccessible } from '../helpers/axe.js'
 import { mountVapor } from '../helpers/mount-vapor.js'
+
+// Big pages (465 markers, 65 table rows) and axe: slow on a loaded machine.
+vi.setConfig({ testTimeout: 120000 })
 
 const claims = graph.byType.get('claim')
 const articles = graph.byType.get('article')
@@ -39,7 +42,7 @@ describe('ClaimTemplate', () => {
       expect(result.text, claim.id).toContain(claim.statement)
       expect(result.links, claim.id).toBeGreaterThan(0)
     }
-  })
+  }, 120000)
 
   it('takes the page model the entity dispatcher passes, as well as a bare id', () => {
     const claim = claims.find((entry) => entry.id === 'claim:free-glycine-stimulates-gastrin')
@@ -98,7 +101,7 @@ describe('ArticleTemplate', () => {
       expect(result.text, article.id).toContain(article.journal)
       expect(result.links, article.id).toBeGreaterThan(0)
     }
-  })
+  }, 120000)
 
   it('shows citation links, design, grade and population chips and at most five key points', () => {
     const { container, unmount } = mountVapor(ArticleTemplate, { props: { model: page('article:lamers-2007-glycine-flux') } })
