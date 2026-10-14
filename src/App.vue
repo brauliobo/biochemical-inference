@@ -44,6 +44,8 @@ watch(() => route.path, async () => {
           li
             RouterLink(to="/kb" section) Knowledge base
           li
+            RouterLink(to="/atlas" section) Atlas
+          li
             RouterLink(to="/workbench" section) Workbenches
   main#main.site-main(ref="main" tabindex="-1")
     .container
