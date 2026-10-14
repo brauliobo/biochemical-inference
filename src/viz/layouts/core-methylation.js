@@ -34,12 +34,12 @@ const layout = {
   // Groups are labelled clusters, not boxes: x, y is where a renderer may put the label (top left of the cluster).
   groups: [
     { id: 'serine', label: 'Serine synthesis', x: 38, y: 34 },
-    { id: 'glycine', label: 'Glycine, SHMT and the sarcosine loop', x: 318, y: 34 },
+    { id: 'glycine', label: 'Glycine, SHMT and the sarcosine loop', x: 520, y: 30 },
     { id: 'folate', label: 'Folate cycle', x: 118, y: 171 },
     { id: 'nucleotide', label: 'Nucleotide synthesis', x: 38, y: 563 },
-    { id: 'methionine', label: 'Methionine cycle', x: 849, y: 51 },
-    { id: 'remethylation', label: 'Remethylation: MTR, cobalamin, BHMT', x: 536, y: 353 },
-    { id: 'transsulf', label: 'Transsulfuration', x: 927, y: 573 },
+    { id: 'methionine', label: 'Methionine cycle', x: 800, y: 30 },
+    { id: 'remethylation', label: 'Remethylation: MTR, cobalamin, BHMT', x: 560, y: 765 },
+    { id: 'transsulf', label: 'Transsulfuration', x: 1000, y: 712 },
     { id: 'choline', label: 'Choline oxidation', x: 336, y: 871 },
     { id: 'kennedy', label: 'Kennedy, PEMT and acetylcholine', x: 767, y: 751 },
     { id: 'pcturn', label: 'Phosphatidylcholine turnover', x: 1247, y: 673 },
