@@ -43,6 +43,37 @@ const freezeDef = (item) => Object.freeze({
 
 export const RELATIONS = Object.freeze(definitions.map(freezeDef))
 
+// Direction of effect carried by a relation, from source to target: '+' raises/produces/worsens,
+// '-' lowers/relieves. Relations missing here are structural or unsigned (part-of, associated-with, ...).
+// An unsigned relation may still carry an explicit `sign` on the edge (see EDGE_FIELDS).
+const SIGNS = {
+  increases: '+',
+  decreases: '-',
+  causes: '+',
+  mitigates: '-',
+  aggravates: '+',
+  'precursor-of': '+',
+  'manifests-as': '+'
+}
+
+/** Optional properties an authored relation may carry in addition to rel/to/note. */
+export const EDGE_FIELDS = Object.freeze(['sign', 'hypothesis', 'claim', 'strength'])
+export const EDGE_SIGNS = Object.freeze(['+', '-'])
+export const EDGE_STRENGTHS = Object.freeze(['weak', 'moderate', 'strong'])
+
+/** Relations that state a directional effect (the ones drawn in causal views). */
+export const CAUSAL_RELATIONS = Object.freeze(['increases', 'decreases', 'causes', 'mitigates', 'aggravates'])
+
+/** Intrinsic sign of a forward relation id ('+', '-') or null when the relation is unsigned. */
+export function intrinsicSign(rel) {
+  return SIGNS[rel] ?? null
+}
+
+/** Effective sign of an authored edge: the relation's own sign, else the explicit `sign`, else null. */
+export function edgeSign(edge) {
+  return intrinsicSign(edge.rel) ?? edge.sign ?? null
+}
+
 /** Ids authors may write (forward and symmetric). */
 export const AUTHORABLE_RELATIONS = Object.freeze(RELATIONS.map((item) => item.id))
 
