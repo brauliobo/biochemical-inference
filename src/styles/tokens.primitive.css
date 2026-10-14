@@ -160,3 +160,27 @@
   --size-sidebar: 16rem;
   --size-grid-min: 16rem;
 }
+
+/*
+ * Chart palette (src/viz). Colour-blind-safe categorical hues after Okabe and
+ * Ito, one value per scheme: "strong" is for light surfaces, "soft" for dark
+ * ones. Every value is at least 3:1 against the three surfaces of its scheme
+ * (tests/unit/viz-contrast.test.js). Charts never rely on hue alone: series also
+ * differ in dash pattern and marker shape.
+ */
+:root {
+  --chart-blue-strong: #1f5fa8;
+  --chart-blue-soft: #78b6f0;
+  --chart-vermillion-strong: #c2410c;
+  --chart-vermillion-soft: #f4906a;
+  --chart-teal-strong: #0f7a63;
+  --chart-teal-soft: #4fcfae;
+  --chart-purple-strong: #9d3c86;
+  --chart-purple-soft: #e594cf;
+  --chart-amber-strong: #8f5f00;
+  --chart-amber-soft: #e9b84a;
+  --chart-sky-strong: #2678b8;
+  --chart-sky-soft: #a6d6f7;
+  --chart-grey-strong: #5a6a66;
+  --chart-grey-soft: #adbbb7;
+}

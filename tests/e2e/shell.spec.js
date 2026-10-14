@@ -29,6 +29,7 @@ const ROUTES = [
   '/#/kb/enzyme/gnmt?to=outcome%3Abelching',
   '/#/kb/state/no-such-entry',
   '/#/kb/not-a-type',
+  '/#/dev/viz',
   '/#/workbench',
   ...workbenches.map((item) => `/#/workbench/${item.name}`),
   '/#/workbench/no-such-workbench',

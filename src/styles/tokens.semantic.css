@@ -124,3 +124,70 @@
     --motion-slow: var(--duration-0);
   }
 }
+
+/*
+ * Chart roles (src/viz, src/styles/viz.css). Categorical series, the sequential
+ * and diverging scales (each bin has the text colour that sits on it), signed
+ * edge colours and evidence-grade colours. Same rules as above: var() of
+ * primitives only, light-dark pairs, contrast verified by tests/unit/viz-contrast.test.js.
+ */
+:root {
+  /* Categorical series 1 to 8 (also differ by dash and marker shape) */
+  --color-viz-1: light-dark(var(--chart-blue-strong), var(--chart-blue-soft));
+  --color-viz-2: light-dark(var(--chart-vermillion-strong), var(--chart-vermillion-soft));
+  --color-viz-3: light-dark(var(--chart-teal-strong), var(--chart-teal-soft));
+  --color-viz-4: light-dark(var(--chart-purple-strong), var(--chart-purple-soft));
+  --color-viz-5: light-dark(var(--chart-amber-strong), var(--chart-amber-soft));
+  --color-viz-6: light-dark(var(--chart-sky-strong), var(--chart-sky-soft));
+  --color-viz-7: light-dark(var(--chart-grey-strong), var(--chart-grey-soft));
+  --color-viz-8: light-dark(var(--neutral-900), var(--neutral-100));
+
+  /* Sequential scale, 6 bins from low to high, and the text colour on each bin */
+  --color-viz-seq-1: light-dark(var(--teal-50), var(--teal-800));
+  --color-viz-seq-2: light-dark(var(--teal-200), var(--teal-700));
+  --color-viz-seq-3: light-dark(var(--teal-400), var(--teal-600));
+  --color-viz-seq-4: light-dark(var(--teal-500), var(--teal-500));
+  --color-viz-seq-5: light-dark(var(--teal-600), var(--teal-300));
+  --color-viz-seq-6: light-dark(var(--teal-800), var(--teal-100));
+  --color-viz-seq-1-on: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-viz-seq-2-on: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-viz-seq-3-on: light-dark(var(--neutral-900), var(--neutral-0));
+  --color-viz-seq-4-on: light-dark(var(--neutral-900), var(--neutral-950));
+  --color-viz-seq-5-on: light-dark(var(--neutral-0), var(--neutral-950));
+  --color-viz-seq-6-on: light-dark(var(--neutral-0), var(--neutral-950));
+
+  /* Diverging scale, 7 bins: negative 3 to 1, centre, positive 1 to 3 */
+  --color-viz-div-n3: light-dark(var(--red-600), var(--red-300));
+  --color-viz-div-n2: light-dark(var(--red-400), var(--red-500));
+  --color-viz-div-n1: light-dark(var(--red-100), var(--red-800));
+  --color-viz-div-0: light-dark(var(--neutral-100), var(--neutral-800));
+  --color-viz-div-p1: light-dark(var(--blue-100), var(--blue-800));
+  --color-viz-div-p2: light-dark(var(--blue-400), var(--blue-500));
+  --color-viz-div-p3: light-dark(var(--blue-600), var(--blue-300));
+  --color-viz-div-n3-on: light-dark(var(--neutral-0), var(--neutral-950));
+  --color-viz-div-n2-on: light-dark(var(--neutral-900), var(--neutral-0));
+  --color-viz-div-n1-on: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-viz-div-0-on: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-viz-div-p1-on: light-dark(var(--neutral-900), var(--neutral-100));
+  --color-viz-div-p2-on: light-dark(var(--neutral-900), var(--neutral-0));
+  --color-viz-div-p3-on: light-dark(var(--neutral-0), var(--neutral-950));
+
+  /* Flux strokes of the metabolic map: low, medium, high */
+  --color-viz-flux-1: light-dark(var(--neutral-500), var(--neutral-400));
+  --color-viz-flux-2: light-dark(var(--teal-600), var(--teal-300));
+  --color-viz-flux-3: light-dark(var(--red-500), var(--red-300));
+
+  /* Signed causal edges. Each also has its own end marker, label and, for a hypothesis, a dash. */
+  --color-edge-increase: light-dark(var(--chart-blue-strong), var(--chart-blue-soft));
+  --color-edge-decrease: light-dark(var(--chart-vermillion-strong), var(--chart-vermillion-soft));
+  --color-edge-mitigate: light-dark(var(--chart-teal-strong), var(--chart-teal-soft));
+  --color-edge-aggravate: light-dark(var(--chart-purple-strong), var(--chart-purple-soft));
+  --color-edge-neutral: light-dark(var(--chart-grey-strong), var(--chart-grey-soft));
+  --color-edge-hypothesis: light-dark(var(--chart-amber-strong), var(--chart-amber-soft));
+
+  /* Evidence grades (the letter inside the badge carries the meaning too) */
+  --color-grade-established: light-dark(var(--green-600), var(--green-400));
+  --color-grade-plausible: light-dark(var(--blue-600), var(--blue-400));
+  --color-grade-speculative: light-dark(var(--amber-600), var(--amber-400));
+  --color-grade-conversation: light-dark(var(--neutral-500), var(--neutral-400));
+}
