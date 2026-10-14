@@ -15,7 +15,8 @@ export const routes = [
   { name: 'kb-type', path: '/kb/:type', title: 'Knowledge base', load: () => import('./views/kb/KbTypeView.vue') },
   { name: 'kb-entity', path: '/kb/:type/:slug', title: 'Knowledge base', load: () => import('./views/kb/KbEntityView.vue') },
   { name: 'workbench-index', path: '/workbench', title: 'Workbenches', load: () => import('./views/WorkbenchIndexView.vue') },
-  { name: 'workbench', path: '/workbench/:name', title: 'Workbench', load: () => import('./views/WorkbenchView.vue') }
+  { name: 'workbench', path: '/workbench/:name', title: 'Workbench', load: () => import('./views/WorkbenchView.vue') },
+  { name: 'dev-viz', path: '/dev/viz', title: 'Chart components', load: () => import('./views/dev/VizGallery.vue') }
 ]
 
 export const notFoundRoute = {
