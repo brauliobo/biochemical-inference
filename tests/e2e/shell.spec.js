@@ -30,6 +30,11 @@ const ROUTES = [
   '/#/kb/state/no-such-entry',
   '/#/kb/not-a-type',
   '/#/dev/viz',
+  '/#/evidence',
+  '/#/evidence/claims',
+  '/#/evidence/literature',
+  '/#/evidence/claim/free-glycine-stimulates-gastrin',
+  '/#/evidence/article/lamers-2007-glycine-flux',
   '/#/workbench',
   ...workbenches.map((item) => `/#/workbench/${item.name}`),
   '/#/workbench/no-such-workbench',
@@ -38,6 +43,7 @@ const ROUTES = [
 
 for (const colorScheme of ['light', 'dark']) {
   test(`has no WCAG 2.2 AA violations on any shell route (${colorScheme})`, async ({ page }) => {
+    test.setTimeout(180_000) // one axe scan per route, and the evidence dashboards are large pages
     await page.emulateMedia({ colorScheme })
     for (const route of ROUTES) {
       await page.goto(route)

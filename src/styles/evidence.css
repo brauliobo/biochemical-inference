@@ -1,0 +1,389 @@
+/*
+ * Evidence dashboards (src/components/evidence, src/views/evidence, the claim and article
+ * templates). Semantic tokens only. Colour never stands alone: every mark pairs a hue with a
+ * marker shape (design, stance, status) or a printed number.
+ */
+
+/* ---- Design icon: the marker shape and colour of a study design, shared with the Timeline lanes ---- */
+.ev-design {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  white-space: nowrap;
+}
+.ev-design__icon {
+  flex: none;
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  overflow: visible;
+}
+
+/* ---- Grade mark: one letter in a ring in the grade colour; the word is for assistive technology ---- */
+.ev-grade {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: calc(var(--icon-size) * 1.5);
+  block-size: calc(var(--icon-size) * 1.5);
+  border: var(--border-width-strong) solid var(--viz-grade);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-heading);
+  line-height: var(--leading-compact);
+}
+
+/* ---- Status tiles: the headline counters. Each is a button that filters the table below it. ---- */
+.ev-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--target-min) * 3)), 1fr));
+  gap: var(--space-gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ev-tile {
+  --tile-color: var(--color-border-strong);
+  display: grid;
+  gap: var(--space-cluster-tight);
+  align-content: start;
+  inline-size: 100%;
+  min-block-size: calc(var(--target-min) * 2);
+  padding: var(--space-inset);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-block-start: var(--border-width-accent) solid var(--tile-color);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  text-align: start;
+  cursor: pointer;
+}
+.ev-tile:hover { background: var(--color-surface-sunken); }
+.ev-tile[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  border-block-start-color: var(--tile-color);
+  border-width: var(--border-width-strong);
+  background: var(--color-surface-sunken);
+}
+.ev-tile--supported { --tile-color: var(--color-success-border); }
+.ev-tile--partly-supported { --tile-color: var(--color-info-border); }
+.ev-tile--unsupported { --tile-color: var(--color-danger-border); }
+.ev-tile--contested { --tile-color: var(--color-warning-border); }
+.ev-tile__count {
+  font-size: var(--text-h2);
+  font-weight: var(--weight-heading);
+  line-height: var(--leading-compact);
+  font-variant-numeric: tabular-nums;
+}
+.ev-tile__label { font-weight: var(--weight-strong); }
+.ev-tile__share {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+.ev-tile__bar {
+  display: block;
+  block-size: var(--border-width-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  overflow: hidden;
+}
+.ev-tile__bar > span {
+  display: block;
+  block-size: 100%;
+  inline-size: calc(var(--share) * 100%);
+  background: var(--tile-color);
+}
+
+/* ---- Verdict bar: bar length = how much evidence, split = for versus against (weighted by design) ---- */
+.ev-vbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-cluster);
+  min-inline-size: calc(var(--grid-min) * 0.6);
+}
+.ev-vbar__track {
+  display: flex;
+  flex: 1 1 auto;
+  block-size: var(--icon-size);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-sunken);
+  overflow: hidden;
+}
+.ev-vbar--large .ev-vbar__track { block-size: calc(var(--icon-size) * 1.75); }
+.ev-vbar__fill {
+  display: flex;
+  inline-size: calc(var(--length) * 100%);
+  min-inline-size: 0;
+}
+.ev-vbar__for {
+  flex-grow: var(--for);
+  flex-basis: 0;
+  background: var(--color-viz-1);
+}
+.ev-vbar__against,
+.ev-key__chip--against {
+  border-inline-start: var(--border-width-strong) solid var(--color-surface-raised);
+  background-color: var(--color-surface-raised);
+  background-image: repeating-linear-gradient(135deg, var(--color-viz-2) 0, var(--color-viz-2) var(--space-cluster-tight), transparent var(--space-cluster-tight), transparent calc(var(--space-cluster-tight) * 2));
+}
+.ev-vbar__against {
+  flex-grow: var(--against);
+  flex-basis: 0;
+}
+.ev-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  font-size: var(--text-small);
+}
+.ev-key__chip {
+  display: inline-block;
+  inline-size: calc(var(--icon-size) * 1.5);
+  block-size: var(--icon-size);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+}
+.ev-key__chip--for { background: var(--color-viz-1); }
+.ev-vbar__none {
+  padding-inline: var(--space-cluster-tight);
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+  line-height: var(--icon-size);
+}
+.ev-vbar__nums {
+  flex: none;
+  min-inline-size: calc(var(--target-min) * 1.5);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* ---- Claims matrix and literature table ---- */
+/* The table is the containing block of its visually hidden text, so that text scrolls (and is clipped) with it. */
+.ev-table {
+  position: relative;
+  font-size: var(--text-small);
+}
+.ev-table :is(th, td) { vertical-align: middle; }
+.ev-num { font-variant-numeric: tabular-nums; }
+.ev-table .ev-num { text-align: end; }
+.ev-table .ev-group th {
+  background: var(--color-surface-sunken);
+  font-size: var(--text-small);
+  text-align: start;
+}
+.ev-table .badge { white-space: nowrap; }
+.ev-oneline {
+  display: block;
+  max-inline-size: calc(var(--measure) * 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ev-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  min-block-size: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--weight-strong);
+  text-align: start;
+  cursor: pointer;
+}
+.ev-sort:hover { color: var(--color-link-hover); }
+th[aria-sort] .ev-sort::after {
+  content: "\25BE";
+  color: var(--color-accent);
+}
+.ev-stance {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-cluster-tight);
+  white-space: nowrap;
+}
+
+/* ---- Year dot plot: a design marker placed along a thin axis ---- */
+.ev-yearaxis {
+  display: flex;
+  align-items: center;
+  gap: var(--space-cluster);
+}
+.ev-yearaxis__track {
+  position: relative;
+  flex: none;
+  inline-size: calc(var(--target-min) * 3);
+  block-size: calc(var(--icon-size) * 1.25);
+}
+.ev-yearaxis__track::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  border-block-start: var(--border-width) solid var(--color-border-strong);
+}
+.ev-yearaxis__dot {
+  position: absolute;
+  inset-inline-start: calc(var(--at) * 100%);
+  inset-block-start: 50%;
+  inline-size: var(--icon-size);
+  block-size: var(--icon-size);
+  translate: -50% -50%;
+  overflow: visible;
+}
+
+/* ---- Dumbbell: what the conversation claimed (open ring at the right edge) against where the recorded literature puts it ---- */
+.ev-db {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ev-db__row,
+.ev-db__axis {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) calc(var(--target-min) * 1.25);
+  align-items: center;
+  gap: var(--space-cluster);
+  min-block-size: var(--target-min);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+.ev-db__axis {
+  border-block-end: var(--border-width) solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+}
+.ev-db__scale {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-cluster-tight);
+}
+.ev-db__label {
+  display: block;
+  overflow: hidden;
+  font-size: var(--text-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ev-db__plot {
+  position: relative;
+  margin-inline: var(--space-cluster);
+  block-size: calc(var(--icon-size) * 1.75);
+}
+.ev-db__plot::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  border-inline-start: var(--border-width) dashed var(--color-border-strong);
+}
+.ev-db__line {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--from) * 100%);
+  inline-size: calc((var(--to) - var(--from)) * 100%);
+  border-block-start: var(--border-width-accent) solid var(--viz-color);
+}
+.ev-db__mark {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--at) * 100%);
+  inline-size: calc(var(--icon-size) * 1.25);
+  block-size: calc(var(--icon-size) * 1.25);
+  translate: -50% -50%;
+  overflow: visible;
+}
+.ev-db__claimed {
+  fill: var(--color-surface-raised);
+  stroke: var(--color-text);
+  stroke-width: var(--border-width-strong);
+}
+.ev-db__num {
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+/* Narrow screens: names wrap in a narrow column so more of a table row is on screen; the dumbbell
+   gives the claim name the full row and puts the plot under it. */
+@media (max-width: 40rem) {
+  .ev-oneline {
+    max-inline-size: calc(var(--target-min) * 3.5);
+    white-space: normal;
+  }
+  .ev-db__row {
+    grid-template-columns: minmax(0, 1fr) calc(var(--target-min) * 1.25);
+    gap: 0 var(--space-cluster);
+    padding-block: var(--space-cluster-tight);
+  }
+  .ev-db__label {
+    grid-column: 1 / -1;
+    white-space: normal;
+  }
+  .ev-db__axis { grid-template-columns: minmax(0, 1fr) calc(var(--target-min) * 1.25); }
+  .ev-db__axis > :first-child { display: none; }
+}
+
+/* ---- Support index gauge ---- */
+.ev-gauge {
+  position: relative;
+  padding-block: var(--space-cluster-tight);
+}
+.ev-gauge__track {
+  display: block;
+  block-size: var(--icon-size);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background-image: linear-gradient(to right, var(--color-viz-div-n2), var(--color-viz-div-0), var(--color-viz-div-p2));
+}
+.ev-gauge__mark {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--at) * 100%);
+  inline-size: calc(var(--icon-size) * 1.75);
+  block-size: calc(var(--icon-size) * 1.75);
+  translate: -50% -50%;
+  overflow: visible;
+}
+.ev-gauge__ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-muted);
+  font-size: var(--text-caption);
+}
+
+/* ---- Verdict card ---- */
+.ev-verdict {
+  border-inline-start: var(--border-width-accent) solid var(--tile-color, var(--color-border-strong));
+}
+.ev-verdict--supported { --tile-color: var(--color-success-border); }
+.ev-verdict--partly-supported { --tile-color: var(--color-info-border); }
+.ev-verdict--unsupported { --tile-color: var(--color-danger-border); }
+.ev-verdict--contested { --tile-color: var(--color-warning-border); }
+.ev-verdict__statement {
+  margin: 0;
+  font-size: var(--text-lead);
+  line-height: var(--leading-prose);
+}
+
+/* ---- Chips: a list of short facts ---- */
+.ev-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ev-chips > li { min-inline-size: 0; }
+.ev-chips .ev-stance { white-space: normal; }
+
+/* ---- Citation card ---- */
+.ev-citation__title {
+  margin: 0;
+  font-size: var(--text-h3);
+}
