@@ -37,6 +37,8 @@ const chosenStatus = computed(() => (chosen.value ? STATUS_WORD[chosen.value.sta
 
 const { result, running, error, warnings } = useModelRun(() => import('../../components/dash-gut/gut-run.js').then((module) => module.createGutRunner()), snapshot, { debounceMs: 120 })
 const tiles = computed(() => (result.value ? gutTiles(result.value, controls) : []))
+const ph = computed(() => (result.value ? phSeries(result.value) : []))
+const acid = computed(() => (result.value ? acidSeries(result.value) : []))
 const explanations = computed(() => (result.value ? EXPLANATIONS.map((item) => ({ id: item.id, title: item.title, evidence: item.evidence, model: item.model(result.value, controls) })) : []))
 const PARAMS = ['bao', 'dpao', 'ki_fb', 'alk_other', 'k_pump_rec', 'air_in', 'k_belch', 'k_pass', 'hco3_mucosal']
 </script>
@@ -55,8 +57,8 @@ DashboardShell(title="Gut, acid and belching" question="Why would glycine powder
     Panel(title="What the model says" title-id="gut-tiles")
       ResultTiles(:tiles="tiles")
     Panel(title="Stomach pH and acid" title-id="gut-ph")
-      LineChartPlus(id="gut-ph-chart" title="Stomach pH over 8 hours" :x="result.time" :series="phSeries(result)" :events="result.markers" :bands="[{ from: 0, to: 4, label: 'Below pH 4' }]" unit="pH" x-unit="h" :y-min="0" :y-max="8" :height="280")
-      LineChartPlus(id="gut-acid-chart" title="Acid secreted by the stomach wall" :x="result.time" :series="acidSeries(result)" :events="result.markers" unit="mmol/h" x-unit="h" :y-min="0" :height="220")
+      LineChartPlus(id="gut-ph-chart" title="Stomach pH over 8 hours" :x="result.time" :series="ph" :events="result.markers" :bands="[{ from: 0, to: 4, label: 'Below pH 4' }]" unit="pH" x-unit="h" :y-min="0" :y-max="8" :height="280")
+      LineChartPlus(id="gut-acid-chart" title="Acid secreted by the stomach wall" :x="result.time" :series="acid" :events="result.markers" unit="mmol/h" x-unit="h" :y-min="0" :height="220")
     Panel(title="Where the CO2 goes" title-id="gut-co2" lede="Acid and bicarbonate make CO2, but almost all of it crosses the gut wall. Compare with the swallowed air in the same gas pocket.")
       Co2Budget(:co2="result.co2")
     Panel(title="Competing explanations for belching" title-id="gut-explanations" lede="Grades and verdicts come from the knowledge base; the last chip says what the model can say about each.")

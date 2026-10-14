@@ -32,6 +32,7 @@ const presets = [...HISTAMINE_PRESETS, ...METHYLATION_LINKS.map((link) => ({ id:
 const preset = ref('reference')
 const link = ref(null) // the methylation-model values behind a "Methylation model: ..." preset
 const linking = ref(false)
+const linkProblem = ref('')
 
 const sameAs = (item) => Object.keys(HISTAMINE_DEFAULTS).every((key) => item.controls[key] === controls[key])
 const linkHolds = computed(() => link.value && Math.abs(controls.samUM - link.value.samUM) < 0.5 && Math.abs(controls.sahUM - link.value.sahUM) < 0.5)
@@ -49,11 +50,17 @@ watch(preset, async (id) => {
   const wanted = METHYLATION_LINKS.find((item) => item.id === id)
   if (!wanted || link.value?.id === id) return
   linking.value = true
-  const { methylationSamSah } = await import('../../components/dash-gut/methylation-link.js')
-  const found = methylationSamSah(wanted.scenario)
-  linking.value = false
-  Object.assign(controls, HISTAMINE_DEFAULTS, { samUM: Math.round(found.sam * 10) / 10, sahUM: Math.round(found.sah * 10) / 10, diurnal: controls.diurnal })
-  link.value = { ...found, id, samUM: controls.samUM, sahUM: controls.sahUM }
+  linkProblem.value = ''
+  try {
+    const { methylationSamSah } = await import('../../components/dash-gut/methylation-link.js')
+    const found = methylationSamSah(wanted.scenario)
+    Object.assign(controls, HISTAMINE_DEFAULTS, { samUM: Math.round(found.sam * 10) / 10, sahUM: Math.round(found.sah * 10) / 10, diurnal: controls.diurnal })
+    link.value = { ...found, id, samUM: controls.samUM, sahUM: controls.sahUM }
+  } catch (problem) {
+    linkProblem.value = `The methylation model could not be read: ${problem.message}`
+  } finally {
+    linking.value = false
+  }
 })
 const linkStatus = computed(() => (link.value ? STATUS_WORD[{ supported: 'measured-anchor', partly: 'model-prediction', hypothesis: 'hypothesis' }[link.value.status] ?? 'hypothesis'] : null))
 
@@ -85,6 +92,7 @@ DashboardShell(title="Histamine and night waking" question="Does low SAM slow hi
         span {{ `${link.label}: SAM:SAH ${link.ratio0.toFixed(1)} to ${link.ratio.toFixed(1)}, so SAM ${(link.relSam * 100).toFixed(0)}% and SAH ${(link.relSah * 100).toFixed(0)}% of baseline.` }}
       p.muted {{ link.summary }}
     p.muted(v-if="linking" role="status") Reading SAM and SAH from the methylation model.
+    p.muted(v-if="linkProblem" role="alert") {{ linkProblem }}
     .dg-controls
       SliderField(id="his-sam" label="SAM available to HNMT" unit="uM" :min="SAM_LIMITS.min" :max="SAM_LIMITS.max" :step="1" v-model="controls.samUM" hint="Reference 60 uM (rat-liver scale; human tissue not measured).")
       SliderField(id="his-sah" label="SAH (HNMT is inhibited by it)" unit="uM" :min="SAH_LIMITS.min" :max="SAH_LIMITS.max" :step="1" v-model="controls.sahUM" hint="Reference 12 uM.")

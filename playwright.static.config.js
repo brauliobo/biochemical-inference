@@ -13,7 +13,7 @@ const port = Number(process.env.E2E_STATIC_PORT ?? 4173)
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  testMatch: ['shell.spec.js', 'usability-tasks.spec.js', 'populated-states.spec.js', 'evidence-dashboards.spec.js'],
+  testMatch: ['shell.spec.js', 'usability-tasks.spec.js', 'populated-states.spec.js', 'evidence-dashboards.spec.js', 'dashboards-b.spec.js'],
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 2 : 0,
