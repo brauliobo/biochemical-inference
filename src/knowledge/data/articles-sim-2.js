@@ -6137,55 +6137,6 @@ export default [
     ]
   },
   {
-    "id": "article:dressman-1990-upper-gi-ph",
-    "type": "article",
-    "name": "Upper gastrointestinal (GI) pH in young, healthy men and women",
-    "aliases": [
-      "Dressman 1990"
-    ],
-    "summary": "Heidelberg capsule study in young healthy adults: median fasted gastric pH 1.7, duodenal 6.1; a meal raised gastric pH briefly to 6.7 before it returned to fasted values within 2 hours.",
-    "body": [
-      "Fasting and postprandial gastric pH."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Dressman JB",
-      "Berardi RR",
-      "Dermentzoglou LC",
-      "Russell TL",
-      "Schmaltz SP",
-      "Barnett JL",
-      "Jarvenpaa KM"
-    ],
-    "year": 1990,
-    "journal": "Pharmaceutical research",
-    "doi": "10.1023/a:1015827908309",
-    "pmid": "2395805",
-    "url": "https://doi.org/10.1023/a:1015827908309",
-    "verified": true,
-    "takeaways": [
-      "pH was recorded continuously for about 6 hours.",
-      "Fed gastric pH peaked at a median of 6.7 and declined to fasted values in under 2 hours; fed duodenal pH was 5.4 and did not recover within 4 hours.",
-      "No gender effect was found."
-    ],
-    "facts": {
-      "design": "physiology study",
-      "population": "Young healthy men and women"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "system:gastric-physiology",
-        "note": "Fasting pH 1.7; meal peak 6.7."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "state:hypochlorhydria",
-        "note": "Reference for normal pH."
-      }
-    ]
-  },
-  {
     "id": "article:delchier-1997-omeprazole-24h-acidity",
     "type": "article",
     "name": "Twenty-four-hour intragastric acidity and plasma gastrin during 3-month treatment with omeprazole in healthy subjects",
