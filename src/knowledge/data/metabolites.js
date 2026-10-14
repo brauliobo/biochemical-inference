@@ -777,7 +777,6 @@ export default [
     evidence: "established",
     facts: { formula: "C6H11N3", molarMass: "125.17 g/mol", chebi: "CHEBI:29009", pubchem: "CID 3614" },
     relations: [
-      { rel: "decreases", to: "state:histamine-excess", note: "Methylation inactivates histamine" },
       { rel: "part-of", to: "pathway:histamine-degradation" }
     ],
     refs: ["article:maintz-2007-histamine-intolerance", "article:yoshikawa-2019-hnmt-brain"]

@@ -35,10 +35,11 @@ export default [
       { rel: "interacts-with", to: "compound:5-mthf", note: "5-MTHF polyglutamate binds and inhibits GNMT (established)" },
       { rel: "mitigates", to: "state:overmethylation", note: "disposes of surplus SAM methyl groups" },
       { rel: "associated-with", to: "state:undermethylation", note: "conversation-proposed: bolus free glycine over-recruits GNMT and drains SAM; human evidence lacking" },
-      { rel: "decreases", to: "compound:sam", note: "Spends SAM on methylating glycine; the hepatic methyl-sink reaction." },
+      { rel: "decreases", to: "compound:sam", note: "Spends SAM on methylating glycine; the hepatic methyl-sink reaction.", claim: "claim:gnmt-methyl-sink-valve", strength: "strong" },
       { rel: "decreases", to: "compound:glycine", note: "Glycine is its methyl acceptor." },
       { rel: "increases", to: "compound:sah", note: "Co-product of every methylation." },
-      { rel: "measured-by", to: "outcome:sarcosine-elevation", note: "Sarcosine is the product; it is raised when GNMT flux is high or sarcosine clearance is impaired." }
+      { rel: "measured-by", to: "outcome:sarcosine-elevation", note: "Sarcosine is the product; it is raised when GNMT flux is high or sarcosine clearance is impaired." },
+      { rel: "increases", to: "compound:sarcosine", note: "Product of glycine methylation.", strength: "strong" }
     ],
     refs: ["article:melendez-hevia-2009-glycine-weak-link"]
   },
@@ -70,7 +71,16 @@ export default [
       { rel: "part-of", to: "pathway:pemt-pc-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "consumes 3 SAM per PC" },
       { rel: "associated-with", to: "state:undermethylation", note: "low SAM limits PEMT output; weak link from PC to vagal acetylcholine is conversation-proposed" },
-      { rel: "interacts-with", to: "enzyme:chpt1", note: "parallel route to PC (CDP-choline) compensates when PEMT is limited" }
+      { rel: "interacts-with", to: "enzyme:chpt1", note: "parallel route to PC (CDP-choline) compensates when PEMT is limited" },
+      {
+        rel: "increases",
+        to: "compound:phosphatidylcholine",
+        note: "Hepatic de novo route to phosphatidylcholine; the CDP-choline route runs in parallel.",
+        claim: "claim:pemt-consumes-three-sam",
+        strength: "strong"
+      },
+      { rel: "decreases", to: "compound:sam", note: "Three SAM per phosphatidylcholine, one of the largest methyl sinks.", claim: "claim:pemt-consumes-three-sam", strength: "strong" },
+      { rel: "increases", to: "compound:sah", note: "Three SAH per phosphatidylcholine." }
     ]
   },
   {
@@ -101,7 +111,11 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "folate-independent remethylation" },
       { rel: "part-of", to: "pathway:choline-oxidation", note: "first methyl-donating step of betaine catabolism" },
       { rel: "mitigates", to: "state:undermethylation", note: "regenerates methionine/SAM from homocysteine without folate or B12 (plausible; supplement trials mixed)" },
-      { rel: "interacts-with", to: "enzyme:mtr", note: "parallel remethylation route" }
+      { rel: "interacts-with", to: "enzyme:mtr", note: "parallel remethylation route" },
+      { rel: "decreases", to: "compound:homocysteine", note: "Folate- and B12-independent remethylation, mainly in liver and kidney.", strength: "strong" },
+      { rel: "increases", to: "compound:methionine", strength: "strong" },
+      { rel: "decreases", to: "compound:betaine" },
+      { rel: "increases", to: "compound:dimethylglycine", note: "Co-product; first step of betaine methyl loss on the way to glycine." }
     ]
   },
   {
@@ -158,7 +172,9 @@ export default [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:methionine-cycle", note: "supplies the methyl donor 5-MTHF" },
       { rel: "interacts-with", to: "compound:sam", note: "SAM is an allosteric inhibitor (established)" },
-      { rel: "associated-with", to: "state:undermethylation", note: "reduced-activity variants can lower remethylation, mainly when folate is low" }
+      { rel: "associated-with", to: "state:undermethylation", note: "reduced-activity variants can lower remethylation, mainly when folate is low" },
+      { rel: "increases", to: "compound:5-mthf", strength: "strong" },
+      { rel: "decreases", to: "compound:5-10-methylene-thf" }
     ]
   },
   {
@@ -188,7 +204,11 @@ export default [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:folate-cycle", note: "only enzyme that releases THF from 5-MTHF" },
       { rel: "interacts-with", to: "compound:methylcobalamin", note: "cofactor / methyl carrier" },
-      { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" }
+      { rel: "interacts-with", to: "enzyme:mtrr", note: "MTRR reactivates oxidised cobalamin" },
+      { rel: "decreases", to: "compound:homocysteine", strength: "strong" },
+      { rel: "increases", to: "compound:methionine", strength: "strong" },
+      { rel: "decreases", to: "compound:5-mthf", note: "Uses 5-methyl-THF as methyl donor; the reaction that traps folate as 5-MTHF when B12 is short." },
+      { rel: "increases", to: "compound:thf" }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -217,7 +237,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle", note: "keeps methionine synthase active" },
       { rel: "interacts-with", to: "enzyme:mtr", note: "binds and reactivates MTR" },
-      { rel: "interacts-with", to: "compound:sam", note: "methyl donor for reactivation" }
+      { rel: "interacts-with", to: "compound:sam", note: "methyl donor for reactivation" },
+      { rel: "increases", to: "compound:methylcobalamin", note: "Reactivates cob(II)alamin by reductive methylation with SAM." }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:stabler-2013-vitamin-b12-deficiency"]
   },
@@ -303,7 +324,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methionine-cycle" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "sets SAM:SAH methylation index" },
-      { rel: "associated-with", to: "state:undermethylation", note: "elevated homocysteine pushes equilibrium toward SAH and lowers the SAM:SAH ratio" }
+      { rel: "associated-with", to: "state:undermethylation", note: "elevated homocysteine pushes equilibrium toward SAH and lowers the SAM:SAH ratio" },
+      { rel: "decreases", to: "compound:sah", strength: "strong" },
+      { rel: "increases", to: "compound:homocysteine" }
     ],
     refs: ["article:selhub-1999-homocysteine-metabolism", "article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -332,7 +355,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "interacts-with", to: "compound:magnesium", note: "required divalent cation" },
-      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; product SAH inhibits" }
+      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; product SAH inhibits" },
+      { rel: "decreases", to: "compound:sam", note: "A small methyl sink; dopamine, catecholamine and oestrogen metabolism." },
+      { rel: "increases", to: "compound:sah" }
     ],
     refs: ["article:meiser-2013-dopamine-metabolism"]
   },
@@ -364,7 +389,9 @@ export default [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
       { rel: "interacts-with", to: "compound:sam", note: "allosteric activator" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "low PLP lowers CBS flux; post-methionine-load homocysteine is a functional marker" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "low PLP lowers CBS flux; post-methionine-load homocysteine is a functional marker" },
+      { rel: "decreases", to: "compound:homocysteine", strength: "strong" },
+      { rel: "increases", to: "compound:cystathionine" }
     ],
     refs: ["article:morris-2017-cbs-deficiency-guidelines", "article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -394,7 +421,9 @@ export default [
       { rel: "part-of", to: "pathway:transsulfuration" },
       { rel: "part-of", to: "pathway:glutathione-synthesis", note: "supplies cysteine" },
       { rel: "interacts-with", to: "compound:plp", note: "pyridoxal phosphate cofactor" },
-      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "cystathionine rises when PLP is limiting" }
+      { rel: "associated-with", to: "state:b6-functional-deficiency", note: "cystathionine rises when PLP is limiting" },
+      { rel: "decreases", to: "compound:cystathionine" },
+      { rel: "increases", to: "compound:cysteine" }
     ],
     refs: ["article:reactome-sulfur-amino-acid-metabolism"]
   },
@@ -621,7 +650,10 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route", note: "choline-derived glycine" },
-      { rel: "part-of", to: "pathway:folate-cycle", note: "donates one-carbon unit to mitochondrial THF" }
+      { rel: "part-of", to: "pathway:folate-cycle", note: "donates one-carbon unit to mitochondrial THF" },
+      { rel: "decreases", to: "compound:dimethylglycine" },
+      { rel: "increases", to: "compound:sarcosine" },
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "The methyl carbon enters the folate pool." }
     ],
     refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
@@ -650,7 +682,9 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "part-of", to: "pathway:glycine-serine-route" },
-      { rel: "interacts-with", to: "enzyme:gnmt", note: "shared metabolite sarcosine; recaptures GNMT-derived methyl as one-carbon unit" }
+      { rel: "interacts-with", to: "enzyme:gnmt", note: "shared metabolite sarcosine; recaptures GNMT-derived methyl as one-carbon unit" },
+      { rel: "decreases", to: "compound:sarcosine", note: "Also recaptures the sarcosine made by GNMT." },
+      { rel: "increases", to: "compound:glycine", note: "Final step of the choline-derived glycine route." }
     ],
     refs: ["article:reactome-choline-catabolism", "article:watmough-2010-etf-qo"]
   },
@@ -680,7 +714,9 @@ export default [
     },
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
-      { rel: "interacts-with", to: "enzyme:choline-kinase", note: "competes for the free choline pool" }
+      { rel: "interacts-with", to: "enzyme:choline-kinase", note: "competes for the free choline pool" },
+      { rel: "decreases", to: "compound:choline", note: "Mitochondrial oxidation, the first step to betaine." },
+      { rel: "increases", to: "compound:betaine-aldehyde" }
     ]
   },
   {
@@ -708,7 +744,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:choline-oxidation" },
       { rel: "associated-with", to: "state:b6-functional-deficiency", note: "ALDH7A1 deficiency traps PLP via P6C (pyridoxine-dependent epilepsy)" },
-      { rel: "interacts-with", to: "compound:plp", note: "inactivated by P6C when the enzyme is deficient" }
+      { rel: "interacts-with", to: "compound:plp", note: "inactivated by P6C when the enzyme is deficient" },
+      { rel: "increases", to: "compound:betaine", note: "Betaine aldehyde dehydrogenase step." }
     ],
     refs: ["article:reactome-choline-catabolism"]
   },
@@ -854,7 +891,11 @@ export default [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "part-of", to: "pathway:methyl-budget" },
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "reduced activity variants or low SAM may slow intracellular clearance (plausible)" },
-      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; SAH-inhibited" }
+      { rel: "associated-with", to: "state:undermethylation", note: "SAM-dependent; SAH-inhibited" },
+      { rel: "decreases", to: "compound:histamine", note: "Intracellular ring N-methylation; the only histamine-clearing route in brain.", claim: "claim:hnmt-needs-sam", strength: "strong" },
+      { rel: "decreases", to: "compound:sam", note: "One SAM per histamine methylated; a small methyl sink." },
+      { rel: "increases", to: "compound:sah" },
+      { rel: "increases", to: "compound:methylhistamine" }
     ]
   },
   {
@@ -882,7 +923,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:histamine-degradation" },
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "low DAO activity is the proposed mechanism; contested" },
-      { rel: "interacts-with", to: "enzyme:hnmt", note: "complementary extracellular vs intracellular clearance" }
+      { rel: "interacts-with", to: "enzyme:hnmt", note: "complementary extracellular vs intracellular clearance" },
+      { rel: "decreases", to: "compound:histamine", note: "Extracellular oxidative deamination in gut and kidney; not SAM-dependent.", strength: "strong" }
     ]
   },
 
@@ -1369,7 +1411,9 @@ export default [
     },
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis", note: "rate-limiting first step" },
-      { rel: "interacts-with", to: "compound:creatine", note: "end-product repression of expression" }
+      { rel: "interacts-with", to: "compound:creatine", note: "end-product repression of expression" },
+      { rel: "decreases", to: "compound:glycine", note: "Glycine is the amidino acceptor; creatine synthesis is a continuing glycine sink." },
+      { rel: "increases", to: "compound:guanidinoacetate" }
     ],
     refs: ["article:brosnan-2007-creatine-review"]
   },
@@ -1398,7 +1442,16 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "large SAM consumer; share debated" },
-      { rel: "associated-with", to: "state:undermethylation", note: "consumes SAM; creatine supplementation spares methyl groups (plausible)" }
+      { rel: "associated-with", to: "state:undermethylation", note: "consumes SAM; creatine supplementation spares methyl groups (plausible)" },
+      {
+        rel: "decreases",
+        to: "compound:sam",
+        note: "One SAM per creatine made; creatine synthesis is one of the largest methyl sinks (share debated).",
+        claim: "claim:gnmt-methyl-sink-valve",
+        strength: "strong"
+      },
+      { rel: "increases", to: "compound:sah", note: "Co-product of the methylation of guanidinoacetate." },
+      { rel: "increases", to: "compound:creatine" }
     ],
     refs: ["article:brosnan-2007-creatine-review"]
   },
@@ -1710,7 +1763,8 @@ export default [
       { rel: "catalyzes", to: "reaction:glycine-cleavage-system" },
       { rel: "part-of", to: "pathway:glycine-cleavage" },
       { rel: "decreases", to: "compound:glycine", note: "Main catabolic route" },
-      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Provides one-carbon units to the folate pool" }
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Provides one-carbon units to the folate pool" },
+      { rel: "increases", to: "compound:carbon-dioxide" }
     ],
     refs: ["article:kikuchi-2008-glycine-cleavage-system", "article:reactome-glycine-degradation", "article:applegarth-2004-glycine-encephalopathy"]
   },
@@ -1737,7 +1791,9 @@ export default [
       { rel: "catalyzes", to: "reaction:shmt-serine-glycine-interconversion" },
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "part-of", to: "pathway:glycine-serine-route" },
-      { rel: "increases", to: "compound:glycine", note: "Main endogenous source, from serine" }
+      { rel: "increases", to: "compound:glycine", note: "Main endogenous source, from serine" },
+      { rel: "decreases", to: "compound:serine" },
+      { rel: "increases", to: "compound:5-10-methylene-thf", note: "Carries the serine beta-carbon into the folate pool." }
     ],
     refs: ["article:reactome-folate-pterine-metabolism", "article:parra-2018-vitamin-b6-metabolism"]
   },
@@ -1816,7 +1872,7 @@ export default [
     relations: [
       { rel: "increases", to: "compound:1-methylnicotinamide" },
       { rel: "increases", to: "compound:sah", note: "Co-product of every methylation" },
-      { rel: "decreases", to: "compound:sam", note: "Methyl donor consumed" },
+      { rel: "decreases", to: "compound:sam", note: "Methyl donor consumed", claim: "claim:niacin-drains-methyl-groups", strength: "weak" },
       { rel: "decreases", to: "compound:nicotinamide" },
       { rel: "part-of", to: "pathway:methyl-budget", note: "One of several SAM sinks; relative size in humans is uncertain" }
     ],

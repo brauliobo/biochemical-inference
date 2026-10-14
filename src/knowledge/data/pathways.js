@@ -271,7 +271,8 @@ export default [
       { rel: "associated-with", to: "disease:histamine-intolerance", note: "reduced DAO/HNMT capacity is the proposed mechanism" },
       { rel: "associated-with", to: "outcome:night-waking", note: "conversation-only: nocturnal histamine peak, relieved by choline" },
       { rel: "associated-with", to: "outcome:tachycardia", note: "conversation-only: histamine H1/H2 cardiac effect at night" },
-      { rel: "interacts-with", to: "pathway:methyl-budget", note: "HNMT competes for SAM and is inhibited by SAH" }
+      { rel: "interacts-with", to: "pathway:methyl-budget", note: "HNMT competes for SAM and is inhibited by SAH" },
+      { rel: "decreases", to: "state:histamine-excess", note: "DAO (extracellular) and HNMT (intracellular) clear histamine.", strength: "strong" }
     ]
   },
   {
@@ -344,7 +345,16 @@ export default [
       { rel: "associated-with", to: "outcome:belching", note: "conversation-proposed gas source; magnitude unproven" },
       { rel: "associated-with", to: "system:gastric-physiology" },
       { rel: "associated-with", to: "system:bile", note: "biliary bicarbonate contributes to neutralisation" },
-      { rel: "interacts-with", to: "pathway:gastric-acid-secretion", note: "acid source" }
+      { rel: "interacts-with", to: "pathway:gastric-acid-secretion", note: "acid source" },
+      { rel: "increases", to: "compound:carbon-dioxide", note: "H+ + HCO3- gives H2CO3 and then CO2 + H2O; about 25 mL of gas per mmol at body temperature.", strength: "strong" },
+      {
+        rel: "increases",
+        to: "outcome:co2-gastric-distension",
+        note: "Conversation claim that CO2 formed in the stomach (acid meeting bicarbonate from reflux or swallowed alkali) distends it; chemistry is established, the volume after glycine is not.",
+        hypothesis: true,
+        claim: "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        strength: "weak"
+      }
     ],
     refs: ["article:kaunitz-2006-duodenal-co2-carbonic-anhydrase", "article:allen-2005-mucus-bicarbonate-barrier"]
   },
@@ -514,7 +524,23 @@ export default [
       { rel: "associated-with", to: "disease:sibo", note: "conversation-only: overgrowth as the setting for glycine fermentation" },
       { rel: "associated-with", to: "system:gut-microbiota" },
       { rel: "associated-with", to: "outcome:belching", note: "conversation-only mechanism for eructation after glycine or collagen powder" },
-      { rel: "associated-with", to: "state:hypochlorhydria", note: "loss of the acid barrier (PPIs) permits upper-gut colonisation; established as a risk, magnitude debated" }
+      { rel: "associated-with", to: "state:hypochlorhydria", note: "loss of the acid barrier (PPIs) permits upper-gut colonisation; established as a risk, magnitude debated" },
+      {
+        rel: "increases",
+        to: "compound:carbon-dioxide",
+        note: "Glycine cleavage and fermentation release CO2 and ammonia; human relevance after oral glycine is speculative.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "compound:ammonia",
+        note: "Ammonia is the other end product of Stickland reduction and bacterial glycine cleavage.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      }
     ]
   },
   {
@@ -635,15 +661,24 @@ export default [
     evidence: "established",
     facts: { receptors: "H1 (Gq-coupled), H2 (Gs-coupled); H3 and H4 have newer, smaller roles in the heart" },
     relations: [
-      { rel: "causes", to: "outcome:flushing", note: "When histamine release is large." },
+      { rel: "causes", to: "outcome:flushing", note: "When histamine release is large.", claim: "claim:histamine-h1-h2-tachycardia-flushing" },
       {
         rel: "causes",
         to: "outcome:tachycardia",
-        note: "Established in allergy and mast-cell settings; not shown to cause palpitations at normal levels."
-      },
+        note: "Established in allergy and mast-cell settings; not shown to cause palpitations at normal levels.",
+        claim: "claim:histamine-h1-h2-tachycardia-flushing"
+    },
       { rel: "interacts-with", to: "compound:histamine" },
       { rel: "interacts-with", to: "pathway:histamine-degradation", note: "Clearance ends receptor signalling." },
-      { rel: "associated-with", to: "system:cardiac-autonomic-control" }
+      { rel: "associated-with", to: "system:cardiac-autonomic-control" },
+      {
+        rel: "causes",
+        to: "outcome:night-waking",
+        note: "Histamine is a wake-promoting transmitter; the 2-4 am release peak is partly supported.",
+        hypothesis: true,
+        claim: "claim:histamine-peaks-2-4am",
+        strength: "weak"
+      }
     ],
     refs: ["article:hattori-2017-histamine-cardiovascular", "article:maintz-2007-histamine-intolerance"]
   },
@@ -683,7 +718,8 @@ export default [
         rel: "interacts-with",
         to: "intervention:prokinetic-drugs",
         note: "Erythromycin triggers phase III through the motilin receptor."
-      }
+      },
+      { rel: "decreases", to: "disease:sibo", note: "Phase III sweeps residue and bacteria distally; reduced MMC activity is a recognised predisposition.", strength: "moderate" }
     ],
     refs: ["article:deloose-2012-migrating-motor-complex", "article:mondal-2017-duodenal-ph-mmc-motilin"]
   },

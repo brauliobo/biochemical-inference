@@ -29,9 +29,25 @@ export default [
       { rel: "measured-by", to: "outcome:low-sam-sah-ratio" },
       { rel: "measured-by", to: "outcome:global-dna-methylation", note: "Research tool; not a clinical diagnostic." },
       { rel: "measured-by", to: "outcome:blood-histamine-level", note: "Walsh marker; non-specific and not validated." },
-      { rel: "decreases", to: "pathway:histamine-degradation", note: "Plausible via SAM-dependent HNMT; not shown to be limiting in vivo." },
+      { rel: "decreases", to: "pathway:histamine-degradation", note: "Plausible via SAM-dependent HNMT; not shown to be limiting in vivo.", hypothesis: true, claim: "claim:hnmt-needs-sam", strength: "weak" },
       { rel: "associated-with", to: "state:methyl-donor-depletion" },
-      { rel: "associated-with", to: "state:overmethylation", note: "Opposite pole of the Walsh classification." }
+      { rel: "associated-with", to: "state:overmethylation", note: "Opposite pole of the Walsh classification." },
+      {
+        rel: "decreases",
+        to: "system:vagal-tone",
+        note: "Summary of the conversation chain (SAM, PEMT, PC, choline, acetylcholine); no human evidence of subclinical vagal dysfunction in under-methylation.",
+        hypothesis: true,
+        claim: "claim:undermethylation-causes-subclinical-vagal-dysfunction",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "state:histamine-excess",
+        note: "Walsh-framework link (low blood histamine is claimed in over-methylation, high in under-methylation); mechanism would be less SAM for HNMT, not shown to be limiting.",
+        hypothesis: true,
+        claim: "claim:hnmt-needs-sam",
+        strength: "weak"
+      }
     ],
     refs: ["article:stead-2006-methyl-balance-reevaluation", "article:luka-2009-gnmt-sam-regulation", "article:ueland-2011-choline-betaine"]
   },
@@ -105,7 +121,17 @@ export default [
       { rel: "manifests-as", to: "outcome:glutamate-gaba-imbalance" },
       { rel: "manifests-as", to: "outcome:low-plp-status" },
       { rel: "measured-by", to: "outcome:low-plp-status" },
-      { rel: "aggravates", to: "state:glycine-insufficiency", note: "SHMT and the glycine cleavage system need PLP; the effect on glycine pools in humans is modest and indirect." }
+      { rel: "aggravates", to: "state:glycine-insufficiency", note: "SHMT and the glycine cleavage system need PLP; the effect on glycine pools in humans is modest and indirect.", claim: "claim:shmt-gcs-need-plp" },
+      { rel: "increases", to: "compound:glycine", note: "Moderate dietary B6 restriction raised plasma glycine and cystathionine in healthy adults (tracer study).", strength: "moderate" },
+      { rel: "increases", to: "compound:cystathionine", note: "Same study: cystathionine rose with B6 restriction.", strength: "moderate" },
+      {
+        rel: "decreases",
+        to: "enzyme:glycine-cleavage-system",
+        note: "PLP is required by the P protein (GLDC); the size of the effect on glycine catabolism in humans is modest.",
+        claim: "claim:shmt-gcs-need-plp",
+        strength: "weak"
+      },
+      { rel: "decreases", to: "enzyme:gad", note: "GAD needs PLP; severe deficiency lowers GABA and can cause seizures.", strength: "moderate" }
     ],
     refs: ["article:parra-2018-vitamin-b6-metabolism", "article:petroff-2002-gaba-glutamate"]
   },
@@ -126,7 +152,15 @@ export default [
       { rel: "manifests-as", to: "outcome:belching", note: "Retained air/gas may be vented; belching itself is mostly swallowed air." },
       { rel: "causes", to: "disease:gastroparesis", note: "Severe, confirmed delay with no mechanical obstruction." },
       { rel: "measured-by", to: "outcome:delayed-gastric-emptying" },
-      { rel: "associated-with", to: "disease:functional-dyspepsia" }
+      { rel: "associated-with", to: "disease:functional-dyspepsia" },
+      {
+        rel: "aggravates",
+        to: "outcome:belching",
+        note: "Retained gas or air is vented as belching; the claimed link from subclinical dysmotility is a hypothesis, and most belching is swallowed air.",
+        hypothesis: true,
+        claim: "claim:undermethylation-causes-subclinical-vagal-dysfunction",
+        strength: "weak"
+      }
     ],
     refs: ["article:camilleri-2022-acg-gastroparesis", "article:stanghellini-2016-rome-iv-gastroduodenal", "article:browning-2014-vagal-control-gi"]
   },
@@ -226,8 +260,8 @@ export default [
     relations: [
       { rel: "causes", to: "state:hypochlorhydria" },
       { rel: "increases", to: "outcome:elevated-gastric-ph" },
-      { rel: "increases", to: "disease:sibo", note: "Moderate association in meta-analyses; causal size debated." },
-      { rel: "aggravates", to: "state:gastric-dysmotility", note: "PPIs delay solid-meal emptying in some studies." },
+      { rel: "increases", to: "disease:sibo", note: "Moderate association in meta-analyses; causal size debated.", claim: "claim:ppis-cause-sibo", strength: "weak" },
+      { rel: "aggravates", to: "state:gastric-dysmotility", note: "PPIs delay solid-meal emptying in some studies.", claim: "claim:ppis-slow-gastric-emptying", strength: "weak" },
       { rel: "measured-by", to: "outcome:elevated-gastric-ph" }
     ],
     refs: ["article:sanaka-2010-ppi-gastric-emptying", "article:lo-2013-ppi-sibo-meta-analysis", "article:su-2018-ppi-sibo-meta-analysis", "article:katz-2022-acg-gerd-guideline"]
@@ -285,11 +319,12 @@ export default [
     ],
     evidence: "established",
     relations: [
-      { rel: "manifests-as", to: "outcome:flushing" },
-      { rel: "manifests-as", to: "outcome:tachycardia" },
-      { rel: "manifests-as", to: "outcome:night-waking", note: "Hypothesised; plasma histamine rises at night in some studies." },
+      { rel: "manifests-as", to: "outcome:flushing", claim: "claim:histamine-h1-h2-tachycardia-flushing", strength: "moderate" },
+      { rel: "manifests-as", to: "outcome:tachycardia", claim: "claim:histamine-h1-h2-tachycardia-flushing", strength: "moderate" },
+      { rel: "manifests-as", to: "outcome:night-waking", note: "Hypothesised; plasma histamine rises at night in some studies.", hypothesis: true, claim: "claim:histamine-peaks-2-4am", strength: "weak" },
       { rel: "causes", to: "disease:histamine-intolerance" },
-      { rel: "measured-by", to: "outcome:blood-histamine-level", note: "Plasma histamine is short-lived; poor routine marker." }
+      { rel: "measured-by", to: "outcome:blood-histamine-level", note: "Plasma histamine is short-lived; poor routine marker." },
+      { rel: "measured-by", to: "compound:methylhistamine", note: "Urinary N-methylhistamine is used as a research marker of histamine turnover; plasma histamine is short-lived." }
     ],
     refs: ["article:maintz-2007-histamine-intolerance", "article:nakamura-2017-mast-cell-clock-histamine"]
   },
@@ -326,7 +361,23 @@ export default [
         to: "outcome:reflux-episodes",
         note: "Bile-containing reflux is detected by bilirubin and impedance monitoring."
       },
-      { rel: "causes", to: "disease:gastritis", note: "Bile reflux gastritis, mainly after gastric surgery or with pyloric incompetence." }
+      { rel: "causes", to: "disease:gastritis", note: "Bile reflux gastritis, mainly after gastric surgery or with pyloric incompetence." },
+      {
+        rel: "aggravates",
+        to: "outcome:belching",
+        note: "Proposed in the same claim; bile reflux is a recognised finding in some reflux patients.",
+        hypothesis: true,
+        claim: "claim:glycine-overload-shifts-bile-conjugation-and-reflux",
+        strength: "weak"
+      },
+      {
+        rel: "increases",
+        to: "pathway:acid-bicarbonate-neutralisation",
+        note: "Bile and pancreatic bicarbonate refluxed into the stomach meet gastric acid there.",
+        hypothesis: true,
+        claim: "claim:acid-bicarbonate-reaction-gives-co2-belching",
+        strength: "weak"
+      }
     ],
     refs: ["article:fein-2006-duodenogastric-reflux-gord", "article:stefaniwsky-1985-udca-alkaline-reflux-gastritis"]
   }

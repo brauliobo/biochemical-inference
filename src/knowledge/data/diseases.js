@@ -67,7 +67,23 @@ export default [
       { rel: "associated-with", to: "state:hypochlorhydria" },
       { rel: "associated-with", to: "state:gastric-dysmotility", note: "Impaired migrating motor complex is a recognised predisposition." },
       { rel: "interacts-with", to: "system:gut-microbiota" },
-      { rel: "manifests-as", to: "outcome:flatulence", note: "Typical but non-specific; carbohydrate fermentation gas." }
+      { rel: "manifests-as", to: "outcome:flatulence", note: "Typical but non-specific; carbohydrate fermentation gas." },
+      {
+        rel: "increases",
+        to: "pathway:gut-bacterial-glycine-fates",
+        note: "Overgrown proximal bacteria are the proposed site of the fermentation.",
+        hypothesis: true,
+        claim: "claim:sibo-bacteria-metabolize-glycine-co2-nh3",
+        strength: "weak"
+      },
+      {
+        rel: "causes",
+        to: "outcome:belching",
+        note: "Conversation claim that proximal bacterial gas appears 15-45 minutes after a dose as belching; breath-test gas is mostly hydrogen and methane and belching is mostly swallowed air.",
+        hypothesis: true,
+        claim: "claim:sibo-gas-appears-in-15-45-min-as-belching",
+        strength: "weak"
+      }
     ],
     refs: ["article:pimentel-2020-acg-sibo-guideline", "article:rezaie-2017-breath-test-consensus", "article:kashyap-2024-sibo-critical-appraisal"]
   },
@@ -109,7 +125,7 @@ export default [
     evidence: "plausible",
     facts: { icd10: "No dedicated code; coded under J38.7 (other diseases of larynx) or K21 when GERD is present" },
     relations: [
-      { rel: "manifests-as", to: "outcome:throat-burning" },
+      { rel: "manifests-as", to: "outcome:throat-burning", claim: "claim:throat-burning-means-lpr", strength: "moderate" },
       { rel: "manifests-as", to: "outcome:salivary-pepsin" },
       { rel: "measured-by", to: "outcome:salivary-pepsin", note: "Controversial and not diagnostic on its own." },
       { rel: "associated-with", to: "system:larynx-pharynx" },

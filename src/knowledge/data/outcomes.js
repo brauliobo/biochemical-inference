@@ -16,8 +16,16 @@ export default [
     relations: [
       { rel: "associated-with", to: "disease:aerophagia-belching-disorders" },
       { rel: "associated-with", to: "system:lower-esophageal-sphincter" },
-      { rel: "aggravates", to: "disease:lpr", note: "Hypothesised route for refluxate/pepsin to reach the larynx; untested." },
-      { rel: "measured-by", to: "outcome:reflux-episodes", note: "Impedance-pH classifies gastric versus supragastric belching." }
+      { rel: "aggravates", to: "disease:lpr", note: "Hypothesised route for refluxate/pepsin to reach the larynx; untested.", hypothesis: true, claim: "claim:belch-aerosol-deposits-pepsin", strength: "weak" },
+      { rel: "measured-by", to: "outcome:reflux-episodes", note: "Impedance-pH classifies gastric versus supragastric belching." },
+      {
+        rel: "increases",
+        to: "outcome:salivary-pepsin",
+        note: "Conversation claim that belches carry acid and pepsin droplets to the larynx; pepsin is found in laryngeal tissue of reflux patients, the belching route is untested.",
+        hypothesis: true,
+        claim: "claim:belch-aerosol-deposits-pepsin",
+        strength: "weak"
+      }
     ],
     refs: ["article:stanghellini-2016-rome-iv-gastroduodenal", "article:ong-2018-diaphragmatic-breathing-belching"]
   },
@@ -163,7 +171,15 @@ export default [
       { rel: "associated-with", to: "state:hypochlorhydria" },
       { rel: "increases", to: "disease:sibo", note: "Reduced acid barrier; association rather than proven cause." },
       { rel: "decreases", to: "compound:pepsin", note: "Pepsin is activated by acid and reversibly inactive near pH 6.5." },
-      { rel: "associated-with", to: "pathway:gastric-acid-secretion" }
+      { rel: "associated-with", to: "pathway:gastric-acid-secretion" },
+      {
+        rel: "aggravates",
+        to: "state:gastric-dysmotility",
+        note: "Conversation claim that higher pH delays LES closure and pyloric opening; no source found.",
+        hypothesis: true,
+        claim: "claim:higher-ph-delays-les-closure-and-pylorus",
+        strength: "weak"
+      }
     ],
     refs: ["article:schubert-2008-gastric-acid-secretion-control"]
   },
@@ -183,7 +199,7 @@ export default [
       { rel: "associated-with", to: "compound:bicarbonate" },
       { rel: "associated-with", to: "compound:hydrochloric-acid" },
       { rel: "associated-with", to: "system:pancreas-bicarbonate" },
-      { rel: "causes", to: "outcome:transient-les-relaxations", note: "Gastric distension is the classical trigger; CO2 from drinks is shown, CO2 from acid-bicarbonate chemistry is not." }
+      { rel: "causes", to: "outcome:transient-les-relaxations", note: "Gastric distension is the classical trigger; CO2 from drinks is shown, CO2 from acid-bicarbonate chemistry is not.", hypothesis: true, claim: "claim:acid-bicarbonate-reaction-gives-co2-belching", strength: "weak" }
     ]
   },
   {
@@ -533,7 +549,21 @@ export default [
     relations: [
       { rel: "associated-with", to: "compound:pepsin" },
       { rel: "associated-with", to: "disease:lpr" },
-      { rel: "associated-with", to: "system:larynx-pharynx" }
+      { rel: "associated-with", to: "system:larynx-pharynx" },
+      {
+        rel: "aggravates",
+        to: "disease:lpr",
+        note: "Pepsin taken up by laryngeal cells depletes protective stress proteins in cultured tissue.",
+        claim: "claim:larynx-50-100x-more-sensitive",
+        strength: "weak"
+      },
+      {
+        rel: "aggravates",
+        to: "outcome:throat-burning",
+        note: "Pepsin and acid on a mucosa without the stomach's mucus and bicarbonate layers; the \"50-100 times\" sensitivity factor is unsourced.",
+        claim: "claim:larynx-50-100x-more-sensitive",
+        strength: "weak"
+      }
     ],
     refs: ["article:johnston-2006-pepsin-laryngeal-epithelium", "article:chen-2023-aga-extraesophageal-reflux"]
   },
