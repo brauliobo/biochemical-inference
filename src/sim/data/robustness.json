@@ -1,0 +1,1105 @@
+{
+ "n": 100,
+ "seed": 7,
+ "flatBand": 0.02,
+ "fingerprint": "9c425fe122ecda68",
+ "rows": [
+  {
+   "id": "g10-all",
+   "scenario": "glycine-10g",
+   "group": "glycine",
+   "label": "10 g glycine, single dose",
+   "note": "All constants sampled over their literature ranges",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.236,
+     "p25": -0.116,
+     "p50": -0.052,
+     "p75": -0.007,
+     "p95": 0,
+     "fracDown": 0.6,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.51
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.3
+      },
+      {
+       "op": "below",
+       "x": -0.2,
+       "fraction": 0.11
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.6
+     }
+    },
+    {
+     "id": "sam",
+     "label": "Trough SAM",
+     "observable": "sam",
+     "reduce": "min",
+     "p5": -0.254,
+     "p25": -0.141,
+     "p50": -0.094,
+     "p75": -0.054,
+     "p95": -0.022,
+     "fracDown": 0.96,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.77
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 0.96
+     }
+    },
+    {
+     "id": "gnmt",
+     "label": "Peak GNMT flux",
+     "observable": "gnmt",
+     "reduce": "max",
+     "p5": 0.001,
+     "p25": 0.015,
+     "p50": 0.077,
+     "p75": 0.163,
+     "p95": 0.388,
+     "fracDown": 0,
+     "fracUp": 0.68,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.61
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.68
+     }
+    },
+    {
+     "id": "sar",
+     "label": "Peak hepatic sarcosine",
+     "observable": "sar",
+     "reduce": "max",
+     "p5": 0.001,
+     "p25": 0.012,
+     "p50": 0.078,
+     "p75": 0.168,
+     "p95": 0.38,
+     "fracDown": 0,
+     "fracUp": 0.68,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.58
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.68
+     }
+    }
+   ]
+  },
+  {
+   "id": "g10-reed",
+   "scenario": "glycine-10g",
+   "group": "glycine",
+   "label": "10 g glycine, GNMT Km(glycine) 130 uM",
+   "note": "Reed value: enzyme already glycine-saturated",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.035,
+     "p25": -0.015,
+     "p50": -0.006,
+     "p75": -0.001,
+     "p95": 0,
+     "fracDown": 0.15,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.02
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.01
+      }
+     ],
+     "verdict": {
+      "key": "mostly-flat",
+      "text": "mostly does not change",
+      "share": 0.85
+     }
+    },
+    {
+     "id": "gnmt",
+     "label": "Peak GNMT flux",
+     "observable": "gnmt",
+     "reduce": "max",
+     "p5": 0,
+     "p25": 0.005,
+     "p50": 0.015,
+     "p75": 0.026,
+     "p95": 0.043,
+     "fracDown": 0,
+     "fracUp": 0.4,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.03
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.6
+     }
+    }
+   ]
+  },
+  {
+   "id": "g10-luka",
+   "scenario": "glycine-10g",
+   "group": "glycine",
+   "label": "10 g glycine, GNMT Km(glycine) 2 mM",
+   "note": "Luka-style value: flux follows hepatic glycine",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.293,
+     "p25": -0.124,
+     "p50": -0.091,
+     "p75": -0.06,
+     "p95": -0.037,
+     "fracDown": 1,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.81
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.41
+      },
+      {
+       "op": "below",
+       "x": -0.2,
+       "fraction": 0.12
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 1
+     }
+    },
+    {
+     "id": "gnmt",
+     "label": "Peak GNMT flux",
+     "observable": "gnmt",
+     "reduce": "max",
+     "p5": 0.057,
+     "p25": 0.1,
+     "p50": 0.153,
+     "p75": 0.219,
+     "p95": 0.37,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.97
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "g5-all",
+   "scenario": "glycine-5g",
+   "group": "glycine",
+   "label": "5 g glycine, single dose",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.18,
+     "p25": -0.086,
+     "p50": -0.039,
+     "p75": -0.006,
+     "p95": 0,
+     "fracDown": 0.6,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.44
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.21
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.6
+     }
+    }
+   ]
+  },
+  {
+   "id": "g3-all",
+   "scenario": "glycine-3g",
+   "group": "glycine",
+   "label": "3 g glycine, single dose",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.132,
+     "p25": -0.062,
+     "p50": -0.029,
+     "p75": -0.004,
+     "p95": 0,
+     "fracDown": 0.54,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.34
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.54
+     }
+    }
+   ]
+  },
+  {
+   "id": "g10day-all",
+   "scenario": "glycine-10g-day",
+   "group": "glycine",
+   "label": "10 g glycine per day, chronic",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.099,
+     "p25": -0.012,
+     "p50": 0.018,
+     "p75": 0.066,
+     "p95": 0.184,
+     "fracDown": 0.21,
+     "fracUp": 0.48,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.13
+      },
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.31
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.48
+     }
+    },
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": -0.396,
+     "p25": -0.197,
+     "p50": -0.127,
+     "p75": -0.076,
+     "p95": -0.034,
+     "fracDown": 0.99,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.86
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 0.99
+     }
+    }
+   ]
+  },
+  {
+   "id": "g10-low-folate",
+   "scenario": "glycine-low-folate",
+   "group": "glycine",
+   "label": "10 g glycine per day, low folate",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.103,
+     "p25": -0.021,
+     "p50": 0.001,
+     "p75": 0.024,
+     "p95": 0.069,
+     "fracDown": 0.28,
+     "fracUp": 0.28,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.17
+      },
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.12
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.43999999999999995
+     }
+    }
+   ]
+  },
+  {
+   "id": "niacin2",
+   "scenario": "niacin-2g",
+   "group": "niacin",
+   "label": "Niacin 2 g per day",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.978,
+     "p25": -0.883,
+     "p50": -0.743,
+     "p75": -0.54,
+     "p95": -0.251,
+     "fracDown": 1,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.2,
+       "fraction": 0.98
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 1
+     }
+    },
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": -0.152,
+     "p25": -0.045,
+     "p50": 0.007,
+     "p75": 0.074,
+     "p95": 0.282,
+     "fracDown": 0.34,
+     "fracUp": 0.43,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.34
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.43
+     }
+    }
+   ]
+  },
+  {
+   "id": "niacin05",
+   "scenario": "niacin-500mg",
+   "group": "niacin",
+   "label": "Niacin 500 mg per day",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.256,
+     "p25": -0.137,
+     "p50": -0.063,
+     "p75": -0.028,
+     "p95": -0.012,
+     "fracDown": 0.85,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.58
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.34
+      }
+     ],
+     "verdict": {
+      "key": "mostly-down",
+      "text": "mostly falls",
+      "share": 0.85
+     }
+    }
+   ]
+  },
+  {
+   "id": "mthfr",
+   "scenario": "mthfr-677tt",
+   "group": "folate",
+   "label": "MTHFR at 0.4x (677TT-like)",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "mthf",
+     "label": "Final 5-MTHF",
+     "observable": "mthf",
+     "reduce": "final",
+     "p5": -0.55,
+     "p25": -0.523,
+     "p50": -0.502,
+     "p75": -0.467,
+     "p95": -0.426,
+     "fracDown": 1,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.2,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 1
+     }
+    },
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": 0.401,
+     "p25": 0.532,
+     "p50": 0.649,
+     "p75": 0.768,
+     "p95": 0.988,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.2,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    },
+    {
+     "id": "trough",
+     "label": "Trough SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "min",
+     "p5": -0.29,
+     "p25": -0.158,
+     "p50": -0.079,
+     "p75": -0.025,
+     "p95": 0,
+     "fracDown": 0.8,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.61
+      }
+     ],
+     "verdict": {
+      "key": "mostly-down",
+      "text": "mostly falls",
+      "share": 0.8
+     }
+    }
+   ]
+  },
+  {
+   "id": "b12",
+   "scenario": "b12-deficiency",
+   "group": "folate",
+   "label": "B12 deficiency (synthase at 0.2x)",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": 0.426,
+     "p25": 0.736,
+     "p50": 0.937,
+     "p75": 1.043,
+     "p95": 1.316,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.2,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    },
+    {
+     "id": "mthf",
+     "label": "Final 5-MTHF",
+     "observable": "mthf",
+     "reduce": "final",
+     "p5": 1.132,
+     "p25": 1.193,
+     "p50": 1.232,
+     "p75": 1.267,
+     "p95": 1.32,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.2,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    },
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.107,
+     "p25": 0.01,
+     "p50": 0.145,
+     "p75": 0.306,
+     "p95": 0.79,
+     "fracDown": 0.16,
+     "fracUp": 0.74,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.11
+      },
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 0.7
+      }
+     ],
+     "verdict": {
+      "key": "mostly-up",
+      "text": "mostly rises",
+      "share": 0.74
+     }
+    }
+   ]
+  },
+  {
+   "id": "b6",
+   "scenario": "b6-restriction",
+   "group": "b6",
+   "label": "B6 restriction (PLP at 41%)",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "cysta",
+     "label": "Final cystathionine",
+     "observable": "cysta",
+     "reduce": "final",
+     "p5": 0.437,
+     "p25": 0.531,
+     "p50": 0.643,
+     "p75": 0.737,
+     "p95": 0.841,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.2,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    },
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": 0.102,
+     "p25": 0.186,
+     "p50": 0.24,
+     "p75": 0.351,
+     "p95": 0.464,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.05,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "bet6-all",
+   "scenario": "betaine-6g-day",
+   "group": "choline",
+   "label": "Betaine 6 g per day",
+   "note": "All constants sampled (BHMT Km(betaine) 23 uM to 2.2 mM)",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": -0.12,
+     "p25": -0.054,
+     "p50": -0.026,
+     "p75": -0.01,
+     "p95": -0.001,
+     "fracDown": 0.55,
+     "fracUp": 0.01,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.29
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.1
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.55
+     }
+    }
+   ]
+  },
+  {
+   "id": "bet6-human",
+   "scenario": "betaine-6g-day",
+   "group": "choline",
+   "label": "Betaine 6 g per day, BHMT Km(betaine) 2.2 mM",
+   "note": "Human recombinant enzyme",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": -0.244,
+     "p25": -0.157,
+     "p50": -0.102,
+     "p75": -0.059,
+     "p95": -0.01,
+     "fracDown": 0.92,
+     "fracUp": 0.02,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.78
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 0.5
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 0.92
+     }
+    }
+   ]
+  },
+  {
+   "id": "bet6-reed",
+   "scenario": "betaine-6g-day",
+   "group": "choline",
+   "label": "Betaine 6 g per day, BHMT Km(betaine) 100 uM",
+   "note": "Reed value: enzyme already saturated",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "thcy",
+     "label": "Final plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "final",
+     "p5": -0.07,
+     "p25": -0.025,
+     "p50": -0.015,
+     "p75": -0.009,
+     "p95": -0.002,
+     "fracDown": 0.33,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.12
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.6699999999999999
+     }
+    }
+   ]
+  },
+  {
+   "id": "bet3",
+   "scenario": "betaine-3g",
+   "group": "choline",
+   "label": "Betaine 3 g, single dose",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "thcy",
+     "label": "Lowest plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "min",
+     "p5": -0.102,
+     "p25": -0.047,
+     "p50": -0.023,
+     "p75": -0.009,
+     "p95": -0.002,
+     "fracDown": 0.52,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.02,
+       "fraction": 0.52
+      },
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 0.25
+      }
+     ],
+     "verdict": {
+      "key": "mixed",
+      "text": "parameter-dependent",
+      "share": 0.52
+     }
+    },
+    {
+     "id": "bhmt",
+     "label": "Peak BHMT flux",
+     "observable": "bhmt",
+     "reduce": "max",
+     "p5": 0.023,
+     "p25": 0.062,
+     "p50": 0.155,
+     "p75": 0.283,
+     "p95": 0.515,
+     "fracDown": 0,
+     "fracUp": 0.97,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.1,
+       "fraction": 0.66
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 0.97
+     }
+    }
+   ]
+  },
+  {
+   "id": "choline2",
+   "scenario": "choline-2g",
+   "group": "choline",
+   "label": "Choline 2 g, single dose",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "bet",
+     "label": "Peak hepatic betaine",
+     "observable": "bet",
+     "reduce": "max",
+     "p5": 0.047,
+     "p25": 0.111,
+     "p50": 0.201,
+     "p75": 0.345,
+     "p95": 0.661,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.1,
+       "fraction": 0.78
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    },
+    {
+     "id": "thcy",
+     "label": "Lowest plasma tHcy",
+     "observable": "tHcy",
+     "reduce": "min",
+     "p5": -0.026,
+     "p25": -0.009,
+     "p50": -0.003,
+     "p75": -0.001,
+     "p95": 0,
+     "fracDown": 0.08,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.02,
+       "fraction": 0.08
+      }
+     ],
+     "verdict": {
+      "key": "robust-flat",
+      "text": "robustly does not change",
+      "share": 0.92
+     }
+    }
+   ]
+  },
+  {
+   "id": "pemt2",
+   "scenario": "pemt-upregulation",
+   "group": "choline",
+   "label": "PEMT at 2x",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "final",
+     "label": "Final SAM:SAH",
+     "observable": "samSahRatio",
+     "reduce": "final",
+     "p5": -0.361,
+     "p25": -0.288,
+     "p50": -0.243,
+     "p75": -0.201,
+     "p95": -0.161,
+     "fracDown": 1,
+     "fracUp": 0,
+     "thresholds": [
+      {
+       "op": "below",
+       "x": -0.05,
+       "fraction": 1
+      },
+      {
+       "op": "below",
+       "x": -0.1,
+       "fraction": 1
+      }
+     ],
+     "verdict": {
+      "key": "robust-down",
+      "text": "robustly falls",
+      "share": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "gnmt-ko",
+   "scenario": "gnmt-ko",
+   "group": "consumers",
+   "label": "GNMT activity at 0 (knockout)",
+   "note": "Human GNMT deficiency: SAM x28-47. The model cannot reach it",
+   "members": 100,
+   "failures": 0,
+   "metrics": [
+    {
+     "id": "sam",
+     "label": "Final SAM",
+     "observable": "sam",
+     "reduce": "final",
+     "p5": 0.288,
+     "p25": 0.525,
+     "p50": 0.724,
+     "p75": 1.143,
+     "p95": 2.062,
+     "fracDown": 0,
+     "fracUp": 1,
+     "thresholds": [
+      {
+       "op": "above",
+       "x": 0.5,
+       "fraction": 0.8
+      },
+      {
+       "op": "above",
+       "x": 9,
+       "fraction": 0
+      }
+     ],
+     "verdict": {
+      "key": "robust-up",
+      "text": "robustly rises",
+      "share": 1
+     }
+    }
+   ]
+  }
+ ]
+}
