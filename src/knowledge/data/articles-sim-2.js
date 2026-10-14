@@ -4,108 +4,6 @@
 // not copied. Each entry says which simulation parameter it supports. Not wired into index.js: import and concatenate it there.
 export default [
   {
-    "id": "article:mudd-1975-labile-methyl-balance-diets",
-    "type": "article",
-    "name": "Labile methyl balances for normal humans on various dietary regimens",
-    "aliases": [
-      "Mudd 1975"
-    ],
-    "summary": "Metabolic-ward study in normal adults on fixed diets: creatinine output exceeded preformed methyl intake, so methyl groups must be made de novo, and homocysteine cycles back to methionine repeatedly.",
-    "body": [
-      "Historical anchor for the [[pathway:methyl-budget|methyl budget]]: it first showed that creatine output exceeds dietary methyl supply."
-    ],
-    "evidence": "established",
-    "authors": [
-      "Mudd SH",
-      "Poole JR"
-    ],
-    "year": 1975,
-    "journal": "Metabolism: clinical and experimental",
-    "doi": "10.1016/0026-0495(75)90040-2",
-    "pmid": "1128236",
-    "url": "https://doi.org/10.1016/0026-0495(75)90040-2",
-    "verified": true,
-    "takeaways": [
-      "Adults ate fixed normal or semisynthetic diets low in methionine, choline and cystine while urinary creatinine, creatine and sarcosine were measured.",
-      "In men on normal diets creatinine excretion alone outweighed total intake of preformed labile methyl groups, so methylneogenesis must contribute in both sexes.",
-      "With labile methyl intake curtailed, de novo methyl formation outweighed ingested methyl groups.",
-      "The average homocysteinyl unit went round the methionine cycle at least 1.9 times (men) or 1.5 times (women) before becoming cystathionine, rising to 3.9 and 3.0 on the restricted diets."
-    ],
-    "facts": {
-      "design": "metabolic-ward study",
-      "population": "Healthy young adult men and women"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "pathway:methyl-budget",
-        "note": "First human labile-methyl balance; methylneogenesis must operate."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "Methyl groups for creatine, sarcosine and other products come from SAM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "state:methyl-donor-depletion",
-        "note": "Shows how curtailed methyl intake raises homocysteine cycling."
-      }
-    ]
-  },
-  {
-    "id": "article:storch-1988-methionine-cycle-fed-fasted",
-    "type": "article",
-    "name": "Quantitative study in vivo of methionine cycle in humans using [methyl-2H3]- and [1-13C]methionine",
-    "aliases": [
-      "Storch 1988"
-    ],
-    "summary": "Stable-isotope infusion in healthy young men: transmethylation was 5.8 umol/kg/h fasted and 14 umol/kg/h fed, remethylation 1.8 and 5.7, transsulfuration 4.0 and 8.3.",
-    "body": [
-      "Source of the fed/fasted whole-body [[pathway:methionine-cycle|methionine-cycle]] fluxes that bound total transmethylation in the SAM budget."
-    ],
-    "evidence": "established",
-    "authors": [
-      "Storch KJ",
-      "Wagner DA",
-      "Burke JF",
-      "Young VR"
-    ],
-    "year": 1988,
-    "journal": "The American journal of physiology",
-    "doi": "10.1152/ajpendo.1988.255.3.e322",
-    "pmid": "3421329",
-    "url": "https://doi.org/10.1152/ajpendo.1988.255.3.e322",
-    "verified": true,
-    "takeaways": [
-      "A five-hour infusion of [methyl-2H3]- and [1-13C]methionine was analysed with a stochastic model in four fed and four post-absorptive young men.",
-      "Post-absorptive: transmethylation 5.8, remethylation 1.8, transsulfuration 4.0 umol/kg/h; fed on small isonitrogenous meals: 14, 5.7 and 8.3.",
-      "Meals more than doubled transmethylation, so the daily total depends on how the day is split between fed and fasted states (about 9.7 vs 23.5 mmol/day at 70 kg).",
-      "Tracer enrichments were taken from plasma methionine, which later work showed underestimates the intracellular enrichment."
-    ],
-    "facts": {
-      "design": "tracer-study",
-      "population": "Healthy young men, n=4 per state"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "pathway:methionine-cycle",
-        "note": "Whole-body transmethylation, remethylation and transsulfuration in the fed and fasted state."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "pathway:methyl-budget",
-        "note": "Provides the lower and upper daily transmethylation bounds."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:methionine",
-        "note": "Tracer kinetics of methionine."
-      }
-    ]
-  },
-  {
     "id": "article:maccoss-2001-intracellular-enrichment-correction",
     "type": "article",
     "name": "Measurement of intracellular sulfur amino acid metabolism in humans",
@@ -157,118 +55,6 @@ export default [
     ]
   },
   {
-    "id": "article:brosnan-2011-creatine-synthesis-burden",
-    "type": "article",
-    "name": "The metabolic burden of creatine synthesis",
-    "aliases": [
-      "Brosnan 2011"
-    ],
-    "summary": "Review: creatine synthesis consumes about 40% of SAM methyl groups and 20-30% of arginine amidino groups; creatinine loss is ~14.6 mmol/day in young men and about half is replaced by diet.",
-    "body": [
-      "Supplies the creatine share of the SAM budget ([[pathway:creatine-synthesis|creatine synthesis]]) and the vegetarian scenario."
-    ],
-    "evidence": "established",
-    "authors": [
-      "Brosnan JT",
-      "da Silva RP",
-      "Brosnan ME"
-    ],
-    "year": 2011,
-    "journal": "Amino acids",
-    "doi": "10.1007/s00726-011-0853-y",
-    "pmid": "21387089",
-    "url": "https://doi.org/10.1007/s00726-011-0853-y",
-    "verified": true,
-    "takeaways": [
-      "Adult creatine is lost spontaneously to creatinine at about 2 g (14.6 mmol) per day in 70 kg men aged 20-39, less in women and the old.",
-      "Omnivores replace roughly half of this from meat and fish; vegetarians must make nearly all of it.",
-      "The whole glycine molecule is used, but because glycine is readily made it is not considered a burden.",
-      "Synthesis accounts for about 40% of labile SAM methyl groups, lower than the older >70% figure but still a major demand."
-    ],
-    "facts": {
-      "design": "review",
-      "population": "Human metabolism, narrative review"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "pathway:creatine-synthesis",
-        "note": "Quantifies the methyl, arginine and glycine demand of creatine synthesis."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:creatine",
-        "note": "Creatinine loss ~14.6 mmol/day, half replaced by diet."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "About 40% of SAM methyl groups."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gamt",
-        "note": "GAMT is the SAM-consuming step."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "intervention:creatine-supplement",
-        "note": "Dietary or supplemental creatine reduces the endogenous synthesis burden."
-      }
-    ]
-  },
-  {
-    "id": "article:luka-2008-gnmt-liver-vs-recombinant",
-    "type": "article",
-    "name": "Acetylation of N-terminal valine of glycine N-methyltransferase affects enzyme inhibition by folate",
-    "aliases": [
-      "Luka 2008"
-    ],
-    "summary": "Rat liver and recombinant GNMT compared: SAM K0.5 280 vs 460 uM, glycine Km 1.9 vs 1.2 mM, Hill ~1.1; 5-methylTHF-pentaglutamate inhibits liver enzyme at ~1 uM; SAH about 97 uM.",
-    "body": [
-      "Primary kinetic constants for the [[enzyme:gnmt|GNMT]] rate law, including the folate inhibition."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Luka Z",
-      "Loukachevitch LV",
-      "Wagner C"
-    ],
-    "year": 2008,
-    "journal": "Biochimica et biophysica acta",
-    "doi": "10.1016/j.bbapap.2008.04.016",
-    "pmid": "18501206",
-    "url": "https://doi.org/10.1016/j.bbapap.2008.04.016",
-    "verified": true,
-    "takeaways": [
-      "Liver GNMT showed K0.5(AdoMet) 280 uM, Hill 1.10, Km(glycine) 1.9 mM, kcat 42 per minute at 25 C, pH 7.5; the recombinant enzyme gave 460 uM, 1.02, 1.2 mM and 52.",
-      "Cooperativity for SAM was hardly present; it rose to 1.5 in the presence of 1 uM 5-methylTHF-Glu5 and after folate loading, suggesting that bound folate causes the earlier reports of strong cooperativity.",
-      "Half-maximal inhibition by 5-methylTHF-Glu5 needed 1.26 uM for liver GNMT but 590 uM for recombinant, and the monoglutamate needed tens of uM.",
-      "AdoHcy inhibited both enzymes with a constant near 95-97 uM (type of constant not stated in the text)."
-    ],
-    "facts": {
-      "design": "in-vitro",
-      "population": "Rat liver and recombinant rat GNMT"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gnmt",
-        "note": "Km, Hill, SAH and folate inhibition constants."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:5-mthf",
-        "note": "Pentaglutamate form inhibits GNMT at ~1 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sah",
-        "note": "Weak product inhibition (~95 uM)."
-      }
-    ]
-  },
-  {
     "id": "article:zhang-2016-gnmt-kinetics-37c",
     "type": "article",
     "name": "Convergent Mechanistic Features between the Structurally Diverse N- and O-Methyltransferases: Glycine N-Methyltransferase and Catechol O-Methyltransferase",
@@ -309,154 +95,6 @@ export default [
         "rel": "evidence-for",
         "to": "compound:glycine",
         "note": "Km(glycine) 1.1 mM."
-      }
-    ]
-  },
-  {
-    "id": "article:ogawa-1982-gnmt-purification-kinetics",
-    "type": "article",
-    "name": "Purification and properties of glycine N-methyltransferase from rat liver",
-    "aliases": [
-      "Ogawa 1982"
-    ],
-    "summary": "Rat liver GNMT purified to homogeneity (a tetramer of 31.5 kDa subunits): Michaelis-Menten in glycine (0.13 mM), cooperative in SAM (30 uM) at pH 7.4 and 25 C.",
-    "body": [
-      "Lower end of the Km range for [[enzyme:gnmt|GNMT]] with respect to SAM and glycine."
-    ],
-    "evidence": "established",
-    "authors": [
-      "Ogawa H",
-      "Fujioka M"
-    ],
-    "year": 1982,
-    "journal": "The Journal of biological chemistry",
-    "doi": "10.1016/s0021-9258(18)34798-7",
-    "pmid": "6801046",
-    "url": "https://doi.org/10.1016/s0021-9258(18)34798-7",
-    "verified": true,
-    "takeaways": [
-      "GNMT is a simple protein of four identical subunits with an isoelectric pH of 6.4 and a pH optimum near 9.",
-      "Velocity versus glycine is hyperbolic; versus S-adenosylmethionine it shows positive cooperativity.",
-      "Half-maximal velocities occur at 0.13 mM glycine and 30 uM SAM (pH 7.4, 25 C).",
-      "These are the lowest published half-saturation values, probably because the enzyme was purified with its bound folate."
-    ],
-    "facts": {
-      "design": "enzymology",
-      "population": "Rat liver GNMT"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gnmt",
-        "note": "First purification and kinetics of rat liver GNMT."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:glycine",
-        "note": "S0.5(glycine) 0.13 mM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "S0.5(SAM) 30 uM with positive cooperativity."
-      }
-    ]
-  },
-  {
-    "id": "article:reed-2015-methyltransferase-model",
-    "type": "article",
-    "name": "Mathematical analysis of the regulation of competing methyltransferases",
-    "aliases": [
-      "Reed 2015"
-    ],
-    "summary": "Mathematical model of liver methyltransferases: at steady state GNMT carries 44%, PEMT 27%, GAMT 25%, DNMT 2% and AS3MT 1% of ~100 uM/h methyl flux, with SAM ~24 uM and SAH ~3.9 uM.",
-    "body": [
-      "Used only as a comparator for [[enzyme:gnmt|GNMT]], [[enzyme:pemt|PEMT]] and GAMT constants and for the flux partition."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Reed MC",
-      "Gamble MV",
-      "Hall MN",
-      "Nijhout HF"
-    ],
-    "year": 2015,
-    "journal": "BMC systems biology",
-    "doi": "10.1186/s12918-015-0215-6",
-    "pmid": "26467983",
-    "url": "https://doi.org/10.1186/s12918-015-0215-6",
-    "verified": true,
-    "takeaways": [
-      "A published liver methionine-cycle model that adds explicit methyltransferase reactions and lists rate constants (GNMT Km 100 uM, Ki(SAH) 35 uM, Hill 2; PEMT Km 18.2 uM, Ki 3.8 uM).",
-      "Its steady-state flux partition (Table 1) is model output chosen to fit literature, not data.",
-      "Several constants are taken from secondary sources or tuned, which the present parameter set checked against primary papers where possible."
-    ],
-    "facts": {
-      "design": "modelling study",
-      "population": "Computational liver model"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gnmt",
-        "note": "Model uses Km 100 uM, Hill 2, Ki(SAH) 35 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:pemt",
-        "note": "Model uses Km 18.2 uM, Ki(SAH) 3.8 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "pathway:methyl-budget",
-        "note": "Model flux partition among methyltransferases."
-      }
-    ]
-  },
-  {
-    "id": "article:martinov-2000-gnmt-methionine-model",
-    "type": "article",
-    "name": "A substrate switch: a new mode of regulation in the methionine metabolic pathway",
-    "aliases": [
-      "Martinov 2000"
-    ],
-    "summary": "Model in which highly cooperative GNMT acts as a SAM-activated sink, giving a low-flux and a high-flux mode that stabilise hepatic SAM and methionine against excess methionine.",
-    "body": [
-      "Conceptual background for [[enzyme:gnmt|GNMT]] as a methionine/SAM buffer; no numbers taken."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Martinov MV",
-      "Vitvitsky VM",
-      "Mosharov EV",
-      "Banerjee R",
-      "Ataullakhanov FI"
-    ],
-    "year": 2000,
-    "journal": "Journal of theoretical biology",
-    "doi": "10.1006/jtbi.2000.2035",
-    "pmid": "10833353",
-    "url": "https://doi.org/10.1006/jtbi.2000.2035",
-    "verified": true,
-    "takeaways": [
-      "The model couples methionine adenosyltransferase, GNMT and the methionine cycle and shows bistable behaviour depending on methionine input.",
-      "The behaviour depends on a strong positive cooperativity of GNMT for SAM, which later enzymology (Luka 2008) finds mainly with bound folate.",
-      "Only the abstract was read; no constants were extracted from it."
-    ],
-    "facts": {
-      "design": "modelling study",
-      "population": "Computational model"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gnmt",
-        "note": "GNMT cooperativity as a SAM and methionine disposal valve."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "Predicts mode switching with SAM level."
       }
     ]
   },
@@ -563,57 +201,6 @@ export default [
         "rel": "evidence-for",
         "to": "compound:sarcosine",
         "note": "Sarcosine stays normal when GNMT is absent."
-      }
-    ]
-  },
-  {
-    "id": "article:luka-2006-gnmt-knockout-mouse-sam",
-    "type": "article",
-    "name": "A glycine N-methyltransferase knockout mouse model for humans with deficiency of this enzyme",
-    "aliases": [
-      "Luka 2006"
-    ],
-    "summary": "Gnmt knockout mice: liver SAM about 36-fold higher (37 to ~1334 nmol/g), SAH lower, methionine ~7-fold higher; SAM:SAH raised from ~3 to ~300.",
-    "body": [
-      "Mouse validation target for the effect of removing [[enzyme:gnmt|GNMT]]."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Luka Z",
-      "Capdevila A",
-      "Mato JM",
-      "Wagner C"
-    ],
-    "year": 2006,
-    "journal": "Transgenic research",
-    "doi": "10.1007/s11248-006-0008-1",
-    "pmid": "16779654",
-    "url": "https://doi.org/10.1007/s11248-006-0008-1",
-    "verified": true,
-    "takeaways": [
-      "Wild-type liver SAM was about 37 nmol/g; the knockout accumulated about 1334 nmol/g.",
-      "Liver SAH fell (12-15 to 3-5 nmol/g) and methionine rose from roughly 100 to 700 nmol/g.",
-      "GNMT is therefore the principal route that holds hepatic SAM down in the mouse."
-    ],
-    "facts": {
-      "design": "animal",
-      "population": "Gnmt knockout and wild-type mice"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:gnmt",
-        "note": "Knockout raises hepatic SAM ~36-fold."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "Hepatic SAM 37 to ~1334 nmol/g."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sah",
-        "note": "Hepatic SAH falls to 3-5 nmol/g."
       }
     ]
   },
@@ -1319,7 +906,7 @@ export default [
     "takeaways": [
       "Cloned from a human kidney library; the protein is 292 amino acids and 84% identical to rat kidney HNMT.",
       "Human renal cortical, purified renal and transfected-cell HNMT had Km(histamine) 20, 13 and 14 uM and Km(AdoMet) about 2, 3 and 6 uM.",
-      "The work set the stage for the HNMT polymorphism that explains the genetic control of red-cell activity."
+      "The cloning was a first step toward determining the molecular basis of the genetic polymorphism that controls red-cell HNMT activity."
     ],
     "facts": {
       "design": "enzymology",
@@ -1519,7 +1106,7 @@ export default [
     "takeaways": [
       "A randomised trial in patients with peripheral arterial disease combining niacin with folic acid.",
       "During titration of niacin from 100 to 1000 mg/day, tHcy rose 17%; at 18 weeks the niacin arm was up 55% against a 7% fall with placebo.",
-      "Folic acid supplementation lowered homocysteine, pointing to a methyl-group demand effect of niacin.",
+      "The authors note that homocysteine can be lowered by folic acid and call for studies of B-vitamin supplementation in people taking long-term niacin; a methyl-group demand mechanism is an interpretation, not a finding.",
       "SAM and SAH were not measured."
     ],
     "facts": {
@@ -1590,59 +1177,6 @@ export default [
     ]
   },
   {
-    "id": "article:gellekink-2005-plasma-sam-sah-lcms",
-    "type": "article",
-    "name": "Stable-isotope dilution liquid chromatography-electrospray injection tandem mass spectrometry method for fast, selective measurement of S-adenosylmethionine and S-adenosylhomocysteine in plasma",
-    "aliases": [
-      "Gellekink 2005"
-    ],
-    "summary": "LC-MS/MS method for plasma SAM and SAH: acidify at collection or SAM degrades; healthy controls had SAM 94.5 nM and SAH 12.3 nM.",
-    "body": [
-      "Plasma SAM/SAH reference values."
-    ],
-    "evidence": "established",
-    "authors": [
-      "Gellekink H",
-      "van Oppenraaij-Emmerzaal D",
-      "van Rooij A",
-      "Struys EA",
-      "den Heijer M",
-      "Blom HJ"
-    ],
-    "year": 2005,
-    "journal": "Clinical chemistry",
-    "doi": "10.1373/clinchem.2004.046995",
-    "pmid": "15919880",
-    "url": "https://doi.org/10.1373/clinchem.2004.046995",
-    "verified": true,
-    "takeaways": [
-      "The assay measures both metabolites in a single run with stable-isotope internal standards.",
-      "Unacidified plasma loses SAM and gains SAH on standing, so samples must be acidified immediately.",
-      "Controls (mean tHcy 11.2 uM) had SAM 94.5 nM and SAH 12.3 nM."
-    ],
-    "facts": {
-      "design": "analytical method",
-      "population": "Healthy controls and patients"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "Plasma SAM ~95 nM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sah",
-        "note": "Plasma SAH ~12 nM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "outcome:low-sam-sah-ratio",
-        "note": "Method for the plasma ratio."
-      }
-    ]
-  },
-  {
     "id": "article:bravo-2022-sam-sah-reference-values",
     "type": "article",
     "name": "Analysis of S-Adenosylmethionine and S-Adenosylhomocysteine: Method Optimisation and Profiling in Healthy Adults upon Short-Term Dietary Intervention",
@@ -1678,7 +1212,7 @@ export default [
     "takeaways": [
       "A validated method and reference intervals for plasma SAM, SAH and their ratio.",
       "Earlier LC-MS/MS and HPLC studies report SAM 73.5-120 nM and SAH 12.7-46.5 nM.",
-      "The ratio is stable even when absolute values differ with pre-analytical handling."
+      "The comparison table shows SAM:SAH ratios of about 2.2-7.4 across earlier studies, so absolute values and ratios both depend on method and cohort."
     ],
     "facts": {
       "design": "analytical method",
@@ -1699,52 +1233,6 @@ export default [
         "rel": "evidence-for",
         "to": "compound:sah",
         "note": "Plasma SAH ~21.5 nM."
-      }
-    ]
-  },
-  {
-    "id": "article:melnyk-2000-plasma-sam-sah-measurement",
-    "type": "article",
-    "name": "Measurement of plasma and intracellular S-adenosylmethionine and S-adenosylhomocysteine utilizing coulometric electrochemical detection: alterations with plasma homocysteine and pyridoxal 5'-phosphate concentrations",
-    "aliases": [
-      "Melnyk 2000"
-    ],
-    "summary": "HPLC method for plasma and intracellular SAM and SAH: healthy women had plasma SAM 156 nM and SAH 20 nM (mean tHcy 7.3 uM).",
-    "body": [
-      "Second SAM/SAH comparator."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Melnyk S",
-      "Pogribna M",
-      "Pogribny IP",
-      "Yi P",
-      "James SJ"
-    ],
-    "year": 2000,
-    "journal": "Clinical chemistry",
-    "doi": "10.1093/clinchem/46.2.265",
-    "pmid": "10657384",
-    "url": "https://doi.org/10.1093/clinchem/46.2.265",
-    "verified": true,
-    "takeaways": [
-      "The assay measures metabolites of the methionine cycle (SAM, SAH, adenosine and homocysteine) in plasma and lymphocytes.",
-      "Healthy women had SAM about 156 nM and SAH about 20 nM, the older HPLC scale."
-    ],
-    "facts": {
-      "design": "analytical method",
-      "population": "Healthy women"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "compound:sam",
-        "note": "Plasma SAM ~156 nM (HPLC)."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:sah",
-        "note": "Plasma SAH ~20 nM (HPLC)."
       }
     ]
   },
@@ -1942,98 +1430,6 @@ export default [
     ]
   },
   {
-    "id": "article:millian-1998-human-bhmt-kinetics",
-    "type": "article",
-    "name": "Human betaine-homocysteine methyltransferase is a zinc metalloenzyme",
-    "aliases": [
-      "Millian 1998"
-    ],
-    "summary": "Recombinant human BHMT (a zinc enzyme) has Km 2.2 mM for betaine and 4 uM for homocysteine; partially purified human liver BHMT behaves the same.",
-    "body": [
-      "Primary Km values for [[enzyme:bhmt|BHMT]]."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Millian NS",
-      "Garrow TA"
-    ],
-    "year": 1998,
-    "journal": "Archives of biochemistry and biophysics",
-    "doi": "10.1006/abbi.1998.0757",
-    "pmid": "9681996",
-    "url": "https://doi.org/10.1006/abbi.1998.0757",
-    "verified": true,
-    "takeaways": [
-      "Human liver BHMT was cloned and expressed; kinetics match the partially purified liver enzyme.",
-      "Km(betaine) is 2.2 mM and Km(homocysteine) 4 uM.",
-      "The human betaine Km is about 100 times higher than the porcine value reported earlier."
-    ],
-    "facts": {
-      "design": "enzymology",
-      "population": "Human liver BHMT, recombinant"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:bhmt",
-        "note": "Human Km(betaine) 2.2 mM, Km(Hcy) 4 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:betaine",
-        "note": "Human BHMT is unsaturated at tissue betaine."
-      }
-    ]
-  },
-  {
-    "id": "article:garrow-1996-pig-bhmt-purification",
-    "type": "article",
-    "name": "Purification, kinetic properties, and cDNA cloning of mammalian betaine-homocysteine methyltransferase",
-    "aliases": [
-      "Garrow 1996"
-    ],
-    "summary": "Porcine liver BHMT purified and cloned: Km 23 uM for betaine and 32 uM for homocysteine; dimethylacetothetin has a 47-fold higher Vmax than betaine.",
-    "body": [
-      "Low end of the betaine Km range for [[enzyme:bhmt|BHMT]]."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Garrow TA"
-    ],
-    "year": 1996,
-    "journal": "The Journal of biological chemistry",
-    "doi": "10.1074/jbc.271.37.22831",
-    "pmid": "8798461",
-    "url": "https://doi.org/10.1074/jbc.271.37.22831",
-    "verified": true,
-    "takeaways": [
-      "Pig liver BHMT is a homotrimer or tetramer of 45 kDa subunits with Km(betaine) 23 uM and Km(homocysteine) 32 uM.",
-      "These are the low betaine Km values often quoted for BHMT, in contrast to the human enzyme (2.2 mM).",
-      "Dimethylthetin is a far faster alternative methyl donor in vitro."
-    ],
-    "facts": {
-      "design": "enzymology",
-      "population": "Pig liver BHMT"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:bhmt",
-        "note": "Pig Km(betaine) 23 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:betaine",
-        "note": "Pig Km(betaine) 23 uM."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:homocysteine",
-        "note": "Pig Km(homocysteine) 32 uM."
-      }
-    ]
-  },
-  {
     "id": "article:wang-1991-bhmt-human-tissues",
     "type": "article",
     "name": "Betaine:homocysteine methyltransferase--a new assay for the liver enzyme and its absence from human skin fibroblasts and peripheral blood lymphocytes",
@@ -2076,55 +1472,6 @@ export default [
         "rel": "evidence-for",
         "to": "system:liver",
         "note": "Human liver is the main BHMT-expressing tissue."
-      }
-    ]
-  },
-  {
-    "id": "article:finkelstein-1984-homocysteine-partition-rat-liver",
-    "type": "article",
-    "name": "Methionine metabolism in mammals. Distribution of homocysteine between competing pathways",
-    "aliases": [
-      "Finkelstein 1984"
-    ],
-    "summary": "A reconstituted rat liver system at in-vivo-like substrate levels sends 27% of homocysteine through methionine synthase, 27% through BHMT and 46% through cystathionine synthase.",
-    "body": [
-      "Only quantitative BHMT share of homocysteine disposal; rodent and in vitro."
-    ],
-    "evidence": "plausible",
-    "authors": [
-      "Finkelstein JD",
-      "Martin JJ"
-    ],
-    "year": 1984,
-    "journal": "The Journal of biological chemistry",
-    "doi": "10.1016/s0021-9258(17)42728-1",
-    "pmid": "6746658",
-    "url": "https://doi.org/10.1016/s0021-9258(17)42728-1",
-    "verified": true,
-    "takeaways": [
-      "Enzyme activities and substrate concentrations of rat liver were reproduced in vitro to see how homocysteine is partitioned.",
-      "About 27% went to methionine synthase, 27% to BHMT and 46% to CBS.",
-      "The partition shifts toward remethylation when methionine is low."
-    ],
-    "facts": {
-      "design": "in-vitro",
-      "population": "Rat liver enzyme reconstitution"
-    },
-    "relations": [
-      {
-        "rel": "evidence-for",
-        "to": "enzyme:bhmt",
-        "note": "BHMT handles ~27% of homocysteine in the reconstituted system."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "pathway:transsulfuration",
-        "note": "CBS takes 46%."
-      },
-      {
-        "rel": "evidence-for",
-        "to": "compound:homocysteine",
-        "note": "Homocysteine partition."
       }
     ]
   },
@@ -2449,9 +1796,9 @@ export default [
     "url": "https://doi.org/10.1002/humu.21560",
     "verified": true,
     "takeaways": [
-      "Kinetic constants of the human enzyme were measured with the wild type and 40 mutants.",
+      "Kinetic constants (Table 2) were measured for the recombinant human wild type and 12 missense mutants found in congenital myasthenic syndrome patients.",
       "Km for choline is 257 +/- 32 uM and Km for acetyl-CoA 11.9 +/- 0.8 uM.",
-      "The table units were inferred from the stated kcat/Km value."
+      "The wild-type kcat is 195 +/- 5 per second."
     ],
     "facts": {
       "design": "enzymology",
@@ -2593,7 +1940,7 @@ export default [
     "takeaways": [
       "Betaine is an osmolyte and methyl donor; its plasma concentration is affected by diet, sex and renal function.",
       "Reference intervals: women 20-60 uM, men 25-75 uM; DMG usually under 10 uM.",
-      "Renal clearance is low (under 5%), so plasma betaine is regulated mainly by metabolism."
+      "Urinary betaine excretion is minimal even after a large dose (normally under 35 mmol/mol creatinine), so plasma betaine is governed mainly by diet and metabolism."
     ],
     "facts": {
       "design": "review",
@@ -2860,7 +2207,7 @@ export default [
     "takeaways": [
       "26 pregnant and 21 non-pregnant women were compared on 480 or 930 mg/day choline for 12 weeks.",
       "Higher intake raised metabolites 12-46%.",
-      "Pregnancy diverts choline toward the fetus and phosphatidylcholine and away from oxidation."
+      "Pregnant women had higher choline but lower betaine, DMG and sarcosine, a pattern consistent with choline being diverted from oxidation toward fetal and phospholipid use (an interpretation beyond the abstract)."
     ],
     "facts": {
       "design": "RCT",
@@ -3309,9 +2656,10 @@ export default [
     "url": "https://doi.org/10.1016/j.foodchem.2013.08.122",
     "verified": true,
     "takeaways": [
-      "Betaine content of foods and meal patterns were reviewed.",
-      "Wheat bran, wheat germ and spinach are rich sources; typical Western intake is about 131 mg/day.",
-      "Cereal products contribute most of the dietary betaine."
+      "Betaine and free choline were measured by LC-MS/MS in a wide range of commercial cereal foods and fractions.",
+      "Whole grain wheat and its fractions were the best common source of betaine; the pseudocereal quinoa was highest at 3900 ug/g.",
+      "Cereals provide about 60-67% of betaine in Western diets and 20-40% in South-East Asian diets.",
+      "Average intake was 131 mg/day, well below the doses used in betaine intervention studies for lowering homocysteine."
     ],
     "facts": {
       "design": "review",
@@ -6530,7 +5878,7 @@ export default [
     "aliases": [
       "Hoad 2015"
     ],
-    "summary": "MRI in 24 healthy volunteers after a mixed meal: gastric secretion volume 64 mL at 15 min and 110 mL at 75 min, a mean net increase of 52 mL over the first hour.",
+    "summary": "MRI in 24 healthy volunteers after a mixed meal: gastric secretion volume 64 mL at 15 min and 110 mL at 75 min, a mean increase of 52 mL per subject over that hour.",
     "body": [
       "Postprandial gastric secretion volume."
     ],
@@ -6555,9 +5903,9 @@ export default [
     "url": "https://doi.org/10.1088/0031-9155/60/3/1367",
     "verified": true,
     "takeaways": [
-      "Gastric content was separated into meal and secretion by MRI.",
-      "The net rise in content was 52 +/- 29 mL over 60 minutes.",
-      "Secretion volume is larger than emptying removes in the first hour."
+      "Gastric content was separated into meal and secretion by MRI T1 mapping of meal dilution, and meal volumes agreed with gamma scintigraphy.",
+      "Secretion volumes after a mixed meal were 64 +/- 51 mL at 15 min and 110 +/- 40 mL at 75 min.",
+      "The mean increase in secretion volume between the two time points was 52 +/- 29 mL (full-text result, not in the abstract); secretion rose in all subjects but one."
     ],
     "facts": {
       "design": "imaging study",
@@ -6567,7 +5915,7 @@ export default [
       {
         "rel": "evidence-for",
         "to": "system:gastric-physiology",
-        "note": "Net secretion ~52 mL/h after a meal."
+        "note": "Post-meal secretion volume rises by about 52 mL over an hour."
       },
       {
         "rel": "evidence-for",
