@@ -114,7 +114,6 @@ export const STRUCT = {
   vd_bet: 30.7,    // L (calc from Schwahn 2003 Cmax with ka 5.2/h so that tmax = 0.9 h)
   rho_hcy: 0.4667  // plasma-pool scaling of Hcy export (assumed so that plasma tHcy 7 uM ~ 3.1 x liver Hcy)
 }
-const MMOL_TO_UMOL = 1000
 const S0 = 5 // mapping used for the whole-body flux anchors of the baseline calibration
 
 // ---- modifier helpers --------------------------------------------------------------------------------------
@@ -167,7 +166,7 @@ function fluxPlan(ref, kin, st) {
   T.gly_up = T.gcs + T.gnmt + T.gly_use + T.gly_efl - T.sardh - (T.shmt_f - T.shmt_r)
   T.ser_out = kin.k_ser_use * ref.ser
   T.ser_in = T.cbs + T.ser_out + (T.shmt_f - T.shmt_r)
-  const rg = 1 / st.vd_gly * 1 // plasma-pool stoichiometry per hepatic flux (V_liver = 1 L)
+  const rg = 1 / st.vd_gly // plasma-pool stoichiometry per hepatic flux (V_liver = 1 L, volume ratio V_liver / V_distribution)
   T.gly_p_out = kin.k_gly_per * ref.gly_p
   T.gly_p_in = T.gly_p_out + (T.gly_up - T.gly_efl) * rg
   // choline / betaine

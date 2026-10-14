@@ -88,6 +88,15 @@ describe('methylation scenarios: expected qualitative outcomes', () => {
     expect(dip(luka)).toBeLessThan(-0.03); expect(dip(luka)).toBeGreaterThan(-0.2)
   })
 
+  it('scenario variant switches select the structural alternative', () => {
+    expect(scenarioIndex['glycine-10g-luka'].variants).toEqual({ gnmtGlycineKm: 'luka2000' })
+    expect(change('glycine-10g-luka', 'samSahRatio', 'trough')).toBeLessThan(change('glycine-10g', 'samSahRatio', 'trough') - 0.03)
+    expect(change('glycine-10g-luka', 'gnmt', 'peak')).toBeGreaterThan(0.05)
+    expect(scenarioIndex['betaine-6g-day-reed100'].variants).toEqual({ bhmtBetaineKm: 'reed100' })
+    expect(change('betaine-6g-day-reed100', 'tHcy')).toBeGreaterThan(change('betaine-6g-day', 'tHcy') + 0.05)
+    expect(change('betaine-6g-day-reed100', 'tHcy')).toBeGreaterThan(-0.06) // saturated BHMT: barely any effect
+  })
+
   it('choline and betaine doses: betaine up, BHMT up, hepatic Hcy and plasma tHcy down (dose-ordered)', () => {
     for (const id of ['choline-500mg', 'choline-2g', 'betaine-3g']) {
       expect(change(id, 'bet', 'peak')).toBeGreaterThan(0)

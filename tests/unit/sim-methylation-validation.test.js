@@ -34,7 +34,7 @@ describe('methylation validation targets', () => {
     const pass = rows.filter((r) => r.status === 'pass').length
     const fail = rows.filter((r) => r.status === 'fail').length
     console.info(`validation: ${pass} pass, ${fail} documented disagreements, ${rows.length} total`)
-    for (const r of rows) console.info(`${r.status.toUpperCase().padEnd(5)} ${r.id.padEnd(28)} ${r.detail}`)
+    for (const r of rows) console.info(`${r.status.toUpperCase().replace("FAIL", "MISMATCH").padEnd(8)} ${r.id.padEnd(28)} ${r.detail}`)
     expect(pass).toBeGreaterThanOrEqual(20)
   })
 

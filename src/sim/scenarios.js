@@ -142,5 +142,12 @@ export const scenarios = [
   }
 ]
 
+// Variant switches: the same scenario under the other structural alternative (see `variants` in models/methylation.js).
+const clone = (id, patch) => { const s = scenarios.find((x) => x.id === id); return { ...s, ...patch, evidence: { ...s.evidence, ...(patch.evidence ?? {}) } } }
+scenarios.push(
+  clone('glycine-10g', { id: 'glycine-10g-luka', label: 'Glycine load 10 g, Luka-style GNMT Km (2 mM)', variants: { gnmtGlycineKm: 'luka2000' }, description: 'Same 10 g glycine dose with the GNMT glycine Km at 2 mM (Luka 2009: 2-20 mM) instead of 130 uM: GNMT is only 45% glycine-saturated, so its flux follows hepatic glycine and SAM:SAH dips by roughly 10% for a few hours. Compare with glycine-10g (Km 130 uM: essentially no effect).' }),
+  clone('betaine-6g-day', { id: 'betaine-6g-day-reed100', label: 'Betaine 6 g/day, BHMT betaine Km 100 uM (Reed)', variants: { bhmtBetaineKm: 'reed100' }, description: 'Chronic betaine with the Reed BHMT betaine Km of 100 uM: BHMT is already saturated by the ~1 mM hepatic betaine, so extra betaine barely lowers tHcy - contradicting the human trials; the human enzyme Km (2.2 mM, default) reproduces them.', expected: [{ observable: 'tHcy', direction: 'down, but much less than in the default variant', note: 'human trials show -20% at 6 g/day' }], evidence: { status: 'supported', summary: 'The Km 100 uM variant fails the human betaine data (dose-response of tHcy); kept to show the structural dependence.' } })
+)
+
 export const scenarioIndex = Object.fromEntries(scenarios.map((s) => [s.id, s]))
 export default scenarios
