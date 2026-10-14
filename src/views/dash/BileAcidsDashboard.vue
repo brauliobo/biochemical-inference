@@ -45,7 +45,7 @@ const EVIDENCE = [
   { id: 'claim:glycine-overload-shifts-bile-conjugation-and-reflux' },
   { id: 'article:johnson-1991-baat-human-liver', label: 'Johnson 1991: BAAT kinetics, human liver' },
   { id: 'article:styles-2016-baat-recombinant', label: 'Styles 2016: BAAT kinetics, recombinant' },
-  { id: 'enzyme:baat', label: 'Hepatic glycine and taurine pools in people: not found', note: 'no data', tone: 'warning' }
+  { id: 'enzyme:baat', label: 'Hepatic glycine and taurine pools in people: not found', note: 'no data', tone: 'warning', plain: true }
 ]
 </script>
 

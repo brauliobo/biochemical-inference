@@ -60,7 +60,7 @@ const EVIDENCE = [
   { id: 'claim:p5p-gad-gaba-relieves-anxiety' },
   { id: 'claim:pyroluria-causes-b6-zinc-deficiency' },
   { id: 'claim:undermethylated-have-functional-b6-deficiency' },
-  { id: 'compound:vitamin-b6', label: 'Critical effect of the upper limits: sensory neuropathy', note: 'IOM and EFSA', tone: 'info' },
+  { id: 'compound:vitamin-b6', label: 'Critical effect of the upper limits: sensory neuropathy', note: 'IOM and EFSA', tone: 'info', plain: true },
   { id: 'article:field-2022-b6-anxiety', label: 'Field 2022: 100 mg pyridoxine HCl a day, about eight times the EFSA UL', note: 'anxiety trial', tone: 'warning' }
 ]
 const PARAMS = ['kplp_cbs', 'kplp_cth', 'kplp_shmt', 'kplp_gcs']

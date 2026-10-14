@@ -117,7 +117,7 @@ DashboardShell(title="Histamine and night waking" question="Does low SAM slow hi
       .dg-pair
         LineChartPlus(id="his-sweep-chart" title="Steady-state histamine against SAM" :x="sweep.x" :series="sweep.series" :events="sweep.events" :ref-lines="[{ value: 1, label: 'Reference' }]" unit="x reference" x-unit="uM" x-label="SAM available to HNMT" :y-min="0" :height="280")
         StackedBar(id="his-share-chart" title="Who clears histamine" :bars="bars" unit="uM/h")
-      EvidenceChips(label="Assumptions behind the split" :items="[{ id: 'compound:histamine', label: 'HNMT share of clearance: assumed 60% (brain 80%)', note: 'assumed', tone: 'warning' }, { id: 'enzyme:dao', label: 'DAO capacity and gut absorption: assumed', note: 'assumed', tone: 'warning' }]")
+      EvidenceChips(label="Assumptions behind the split" :items="[{ id: 'compound:histamine', label: 'HNMT share of clearance: assumed 60% (brain 80%)', note: 'assumed', tone: 'warning', plain: true }, { id: 'enzyme:dao', label: 'DAO capacity and gut absorption: assumed', note: 'assumed', tone: 'warning', plain: true }]")
     Panel(title="What the evidence says" title-id="his-evidence" lede="Verdicts and grades from the knowledge base. The day-night rhythm is the weakest link.")
       EvidenceChips(label="Evidence on histamine and night waking" :items="EVIDENCE")
     Panel(title="From histamine to waking, racing heart and flushing" title-id="his-causal" lede="Dashed links are hypotheses. Choline, betaine, P5P, niacin and glycine are shown as signed levers.")

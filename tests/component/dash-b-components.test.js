@@ -25,7 +25,8 @@ describe('EvidenceChips', () => {
       { id: 'claim:free-glycine-stimulates-gastrin' },
       { id: 'article:wald-1982-glycine-gastric-acid', label: 'Wald 1982' },
       { id: 'outcome:belching' },
-      { id: 'claim:belching-mostly-swallowed-air', note: 'tested', tone: 'info' }
+      { id: 'claim:belching-mostly-swallowed-air', note: 'tested', tone: 'info' },
+      { id: 'compound:histamine', label: 'Share of clearance: assumed', note: 'assumed', tone: 'warning', plain: true }
     ]
     const { container } = mountVapor(EvidenceChips, { props: { items, label: 'Test chips' } })
     // links are there at once; grades and verdicts follow when the knowledge data has loaded
@@ -34,7 +35,8 @@ describe('EvidenceChips', () => {
       '#/evidence/claim/free-glycine-stimulates-gastrin',
       '#/evidence/article/wald-1982-glycine-gastric-acid',
       '#/kb/outcome/belching',
-      '#/evidence/claim/belching-mostly-swallowed-air'
+      '#/evidence/claim/belching-mostly-swallowed-air',
+      '#/kb/compound/histamine'
     ])
     await waitFor(() => expect(container.textContent).toContain('Unsupported'), slow)
     const chips = within(container).getByRole('list', { name: 'Test chips' }).querySelectorAll('li')
@@ -46,6 +48,9 @@ describe('EvidenceChips', () => {
     expect(chips[3].textContent).toContain('Supported')
     expect(chips[3].textContent).toContain('tested')
     expect(chips[0].querySelector('.ev-grade')).toBeTruthy()
+    // a chip that states an assumption has no grade letter, only its note
+    expect(chips[4].querySelector('.ev-grade')).toBeNull()
+    expect(chips[4].textContent).toContain('assumed')
     await expectAccessible(container, { page: false })
   })
 })

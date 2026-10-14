@@ -13,6 +13,9 @@ import { articlePath, claimPath, shortName, statusInfo } from './causal-view.js'
 // there at once.
 //
 //   EvidenceChips(label="Evidence" :items="[{ id: 'claim:histamine-peaks-2-4am', note: 'weak' }, { id: 'article:szefler-1991-nocturnal-histamine', label: 'Szefler 1991: plasma 2x at 04:00' }]")
+//
+// An item may carry `label` (replaces the entry's name), `note` and `tone` (a badge) and `plain: true` (no grade letter: for
+// a chip that states an assumption or a gap and only uses the entry as its link).
 const props = defineProps({
   items: { type: Array, required: true },
   label: { type: String, default: 'Evidence' }
@@ -27,7 +30,7 @@ const rows = computed(() => props.items.map((item) => {
     key: item.id,
     text: item.label ?? (entity ? (isClaim ? entity.name : shortName(entity.name)) : slug(item.id)),
     href: isClaim ? claimPath(item.id) : item.id.startsWith('article:') ? articlePath(item.id) : entityPath(item.id),
-    grade: entity?.evidence ?? '',
+    grade: item.plain ? '' : entity?.evidence ?? '',
     status: isClaim && entity ? statusInfo(entity.status) : null,
     note: item.note ?? '',
     tone: item.tone ?? 'muted'
