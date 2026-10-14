@@ -48,7 +48,10 @@ const rel = (v, ref) => (ref ? v / ref - 1 : NaN)
  *   fracDown(x), fracUp(x)}} }.
  */
 export function methylationEnsemble(options) {
-  const { scenario, n = 100, seed = 1, metrics, variants = {}, fixed = {}, rtol = 1e-3, samplesPerHour = 1 } = options
+  const { scenario: full, n = 100, seed = 1, metrics, variants = {}, fixed = {}, rtol = 1e-3, samplesPerHour = 1, hours } = options
+  // Every member starts exactly at its own steady state, so an empty baseline stage is skipped (saves ~40% of the run);
+  // `hours` shortens the intervention stage (acute doses are over within ~24 h).
+  const scenario = { ...full, stages: full.stages.filter((s, i) => i > 0 || s.controls || s.events).map((s, i, a) => (i === a.length - 1 && hours ? { ...s, hours: Math.min(s.hours, hours) } : s)) }
   const rng = createRng(seed)
   const space = ensembleSpace()
   const members = []
@@ -64,7 +67,7 @@ export function methylationEnsemble(options) {
     } catch (e) { run = null }
     if (!run || !run.ok) { failures += 1; continue }
     const effects = {}
-    const iBase = baselineIndex(run)
+    const iBase = scenario.stages.length === full.stages.length ? baselineIndex(run) : 0
     for (const m of metrics) {
       const arr = run.series[m.observable] ?? run.fluxes[m.observable]
       const base = arr[iBase]

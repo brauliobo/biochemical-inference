@@ -3,6 +3,7 @@
 // Imports the engine, so it is loaded together with the model by the UI but is not part of the model data module.
 
 import { compileModel, simulate, steadyState } from '../index.js'
+import { luFactor, luSolve } from '../linalg.js'
 import { getModel } from './methylation.js'
 
 /** umol per gram of the orally dosed compounds (molar masses 75.07, 117.15, 104.17 (choline), 149.21, 123.11). */
@@ -33,9 +34,81 @@ export function scenarioModel(scenario, selection = {}) {
   return getModel({ ...(scenario.variants ?? {}), ...selection })
 }
 
-/** Steady state of a control setting (the engine's steadyState on the compiled model). */
+/**
+ * Pseudo-transient Newton from the reference state: linearly implicit Euler steps (I/dt - J) dy = f(y) whose dt grows
+ * while the residual falls, which turns into plain Newton for large dt. The folate/PE/PC pools relax ~6 orders of
+ * magnitude slower than the fast folate couplings, so a plain damped Newton step overshoots the fast pools; this
+ * continuation takes ~10-60 ms where the engine's integrate-to-convergence steadyState needs 0.2-5 s. Returns the same
+ * shape as the engine's steadyState ({ converged, residual, state, observables, fluxes, values, y }) or null.
+ */
+export function newtonSteady(model, controls = {}, { tol = 1e-9, maxIter = 400, start } = {}) {
+  const c = compiledFor(model)
+  const sys = c.bind(controls)
+  const n = c.names.length
+  const free = c.names.map((_, i) => i).filter((i) => !c.fixed[i])
+  const m = free.length
+  let y = Float64Array.from(start ?? sys.y0)
+  if (!start) {
+    // the total folate pool is pinned at supply / loss constant (loss acts on every form): start from that total
+    const idx = ['thf', 'ch2thf', 'mthf', 'f10', 'dhf'].map((id) => c.speciesIndex.get(id))
+    const total = idx.reduce((a, i) => a + y[i], 0)
+    const want = sys.getParam('rate_fol_in') / sys.getParam('k_fol_loss')
+    if (total > 0 && want > 0) for (const i of idx) y[i] *= want / total
+  }
+  const f = new Float64Array(n); const fp = new Float64Array(n); const fm = new Float64Array(n); const f2 = new Float64Array(n)
+  const J = new Float64Array(m * m); const A = new Float64Array(m * m); const piv = new Int32Array(m); const rhs = new Float64Array(m); const dx = new Float64Array(m)
+  const resid = (yy, ff) => { let r = 0; for (const i of free) r = Math.max(r, Math.abs(ff[i]) / (Math.abs(yy[i]) + 1e-6)); return r }
+  let r0 = resid(y, sys.derivative(0, y, f))
+  let dt = 0.5
+  for (let it = 0; it < maxIter && r0 > tol; it += 1) {
+    for (let jj = 0; jj < m; jj += 1) {
+      const j = free[jj]
+      const h = 1e-5 * Math.max(Math.abs(y[j]), 1e-3)
+      const keep = y[j]
+      y[j] = keep + h; sys.derivative(0, y, fp)
+      y[j] = Math.max(0, keep - h); const hm = keep - y[j]; sys.derivative(0, y, fm); y[j] = keep
+      for (let ii = 0; ii < m; ii += 1) J[ii * m + jj] = (fp[free[ii]] - fm[free[ii]]) / (h + hm)
+    }
+    let accepted = false
+    for (let tries = 0; tries < 12 && !accepted; tries += 1) {
+      for (let k = 0; k < m * m; k += 1) A[k] = -J[k]
+      for (let i = 0; i < m; i += 1) { A[i * m + i] += 1 / dt; rhs[i] = f[free[i]] }
+      if (!luFactor(A, m, piv)) { dt *= 0.25; continue }
+      luSolve(A, m, piv, rhs, dx)
+      const trial = Float64Array.from(y)
+      for (let i = 0; i < m; i += 1) trial[free[i]] = Math.max(0, y[free[i]] + dx[i])
+      const r = resid(trial, sys.derivative(0, trial, f2))
+      if (r < r0 * 1.2 || r < tol) { y = trial; f.set(f2); dt = Math.min(dt * (r < r0 ? 3 : 1), 1e12); r0 = r; accepted = true } else dt *= 0.25
+    }
+    if (!accepted) return null
+  }
+  if (!(r0 <= tol * 10)) return null
+  const flux = sys.fluxes(0, y)
+  const values = c.values(y, flux)
+  return {
+    converged: true, residual: r0, y, warnings: [], values,
+    state: Object.fromEntries(c.names.map((id) => [id, values[id]])),
+    observables: Object.fromEntries(c.observableIds.map((id) => [id, values[id]])),
+    fluxes: Object.fromEntries(c.reactionIds.map((id) => [id, values[id]]))
+  }
+}
+
+/** Steady state of a control setting: Newton from the reference, falling back to the engine's steadyState. */
 export function steady(model, controls = {}) {
-  return steadyState(compiledFor(model), controls, { tMax: 5e4 })
+  const direct = newtonSteady(model, controls)
+  if (direct) return direct
+  // pseudo-transient continuation: relax for a while with the stiff solver, then retry Newton
+  const c = compiledFor(model)
+  let y = null
+  for (const hours of [20, 200, 2000]) {
+    const events = y ? [{ time: 0, set: Object.fromEntries(c.names.map((id, i) => [id, y[i]]).filter(([id]) => !c.fixed[c.names.indexOf(id)])) }] : []
+    const run = simulate(c, { controls, times: [0, hours], events, rtol: 1e-6, atol: 1e-9, method: 'rosenbrock' })
+    if (!run.ok) break
+    y = c.names.map((id) => run.series[id][1])
+    const q = newtonSteady(model, controls, { start: Float64Array.from(y) })
+    if (q) return q
+  }
+  return steadyState(c, controls, { tol: 1e-8, tMax: 5e4 })
 }
 
 /**
@@ -53,7 +126,7 @@ export function runScenario(scenario, options = {}) {
   const sph = options.samplesPerHour ?? 2
   let y = Float64Array.from(c.y0)
   if (Object.keys(bg).length) {
-    const ss = steadyState(c, bg, { tMax: 5e4 })
+    const ss = steady(model, bg)
     if (!ss.converged) throw new Error(`Background state of "${scenario.id ?? 'scenario'}" has no steady state`)
     y = Float64Array.from(ss.y)
   }
@@ -67,7 +140,9 @@ export function runScenario(scenario, options = {}) {
     const handoff = {}
     c.names.forEach((id, i) => { if (!c.fixed[i]) handoff[id] = y[i] })
     const events = [{ time: 0, set: handoff }, ...expandEvents(stage.events, 0)]
-    const run = simulate(c, { controls: { ...bg, ...(stage.controls ?? {}) }, times, events, rtol: options.rtol ?? 1e-4, atol: options.atol ?? 1e-7 })
+    // method 'rosenbrock': the folate cycle is stiff from t = 0, and the automatic dopri5 -> Rosenbrock hand-over comes
+    // late (7x more steps after a dose); same accuracy, 3-7x faster
+    const run = simulate(c, { controls: { ...bg, ...(stage.controls ?? {}) }, times, events, rtol: options.rtol ?? 1e-4, atol: options.atol ?? 1e-7, method: options.method ?? 'rosenbrock' })
     if (!run.ok) { out.ok = false; out.warnings.push(...run.warnings) }
     const m = run.time.length
     const skip = si === 0 ? 0 : 1 // the first sample of a later stage repeats the previous stage's last

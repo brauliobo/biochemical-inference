@@ -2,22 +2,21 @@
 // runValidation() returns one row per target: { id, group, title, observed, expected, tolerance, status: 'pass' | 'fail' |
 // 'info', detail, source, why }. Rows whose pinned expectedStatus is 'fail' are known, explained disagreements.
 
-import { conservedSums, simulate, steadyState } from '../index.js'
+import { conservedSums, simulate } from '../index.js'
 import { validationTargets } from '../validation-targets.js'
 import { getModel, methylationModel } from './methylation.js'
-import { compiledFor, effect, runScenario } from './methylation-run.js'
+import { compiledFor, effect, runScenario, steady } from './methylation-run.js'
 import { scenarioIndex } from '../scenarios.js'
 
 const cache = new Map()
-const key = (m, c) => `${m.id}:${JSON.stringify(m.reference.struct)}:${JSON.stringify(c)}`
 const modelIds = new WeakMap()
 let nextModelId = 1
 const mid = (m) => { if (!modelIds.has(m)) modelIds.set(m, nextModelId++); return modelIds.get(m) }
 
-/** Steady state of control settings (cached; tol 1e-6 is plenty for effect sizes). */
+/** Steady state of control settings (cached). */
 export function ss(controls = {}, model = methylationModel) {
   const k = `${mid(model)}:${JSON.stringify(controls)}`
-  if (!cache.has(k)) cache.set(k, steadyState(compiledFor(model), controls, { tol: 1e-6, tMax: 5e4 }))
+  if (!cache.has(k)) cache.set(k, steady(model, controls))
   return cache.get(k)
 }
 const relOf = (a, b, id) => a.values[id] / b.values[id] - 1
