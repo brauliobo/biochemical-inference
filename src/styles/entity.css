@@ -276,3 +276,9 @@ a.species:hover { background: var(--color-surface-sunken); }
 
 /* A long unbreakable term in a title (N-methyltransferase) wraps instead of widening a narrow screen. */
 h1 { overflow-wrap: anywhere; }
+
+/* Hypothesis edges of a causal graph coloured by the status of the claim behind them (the dash and the label stay). */
+.viz-status--unsupported { --viz-color: var(--color-danger-text); }
+.viz-status--partly-supported { --viz-color: var(--color-info-text); }
+.viz-status--contested { --viz-color: var(--color-warning-text); }
+.viz-status--supported { --viz-color: var(--color-success-text); }
