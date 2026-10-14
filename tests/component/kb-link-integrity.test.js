@@ -49,7 +49,11 @@ describe('rendered link integrity', () => {
         } else if (route.name === 'atlas-causal') {
           // "Open in the causal atlas" must name a real entity
           if (!graph.has(location.query.focus)) problems.push(`${entity.id}: ${href} has no entity to focus`)
-        } else if (!['home', 'kb-hub', 'kb-paths', 'kbMap'].includes(route.name)) {
+        } else if (route.name === 'evidence-claims' || route.name === 'evidence-claim' || route.name === 'evidence-article') {
+          // Claim pages link to the claims audit (optionally by topic); evidence pages must name a real entity.
+          if (route.name === 'evidence-claim' && !graph.has(`claim:${params.slug}`)) problems.push(`${entity.id}: ${href} has no claim`)
+          if (route.name === 'evidence-article' && !graph.has(`article:${params.slug}`)) problems.push(`${entity.id}: ${href} has no article`)
+        } else if (!['home', 'kb-hub', 'kb-paths', 'kbMap', 'evidence', 'evidence-literature'].includes(route.name)) {
           problems.push(`${entity.id}: ${href} resolves to ${route.name}`)
         }
       }
