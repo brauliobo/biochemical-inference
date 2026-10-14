@@ -55,7 +55,8 @@ export function presetFor(controls) {
 export const STATUS_WORD = Object.freeze({
   'measured-anchor': { word: 'Reproduces a measurement', tone: 'success' },
   'model-prediction': { word: 'Model prediction', tone: 'info' },
-  hypothesis: { word: 'Hypothesis', tone: 'warning' }
+  hypothesis: { word: 'Hypothesis', tone: 'warning' },
+  recorded: { word: 'From recorded data', tone: 'success' }
 })
 
 /** Human data on the glycine -> acid hypothesis, shown beside its slider. `article` ids exist in the knowledge base. */

@@ -1,0 +1,115 @@
+/*
+ * Gut/acid, histamine/night, B6/GABA, bile-acid and TMA/TMAO dashboards (src/components/dash-gut,
+ * src/views/dash/*). Semantic tokens only. Colour never stands alone: every chip prints a word, every
+ * bar a number.
+ */
+
+/* ---- Chips: an evidence grade, a linked name, the verdict of a claim, a note ---- */
+.dg-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  padding: 0;
+  list-style: none;
+}
+.dg-chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: var(--space-cluster-tight) var(--space-inset-tight);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-raised);
+}
+.dg-chip__text { overflow-wrap: anywhere; }
+.dg-chip__note { color: var(--color-text-muted); font-size: var(--text-small); }
+
+/* ---- Competing explanations: one card each, in a responsive row ---- */
+.dg-explanations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--target-min) * 5)), 1fr));
+  gap: var(--space-gutter);
+  padding: 0;
+  list-style: none;
+}
+.dg-explanations > li {
+  display: grid;
+  gap: var(--space-stack-tight);
+  align-content: start;
+  min-inline-size: 0;
+  padding: var(--space-inset);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-raised);
+}
+.dg-explanations__name { font-weight: var(--weight-strong); }
+
+/* ---- Edge verdict rows below a causal map ---- */
+.dg-edges {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  list-style: none;
+}
+.dg-edges > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-cluster-tight) var(--space-cluster);
+  padding-block: var(--space-inset-tight);
+  border-block-end: var(--border-width) solid var(--color-border);
+}
+.dg-edges > li:last-child { border-block-end: 0; }
+.dg-edge__ends { font-weight: var(--weight-strong); overflow-wrap: anywhere; }
+
+/* ---- Horizontal bar with a printed number (remaining enzyme activity, share) ---- */
+.dg-bars { display: grid; gap: var(--space-stack-tight); padding: 0; list-style: none; }
+.dg-bars > li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto;
+  align-items: center;
+  gap: var(--space-cluster);
+}
+.dg-bar {
+  --dg-fill: 0%;
+  block-size: var(--space-inset);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  overflow: hidden;
+}
+.dg-bar > span {
+  display: block;
+  inline-size: var(--dg-fill);
+  block-size: 100%;
+  background: var(--color-viz-2);
+}
+.dg-bars__value { font-variant-numeric: tabular-nums; font-weight: var(--weight-strong); white-space: nowrap; }
+
+/* ---- Two-column layout of a chart next to its readout ---- */
+.dg-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--target-min) * 8)), 1fr));
+  gap: var(--space-gutter);
+  align-items: start;
+}
+.dg-pair > * { min-inline-size: 0; }
+
+/* ---- Controls panel: sliders in a responsive grid, hypothesis control set apart ---- */
+.dg-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--target-min) * 6)), 1fr));
+  gap: var(--space-stack) var(--space-gutter);
+  align-items: start;
+}
+.dg-controls > * { min-inline-size: 0; }
+.dg-hypothesis {
+  padding: var(--space-inset);
+  border: var(--border-width) dashed var(--color-warning-border);
+  border-radius: var(--radius-card);
+  background: var(--color-warning-surface);
+  color: var(--color-text);
+}

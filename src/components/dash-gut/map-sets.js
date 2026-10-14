@@ -55,6 +55,7 @@ export const HISTAMINE_MAP = Object.freeze({
     'intervention:niacin-nicotinamide-supplement': 'Niacin',
     'intervention:h2-receptor-antagonists': 'H2 blocker',
     'compound:sam': 'SAM',
+    'compound:gaba': 'GABA',
     'enzyme:hnmt': 'HNMT',
     'enzyme:bhmt': 'BHMT',
     'enzyme:dao': 'DAO',
@@ -82,6 +83,7 @@ export const B6_MAP = Object.freeze({
   labels: {
     'intervention:p5p-supplement': 'P5P supplement',
     'compound:plp': 'PLP (active B6)',
+    'compound:gaba': 'GABA',
     'enzyme:glycine-cleavage-system': 'Glycine cleavage',
     'state:b6-functional-deficiency': 'Functional B6 deficiency',
     'disease:pyroluria-kpu': 'Pyroluria (KPU)',
