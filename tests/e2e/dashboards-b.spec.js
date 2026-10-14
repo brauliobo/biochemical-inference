@@ -85,7 +85,9 @@ test('the simulation engine and the models load lazily: they are not in the firs
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await page.waitForLoadState('networkidle')
   const home = [...scripts]
-  expect(home.filter((path) => /gut-run|histamine-run|b6-run|bile-run|methylation|gastric|parameters-b/.test(path))).toEqual([])
+  // The model chunks only. The home page's map hero lazily loads the core-methylation LAYOUT (a diagram: nodes, edges, no kinetics),
+  // which is not a model (docs/DASHBOARDS.md); the body check below proves that no home chunk carries a rate law.
+  expect(home.filter((path) => /gut-run|histamine-run|b6-run|bile-run|\/methylation|Methylation|\/gastric-[A-Za-z0-9_]{8}\.js|parameters-b/.test(path))).toEqual([])
   for (const path of home) {
     const body = await (await page.request.get(path)).text()
     expect(body, `${path} carries a model`).not.toMatch(/k_pump_rec|vmax_hnmt_s|kplp_cbs|rate_gly_diet/)
