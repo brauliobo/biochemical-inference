@@ -6,6 +6,7 @@ import { adjacency, adjacencyRows, describeGraph, filterGraph, measureNode, reac
 import LegendToggle from './LegendToggle.vue'
 import { layoutLayered } from './layout/layered.js'
 import { textWidth } from './scale.js'
+import { useChartWidth } from './useChartWidth.js'
 import { edgeSign, endMarker, gradeStyle, GRADE_STYLES, shapePath, SIGN_IDS, SIGNS, signGlyph, signWords, typeLook } from './shapes.js'
 
 // A layered causal graph: nodes in tiers (or by longest path), signed edges, own
@@ -43,6 +44,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['select', 'focus-node'])
 
+const { el, width } = useChartWidth(900)
 const hiddenTypes = ref([])
 const hiddenSigns = ref([])
 const hideHypothesis = ref(false)
@@ -217,7 +219,7 @@ function onKey(event) {
 
 <template lang="pug">
 ChartFrame(:id="id" :title="title" :summary="summaryText" :table-label="tableLabel")
-  .viz-box
+  .viz-box(ref="el")
     .viz-graph(ref="box" role="group" tabindex="0" :aria-label="ariaLabel" :aria-activedescendant="focused && dataById.has(active) ? domId(active) : undefined" @focus="onFocus" @blur="onBlur" @keydown="onKey")
       svg.viz-gsvg(:class="fit ? 'viz-gsvg--fit' : 'viz-gsvg--natural'" :viewBox="`0 0 ${layout.width} ${layout.height}`" :width="fit ? undefined : layout.width" :height="fit ? undefined : layout.height")
         g(v-for="tier in tierLabels" :key="`tier-${tier.index}`")
@@ -245,7 +247,7 @@ ChartFrame(:id="id" :title="title" :summary="summaryText" :table-label="tableLab
       template(v-if="info")
         strong {{ info.data.label }}
         span {{ `: ${info.sentence}` }}
-      span.muted(v-else) Hover or focus a node to see what leads to it and what it leads to. Arrow keys follow the links.
+      span.muted(v-else) {{ width < 520 ? 'Scroll the graph sideways, or choose Fit to width. Tap a node to see what leads to it and what it leads to.' : 'Hover or focus a node to see what leads to it and what it leads to. Arrow keys follow the links.' }}
     .stack.stack--tight(v-if="info && (info.leadsTo.length || info.comesFrom.length)")
       .cluster.cluster--tight(v-if="info.leadsTo.length")
         span.muted Leads to:
