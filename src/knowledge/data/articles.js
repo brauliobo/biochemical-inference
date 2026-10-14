@@ -12606,5 +12606,275 @@ export default [
       { rel: 'evidence-for', to: 'compound:betaine', note: 'Authorised EU claim for homocysteine metabolism, with 1.5 g/day as the intake at which the effect is stated and a cholesterol warning above 4 g/day.' },
       { rel: 'evidence-for', to: 'intervention:betaine-anhydrous', note: 'Regulatory frame for low-dose betaine in foods and supplements in the EU; healthy-volunteer evidence only.' }
     ]
+  },
+{
+    id: 'article:efsa-2023-folate-ul',
+    type: 'article',
+    name: 'Scientific opinion on the tolerable upper intake level for folate',
+    aliases: ['EFSA 2023 folate UL', 'EFSA 2023 folic acid upper limit', 'EFSA NDA Panel 2023 folate'],
+    summary: 'EFSA kept the SCF folic acid ULs (1000 micrograms/day for adults) but applied them to the combined intake of folic acid and 5-MTHF salts; critical effect is neurological progression in B12 deficiency.',
+    body: [
+      'The current European safety ceiling for supplemental [[compound:folate]]. EFSA reviewed whether excess folate raises the risk of cobalamin-dependent neuropathy, cognitive decline in people with low B12 status, and colorectal or prostate cancer. It found the cancer and cognition evidence insufficient for a causal conclusion and kept the older concern, progression of neurological symptoms in vitamin B12 deficiency, as the critical effect. It therefore retained the SCF numbers of [[article:scf-2000-folate-ul]].',
+      'A main change from the SCF opinion is scope: the limits now apply to the combined intake of [[compound:folic-acid]] and the two authorised 5-methyltetrahydrofolate salts (glucosamine and calcium), so the statement that the limit covers folic acid only is true of the US and SCF values but not of the EU limit for [[intervention:methylfolate-supplement]]. Folate naturally present in food is not counted. EFSA judged it unlikely that Europeans exceed the limits from supplements except regular users of high-dose products. See also [[article:efsa-2022-5-mthf-dietary-folate-equivalents]] for how 5-MTHF is converted to dietary folate equivalents.'
+    ],
+    evidence: 'established',
+    authors: ['EFSA Panel on Nutrition, Novel Foods and Food Allergens (NDA)'],
+    year: 2023,
+    journal: 'EFSA Journal',
+    doi: '10.2903/j.efsa.2023.8353',
+    pmid: '37965303',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10641704/',
+    verified: true,
+    takeaways: [
+      'The critical effect for the folic acid UL is the risk of progression of neurological symptoms in cobalamin-deficient patients; the evidence on cognitive decline, colorectal cancer and prostate cancer was insufficient to conclude on a causal relationship.',
+      'The ULs retained from the SCF are 1000 micrograms/day for adults including pregnant and lactating women, and 200 (1-3 years), 300 (4-6), 400 (7-10), 600 (11-14) and 800 (15-17) micrograms/day for children; a new UL of 200 micrograms/day covers infants aged 4-11 months.',
+      'The ULs apply to the combined intake of folic acid, (6S)-5-methyltetrahydrofolic acid glucosamine salt and L-5-methyltetrahydrofolic acid calcium salt under their authorised conditions of use, not to folate naturally present in foods.',
+      'EFSA considered it unlikely that European populations exceed the ULs from supplemental folate, except regular users of supplements with high doses of folic acid or 5-MTHF salts.'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:folic-acid', note: 'EU upper limit of 1000 micrograms/day for adults, unchanged from the SCF value.' },
+      { rel: 'evidence-for', to: 'compound:folate', note: 'Defines the EU supplemental ceiling for folate forms and excludes food folate.' },
+      { rel: 'evidence-for', to: 'intervention:methylfolate-supplement', note: 'The EU limit covers 5-MTHF salts together with folic acid, so methylfolate doses count toward the same 1000 micrograms/day.' },
+      { rel: 'evidence-for', to: 'intervention:folic-acid-supplement', note: 'Current EU ceiling for supplemental folic acid, set on the risk of masking and worsening vitamin B12 deficiency.' }
+    ]
+  },
+  {
+    id: 'article:dressman-1990-upper-gi-ph',
+    type: 'article',
+    name: 'Upper gastrointestinal (GI) pH in young, healthy men and women',
+    aliases: ['Dressman 1990', 'Dressman gastric pH capsule', 'fasting gastric pH 1.7'],
+    summary: 'Heidelberg capsule study in young healthy adults: median fasting gastric pH 1.7; a meal lifts it briefly to a median of 6.7 and it returns to fasting values in under 2 hours.',
+    body: [
+      'A widely used reference for what normal stomach acidity looks like. In the fasted state the median gastric pH was 1.7, which is the strongly acidic baseline produced by [[compound:hydrochloric-acid]] secretion. A standard solid and liquid meal acts as a buffer, so gastric pH rose briefly (median peak 6.7) and drifted back to the fasted value within about two hours as secretion caught up.',
+      'This gives a yardstick for judging claims about low acid ([[state:hypochlorhydria]]) and for the size and timing of any pH rise after food or buffered supplements. In the same subjects the duodenum was near neutral when fasted (median 6.1) and fell to a median of 5.4 after the meal; duodenal pH did not track gastric pH, and neither differed by sex. The study used pH telemetry capsules in healthy volunteers, so it says nothing about people with gastritis or on acid-suppressing drugs.'
+    ],
+    evidence: 'established',
+    authors: ['Dressman JB', 'Berardi RR', 'Dermentzoglou LC', 'Russell TL', 'Schmaltz SP', 'Barnett JL', 'Jarvenpaa KM'],
+    year: 1990,
+    journal: 'Pharmaceutical Research',
+    doi: '10.1023/a:1015827908309',
+    pmid: '2395805',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/2395805/',
+    verified: true,
+    takeaways: [
+      'In fasted young healthy men and women the median gastric pH measured by Heidelberg capsule was 1.7 and the median duodenal pH was 6.1.',
+      'After a standard solid and liquid meal gastric pH climbed briefly to a median peak of 6.7 and then declined gradually back to the fasted value in under 2 hours.',
+      'The meal lowered the median duodenal pH to 5.4, and the postprandial duodenal pH did not return to fasted values within the 4-hour observation period.',
+      'Duodenal pH was not related to gastric pH in either state, and upper GI pH did not depend on sex.'
+    ],
+    facts: { design: 'physiological study (pH telemetry)' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:hydrochloric-acid', note: 'Fasting gastric pH of about 1.7 and the post-meal pH rise and recovery in healthy adults.' },
+      { rel: 'evidence-for', to: 'state:hypochlorhydria', note: 'Healthy reference values (fasting median 1.7, meal peak 6.7 returning within 2 hours) against which a raised gastric pH is judged.' }
+    ]
+  },
+  {
+    id: 'article:schubert-kaunitz-2010-gastric-secretion',
+    type: 'article',
+    name: 'Gastric Secretion (chapter 49, Sleisenger and Fordtran\'s Gastrointestinal and Liver Disease, 9th edition)',
+    aliases: ['Schubert Kaunitz 2010', 'Sleisenger Fordtran gastric secretion', 'Gastric Secretion chapter 49'],
+    summary: 'Textbook chapter on acid secretion: parietal cells secrete HCl at about 160 mM; basal output upper limit about 10 (men) and 5 (women) mmol/h; expected peak acid output 10-60 mmol/h.',
+    body: [
+      'A standard physiology reference for the numbers behind [[compound:hydrochloric-acid]] output. Parietal cells secrete acid at about 160 mM (pH 0.8). Basal acid output, measured over four 15-minute periods, has an upper limit of normal of roughly 10 mmol H+ per hour in men and 5 in women and varies through the day, lowest between 6 and 11 am and highest between 2 and 11 pm.',
+      'After pentagastrin stimulation the expected range is 5 to 50 mmol/h for maximal and 10 to 60 mmol/h for peak acid output, both higher in men and in smokers and tracking parietal cell mass. Output after a meal rises quickly toward the peak value, but the meal first buffers the acid that is secreted. The chapter is a secondary summary of the primary physiology papers and the stated ranges are wide, so single-study means can be lower. The chapter text was read on the Clinical Gate mirror; the bibliographic record (authors, pages, edition) is from Crossref and Open Library.'
+    ],
+    evidence: 'established',
+    authors: ['Schubert ML', 'Kaunitz JD'],
+    year: 2010,
+    journal: 'In: Feldman M, Friedman LS, Brandt LJ, eds. Sleisenger and Fordtran\'s Gastrointestinal and Liver Disease, 9th edition. Saunders/Elsevier, pp. 817-832',
+    doi: '10.1016/b978-1-4160-6189-2.00049-4',
+    verified: true,
+    takeaways: [
+      'Parietal cells secrete hydrochloric acid at a concentration of approximately 160 mM, or pH 0.8.',
+      'The upper limit of normal basal acid output is about 10 mmol H+ per hour in men and 5 mmol H+ per hour in women, with the lowest output in the morning and the highest in the afternoon and evening.',
+      'The expected range is 5-50 mmol H+/h for maximal acid output and 10-60 mmol H+/h for peak acid output after pentagastrin; both are higher in men and smokers and correlate with parietal cell mass.',
+      'Meal-stimulated acid secretion rises rapidly toward the peak acid output, while the meal itself initially buffers the acid; sham feeding alone reaches about half of peak output.'
+    ],
+    facts: { design: 'textbook' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:hydrochloric-acid', note: 'Secreted concentration of about 160 mM and normal basal and peak output ranges.' },
+      { rel: 'evidence-for', to: 'outcome:increased-gastric-acid-output', note: 'Defines the upper limits of normal basal output (10 and 5 mmol/h) and the stimulated range against which hypersecretion is judged.' }
+    ]
+  },
+  {
+    id: 'article:stabler-2004-sam-sah-serum-lcms',
+    type: 'article',
+    name: 'Quantification of serum and urinary S-adenosylmethionine and S-adenosylhomocysteine by stable-isotope-dilution liquid chromatography-mass spectrometry',
+    aliases: ['Stabler and Allen 2004', 'Stabler Allen SAM SAH reference intervals'],
+    summary: 'LC-MS assay of SAM and SAH in 48 volunteers: serum reference intervals SAM 71-168 and SAH 8-26 nmol/L; both metabolites drift in stored samples, so handling must be strict.',
+    body: [
+      'One of the few papers giving reference intervals for circulating [[compound:sam]] and [[compound:sah]] in healthy adults measured by mass spectrometry. The intervals (mean plus or minus 2 SD of log-transformed data) were 71-168 nmol/L for serum SAM and 8-26 nmol/L for serum SAH, which implies a serum SAM:SAH ratio of roughly 3 to 20 and a typical value near 6-8 ([[outcome:low-sam-sah-ratio]]).',
+      'The authors also show how fragile the measurement is: SAM falls and SAH rises in serum and plasma kept at 4 degrees C or room temperature for up to 80 hours, and both are unstable in samples stored beyond two years at -20 degrees C. Urinary SAM:SAH is far higher than the serum or red-cell ratio, so urine is not a proxy for tissue methylation capacity. Values from poorly handled samples are therefore unreliable.'
+    ],
+    evidence: 'established',
+    authors: ['Stabler SP', 'Allen RH'],
+    year: 2004,
+    journal: 'Clinical Chemistry',
+    doi: '10.1373/clinchem.2003.026252',
+    pmid: '14656903',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/14656903/',
+    verified: true,
+    takeaways: [
+      'In 48 volunteers the estimated serum reference intervals were 71-168 nmol/L for SAM and 8-26 nmol/L for SAH.',
+      'Assay imprecision (CV) was about 5% for SAM and 17% for SAH.',
+      'SAM decreased and SAH increased in serum and plasma left for up to 80 hours, and both were unstable in samples stored longer than 2 years at -20 degrees C.',
+      'Fractional excretion of SAM exceeds that of SAH, and the urinary SAM:SAH ratio is much higher than the serum or erythrocyte ratio.'
+    ],
+    facts: { design: 'assay validation with reference intervals', population: 'Healthy volunteers, n=48' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Serum reference interval of 71-168 nmol/L in healthy adults.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Serum reference interval of 8-26 nmol/L in healthy adults.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Gives the normal circulating ranges and the sample-handling pitfalls behind any measured SAM:SAH ratio.' }
+    ]
+  },
+  {
+    id: 'article:gellekink-2005-sam-sah-plasma-lcms',
+    type: 'article',
+    name: 'Stable-isotope dilution liquid chromatography-electrospray injection tandem mass spectrometry method for fast, selective measurement of S-adenosylmethionine and S-adenosylhomocysteine in plasma',
+    aliases: ['Gellekink 2005', 'Gellekink SAM SAH plasma'],
+    summary: 'LC-MS/MS method for plasma SAM and SAH; in controls (mean total homocysteine 11.2 umol/L) plasma SAM was 94.5 and SAH 12.3 nmol/L; immediate acidification prevents SAM degradation.',
+    body: [
+      'A second mass-spectrometry dataset for circulating [[compound:sam]] and [[compound:sah]]. In a group of controls with mean plasma total homocysteine of 11.2 micromol/L, plasma SAM averaged 94.5 nmol/L and SAH 12.3 nmol/L, a ratio near 8, which sits inside the range reported by [[article:stabler-2004-sam-sah-serum-lcms]].',
+      'The method measures both metabolites in plasma with quantification limits of 2.0 nmol/L for SAM and 1.0 nmol/L for SAH, with inter-assay CVs of 3.9% and 8.3%. The practical lesson is that SAM degrades in unacidified plasma, so adding acetic acid at once is needed for trustworthy [[outcome:low-sam-sah-ratio]] readings.'
+    ],
+    evidence: 'established',
+    authors: ['Gellekink H', 'van Oppenraaij-Emmerzaal D', 'van Rooij A', 'Struys EA', 'den Heijer M', 'Blom HJ'],
+    year: 2005,
+    journal: 'Clinical Chemistry',
+    doi: '10.1373/clinchem.2004.046995',
+    pmid: '15919880',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/15919880/',
+    verified: true,
+    takeaways: [
+      'In a group of controls with a mean plasma total homocysteine of 11.2 micromol/L, plasma AdoMet (SAM) was 94.5 nmol/L and AdoHcy (SAH) was 12.3 nmol/L.',
+      'Quantification limits were 2.0 nmol/L for SAM and 1.0 nmol/L for SAH; inter-assay CVs were 3.9% and 8.3% and mean recoveries 94.5% and 96.8%.',
+      'Immediate acidification of plasma with acetic acid prevented the observed degradation of SAM, which is a serious problem in unacidified samples.'
+    ],
+    facts: { design: 'assay validation with control values', population: 'Healthy controls' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 94.5 nmol/L in controls and the need to acidify samples.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 12.3 nmol/L in controls.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Supplies a control plasma ratio of about 8 and the pre-analytical safeguards for measuring it.' }
+    ]
+  },
+  {
+    id: 'article:melnyk-2000-sam-sah-plasma-hplc',
+    type: 'article',
+    name: 'Measurement of plasma and intracellular S-adenosylmethionine and S-adenosylhomocysteine utilizing coulometric electrochemical detection: alterations with plasma homocysteine and pyridoxal 5\'-phosphate concentrations',
+    aliases: ['Melnyk 2000', 'Melnyk SAM SAH HPLC'],
+    summary: 'HPLC method in healthy women (total homocysteine 7.3 umol/L): plasma SAM 156 and SAH 20 nmol/L; higher homocysteine raised SAH and lowered the SAM/SAH ratio.',
+    body: [
+      'An HPLC coulometric method for [[compound:sam]] and [[compound:sah]] from the same research group as [[article:james-2004-autism-sam-sah]]. In healthy adult women with mean total homocysteine of 7.3 micromol/L the mean plasma values were 156 nmol/L for SAM and 20 nmol/L for SAH (ratio about 8).',
+      'In women with raised homocysteine (mean 12.1 micromol/L) plasma SAH rose while SAM did not, and pyridoxal 5\'-phosphate was lower. The plasma SAM/SAH ratio was inversely correlated with homocysteine and directly with the ratio in lymphocytes, which supports using plasma as a rough window on cellular methylation potential ([[outcome:low-sam-sah-ratio]]). Absolute values differ between methods and cohorts (SAM 156 here against 94.5 in [[article:gellekink-2005-sam-sah-plasma-lcms]]), so ratios are best compared within one method. An erratum to the paper was published in Clinical Chemistry 2001;47:612; the values above are those of the indexed abstract.'
+    ],
+    evidence: 'established',
+    authors: ['Melnyk S', 'Pogribna M', 'Pogribny IP', 'Yi P', 'James SJ'],
+    year: 2000,
+    journal: 'Clinical Chemistry',
+    pmid: '10657384',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/10657384/',
+    verified: true,
+    takeaways: [
+      'In healthy adult women with mean total homocysteine of 7.3 micromol/L, mean plasma SAM was 156 nmol/L and SAH was 20 nmol/L.',
+      'In women with higher homocysteine (mean 12.1 micromol/L) plasma SAH was increased but SAM was not, and plasma pyridoxal 5\'-phosphate was reduced.',
+      'The plasma SAM/SAH ratio was inversely correlated with homocysteine (r = 0.73 in magnitude) and directly correlated with the lymphocyte SAM/SAH ratio (r = 0.70).',
+      'The method uses 200 microlitres of plasma, 10^6 lymphocytes or 10 mg of tissue and needs no derivatisation.'
+    ],
+    facts: { design: 'assay validation with cohort comparison', population: 'Healthy adult women with normal and raised homocysteine' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Plasma SAM of 156 nmol/L in healthy women measured by HPLC.' },
+      { rel: 'evidence-for', to: 'compound:sah', note: 'Plasma SAH of 20 nmol/L in healthy women, higher when homocysteine is raised.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows the plasma ratio falls with raised homocysteine and tracks the lymphocyte ratio.' }
+    ]
+  },
+  {
+    id: 'article:luka-2006-gnmt-knockout-mouse',
+    type: 'article',
+    name: 'A glycine N-methyltransferase knockout mouse model for humans with deficiency of this enzyme',
+    aliases: ['Luka 2006', 'Luka Gnmt knockout mouse', 'GNMT knockout SAM SAH 300'],
+    summary: 'Gnmt-knockout mice have up to 7-fold more methionine, up to 35-fold more SAM and 3-fold less SAH in liver; the liver SAM/SAH ratio rises from about 3 to about 300.',
+    body: [
+      'The primary source of the numbers quoted for what happens when the GNMT "valve" is removed ([[enzyme:gnmt]], [[claim:gnmt-methyl-sink-valve]]). The mice, made to model the few human cases of GNMT deficiency, lack GNMT protein and activity in the liver. Compared with wild type they had up to a 7-fold increase in free methionine and up to a 35-fold increase in [[compound:sam]], while [[compound:sah]] fell about 3-fold, so the SAM/SAH ratio rose from about 3 to about 300 in liver ([[outcome:low-sam-sah-ratio]]).',
+      'The abstract suggests a significant change in methylation in the liver and other organs where GNMT is expressed. These are tissue values in a knockout mouse, not human plasma values, and they show an extreme high ratio rather than the low-ratio state discussed for undermethylation. The later review [[article:luka-2009-gnmt-sam-regulation]] restates the same experiment in nmol per gram of liver.'
+    ],
+    evidence: 'established',
+    authors: ['Luka Z', 'Capdevila A', 'Mato JM', 'Wagner C'],
+    year: 2006,
+    journal: 'Transgenic Research',
+    doi: '10.1007/s11248-006-0008-1',
+    pmid: '16779654',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/16779654/',
+    verified: true,
+    takeaways: [
+      'Homozygous Gnmt-deficient mice had no GNMT protein or activity in the liver.',
+      'Compared with wild type, free methionine rose up to 7-fold and SAM up to 35-fold, while SAH fell significantly (3-fold).',
+      'The liver SAM/SAH ratio rose from 3 in wild-type mice to 300 in homozygous knockout mice.',
+      'The authors infer a possible significant change in methylation in the liver and other organs where GNMT is expressed.'
+    ],
+    facts: { design: 'knockout mouse', population: 'Gnmt-/- and wild-type mice, liver' },
+    relations: [
+      { rel: 'evidence-for', to: 'enzyme:gnmt', note: 'Loss of GNMT raises liver SAM about 35-fold and the SAM/SAH ratio from about 3 to about 300.' },
+      { rel: 'evidence-for', to: 'claim:gnmt-methyl-sink-valve', note: 'Direct experimental support that GNMT removes surplus SAM; mouse liver data.' },
+      { rel: 'evidence-for', to: 'compound:sam', note: 'Up to 35-fold SAM accumulation in knockout liver.' },
+      { rel: 'evidence-for', to: 'outcome:low-sam-sah-ratio', note: 'Shows how far the tissue SAM/SAH ratio can swing (the high end), in mouse liver only.' }
+    ]
+  },
+  {
+    id: 'article:scf-2000-vitamin-b6-ul',
+    type: 'article',
+    name: 'Opinion of the Scientific Committee on Food on the Tolerable Upper Intake Level of Vitamin B6',
+    aliases: ['SCF 2000 vitamin B6', 'SCF 2000 B6 UL', 'EU SCF B6 25 mg', 'SCF/CS/NUT/UPPLEV/16'],
+    summary: 'EU Scientific Committee on Food set the vitamin B6 UL at 25 mg/day for adults (5-20 mg for children) on peripheral neurotoxicity; EFSA lowered it to 12 mg/day in 2023.',
+    body: [
+      'The earlier European ceiling for [[compound:vitamin-b6]], expressed on 19 October 2000. The committee judged that severe toxicity occurs at 500 mg/day or more and that minor neurological symptoms may appear at 100 mg/day or more after long use. It started from the average intake of about 100 mg/day in the Dalton and Dalton (1987) study, whose dose-response data come largely from women with premenstrual syndrome, halved it because that intake corresponds to a possible effect level for long-term use, and halved it again for gaps in the database, arriving at 25 mg/day.',
+      'The same value was applied to pregnancy and lactation, with child limits scaled by body weight. EFSA revised the figure downward to 12 mg/day in [[article:efsa-2023-b6-ul]], so this opinion explains older European labels. The US value of 100 mg/day, set in the IOM report behind [[article:iom-1998-choline-dri]], is four times higher because it rests on a no-effect level of 200 mg/day. The endpoint for both is neurotoxicity of high-dose [[compound:pyridoxine]].'
+    ],
+    evidence: 'established',
+    authors: ['Scientific Committee on Food'],
+    year: 2000,
+    journal: 'European Commission, Scientific Committee on Food (SCF/CS/NUT/UPPLEV/16 Final)',
+    url: 'https://ec.europa.eu/food/fs/sc/scf/out80c_en.pdf',
+    verified: true,
+    takeaways: [
+      'The adult UL is 25 mg/day vitamin B6, also for pregnant and lactating women.',
+      'It is derived from an intake of about 100 mg/day associated with a possible effect on long-term use, divided by 2 for that reason and by 2 again for deficiencies in the database.',
+      'Severe toxicity was seen at 500 mg/day or more, and minor neurological symptoms may occur at 100 mg/day or more taken for long periods.',
+      'Child limits are 5 mg/day (1-3 years), 7 (4-6), 10 (7-10), 15 (11-14) and 20 (15-17).'
+    ],
+    facts: { design: 'guideline' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:vitamin-b6', note: 'Former EU upper limit of 25 mg/day, now replaced by EFSA 12 mg/day.' },
+      { rel: 'evidence-for', to: 'compound:pyridoxine', note: 'Neurotoxicity of high-dose pyridoxine is the basis of the limit.' }
+    ]
+  },
+  {
+    id: 'article:cdc-nhanes-mma-lab-manual',
+    type: 'article',
+    name: 'Laboratory Procedure Manual: Methylmalonic acid (MMA), serum, LC-MS/MS (NHANES 2013-2014, method 4010.03)',
+    aliases: ['CDC NHANES MMA manual', 'NHANES methylmalonic acid method', 'serum MMA reference range 73-271'],
+    summary: 'CDC NHANES serum MMA method: normal 73-271 nmol/L (mean +/-2 SD) or 53-376 nmol/L (+/-3 SD), citing Allen 1990; values above 2,000 nmol/L fit B12 deficiency; renal impairment raises MMA.',
+    body: [
+      'A laboratory manual rather than a clinical study, used here because it states the serum reference range for [[compound:methylmalonic-acid]] with its source. Normal values were first defined as mean plus or minus 3 SD (53-376 nmol/L) and are now more often given as mean plus or minus 2 SD (73-271 nmol/L), both attributed to Allen and colleagues (Am J Hematol 1990;34:90-8, PubMed 2339683). The range applies to serum; other matrices and laboratories differ.',
+      'The manual adds that MMA above 2,000 nmol/L is considered representative of vitamin B12 deficiency ([[disease:vitamin-b12-deficiency]]), that raised values must be read with caution because impaired kidney function, especially in older people, also raises MMA, and that there is no scientific consensus on cutoffs for subclinical deficiency. This is the practical background to [[intervention:homocysteine-mma-testing]]. The NHANES 2013-2014 cycle used this method to produce the MMA data file.'
+    ],
+    evidence: 'established',
+    authors: ['Centers for Disease Control and Prevention, Division of Laboratory Sciences, Nutritional Biomarkers Branch'],
+    year: 2013,
+    journal: 'CDC NHANES Laboratory Procedure Manual (method no. 4010.03)',
+    url: 'https://wwwn.cdc.gov/nchs/data/nhanes/public/2013/labmethods/MMA_H_MET.pdf',
+    verified: true,
+    takeaways: [
+      'The serum MMA reference range is 73-271 nmol/L (0.073-0.271 micromol/L) as mean +/- 2 SD, or 53-376 nmol/L as mean +/- 3 SD, citing Allen et al. 1990.',
+      'MMA values above 2,000 nmol/L are considered representative of vitamin B12 deficiency.',
+      'Elevated MMA should be interpreted with caution because impaired renal function, particularly in older persons, also raises it.',
+      'There is no scientific consensus on cutoff values for low vitamin B12 status, particularly subclinical deficiency.'
+    ],
+    facts: { design: 'database' },
+    relations: [
+      { rel: 'evidence-for', to: 'compound:methylmalonic-acid', note: 'Serum reference range of 73-271 nmol/L (mean +/- 2 SD) and its caveats.' },
+      { rel: 'evidence-for', to: 'intervention:homocysteine-mma-testing', note: 'States how MMA results are interpreted (reference range, 2,000 nmol/L, renal confounding).' },
+      { rel: 'evidence-for', to: 'disease:vitamin-b12-deficiency', note: 'MMA above 2,000 nmol/L is taken as representative of B12 deficiency; mild rises are non-specific.' }
+    ]
   }
 ]

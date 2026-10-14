@@ -355,6 +355,54 @@ describe('the shipped dataset', () => {
     expect(quantFor(index, 'compound:glycine', { kind: 'flux' })[0].value).toBe(463)
   })
 
+  it('states the vitamin and mineral limits of each authority as the source documents do', () => {
+    const find = (subject, filter) => {
+      const found = quantFor(index, subject, filter)
+      expect(found, JSON.stringify([subject, filter])).toHaveLength(1)
+      return found[0]
+    }
+    const MICRO = '\u00b5'
+    // IOM 1998
+    expect(find('compound:folate', { kind: 'RDA', authority: 'IOM 1998', population: 'adults 19+' })).toMatchObject({ value: 400, unit: `${MICRO}g/day`, basis: 'DFE' })
+    expect(find('compound:folic-acid', { kind: 'UL', authority: 'IOM 1998', population: 'adults 19+' }).value).toBe(1000)
+    expect(find('compound:vitamin-b12', { kind: 'RDA', authority: 'IOM 1998', population: 'adults 19+' }).value).toBe(2.4)
+    expect(find('compound:vitamin-b12', { kind: 'UL', authority: 'IOM 1998' })).toMatchObject({ value: null, established: false })
+    expect(find('compound:vitamin-b6', { kind: 'UL', authority: 'IOM 1998' }).value).toBe(100)
+    expect(find('compound:niacin', { kind: 'UL', authority: 'IOM 1998' }).value).toBe(35)
+    // EFSA
+    expect(find('compound:vitamin-b6', { kind: 'UL', authority: 'EFSA 2023' }).value).toBe(12)
+    expect(find('compound:folic-acid', { kind: 'UL', authority: 'EFSA 2023', population: 'adults' }).basis).toMatch(/5-MTHF salts, combined/)
+    expect(find('compound:folate', { kind: 'PRI', authority: 'EFSA 2017' }).value).toBe(330)
+    expect(find('compound:magnesium', { kind: 'AI', authority: 'EFSA 2017', population: 'men' }).value).toBe(350)
+    // EU SCF
+    expect(find('compound:nicotinamide', { kind: 'UL', authority: 'EU SCF 2002' }).value).toBe(900)
+    expect(find('compound:niacin', { kind: 'UL', authority: 'EU SCF 2002' }).value).toBe(10)
+    expect(find('compound:zinc', { kind: 'UL', authority: 'EU SCF 2003' }).value).toBe(25)
+    expect(find('compound:glycyrrhizin', { kind: 'UL' }).value).toBe(100)
+    // magnesium: the IOM UL sits below the RDA only because it covers supplements alone
+    const mgUl = find('compound:magnesium', { kind: 'UL', authority: 'IOM 1997' })
+    const mgRda = find('compound:magnesium', { kind: 'RDA', authority: 'IOM 1997', population: 'men 31+' })
+    expect(mgUl.value).toBe(350)
+    expect(mgRda.value).toBe(420)
+    expect(mgUl.basis).not.toBe(mgRda.basis)
+    expect(limitsFor(index, 'compound:magnesium').map((group) => group.authority)).toEqual(['IOM 1997', 'EU SCF 2001', 'EFSA 2017'])
+    expect(limitsFor(index, 'compound:vitamin-b6').map((group) => group.authority)).toEqual(['IOM 1998', 'EU SCF 2000', 'EFSA 2017', 'EFSA 2023'])
+  })
+
+  it('keeps the gastric and methylation reference numbers the verification pass confirmed', () => {
+    const one = (subject, filter) => quantFor(index, subject, filter)
+    expect(one('compound:hydrochloric-acid', { kind: 'ph' }).map((record) => record.value).sort()).toEqual([1.7, 6.7])
+    expect(one('compound:hydrochloric-acid', { kind: 'concentration' })[0].value).toBe(160)
+    expect(one('compound:hydrochloric-acid', { kind: 'flux' }).map((record) => record.id)).toEqual(expect.arrayContaining(['quant:hydrochloric-acid-flux-peak-output-range']))
+    expect(one('compound:sam', { kind: 'reference-range' })[0]).toMatchObject({ low: 71, high: 168, unit: 'nmol/L' })
+    expect(one('compound:sah', { kind: 'reference-range' })[0]).toMatchObject({ low: 8, high: 26 })
+    expect(one('enzyme:gnmt', { kind: 'ratio' }).map((record) => record.value).sort((a, b) => a - b)).toEqual([3, 300])
+    expect(one('compound:homocysteine', { kind: 'threshold' }).map((record) => record.value)).toEqual(expect.arrayContaining([15, 30, 100]))
+    expect(one('compound:methylmalonic-acid', { kind: 'reference-range' })[0]).toMatchObject({ low: 0.073, high: 0.271 })
+    expect(one('pathway:creatine-synthesis', { kind: 'flux-share' }).map((record) => record.value).sort()).toEqual([0.4, 0.7])
+    expect(one('intervention:betaine-anhydrous', { kind: 'approved-dose' }).map((record) => record.value).sort((a, b) => a - b)).toEqual([1.5, 6, 20])
+  })
+
   it('exposes the helpers bound to the shipped data from the knowledge index', () => {
     expect(knowledge.quantFor('compound:choline', { kind: 'UL' }).length).toBeGreaterThanOrEqual(2)
     expect(knowledge.limitsFor('compound:choline')[0].authority).toBe('IOM 1998')

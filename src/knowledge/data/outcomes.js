@@ -227,7 +227,7 @@ export default [
     aliases: ["Razão SAM/SAH baixa", "Reduced methylation index", "Low methylation index"],
     summary: "A reduced ratio of S-adenosylmethionine to S-adenosylhomocysteine, indicating weaker methylation drive; measurable but not a validated clinical diagnostic and sensitive to sampling.",
     body: [
-      "[[compound:sah]] inhibits methyltransferases, so a low [[compound:sam]]:SAH ratio predicts reduced methylation potential. Plasma ratios track the supply side (methionine, folate, B12, choline) and kidney function, but tissue ratios may differ. It is the most direct biochemical form of [[state:undermethylation]], yet no clinical thresholds are standardised. GNMT knockout mice show how large the ratio can swing (about 3 to about 300) when the valve is missing ([[enzyme:gnmt]]). Educational only."
+      "[[compound:sah]] inhibits methyltransferases, so a low [[compound:sam]]:SAH ratio predicts reduced methylation potential. Plasma ratios track the supply side (methionine, folate, B12, choline) and kidney function, but tissue ratios may differ. It is the most direct biochemical form of [[state:undermethylation]], yet no clinical thresholds are standardised. GNMT knockout mice show how large the liver ratio can swing (about 3 to about 300) when the valve is missing ([[enzyme:gnmt]], [[article:luka-2006-gnmt-knockout-mouse]]). Educational only."
     ],
     evidence: "plausible",
     relations: [
