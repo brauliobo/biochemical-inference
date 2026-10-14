@@ -1,13 +1,14 @@
 // Presets, tiles, series and map inputs of the choline / TMA / TMAO dashboard (pure; numbers from tma-model.js and the
 // calculators in src/sim/calculators.js).
 import { cholineCoverageOfDeficit, cholineForGlycine } from '../../sim/calculators.js'
+import { withEvidence } from './preset-evidence.js'
 import { TMA_YIELD, doseResponse, intakeWords, tmaOutput } from './tma-model.js'
 
 export const CLAIM = Object.freeze({ lowG: 28, highG: 35 }) // "28-35 g of choline for 10 g of glycine" (claim:choline-28-35g-for-10g-glycine)
 export const UL_MG = 3500
 export const DOSE_MAX_MG = 40000
 
-export const TMA_PRESETS = Object.freeze([
+export const TMA_PRESETS = withEvidence([
   Object.freeze({ id: 'diet', label: 'Typical diet (330 mg)', status: 'recorded', mg: 330, note: 'About 3.2 mmol a day (2.8 to 4.5).' }),
   Object.freeze({ id: 'supplement', label: 'Supplement, 1 g', status: 'recorded', mg: 1000, note: 'Choline bitartrate supplements give 250 to 1000 mg of choline.' }),
   Object.freeze({ id: 'ul', label: 'At the IOM upper limit (3.5 g)', status: 'recorded', mg: 3500, note: 'Set on hypotension, with fishy odour as the secondary effect. EFSA set none.' }),

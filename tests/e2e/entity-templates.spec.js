@@ -71,7 +71,9 @@ test('the entity page and its heavy parts are lazy: Home loads none of them, eac
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await settle(page)
-  expect(has(/Template|KbEntityView|AtlasView|AtlasCausalView|MetabolicMap|LayeredGraph|parameters-b[12]|core-methylation/), `Home loaded: ${[...loaded].join(', ')}`).toBe(false)
+  // The home page draws the metabolic map hero (MetabolicMap and the core-methylation layout, lazily after the first heading;
+  // docs/DASHBOARDS.md), so those two are expected there. Entity pages, the atlas, the layered graph and the kinetic parameters are not.
+  expect(has(/Template|KbEntityView|AtlasView|AtlasCausalView|LayeredGraph|parameters-b[12]/), `Home loaded: ${[...loaded].join(', ')}`).toBe(false)
 
   await page.goto('/#/kb/compound/glycine')
   await expect(page.getByRole('heading', { level: 1, name: 'Glycine' })).toBeVisible()

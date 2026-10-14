@@ -1,6 +1,7 @@
 // Light data for the gut/acid dashboard (no engine, no model): the default controls, the preset scenarios and the
 // evidence chips. Mirrors gastricScenarios in src/sim/models/gastric.js (a unit test keeps the two in step) so the
 // page can draw its controls before the model chunk has loaded.
+import { withEvidence } from './preset-evidence.js'
 
 /** Dashboard controls (what the page's sliders hold). `toModelControls` maps them to the gastric model's controls. */
 export const GUT_DEFAULTS = Object.freeze({
@@ -33,7 +34,7 @@ export function toModelControls(c) {
 const preset = (id, label, status, controls, note) => ({ id, label, status, controls: { ...GUT_DEFAULTS, ...controls }, note })
 
 /** `status` follows the gastric scenarios: measured-anchor, model-prediction, hypothesis. */
-export const GUT_PRESETS = Object.freeze([
+export const GUT_PRESETS = withEvidence([
   preset('meal', 'Standard meal', 'measured-anchor', {}, 'Meal pH peak 5-7, back to acid within 2 h (Dressman).'),
   preset('fasting', 'Fasting', 'measured-anchor', { meal: false }, 'Fasting pH 1.7, basal output 5.1 mmol/h.'),
   preset('ppi-60', 'PPI, 60% of pumps blocked', 'measured-anchor', { ppi: 60 }, 'Omeprazole 20 mg: median pH 4.6, acid down 60%.'),

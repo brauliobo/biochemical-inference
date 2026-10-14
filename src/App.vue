@@ -42,15 +42,13 @@ watch(() => route.path, async () => {
           li
             RouterLink(to="/") Home
           li
-            RouterLink(to="/dashboards" section) Dashboards
+            RouterLink(to="/dashboards" section :also="['/dash']") Dashboards
           li
             RouterLink(to="/atlas" section) Atlas
           li
             RouterLink(to="/evidence" section) Evidence
           li
             RouterLink(to="/kb" section) Knowledge base
-          li
-            RouterLink(to="/atlas" section) Atlas
           li
             RouterLink(to="/workbench" section) Workbenches
   main#main.site-main(ref="main" tabindex="-1")

@@ -1,8 +1,9 @@
 // Presets, tiles, bars and series of the bile-acid dashboard (pure; numbers from bile-run.js and bile-model.js).
+import { withEvidence } from './preset-evidence.js'
 import { BAAT_SETS, GLYCINE_SHARE, GROSS_GLYCINE_MMOL_PER_DAY, glycineGrams, impliedGlyTau, rateCoefficient } from './bile-model.js'
 
 export const BILE_DEFAULTS = Object.freeze({ glycineG: 10, taurineX: 1 })
-export const BILE_PRESETS = Object.freeze([
+export const BILE_PRESETS = withEvidence([
   Object.freeze({ id: 'none', label: 'No supplement', status: 'measured-anchor', controls: { glycineG: 0, taurineX: 1 }, note: 'Observed bile: about 75% glycine conjugates, 3 : 1.' }),
   Object.freeze({ id: 'glycine-10', label: 'Glycine 10 g a day', status: 'hypothesis', controls: { glycineG: 10, taurineX: 1 }, note: 'No human data on glycine supplements and bile conjugation.' }),
   Object.freeze({ id: 'glycine-20', label: 'Glycine 20 g a day', status: 'hypothesis', controls: { glycineG: 20, taurineX: 1 }, note: 'Far above any studied dose; shape only.' }),

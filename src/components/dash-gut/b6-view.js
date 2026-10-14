@@ -1,9 +1,10 @@
 // Presets, tiles, chart series and map inputs of the B6/GABA dashboard (pure; the numbers come from b6-run.js).
+import { withEvidence } from './preset-evidence.js'
 import { articlePath } from './causal-view.js'
 import { timesUl } from './dose-rows.js'
 
 export const B6_DEFAULTS = Object.freeze({ plp: 100 })
-export const B6_PRESETS = Object.freeze([
+export const B6_PRESETS = withEvidence([
   Object.freeze({ id: 'normal', label: 'Normal B6 status (100%)', status: 'measured-anchor', controls: { plp: 100 }, note: 'The calibrated reference state.' }),
   Object.freeze({ id: 'restriction', label: 'B6 restriction (41%)', status: 'measured-anchor', controls: { plp: 41 }, note: 'Plasma PLP 52.6 to 21.5 nM in 28 days of restriction (Gregory 2013).' }),
   Object.freeze({ id: 'severe', label: 'Severe deficiency (15%)', status: 'model-prediction', controls: { plp: 15 }, note: 'Outside the data: a model extrapolation.' }),
