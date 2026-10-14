@@ -1,0 +1,308 @@
+{
+ "total": 41,
+ "pass": 28,
+ "mismatch": 13,
+ "info": 0,
+ "rows": [
+  {
+   "id": "S-steady",
+   "group": "steady",
+   "title": "Steady state exists, is positive and converged",
+   "status": "pass",
+   "detail": "residual 7.6e-14, min species 0.0e+0"
+  },
+  {
+   "id": "S-stable",
+   "group": "steady",
+   "title": "Steady state is stable (relaxation from +-30% random perturbations)",
+   "status": "pass",
+   "detail": "max deviation from the steady state: 19.0% at 150 h (folate, PE and PC pools relax with half-lives of weeks), 0.2% at 3000 h; no growth in 3 random +-30% perturbations"
+  },
+  {
+   "id": "S-sam",
+   "group": "steady",
+   "title": "Hepatic SAM",
+   "status": "pass",
+   "detail": "23.97 uM"
+  },
+  {
+   "id": "S-sah",
+   "group": "steady",
+   "title": "Hepatic SAH",
+   "status": "pass",
+   "detail": "3.89 uM"
+  },
+  {
+   "id": "S-ratio",
+   "group": "steady",
+   "title": "SAM:SAH ratio",
+   "status": "pass",
+   "detail": "SAM:SAH 6.16"
+  },
+  {
+   "id": "S-thcy",
+   "group": "steady",
+   "title": "Plasma total homocysteine",
+   "status": "pass",
+   "detail": "7.00 uM"
+  },
+  {
+   "id": "S-mat",
+   "group": "flux",
+   "title": "Total MAT (SAM synthesis) flux",
+   "status": "pass",
+   "detail": "MAT-I 78.1 + MAT-III 22.6 = 100.6 uM/h"
+  },
+  {
+   "id": "S-shares-reed",
+   "group": "flux",
+   "title": "SAM-consumer shares (liver model)",
+   "status": "pass",
+   "detail": "GNMT 43.7%, PEMT 27.4%, GAMT 25.3%, DNMT 2.0% (Reed 2015: 44 / 27 / 25 / 2); max deviation 0.2%"
+  },
+  {
+   "id": "S-shares-b2",
+   "group": "flux",
+   "title": "SAM-consumer shares against the whole-body budget of parameters-b2",
+   "status": "mismatch",
+   "why": "The base calibration follows the Reed liver model (GNMT 44%). The B2 budget is whole-body and puts GNMT at ~15% (liver-only ~21%). Select the samConsumerBudget variant \"b2budget\" for the alternative; the glycine ensemble samples GNMT flux over 15-44 uM/h.",
+   "detail": "GNMT 43.7% (whole-body budget 14.5%, range 9.5-31%), creatine 25.3% (budget 36%, range 18-73%)"
+  },
+  {
+   "id": "S-partition",
+   "group": "flux",
+   "title": "Transmethylation / transsulfuration partition",
+   "status": "pass",
+   "detail": "transsulfuration 49.7% of homocysteine disposal; 2.01 methionine cycles per cystathionine (Mudd >= 1.9)"
+  },
+  {
+   "id": "S-bhmt-share",
+   "group": "flux",
+   "title": "BHMT share of remethylation",
+   "status": "pass",
+   "detail": "BHMT 48.9% of remethylation"
+  },
+  {
+   "id": "S-met-balance",
+   "group": "flux",
+   "title": "Methionine balance",
+   "status": "pass",
+   "detail": "methionine in 51.500 = CBS 50.000 + Hcy export 1.500 uM/h"
+  },
+  {
+   "id": "S-scale",
+   "group": "flux",
+   "title": "Absolute flux scale: liver share of whole-body transmethylation",
+   "status": "mismatch",
+   "why": "The Reed 2015 liver cycle (100 uM/h) is 2.4 mmol/day at 1 L, 12% of the whole-body 20 mmol/day. Whole-body loads are therefore converted with a proportional share (loadScale 5 uM/h per mmol/day, ensemble range 3-15), not at absolute scale. Documented scale inconsistency between B1 and B2.",
+   "detail": "model liver (1 L) transmethylation 101 umol/h = 2.4 mmol/day = 12.1% of whole-body 20 mmol/day"
+  },
+  {
+   "id": "S-folate-total",
+   "group": "flux",
+   "title": "Total folate pool",
+   "status": "mismatch",
+   "why": "The model tracks THF, CH2-THF, 5-MTHF, 10-formyl-THF (incl. methenyl) and DHF: 14.4 uM. Reed's 20 includes forms and bound pools that are not modelled. The sum is conserved; only ratios between forms matter for the effects.",
+   "detail": "14.4 uM of modelled folate forms (Reed total 20)"
+  },
+  {
+   "id": "S-gnmt-gly-sat",
+   "group": "flux",
+   "title": "GNMT glycine saturation at hepatic glycine",
+   "status": "pass",
+   "detail": "GNMT glycine saturation 92.7% with Km 130 uM (B1 note: ~93%), 45.4% with Km 2 mM"
+  },
+  {
+   "id": "S-pemt-fraction",
+   "group": "flux",
+   "title": "PEMT flux as fraction of the liver PC pool",
+   "status": "mismatch",
+   "why": "B2 holds two incompatible PEMT numbers: the SAM budget (3.75 mmol/day; Reed 27.5 uM/h SAM = 9.2 uM PC/h here) and the PC-pool fraction (0.53%/h x 17.3 mM = 92 uM PC/h, i.e. 275 uM/h of SAM). The model follows the SAM budget; the PC-pool number would exceed all other SAM consumers combined.",
+   "detail": "PEMT makes 0.053%/h of the PC pool (Pynn 2011: 0.53%/h, range 0.27-1.06)"
+  },
+  {
+   "id": "S-gly-pk",
+   "group": "pk",
+   "title": "Plasma glycine after 4.6 g (1 mmol/kg lean mass)",
+   "status": "pass",
+   "detail": "peak 953 uM at 35 min (Gannon 2002, unverified secondhand: 217 -> 909 uM at 40 min; 414 uM at 120 min, model 512)"
+  },
+  {
+   "id": "S-bet-pk",
+   "group": "pk",
+   "title": "Plasma betaine after 50 mg/kg",
+   "status": "pass",
+   "detail": "Cmax 961 uM at 0.88 h, late half-life 22.3 h (Schwahn 2003, 50 mg/kg: 939 uM, 0.9 h, 14.4 h [6-32])"
+  },
+  {
+   "id": "D-betaine-hcy",
+   "group": "direction",
+   "title": "Betaine lowers fasting tHcy in a dose-dependent way",
+   "status": "pass",
+   "detail": "tHcy -12.9% / -14.1% / -14.9% at 1.5 / 3 / 6 g/day (Olthof 2003: -12% / -15% / -20%)"
+  },
+  {
+   "id": "D-betaine-postload",
+   "group": "direction",
+   "title": "Betaine lowers the post-methionine-load tHcy increment",
+   "status": "pass",
+   "detail": "post-load tHcy increment 4.7 -> 3.8 uM with betaine 6 g/day (-20.2%; Olthof 2003: -40%)"
+  },
+  {
+   "id": "D-choline-hcy",
+   "group": "direction",
+   "title": "Choline lowers fasting tHcy",
+   "status": "pass",
+   "detail": "tHcy -11.8% at +2.6 g choline/day (Olthof 2005: -18%)"
+  },
+  {
+   "id": "D-choline-bhmt",
+   "group": "direction",
+   "title": "Choline and betaine raise BHMT flux and lower hepatic Hcy",
+   "status": "pass",
+   "detail": "BHMT flux 36.8% (choline 2 g/day), 52.5% (betaine 3 g/day); liver Hcy -15.7% / -21.3%"
+  },
+  {
+   "id": "D-mthfr",
+   "group": "direction",
+   "title": "MTHFR 677TT-like (0.4x): tHcy up, 5-MTHF down",
+   "status": "pass",
+   "detail": "MTHFR 0.4x: tHcy 52.6%, 5-MTHF -45.6%, SAM:SAH -16.1%"
+  },
+  {
+   "id": "D-b6-cysta",
+   "group": "direction",
+   "title": "B6 restriction raises cystathionine",
+   "status": "pass",
+   "detail": "cystathionine 68.2% at PLP 41% (Gregory 2013: +52% and +66%)"
+  },
+  {
+   "id": "D-b6-thcy",
+   "group": "direction",
+   "title": "B6 restriction leaves fasting tHcy unchanged",
+   "status": "mismatch",
+   "why": "With cellular PLP at 41% (assumed equal to plasma PLP) CBS falls to 70% and Hcy must rise ~35% to restore flux (Km 1 mM, linear regime). Hepatic PLP probably falls less than plasma PLP; with PLP at 75% the model change is small. Ensemble range of kplp_cbs 0.3-0.6 does not cover the observed flat response.",
+   "detail": "fasting tHcy 24.3% (restriction study: unchanged)"
+  },
+  {
+   "id": "D-b6-glycine",
+   "group": "direction",
+   "title": "B6 restriction raises glycine",
+   "status": "mismatch",
+   "why": "SHMT and GCS are scaled by the same PLP factor (K 0.10), so glycine barely moves (+2%); in vivo the glycine rise compensates the lower enzyme activity (cleavage flux unchanged). Weak data (n.s. in the largest cohort).",
+   "detail": "hepatic glycine 2.4% (plasma glycine +10-29% in restriction studies)"
+  },
+  {
+   "id": "D-b6-postload",
+   "group": "direction",
+   "title": "B6 restriction enlarges the post-load tHcy increment",
+   "status": "pass",
+   "detail": "post-load tHcy increment 4.7 -> 6.3 uM (B6 restriction: larger, Ubbink 1996)"
+  },
+  {
+   "id": "D-b12-trap",
+   "group": "direction",
+   "title": "B12 deficiency: methyl-folate trap and hyperhomocysteinaemia",
+   "status": "pass",
+   "detail": "B12 0.2x: 5-MTHF 113.7%, THF -70.9%, 10-formyl-THF -62.5%, tHcy 87.3%, total folate 0.0%"
+  },
+  {
+   "id": "D-b12-ratio",
+   "group": "direction",
+   "title": "B12 deficiency lowers SAM:SAH",
+   "status": "mismatch",
+   "why": "The trapped 5-MTHF inhibits GNMT (Reed/Yeo mechanism), cutting SAM consumption and raising SAM:SAH. Parameter-dependent: with weak folate inhibition (Ki > ~100 uM) the sign flips (see ensemble). Not settled in humans.",
+   "detail": "SAM:SAH 28.6% (cobalamin-deficiency literature: SAM low-normal, SAH up; model: trapped 5-MTHF inhibits GNMT)"
+  },
+  {
+   "id": "D-niacin",
+   "group": "direction",
+   "title": "Niacin load raises SAH and lowers SAM:SAH",
+   "status": "pass",
+   "detail": "niacin 2 g/day: SAH 21.9%, SAM -38.1%, SAM:SAH -49.2%, NNMT 52 uM/h"
+  },
+  {
+   "id": "D-niacin-thcy",
+   "group": "direction",
+   "title": "Niacin raises tHcy",
+   "status": "mismatch",
+   "why": "tHcy rises by only a few percent at 1 g/day because the extra-hepatic half of plasma Hcy is unaffected by the hepatic methyl sink. Size, not sign, disagrees.",
+   "detail": "tHcy 3.7% at 1 g/day niacin (Garg 1999: +17% during titration to 1 g, +55% at 18 weeks)"
+  },
+  {
+   "id": "D-niacin-methyl",
+   "group": "direction",
+   "title": "Fraction of niacin methylated by NNMT",
+   "status": "pass",
+   "detail": "64.1% of niacin methylated at 2 g/day (B2: 4.38-6.3 mmol methyl/g of 8.12 mmol/g = 54-78%)"
+  },
+  {
+   "id": "D-glycine-sarcosine",
+   "group": "direction",
+   "title": "Glycine bolus raises GNMT flux and sarcosine",
+   "status": "mismatch",
+   "why": "Only the Luka-style (mM) Km gives a transient GNMT rise; sarcosine is cleared by SARDH within an hour so its peak stays flat. With the Reed Km (130 uM, 93% saturated) GNMT flux falls slightly because SAM feedback (Hill 2) and 5-MTHF inhibition outweigh the glycine term. Hypothesis-level; no human data.",
+   "detail": "10 g glycine bolus, peak GNMT flux / sarcosine / trough SAM:SAH: Reed Km 1.7% / 0.0% / -1.6%; Luka Km 9.5% / 3.8% / -9.0%"
+  },
+  {
+   "id": "D-glycine-chronic-sarcosine",
+   "group": "direction",
+   "title": "Chronic glycine raises hepatic sarcosine",
+   "status": "mismatch",
+   "why": "Model sarcosine does not rise (SAM and GNMT feedback, rapid SARDH). Mouse, high-fat diet, 6 weeks - far outside the model regime; shown as an unreproduced observation.",
+   "detail": "chronic glycine 10 g/day: liver sarcosine -5.6% (Reed Km), -1.7% (Luka Km); mouse +86% (Alves 2022)"
+  },
+  {
+   "id": "D-glycine-thcy",
+   "group": "direction",
+   "title": "Glycine supplementation and tHcy",
+   "status": "mismatch",
+   "why": "Extra glycine raises serine through SHMT (serine +17% in Tan 2025 too), which in the model enhances CBS and lowers Hcy; the human data show a small rise. Serine/CBS coupling and the SHMT exchange flux are unconstrained assumptions.",
+   "detail": "tHcy -8.9% at 7 g/day glycine (Tan 2025: +0.6 uM = +6%); the serine -> CBS arm lowers Hcy in the model"
+  },
+  {
+   "id": "D-folate-low",
+   "group": "direction",
+   "title": "Low folate supply: SAM down, tHcy up",
+   "status": "pass",
+   "detail": "folate supply 0.5x: total folate -50.0%, tHcy 46.1%, SAM -26.7%"
+  },
+  {
+   "id": "D-met-load",
+   "group": "direction",
+   "title": "Methionine load test (100 mg/kg)",
+   "status": "pass",
+   "detail": "100 mg/kg methionine: tHcy peaks 67.8% at 4.8 h after the dose (clinical test: roughly +100% at 4-8 h)"
+  },
+  {
+   "id": "D-gnmt-ko",
+   "group": "knockout",
+   "title": "GNMT loss raises SAM 30-fold",
+   "status": "mismatch",
+   "why": "SAM rises only x2.6 (x6.5 with GAMT Km 6.7 uM): other consumers (GAMT, PEMT) keep spare capacity and MAT-I is SAM-inhibited, so the calibrated network buffers SAM. In vivo methionine rises 7-25x as well, which the model (net methionine input fixed) cannot do. Direction right, magnitude not: GNMT-dependent SAM effects should be read as lower bounds.",
+   "detail": "GNMT activity 0: SAM x2.6 (human deficiency x28-47, mouse x36), SAH -18.0% (mouse: falls 12-15 -> 3-5)"
+  },
+  {
+   "id": "D-bhmt-ko",
+   "group": "knockout",
+   "title": "BHMT loss: SAM down, SAH and tHcy up",
+   "status": "mismatch",
+   "why": "SAM falls in the right direction but SAH falls and tHcy rises only 1.5x: CBS (linear in Hcy, Km 1 mM) absorbs the extra Hcy in the model, whereas the knockout mouse cannot. Net methionine input is fixed by construction.",
+   "detail": "BHMT activity 0: SAM x0.74 (mouse x0.57), SAH x0.87 (mouse x2.6), tHcy x1.47 (mouse x8)"
+  },
+  {
+   "id": "C-folate",
+   "group": "conservation",
+   "title": "Total folate is conserved by the closed folate reactions",
+   "status": "pass",
+   "detail": "closed folate reactions conserve total folate; the only open reactions are fol_in, fol_loss_ch2thf, fol_loss_dhf, fol_loss_f10, fol_loss_mthf, fol_loss_thf"
+  },
+  {
+   "id": "C-methyl",
+   "group": "conservation",
+   "title": "Methyl-group accounting with boundary exchanges",
+   "status": "pass",
+   "detail": "internal methyl transfers (MAT, GNMT, PEMT, BHMT, MTR, MTHFR, DMGDH, SARDH, CHDH, Kennedy, PLD) conserve methyl groups; 26 boundary reactions exchange them: bet_efl, bet_up, cho_abs, cho_diet, cho_in, cho_out, dmg_out, d"
+  }
+ ]
+}

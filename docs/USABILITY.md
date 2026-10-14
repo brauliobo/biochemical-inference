@@ -68,7 +68,7 @@ An interaction is one activation of a link or control (click, tap, or Enter).
 | F2 | Median time on task | T2 under 30 s; T1 under 60 s | Moderated test |
 | F3 | Largest Contentful Paint / Interaction to Next Paint / Cumulative Layout Shift | 2.5 s / 200 ms / 0.1 or better, mid-range mobile, throttled 4G | Lighthouse or WebPageTest per release |
 | F4 | Initial JavaScript, home route | 100 kB gzip or less before the first heading renders (the knowledge data, about 182 kB gzip, loads lazily after first paint, see `src/kb/knowledge-lazy.js`); workbench code never loads on knowledge pages | `npm run build:static` output, network log (see Results) |
-| F5 | Keyboard cost | Skip link first; primary navigation within 5 Tab presses of page load | `shell.spec.js` |
+| F5 | Keyboard cost | Skip link first; primary navigation within 5 Tab presses of page load (the navigation has six links: Home, Dashboards, Atlas, Evidence, Knowledge base, Workbenches) | `shell.spec.js` |
 
 ### Satisfaction
 
@@ -170,7 +170,7 @@ per measure) and `tests/e2e/shell.spec.js`.
 | A1 the same 16 populated workbench states in Chromium with the built CSS (contrast, target size, reflow), light and dark, desktop and 360 px | 0 violations, no horizontal overflow | 0 violations. It found one defect, fixed: a long digest in the single-page workbench's "Controlled run" grid widened the page by 303 px at 360 px (`.grid > *` now has `min-inline-size: 0` and wraps long identifiers) |
 | A4 buttons, fields, disclosure summaries in `main` on 5 key pages (a guided-path step included: Previous / Next and Read the page are buttons-as-links at 44 px) | 44 px or more | 0 under 44 px |
 | A5 horizontal overflow at 320 px, 10 key routes (the guided-path list and a step included) | none | 0 routes overflow |
-| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 47.4 kB (index 33.0 kB; the guided-path cards add the 7.9 kB gzip paths data, 41.7 kB before them); the knowledge data chunk (353 kB gzip as built today) follows lazily |
+| F4 JavaScript before the first heading, Home | 100 kB gzip or less | 53.1 kB with the dashboard home (map hero, question cards and counters load after the first paint; `tests/e2e/dashboards.spec.js` measures it and asserts that the home page never fetches the simulator or the literature tables); before that redesign 47.4 kB (index 33.0 kB; the guided-path cards add the 7.9 kB gzip paths data); the knowledge data chunk follows lazily |
 
 Not measured here (needs people or devices): E1, E2, F2, F3, S1 to S4, screen readers,
 zoom to 400 percent, forced colours. They stay on the manual list above.

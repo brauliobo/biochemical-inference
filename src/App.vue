@@ -42,6 +42,12 @@ watch(() => route.path, async () => {
           li
             RouterLink(to="/") Home
           li
+            RouterLink(to="/dashboards" section) Dashboards
+          li
+            RouterLink(to="/atlas" section) Atlas
+          li
+            RouterLink(to="/evidence" section) Evidence
+          li
             RouterLink(to="/kb" section) Knowledge base
           li
             RouterLink(to="/atlas" section) Atlas

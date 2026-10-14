@@ -1,0 +1,322 @@
+{
+ "unit": "g/day or mmol/day, see each budget",
+ "budgets": [
+  {
+   "id": "glycine-sinks",
+   "title": "Where glycine goes: net metabolic uses (adult, 70 kg)",
+   "unit": "g/day",
+   "items": [
+    {
+     "label": "Collagen synthesis (net of recycling)",
+     "value": 12,
+     "low": 4,
+     "high": 12,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Assumes 95% of glycine released in the procollagen cycle is recycled; at no recycling the gross need is 240 g/day; low = supply-matching 4 g/day (recycling >98%)."
+    },
+    {
+     "label": "Other protein synthesis (net)",
+     "value": 1,
+     "low": 1,
+     "high": 10.2,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Turnover 203 g/day non-collagen protein, ~5% glycine; 1 g/day net is the authors' value, high = gross 10.2 g/day (calc)."
+    },
+    {
+     "label": "Glutathione synthesis (net)",
+     "value": 0.57,
+     "low": 0.57,
+     "high": 3.75,
+     "source": "article:melendez-hevia-2009-glycine-weak-link"
+    },
+    {
+     "label": "Creatine synthesis",
+     "value": 0.55,
+     "low": 0.28,
+     "high": 1.1,
+     "source": "article:brosnan-2011-metabolic-burden-creatine-synthesis",
+     "note": "7.3 mmol/day (3.7-14.6) x 75.07; Meléndez-Hevia Table 2 uses 5.6 mmol = 0.42 g. Neutral for glycine in that author's one-carbon accounting because the methyl group is made from serine."
+    },
+    {
+     "label": "Haem (porphyrins)",
+     "value": 0.24,
+     "low": 0.24,
+     "high": 0.24,
+     "source": "article:melendez-hevia-2009-glycine-weak-link"
+    },
+    {
+     "label": "Purines",
+     "value": 0.21,
+     "low": 0.21,
+     "high": 0.21,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "A net glycine SOURCE overall in that accounting (+0.21 g/day)."
+    },
+    {
+     "label": "Hippurate (benzoate conjugation)",
+     "value": 0.6,
+     "low": 0.4,
+     "high": 0.8,
+     "source": "article:beyoglu-2012-glycine-conjugation-review",
+     "note": "Not in Meléndez-Hevia Table 2; diet dependent."
+    },
+    {
+     "label": "Bile acid conjugation (net, de novo)",
+     "value": 0.06,
+     "low": 0.03,
+     "high": 0.11,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Gross conjugation is ~0.45 g/day (6 mmol; Hepner 1972) but the freed glycine is largely oxidised after bacterial deconjugation."
+    }
+   ],
+   "totals": [
+    {
+     "label": "Net glycine supply: synthesis 2.9 + diet 1.5-3.0 (Meléndez-Hevia 2009)",
+     "value": 5.15,
+     "low": 4.4,
+     "high": 5.9,
+     "source": "article:melendez-hevia-2009-glycine-weak-link"
+    }
+   ],
+   "contested": [
+    "The headline \"10 g/day deficit\" = items 15.2 g/day (this list, with hippurate) minus 5.15 g/day supply = ~10 g/day; the authors' own balance is -8.5 to -10 g/day with 14.5 g/day of uses.",
+    "Collagen need (the biggest item) rests on a 95% recycling assumption and on net collagen synthesis of 96.5 g/day assembled from rat, rabbit and human tissue data.",
+    "Tracer-derived de novo glycine synthesis (7-44 g/day in four studies, see glycine-synthesis-estimates) is 2.5-15x the 2.9 g/day pathway sum; no study has directly tested the deficit.",
+    "No study measured whether 3-10 g/day oral glycine changes collagen turnover."
+   ]
+  },
+  {
+   "id": "glycine-sources",
+   "title": "Glycine supply in the Meléndez-Hevia 2009 pathway summation (adult, 70 kg)",
+   "unit": "g/day",
+   "items": [
+    {
+     "label": "Serine -> glycine (SHMT, net of one-carbon sinks)",
+     "value": 2.54,
+     "low": 2.54,
+     "high": 2.54,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 33.69 mmol/day."
+    },
+    {
+     "label": "Sarcosine from endogenous methylation (re-entry)",
+     "value": 0.14,
+     "low": 0.14,
+     "high": 0.14,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 1.89 mmol/day."
+    },
+    {
+     "label": "Glyoxylate",
+     "value": 0.09,
+     "low": 0.09,
+     "high": 0.09,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 1.17 mmol/day (from mouse oxalate scaling)."
+    },
+    {
+     "label": "Sarcosine from dietary choline",
+     "value": 0.11,
+     "low": 0.11,
+     "high": 0.11,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 1.43 mmol/day."
+    },
+    {
+     "label": "Dietary threonine (7% to glycine)",
+     "value": 0.02,
+     "low": 0.02,
+     "high": 0.02,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 0.29 mmol/day."
+    },
+    {
+     "label": "Carnitine synthesis",
+     "value": 0.006,
+     "low": 0.006,
+     "high": 0.006,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Table 1: 0.08 mmol/day."
+    },
+    {
+     "label": "Dietary protein glycine",
+     "value": 2.25,
+     "low": 1.5,
+     "high": 3,
+     "source": "article:melendez-hevia-2009-glycine-weak-link"
+    }
+   ]
+  },
+  {
+   "id": "glycine-synthesis-estimates",
+   "title": "Five estimates of endogenous glycine synthesis (NOT additive)",
+   "unit": "g/day",
+   "items": [
+    {
+     "label": "Meléndez-Hevia 2009: summed pathway fluxes (net new glycine)",
+     "value": 2.9,
+     "low": 2.9,
+     "high": 2.9,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Only net new glycine; counts one-carbon units used."
+    },
+    {
+     "label": "Yu 1985: de novo N-synthesis, low-N diet 0.6 g protein/kg",
+     "value": 7.4,
+     "low": 2.5,
+     "high": 7.4,
+     "source": "article:yu-1985-glycine-synthesis-dispensable-aa",
+     "note": "59 vs 20 umol/kg/h with vs without dispensable amino acids; the no-DAA value is the 2.5 g/day end."
+    },
+    {
+     "label": "Tan 2022: de novo synthesis, fasting, healthy weight",
+     "value": 11.2,
+     "low": 9.3,
+     "high": 14.3,
+     "source": "article:tan-2022-glycine-serine-synthesis-obesity",
+     "note": "124 (IQR 103-159) umol/kg lean mass/h at an ASSUMED 50 kg lean mass (my assumption)."
+    },
+    {
+     "label": "Robert 1982: post-absorptive de novo synthesis",
+     "value": 24.5,
+     "low": 24.5,
+     "high": 24.5,
+     "source": "article:robert-1982-glycine-synthesis-postabsorptive",
+     "note": "81% of 240 umol/kg/h flux = 194 umol/kg/h."
+    },
+    {
+     "label": "Gersovitz 1980: fed, 1.5 g protein/kg/day",
+     "value": 44.3,
+     "low": 44.3,
+     "high": 44.3,
+     "source": "article:gersovitz-1980-glycine-flux-protein-intake",
+     "note": "351 umol/kg/h of 458 umol/kg/h flux; falls sharply on 0.4 g/kg protein."
+    }
+   ],
+   "contested": [
+    "The estimates measure different things (net pathway sum vs tracer rate of appearance that includes recycling through serine and one-carbon exchange). Both Gibson 2002 (glycine production maintained on marginal protein) and Tan 2022 are cited against a hard shortage but neither quantifies a deficit."
+   ]
+  },
+  {
+   "id": "glycine-flux-partition",
+   "title": "Gross whole-body glycine flux and its tracer-derived partition (fed adult, 70 kg)",
+   "unit": "g/day",
+   "items": [
+    {
+     "label": "Glycine -> serine (SHMT exchange)",
+     "value": 24.3,
+     "low": 20.8,
+     "high": 27.9,
+     "source": "article:lamers-2007-glycine-flux"
+    },
+    {
+     "label": "Glycine cleavage system (decarboxylation)",
+     "value": 24,
+     "low": 12.1,
+     "high": 29.1,
+     "source": "article:lamers-2007-glycine-flux",
+     "note": "The [1-13C] tracer in the later study gives about half (96 vs 190 umol/kg/h)."
+    },
+    {
+     "label": "Protein synthesis, glutathione, creatine and all other uses (remainder)",
+     "value": 10.1,
+     "low": 0,
+     "high": 32.4,
+     "source": "calc:flux-minus-shmt-minus-gcs",
+     "note": "Remainder 463 - 193 - 190 = 80 umol/kg/h; the ranges of the three parts are wide enough that it could be zero."
+    }
+   ],
+   "totals": [
+    {
+     "label": "Whole-body glycine flux (fed)",
+     "value": 58.4,
+     "low": 51.5,
+     "high": 65.3,
+     "source": "article:lamers-2007-glycine-flux"
+    }
+   ],
+   "contested": [
+    "This is turnover (appearance and disappearance), dominated by recycling through protein breakdown, serine exchange and the cleavage system; it is NOT net synthesis or net requirement. Fasting flux is 240 umol/kg/h (30 g/day)."
+   ]
+  },
+  {
+   "id": "choline-sources",
+   "title": "Where body choline comes from (adult, 70 kg)",
+   "unit": "mmol/day",
+   "items": [
+    {
+     "label": "Dietary choline (free + phosphocholine + GPC + PC)",
+     "value": 3.2,
+     "low": 2.8,
+     "high": 4.5,
+     "source": "article:wallace-2017-us-choline-intake",
+     "note": "US 338 mg/day, Framingham 313, EU 291-468 mg/day. Only ~8% of US adults meet the AI."
+    },
+    {
+     "label": "Endogenous de novo choline moiety (PEMT)",
+     "value": 1.25,
+     "low": 0.83,
+     "high": 1.67,
+     "source": "calc:pemt-sam-over-three",
+     "note": "PEMT SAM use divided by three. Inherits the 2-fold PEMT uncertainty."
+    }
+   ],
+   "contested": [
+    "Rat de novo choline synthesis (70 umol/day per 100 g, Wise & Elwyn 1965, as extrapolated in Meléndez-Hevia 2009 to ~49 mmol/day for 70 kg) is inconsistent with a total methyl budget of ~20 mmol/day (3 SAM per choline) and was NOT used."
+   ]
+  },
+  {
+   "id": "choline-fate",
+   "title": "What happens to body choline (adult, 70 kg)",
+   "unit": "mmol/day",
+   "items": [
+    {
+     "label": "Oxidised to betaine, then DMG, sarcosine, glycine (CHDH/BADH)",
+     "value": 3.3,
+     "low": 1.9,
+     "high": 3.3,
+     "source": "article:melendez-hevia-2009-glycine-weak-link",
+     "note": "Inferred from urinary sarcosine in patients with a sarcosine-oxidation defect (Mudd 1980/2007, second-hand). Betaine -> methionine by BHMT donates one methyl group per betaine to the methionine cycle."
+    },
+    {
+     "label": "Gut-bacterial trimethylamine (urinary TMAO)",
+     "value": 0.16,
+     "low": 0.03,
+     "high": 1.35,
+     "source": "assumption:tma-habitual-diet",
+     "note": "ASSUMED: 5% (1-30%) of dietary choline. A large free-choline bolus gives 63% (Zhang 1999); phosphatidylcholine does not raise TMAO (Cho 2020)."
+    },
+    {
+     "label": "Acetylcholine synthesis",
+     "value": 0.01,
+     "low": 0,
+     "high": 0.1,
+     "source": "assumption:acetylcholine-token",
+     "note": "Whole-body ACh turnover NOT FOUND; shown as a token so the bar is complete."
+    },
+    {
+     "label": "Residual (net PC/membrane accretion, urinary choline/betaine, faecal loss)",
+     "value": 1,
+     "low": 0,
+     "high": 2.5,
+     "source": "calc:supply-minus-identified-fates",
+     "note": "Remainder of the midpoint supply; not measured. Renal clearance of betaine is <5% and ~4% of an oral betaine dose is excreted unchanged (Lever 1994; Schwahn 2003)."
+    }
+   ],
+   "totals": [
+    {
+     "label": "Dietary + endogenous choline supply",
+     "value": 4.45,
+     "low": 3.6,
+     "high": 6.2,
+     "source": "calc:sum-of-choline-sources"
+    }
+   ],
+   "contested": [
+    "The partition is NOT measured as a whole in humans. Isotope studies give enrichment ratios, not fractions of dose (Yan 2013: d9-betaine:d9-choline 1.24; d9-PC 9.4%, PEMT-derived d3/d6-PC 0.17 of d9-PC).",
+    "PEMT share of hepatic PC synthesis: 20-40% of the CDP-choline rate in rat hepatocytes, ~10% in mouse (Pynn 2011), up to 47% in mouse hepatocytes vs ~10% in human liver cell lines (2026 NMR, not in repo). Human in vivo: not measured.",
+    "Pregnancy diverts choline toward PC and away from betaine (plasma choline +30%, betaine/DMG/sarcosine -13 to -55%; Yan 2012)."
+   ]
+  }
+ ]
+}
