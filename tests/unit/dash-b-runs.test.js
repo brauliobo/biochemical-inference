@@ -163,6 +163,7 @@ describe('methylation link for the histamine page', () => {
     for (const link of METHYLATION_LINKS) {
       const scenario = scenarioIndex[link.scenario]
       expect(scenario, link.id).toBeTruthy()
+      expect(link.evidence, link.id).toBe(scenario.evidence.status)
       expect(Object.keys(chronicControls(scenario)).length, link.id).toBeGreaterThan(0)
     }
     expect(() => methylationSamSah('nope')).toThrow(/Unknown methylation scenario/)

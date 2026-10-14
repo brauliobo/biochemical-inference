@@ -44,6 +44,9 @@ beforeEach(() => {
 const slow = { timeout: 30000 }
 const main = () => document.body
 const text = () => document.body.textContent.replace(/\s+/g, ' ')
+// A preset row is a radio whose label also carries the evidence chip of the shared ScenarioPresets ("... Supported"), so
+// find it by the start of its accessible name.
+const preset = (label) => screen.getByRole('radio', { name: new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}( |$)`) })
 const slider = (name) => screen.getByLabelText(name, { selector: 'input[type="range"]' })
 
 async function open(View, heading) {
@@ -77,7 +80,7 @@ describe('/dash/gut-acid', () => {
     await waitFor(() => expect(calls.gut.at(-1).ppi).toBe(60), slow)
     await waitFor(() => expect(text()).toMatch(/Time with stomach pH below 4\s*5\.2/), slow)
     // the controls now equal the "PPI, 60%" preset
-    await waitFor(() => expect(screen.getByLabelText('PPI, 60% of pumps blocked').checked).toBe(true))
+    await waitFor(() => expect(preset('PPI, 60% of pumps blocked').checked).toBe(true))
   })
 
   it('a preset sets the sliders and says how well it is supported; the glycine hypothesis is 0 by default and labelled', async () => {
@@ -86,7 +89,7 @@ describe('/dash/gut-acid', () => {
     expect(slider('Glycine raises acid output by').value).toBe('0')
     expect(text()).toContain('Hypothesis, not a finding')
     expect(text()).toContain('Reproduces a measurement')
-    await fireEvent.click(screen.getByLabelText('What-if: glycine adds 70% more acid'))
+    await fireEvent.click(preset('What-if: glycine adds 70% more acid'))
     await waitFor(() => expect(slider('Glycine raises acid output by').value).toBe('70'))
     expect(text()).toContain('No human data for the size; Wald 1982 gave 5.6 vs 3.3 mmol/h.')
     await waitFor(() => expect(calls.gut.some((call) => call.glycineAcidBoostPct === 70)).toBe(true), slow)
@@ -137,7 +140,7 @@ describe('/dash/histamine-night', () => {
     await open(HistamineNightDashboard, 'Histamine and night waking')
     await screen.findByRole('heading', { level: 2, name: 'What the model says' }, slow)
     expect(slider('SAM available to HNMT').value).toBe('60')
-    await fireEvent.click(screen.getByLabelText('Methylation model: niacin 2 g/day'))
+    await fireEvent.click(preset('Methylation model: niacin 2 g/day'))
     await waitFor(() => expect(slider('SAM available to HNMT').value).toBe('37.2'), slow)
     expect(slider('SAH (HNMT is inhibited by it)').value).toBe('14.6')
     expect(calls.link).toEqual(['niacin-2g'])
@@ -146,7 +149,7 @@ describe('/dash/histamine-night', () => {
     await waitFor(() => expect(calls.histamine.at(-1)).toMatchObject({ samUM: 37.2, sahUM: 14.6 }), slow)
     // moving a slider by hand leaves the preset
     await fireEvent.update(slider('SAM available to HNMT'), '30')
-    await waitFor(() => expect(screen.getByLabelText('Methylation model: niacin 2 g/day').checked).toBe(false))
+    await waitFor(() => expect(preset('Methylation model: niacin 2 g/day').checked).toBe(false))
   })
 
   it('the day-night rhythm is off until asked for, then the day chart appears with the two clock markers', async () => {
@@ -203,7 +206,7 @@ describe('/dash/b6-gaba', () => {
   it('moving PLP re-runs the model and the map colours follow the PLP slider', async () => {
     await open(B6GabaDashboard, 'Vitamin B6 and GABA')
     await screen.findByRole('heading', { level: 2, name: 'What the model says' }, slow)
-    await fireEvent.click(screen.getByLabelText('B6 restriction (41%)'))
+    await fireEvent.click(preset('B6 restriction (41%)'))
     await waitFor(() => expect(slider('Cellular PLP').value).toBe('41'))
     await waitFor(() => expect(calls.b6.at(-1).plp).toBe(41), slow)
     await waitFor(() => expect(document.querySelector('#b6-shunt-map-caption')).toBeTruthy(), slow)
@@ -238,11 +241,11 @@ describe('/dash/bile-acids', () => {
   it('moving the glycine slider re-runs the what-if and leaves the preset', async () => {
     await open(BileAcidsDashboard, 'Bile acids: glycine or taurine')
     await screen.findByRole('heading', { level: 2, name: 'What the model says' }, slow)
-    expect(screen.getByLabelText('Glycine 10 g a day').checked).toBe(true)
+    expect(preset('Glycine 10 g a day').checked).toBe(true)
     await fireEvent.update(slider('Extra glycine a day'), '4')
     await waitFor(() => expect(calls.bile.at(-1).glycineG).toBe(4), slow)
-    await waitFor(() => expect(screen.getByLabelText('Glycine 10 g a day').checked).toBe(false))
-    await fireEvent.click(screen.getByLabelText('Taurine supply x3'))
+    await waitFor(() => expect(preset('Glycine 10 g a day').checked).toBe(false))
+    await fireEvent.click(preset('Taurine supply x3'))
     await waitFor(() => expect(slider('Liver taurine supply').value).toBe('3'))
   })
 
@@ -279,12 +282,12 @@ describe('/dash/tma-tmao', () => {
   it('the claim presets move the intake: 35 g is ten times the UL, the TMA output rises and the status is a hypothesis', async () => {
     await open(TmaTmaoDashboard, 'Choline, TMA and TMAO')
     await screen.findByText('Choline intake against the IOM and EFSA limits', {}, slow)
-    await fireEvent.click(screen.getByLabelText('The claim, high (35 g)'))
+    await fireEvent.click(preset('The claim, high (35 g)'))
     await waitFor(() => expect(slider('Choline intake').value).toBe('35000'), slow)
     expect(text()).toContain('10.0 times the IOM UL, above the 7.5 g/day level where hypotension appeared')
     expect(text()).toMatch(/TMA \+ TMAO if the bolus yield held\s*212 mmol a day/)
     expect(text()).toContain('Hypothesis')
-    await fireEvent.click(screen.getByLabelText('At the IOM upper limit (3.5 g)'))
+    await fireEvent.click(preset('At the IOM upper limit (3.5 g)'))
     await waitFor(() => expect(slider('Choline intake').value).toBe('3500'), slow)
     expect(text()).toContain('From recorded data')
     expect(text()).toContain('100% of the IOM UL')

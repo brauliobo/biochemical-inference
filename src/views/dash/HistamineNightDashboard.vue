@@ -28,7 +28,7 @@ import StackedBar from '../../viz/StackedBar.vue'
 setPageTitle('Histamine and night waking')
 const controls = reactive({ ...HISTAMINE_DEFAULTS })
 const snapshot = computed(() => ({ ...controls }))
-const presets = [...HISTAMINE_PRESETS, ...METHYLATION_LINKS.map((link) => ({ id: link.id, label: link.label }))]
+const presets = [...HISTAMINE_PRESETS, ...METHYLATION_LINKS.map((link) => ({ id: link.id, label: link.label, evidence: link.evidence }))]
 const preset = ref('reference')
 const link = ref(null) // the methylation-model values behind a "Methylation model: ..." preset
 const linking = ref(false)
