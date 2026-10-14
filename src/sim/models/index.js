@@ -11,9 +11,11 @@
 
 import { OBS, SPECIES, STRUCT, PLAN, methylationModel, getModel, variants, variantOptions } from './methylation.js'
 import { scenarios, scenarioIndex } from '../scenarios.js'
-import { validationTargets } from '../validation-targets.js'
 
-export { methylationModel, getModel, variants, variantOptions, scenarios, scenarioIndex, validationTargets, STRUCT, PLAN }
+export { methylationModel, getModel, variants, variantOptions, scenarios, scenarioIndex, STRUCT, PLAN }
+
+/** Validation targets (lazy: long descriptions, only needed by the validation panel). */
+export const loadValidationTargets = () => import('../validation-targets.js').then((m) => m.validationTargets)
 
 /** Lazy provenance (see methylation-sources.js): resolves to { id, value, low, high, unit, confidence, origin, sourceArticle, locator, ... }. */
 export const parameterSources = (id, model = methylationModel) => import('./methylation-sources.js').then((m) => m.parameterSource(id, model))

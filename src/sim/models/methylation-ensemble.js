@@ -68,7 +68,7 @@ export function methylationEnsemble(options) {
     } catch (e) { run = null }
     if (!run || !run.ok) { failures += 1; continue }
     const effects = {}
-    const iBase = scenario.stages.length === full.stages.length ? baselineIndex(run) : 0
+    const iBase = 0 // the filtered scenario starts at the intervention, i.e. at the member's own steady state
     for (const m of metrics) {
       const arr = run.series[m.observable] ?? run.fluxes[m.observable]
       const base = arr[iBase]
