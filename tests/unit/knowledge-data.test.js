@@ -11,17 +11,17 @@ const graph = buildGraph(entities)
 
 // Floors, not exact counts: they stop content from being deleted by accident but let it grow.
 const MINIMUM_PER_TYPE = {
-  compound: 140,
-  enzyme: 64,
-  reaction: 60,
-  pathway: 26,
+  compound: 152,
+  enzyme: 76,
+  reaction: 74,
+  pathway: 27,
   state: 13,
   disease: 24,
   outcome: 36,
   system: 19,
   intervention: 47,
   claim: 62,
-  article: 245
+  article: 258
 }
 
 describe('the real dataset validates', () => {
@@ -348,7 +348,9 @@ describe('reactions balance', () => {
     'reaction:cbs-cystathionine-synthesis', 'reaction:shmt-serine-glycine-interconversion', 'reaction:mthfd1-methenyl-thf-cyclohydrolase', 'reaction:psat1-phosphoserine-transamination',
     'reaction:bsh-glycocholate-deconjugation', 'reaction:abat-gaba-transamination', 'reaction:chat-acetylcholine-synthesis', 'reaction:dao-histamine-oxidation',
     'reaction:pnpo-pnp-oxidation', 'reaction:proton-bicarbonate-protonation', 'reaction:carbonic-acid-dehydration', 'reaction:carbonic-anhydrase-bicarbonate-dehydration',
-    'reaction:hcl-bicarbonate-neutralisation', 'reaction:urease-urea-hydrolysis', 'reaction:p4h-prolyl-hydroxylation', 'reaction:choline-tma-lyase', 'reaction:tyms-thymidylate-synthesis'
+    'reaction:hcl-bicarbonate-neutralisation', 'reaction:urease-urea-hydrolysis', 'reaction:p4h-prolyl-hydroxylation', 'reaction:choline-tma-lyase', 'reaction:tyms-thymidylate-synthesis',
+    'reaction:atic-aicar-formylation', 'reaction:atic-imp-cyclohydrolase', 'reaction:nnmt-nicotinamide-methylation', 'reaction:creatine-cyclisation',
+    'reaction:mtr-methylcobalamin-demethylation', 'reaction:mtr-cob-i-alamin-methylation'
   ]
 
   it.each(FULLY_BALANCED)('%s balances atoms, hydrogens and charge', (id) => {

@@ -12107,5 +12107,204 @@ export default [
         "note": "Vagal control of the MMC is restricted to the stomach."
       }
     ]
+  },
+{
+    id: "article:wyss-2000-creatine-creatinine-metabolism",
+    type: "article",
+    name: "Creatine and creatinine metabolism",
+    aliases: ["Wyss 2000", "Wyss & Kaddurah-Daouk 2000"],
+    summary: "Comprehensive review of creatine and creatinine metabolism: biosynthesis and degradation pathways and their regulation, tissue distribution of the enzymes, and links to physiology and disease.",
+    body: [
+      "The standard physiology reference for how [[compound:creatine]] is made, stored and lost as [[compound:creatinine]] ([[reaction:creatine-cyclisation]], [[pathway:creatine-synthesis]]). It covers the creatine kinase system, disturbances of it in disease, and the use of creatine as an ergogenic aid ([[intervention:creatine-supplement]])."
+    ],
+    evidence: "established",
+    authors: ["Wyss M", "Kaddurah-Daouk R"],
+    year: 2000,
+    journal: "Physiological reviews",
+    doi: "10.1152/physrev.2000.80.3.1107",
+    pmid: "10893433",
+    url: "https://doi.org/10.1152/physrev.2000.80.3.1107",
+    verified: true,
+    takeaways: [
+      "The review surveys how creatine is synthesised and broken down, how these steps are regulated, and where the enzymes and metabolites occur across species and tissues.",
+      "It links disturbances of the creatine kinase system to muscle, brain, heart and kidney disease and to cancer.",
+      "Creatine and analogues such as cyclocreatine show protective effects in models of hypoxic, ischaemic, neurodegenerative and muscle damage, and oral creatine is used as an ergogenic aid.",
+      "Some data suggest that creatine and creatinine can be precursors of food mutagens and uremic toxins."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:brosnan-2011-metabolic-burden-creatine-synthesis",
+    type: "article",
+    name: "The metabolic burden of creatine synthesis",
+    aliases: ["Brosnan 2011"],
+    summary: "Review quantifying what creatine synthesis costs: replacing the creatine lost to creatinine (about 2 g/day in young men) uses glycine, arginine and roughly 40% of SAM-derived methyl groups.",
+    body: [
+      "Gives numbers for the loss in [[reaction:creatine-cyclisation]] and for the demand it places on the [[pathway:methyl-budget]] through [[pathway:creatine-synthesis]]. It adds that dietary creatine in omnivores replaces about half of the loss, and that glycine supply is not strained in adults because the amino acid is readily synthesised ([[compound:creatinine]])."
+    ],
+    evidence: "established",
+    authors: ["Brosnan JT", "da Silva RP", "Brosnan ME"],
+    year: 2011,
+    journal: "Amino acids",
+    doi: "10.1007/s00726-011-0853-y",
+    pmid: "21387089",
+    url: "https://doi.org/10.1007/s00726-011-0853-y",
+    verified: true,
+    takeaways: [
+      "Creatine is spontaneously converted to creatinine and excreted, so adults must synthesise creatine to replace it.",
+      "Creatinine loss averages about 2 g (14.6 mmol) per day for 70 kg men aged 20 to 39, and is lower in women and older people because of lower muscle mass.",
+      "In omnivores roughly half of the lost creatine can be replaced by dietary creatine; vegetarians depend almost entirely on endogenous synthesis.",
+      "Creatine synthesis accounts for about 40% of SAM-derived labile methyl groups and uses 20 to 30% of arginine's amidino groups, but does not appear to burden glycine metabolism in adults."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:okano-1999-dnmt3a-dnmt3b-de-novo",
+    type: "article",
+    name: "DNA methyltransferases Dnmt3a and Dnmt3b are essential for de novo methylation and mammalian development",
+    aliases: ["Okano 1999"],
+    summary: "Mouse knockout study: Dnmt3a and Dnmt3b are the de novo DNA methyltransferases needed for development; Dnmt3b covers centromeric repeats, and human DNMT3B is mutated in ICF syndrome.",
+    body: [
+      "Primary evidence for the division of labour between the de novo enzymes [[enzyme:dnmt3a]] and [[enzyme:dnmt3b]] and the maintenance enzyme [[enzyme:dnmt1]] ([[enzyme:dnmt]], [[reaction:dnmt-dna-cytosine-methylation]]). The work is in mouse embryonic stem cells and embryos; the human link is the ICF syndrome mutations."
+    ],
+    evidence: "established",
+    authors: ["Okano M", "Bell DW", "Haber DA", "Li E"],
+    year: 1999,
+    journal: "Cell",
+    doi: "10.1016/s0092-8674(00)81656-6",
+    pmid: "10555141",
+    url: "https://doi.org/10.1016/s0092-8674(00)81656-6",
+    verified: true,
+    takeaways: [
+      "Inactivating both Dnmt3a and Dnmt3b by gene targeting blocked de novo methylation in mouse stem cells and early embryos.",
+      "The same double inactivation did not affect the maintenance of imprinted methylation patterns, which therefore depend on another enzyme.",
+      "The two enzymes also have separate roles: Dnmt3b is specifically needed for methylation of centromeric minor satellite repeats.",
+      "Mutations of human DNMT3B are found in ICF syndrome, a developmental disorder with hypomethylated pericentromeric repeats."
+    ],
+    facts: { design: "animal" }
+  },
+  {
+    id: "article:zaccheo-2004-nte-phosphatidylcholine-deacylation",
+    type: "article",
+    name: "Neuropathy target esterase and its yeast homologue degrade phosphatidylcholine to glycerophosphocholine in living cells",
+    aliases: ["Zaccheo 2004"],
+    summary: "Yeast and mammalian cell-line study showing that neuropathy target esterase catalyses the deacylation of phosphatidylcholine to glycerophosphocholine, balancing PC synthesis with degradation.",
+    body: [
+      "Main source for the deacylation route in [[pathway:phosphatidylcholine-catabolism]] and for [[enzyme:pnpla6]] as the enzyme that makes [[compound:glycerophosphocholine]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]). It uses yeast and cultured mammalian cell lines, not human tissue."
+    ],
+    evidence: "plausible",
+    authors: ["Zaccheo O", "Dinsdale D", "Meacock PA", "Glynn P"],
+    year: 2004,
+    journal: "The Journal of biological chemistry",
+    doi: "10.1074/jbc.M400830200",
+    pmid: "15044461",
+    url: "https://doi.org/10.1074/jbc.M400830200",
+    verified: true,
+    takeaways: [
+      "Cells control phosphatidylcholine levels by balancing synthesis against degradation by deacylation to glycerophosphocholine.",
+      "In yeast and mammalian cells this deacylation is catalysed by neuropathy target esterase (NTE), a protein first found through its reaction with nerve-damaging organophosphates.",
+      "Yeast lacking the NTE homologue were viable but did not convert phosphatidylcholine to glycerophosphocholine; their net choline incorporation into PC was not higher, because choline uptake and CDP-choline formation were reduced.",
+      "In cultured mammalian cells, labelled glycerophosphocholine rose when active NTE was overexpressed and fell when NTE was reduced by RNA interference or organophosphate treatment."
+    ],
+    facts: { design: "in-vitro" }
+  },
+  {
+    id: "article:stewart-2012-edi3-gpc-phosphodiesterase",
+    type: "article",
+    name: "Choline-releasing glycerophosphodiesterase EDI3 drives tumor cell migration and metastasis",
+    aliases: ["Stewart 2012"],
+    summary: "Identifies EDI3 (GPCPD1) as the enzyme that cleaves glycerophosphocholine to choline and glycerol 3-phosphate in human cancer cells and links its expression to migration and relapse.",
+    body: [
+      "Shows with purified recombinant protein and gene silencing that [[enzyme:gpcpd1]] cleaves [[compound:glycerophosphocholine]] to [[compound:choline]] and [[compound:glycerol-3-phosphate]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]). The wider findings concern tumour cell migration and are outside this site's scope."
+    ],
+    evidence: "plausible",
+    authors: ["Stewart JD", "Marchan R", "Lesjak MS", "Lambert J", "Hergenroeder R", "Ellis JK", "Lau CH", "Keun HC", "Schmitz G", "Schiller J", "Eibisch M", "Hedberg C", "Waldmann H", "Lausch E", "Tanner B", "Sehouli J", "Sagemueller J", "Staude H", "Steiner E", "Hengstler JG"],
+    year: 2012,
+    journal: "Proceedings of the National Academy of Sciences of the United States of America",
+    doi: "10.1073/pnas.1117654109",
+    pmid: "22570503",
+    url: "https://doi.org/10.1073/pnas.1117654109",
+    verified: true,
+    takeaways: [
+      "The enzyme that releases choline from glycerophosphocholine, the first step controlling the GPC to phosphocholine ratio, was identified and named EDI3.",
+      "Purified recombinant EDI3 cleaves glycerophosphocholine to glycerol 3-phosphate and choline.",
+      "Silencing EDI3 in MCF-7 breast cancer cells lowered this activity, raised the intracellular GPC to phosphocholine ratio, reduced downstream lipid metabolites and inhibited cell migration through PKC alpha signalling.",
+      "High EDI3 expression was linked to shorter relapse-free survival in endometrial and ovarian cancers."
+    ],
+    facts: { design: "in-vitro", population: "Human cancer cell lines and tumour expression data" }
+  },
+  {
+    id: "article:leslie-2015-cytosolic-pla2",
+    type: "article",
+    name: "Cytosolic phospholipase A2: physiological function and role in disease",
+    aliases: ["Leslie 2015"],
+    summary: "Review of the group IV cytosolic phospholipases A2, focusing on cPLA2 alpha, which releases arachidonic acid and lysophospholipids from membranes and is regulated by calcium and phosphorylation.",
+    body: [
+      "Background for [[enzyme:pla2g4a]] and its products [[compound:lysophosphatidylcholine]] and [[compound:fatty-acid]] ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]). The review concerns lipid-mediator production and disease rather than choline recovery from phosphatidylcholine ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    authors: ["Leslie CC"],
+    year: 2015,
+    journal: "Journal of lipid research",
+    doi: "10.1194/jlr.R057588",
+    pmid: "25838312",
+    url: "https://doi.org/10.1194/jlr.R057588",
+    verified: true,
+    takeaways: [
+      "The group IV family has six intracellular phospholipases A2 (cPLA2 alpha to zeta) with a Ser-Asp catalytic dyad; cPLA2 alpha is the best studied.",
+      "cPLA2 alpha hydrolyses phospholipids to arachidonic acid and lysophospholipids, which are precursors of many bioactive lipids.",
+      "Its activity is controlled by transcription, by calcium rises and by phosphorylation, and it promotes lipid mediator production in many human and rodent cell types.",
+      "Humans with cPLA2 alpha deficiency show more pronounced health effects than mice lacking the enzyme."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:peng-2012-mammalian-pld",
+    type: "article",
+    name: "Mammalian phospholipase D physiological and pathological roles",
+    aliases: ["Peng 2012", "Peng & Frohman 2012"],
+    summary: "Review of mammalian phospholipase D enzymes, which most commonly generate the lipid second messenger phosphatidic acid, and of their roles in cancer, neurons, cardiovascular disease and infection.",
+    body: [
+      "Background for [[enzyme:pld]] as the producer of [[compound:phosphatidic-acid]] from [[compound:phosphatidylcholine]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]). The review emphasises signalling and disease models; it does not quantify the choline that PLD releases ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    authors: ["Peng X", "Frohman MA"],
+    year: 2012,
+    journal: "Acta physiologica (Oxford, England)",
+    doi: "10.1111/j.1748-1716.2011.02298.x",
+    pmid: "21447092",
+    url: "https://doi.org/10.1111/j.1748-1716.2011.02298.x",
+    verified: true,
+    takeaways: [
+      "Phospholipase D is a superfamily of signalling enzymes that most commonly generate the lipid second messenger phosphatidic acid, found from bacteria to humans.",
+      "Most functional insight came from cell models; genetic models now reveal physiological and pathophysiological roles of the mammalian PLD enzymes.",
+      "The review highlights connections of the PLD superfamily to cancer, neuronal pathophysiology, cardiovascular topics, spermatogenesis and infectious disease."
+    ],
+    facts: { design: "review" }
+  },
+  {
+    id: "article:wolthers-2007-methionine-synthase-reductase-complex",
+    type: "article",
+    name: "Protein interactions in the human methionine synthase-methionine synthase reductase complex and implications for the mechanism of enzyme reactivation",
+    aliases: ["Wolthers 2007"],
+    summary: "Biochemical study of how human methionine synthase reductase binds methionine synthase to regenerate the cob(II)alamin that forms every 200-1000 catalytic cycles back to the active cob(I)alamin state.",
+    body: [
+      "Describes the module structure of human [[enzyme:mtr]], which binds homocysteine, methyltetrahydrofolate, cobalamin and SAM, and the interaction with [[enzyme:mtrr]] that repairs inactive cob(II)alamin. It is the source here for the escape rate from [[compound:cob-i-alamin]] to [[compound:cob-ii-alamin]] ([[reaction:mtr-methylcobalamin-demethylation]], [[reaction:mtr-cob-i-alamin-methylation]], [[reaction:mtrr-cobalamin-reactivation]])."
+    ],
+    evidence: "plausible",
+    authors: ["Wolthers KR", "Scrutton NS"],
+    year: 2007,
+    journal: "Biochemistry",
+    doi: "10.1021/bi700339v",
+    pmid: "17477549",
+    url: "https://doi.org/10.1021/bi700339v",
+    verified: true,
+    takeaways: [
+      "Methionine synthase transfers a methyl group from methyltetrahydrofolate to homocysteine, forming methionine and tetrahydrofolate, with a bound cobalamin cofactor.",
+      "Catalytically inert cob(II)alamin forms about once every 200 to 1000 catalytic cycles and is regenerated to cob(I)alamin by NADPH-dependent methionine synthase reductase.",
+      "The activation domain of methionine synthase binds the FMN domain of the reductase through electrostatic interactions involving conserved lysine residues.",
+      "Electron transfer to cob(II)alamin in the complex is thermodynamically uphill, so reactivation has a substantial energetic barrier."
+    ],
+    facts: { design: "in-vitro" }
   }
-];
+]

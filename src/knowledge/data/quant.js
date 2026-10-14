@@ -193,6 +193,22 @@ export default [
   { id: 'quant:dtmp-molar-mass', subject: 'compound:dtmp', kind: 'molar-mass', value: 322.21, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
   { id: 'quant:dump-molar-mass', subject: 'compound:dump', kind: 'molar-mass', value: 308.18, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
   { id: 'quant:imp-molar-mass', subject: 'compound:imp', kind: 'molar-mass', value: 348.21, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:gar-molar-mass', subject: 'compound:gar', kind: 'molar-mass', value: 286.18, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:fgar-molar-mass', subject: 'compound:fgar', kind: 'molar-mass', value: 314.19, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:aicar-molar-mass', subject: 'compound:aicar', kind: 'molar-mass', value: 338.21, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:faicar-molar-mass', subject: 'compound:faicar', kind: 'molar-mass', value: 366.22, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:creatinine-molar-mass', subject: 'compound:creatinine', kind: 'molar-mass', value: 113.12, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  { id: 'quant:cob-i-alamin-molar-mass', subject: 'compound:cob-i-alamin', kind: 'molar-mass', value: 1329.4, unit: 'g/mol', basis: 'compound', authority: 'PubChem', established: true },
+  {
+    id: 'quant:glycerol-3-phosphate-molar-mass',
+    subject: 'compound:glycerol-3-phosphate',
+    kind: 'molar-mass',
+    value: 172.07,
+    unit: 'g/mol',
+    basis: 'compound',
+    authority: 'PubChem',
+    established: true
+  },
   { id: 'quant:magnesium-glycinate-molar-mass', subject: 'intervention:magnesium-glycinate', kind: 'molar-mass', value: 172.43, unit: 'g/mol', basis: 'salt', authority: 'PubChem', established: true },
   // Choline: intake limits (IOM 1998, EFSA 2016)
   {
@@ -1416,7 +1432,7 @@ export default [
     unit: 'mL/mmol',
     basis: 'ideal gas at 37 C and 1 atm, per mmol of CO2 (one per H+ neutralised by HCO3-)',
     authority: 'computed (V = RT/P)',
-    note: 'V = 8.3145 x 310.15 / 101325 = 25.45 mL per mmol; at 25 C the same sum gives 24.46. Dissolved CO2 and water vapour are ignored, so this is the gas phase of the full yield.',
+    note: 'V = 8.3145 x 310.15 / 101325 = 25.45 mL per mmol; at 25 C the same sum gives 24.47. Dissolved CO2 and water vapour are ignored, so this is the gas phase of the full yield.',
     established: true
   },
   {

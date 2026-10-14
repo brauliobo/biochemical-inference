@@ -76,49 +76,63 @@ const generated = {
       reversible: false,
       substrates: [],
       products: [{ id: 'compound:proton', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:atp', n: 1 }, { id: 'compound:water', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:atp', n: 1 }, { id: 'compound:water', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:proton-bicarbonate-protonation': {
       enzymes: [],
       reversible: true,
       substrates: [{ id: 'compound:proton', n: 1 }, { id: 'compound:bicarbonate', n: 1 }],
       products: [{ id: 'compound:carbonic-acid', n: 1 }],
-      pooled: { substrates: [], products: [] }
+      pooled: { substrates: [], products: [] },
+      parts: [],
+      partOf: []
     },
     'reaction:carbonic-acid-dehydration': {
       enzymes: [],
       reversible: true,
       substrates: [{ id: 'compound:carbonic-acid', n: 1 }],
       products: [{ id: 'compound:carbon-dioxide', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:carbonic-anhydrase-bicarbonate-dehydration': {
       enzymes: ['enzyme:carbonic-anhydrase'],
       reversible: true,
       substrates: [{ id: 'compound:bicarbonate', n: 1 }, { id: 'compound:proton', n: 1 }],
       products: [{ id: 'compound:carbon-dioxide', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:hcl-bicarbonate-neutralisation': {
       enzymes: [],
       reversible: false,
       substrates: [{ id: 'compound:hydrochloric-acid', n: 1 }, { id: 'compound:bicarbonate', n: 1 }],
       products: [{ id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:chloride', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:water', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:gastric-hcl-secretion': {
       enzymes: ['enzyme:carbonic-anhydrase', 'enzyme:h-k-atpase'],
       reversible: false,
       substrates: [{ id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:chloride', n: 1 }],
       products: [{ id: 'compound:hydrochloric-acid', n: 1 }, { id: 'compound:bicarbonate', n: 1 }, { id: 'compound:proton', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:water', n: 2 }, { id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:water', n: 2 }, { id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:urease-urea-hydrolysis': {
       enzymes: ['enzyme:h-pylori-urease'],
       reversible: false,
       substrates: [{ id: 'compound:urea', n: 1 }],
       products: [{ id: 'compound:ammonia', n: 2 }, { id: 'compound:carbon-dioxide', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [] }
+      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [] },
+      parts: [],
+      partOf: []
     }
   }
 }

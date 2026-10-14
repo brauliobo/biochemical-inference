@@ -436,7 +436,8 @@ export default [
     relations: [
       { rel: "part-of", to: "pathway:folate-cycle" },
       { rel: "precursor-of", to: "compound:formate", note: "Reversible release of formate" },
-      { rel: "substrate-of", to: "pathway:nucleotide-synthesis", note: "Formyl donor for two steps of purine synthesis." }
+      { rel: "substrate-of", to: "pathway:nucleotide-synthesis", note: "Formyl donor for two steps of purine synthesis." },
+      { rel: "substrate-of", to: "enzyme:aldh1l1", note: "Oxidised to THF and CO2" }
     ],
     refs: ["article:reactome-folate-pterine-metabolism"]
   },
@@ -967,12 +968,13 @@ export default [
     aliases: ["DHF", "H2folate", "diidrofolato", "di-hidrofolato", "ácido di-hidrofólico"],
     summary: "Oxidised folate produced when thymidylate synthase uses methylene-THF; it is reduced back to tetrahydrofolate by DHFR, the step blocked by methotrexate.",
     body: [
-      "Thymidylate synthase uses the folate cofactor twice: it donates a one-carbon unit and a pair of electrons, so 5,10-methylene-THF ends as dihydrofolate ([[reaction:tyms-thymidylate-synthesis]]). DHFR (not modelled on this site) must reduce it to [[compound:thf]] before the cycle can continue ([[article:carreras-1995-thymidylate-synthase]]).",
+      "Thymidylate synthase uses the folate cofactor twice: it donates a one-carbon unit and a pair of electrons, so 5,10-methylene-THF ends as dihydrofolate ([[reaction:tyms-thymidylate-synthesis]]). [[enzyme:dhfr]] must reduce it to [[compound:thf]] with NADPH before the cycle can continue ([[reaction:dhfr-dihydrofolate-reduction]], [[article:carreras-1995-thymidylate-synthase]]).",
       "Folic acid, the synthetic vitamin, also needs DHFR for its first reduction, and human liver DHFR is slow at this ([[compound:folic-acid]], [[article:bailey-2009-dhfr-slow-human-liver]])."
     ],
     evidence: "established",
     facts: { formula: "C19H21N7O6", molarMass: "443.41 g/mol", chebi: "CHEBI:15633", pubchem: "CID 135398604" },
-    relations: [{ rel: "precursor-of", to: "compound:thf", note: "Reduced by DHFR (not modelled)." }],
+    relations: [{ rel: "precursor-of", to: "compound:thf", note: "Reduced by DHFR with NADPH; the step blocked by methotrexate." },
+    { rel: "substrate-of", to: "enzyme:dhfr" }],
     refs: ["article:carreras-1995-thymidylate-synthase", "article:bailey-2009-dhfr-slow-human-liver"]
   },
   {
@@ -1012,7 +1014,7 @@ export default [
     aliases: ["IMP", "ácido inosínico", "inosina monofosfato", "inosinic acid"],
     summary: "First complete purine nucleotide of de novo synthesis and the precursor of AMP and GMP; two of its ten synthetic steps take a formyl group from 10-formyl-THF.",
     body: [
-      "IMP is assembled step by step on a ribose phosphate scaffold. Two of the steps (the GART and ATIC transformylase activities) take a formyl unit from [[compound:10-formyl-thf]], so each IMP consumes two folate-carried one-carbon units ([[pathway:nucleotide-synthesis]]). It is then converted to [[compound:amp]] and to GMP, the purines of DNA and RNA.",
+      "IMP is assembled step by step on a ribose phosphate scaffold. Two of the steps (the [[enzyme:gart]] and [[enzyme:atic]] transformylase activities, [[reaction:gart-gar-formylation]] and [[reaction:atic-aicar-formylation]]) take a formyl unit from [[compound:10-formyl-thf]], so each IMP consumes two folate-carried one-carbon units ([[pathway:nucleotide-synthesis]]). It is then converted to [[compound:amp]] and to GMP, the purines of DNA and RNA.",
       "It appears here as a bookkeeping node: the source conversation mentions purine synthesis only as one destination of the mitochondrial one-carbon pool.",
       "Folate or B12 shortage ([[state:folate-trap]]) slows this branch together with thymidylate synthesis ([[reaction:tyms-thymidylate-synthesis]])."
     ],
@@ -1020,5 +1022,238 @@ export default [
     facts: { formula: "C10H13N4O8P", molarMass: "348.21 g/mol", chebi: "CHEBI:17202", pubchem: "CID 135398640" },
     relations: [{ rel: "product-of", to: "pathway:nucleotide-synthesis" }, { rel: "precursor-of", to: "compound:amp" }],
     refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism"]
+  },
+{
+    id: "compound:gar",
+    type: "compound",
+    name: "Glycinamide ribonucleotide (GAR)",
+    aliases: ["GAR", "N1-(5-phospho-D-ribosyl)glycinamide", "5'-phosphoribosylglycinamide", "ribonucleotídeo de glicinamida", "glicinamida ribonucleotídeo", "fosforribosilglicinamida"],
+    summary: "Second intermediate of de novo purine synthesis, glycine attached to a ribose phosphate; GART formylates it with 10-formyl-THF to give FGAR.",
+    body: [
+      "GAR is made by the ATP-driven glycine ligase step of the trifunctional [[enzyme:gart]] protein (UniProt records it as Rhea RHEA:17453) and consumed by its formyltransferase step, [[reaction:gart-gar-formylation]], in which [[compound:10-formyl-thf]] donates the formyl group and leaves as [[compound:thf]]. The whole glycine molecule is built into the purine ring, so purine synthesis draws on [[compound:glycine]] as well as on folate ([[pathway:nucleotide-synthesis]]).",
+      "The entry shows the neutral phospho-ribosyl-glycinamide. At cell pH the phosphate is ionised and the amine protonated (ChEBI lists the 1- ion, CHEBI:58457), which is why Rhea writes a proton on the product side of the formylation."
+    ],
+    evidence: "established",
+    facts: { formula: "C7H15N2O8P", molarMass: "286.18 g/mol", chebi: "CHEBI:18349", pubchem: "CID 5459918" },
+    relations: [
+      { rel: "substrate-of", to: "enzyme:gart" },
+      { rel: "precursor-of", to: "compound:fgar", note: "Formylated by GART" },
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "associated-with", to: "compound:glycine", note: "The glycine unit is incorporated whole into the purine ring" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "compound:fgar",
+    type: "compound",
+    name: "Formylglycinamide ribonucleotide (FGAR)",
+    aliases: ["FGAR", "N-formyl-GAR", "N2-formyl-N1-(5-phospho-D-ribosyl)glycinamide", "formilglicinamida ribonucleotídeo", "N-formil-GAR"],
+    summary: "Third intermediate of de novo purine synthesis; formed when GART moves a formyl group from 10-formyl-THF onto GAR, the first of two folate-dependent steps on the way to IMP.",
+    body: [
+      "FGAR is the product of [[reaction:gart-gar-formylation]], catalysed by the transformylase domain of [[enzyme:gart]]. It carries the first of the two formyl carbons that [[compound:10-formyl-thf]] contributes to each IMP; the second comes later from [[reaction:atic-aicar-formylation]]. The tetrahydrofolate left behind returns to the folate pool ([[compound:thf]], [[pathway:folate-cycle]]).",
+      "Several further steps, which this site does not model, convert FGAR into the imidazole ring of AICAR on the way to [[compound:imp]] ([[pathway:nucleotide-synthesis]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C8H15N2O9P", molarMass: "314.19 g/mol", chebi: "CHEBI:18272", pubchem: "CID 16048611" },
+    relations: [
+      { rel: "product-of", to: "enzyme:gart" },
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" },
+      { rel: "associated-with", to: "compound:imp", note: "Intermediate several steps upstream of IMP" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "compound:aicar",
+    type: "compound",
+    name: "AICA ribonucleotide (AICAR)",
+    aliases: ["AICAR", "AICA ribotide", "acadesine 5'-monophosphate", "5-aminoimidazole-4-carboxamide ribotide", "ribonucleotídeo de AICA", "aminoimidazol carboxamida ribonucleotídeo"],
+    summary: "Imidazole nucleotide late in de novo purine synthesis and an AMP analogue; ATIC formylates it with 10-formyl-THF to FAICAR, the second folate-dependent purine step.",
+    body: [
+      "AICAR is the substrate of the transformylase activity of [[enzyme:atic]] ([[reaction:atic-aicar-formylation]]), where [[compound:10-formyl-thf]] supplies the formyl carbon that becomes C2 of the purine ring. UniProt describes it as an analogue of [[compound:amp]]. Its formation from the preceding intermediate is not modelled here.",
+      "Folate shortage or antifolate drugs that lower 10-formyl-THF slow this step, which would be expected to let the nucleotide build up ([[pathway:nucleotide-synthesis]], [[state:folate-trap]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C9H15N4O8P", molarMass: "338.21 g/mol", chebi: "CHEBI:18406", pubchem: "CID 65110", hmdb: "HMDB0001517" },
+    relations: [
+      { rel: "substrate-of", to: "enzyme:atic" },
+      { rel: "precursor-of", to: "compound:faicar", note: "Formylated by ATIC" },
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022", "article:hmdb-2022"]
+  },
+  {
+    id: "compound:faicar",
+    type: "compound",
+    name: "Formyl-AICAR (FAICAR)",
+    aliases: ["FAICAR", "5-formamido-1-(5-phospho-D-ribosyl)imidazole-4-carboxamide", "5'-phosphoribosyl-5-formamido-4-imidazolecarboxamide", "formil-AICAR", "formamido-imidazol carboxamida ribonucleotídeo"],
+    summary: "Last intermediate before IMP: ATIC's cyclohydrolase closes the formylated imidazole into the second ring of the purine, releasing water.",
+    body: [
+      "FAICAR is formed by the transformylase half of [[enzyme:atic]] ([[reaction:atic-aicar-formylation]]) and converted by its cyclohydrolase half to [[compound:imp]] ([[reaction:atic-imp-cyclohydrolase]]). Both halves sit on one bifunctional protein, so the intermediate is handed over inside the enzyme.",
+      "It is the second place where a formyl unit from [[compound:10-formyl-thf]] enters purine synthesis ([[pathway:nucleotide-synthesis]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C10H15N4O9P", molarMass: "366.22 g/mol", chebi: "CHEBI:18381", pubchem: "CID 166760" },
+    relations: [
+      { rel: "product-of", to: "enzyme:atic" },
+      { rel: "substrate-of", to: "enzyme:atic" },
+      { rel: "precursor-of", to: "compound:imp", note: "Cyclised by ATIC" },
+      { rel: "part-of", to: "pathway:nucleotide-synthesis" }
+    ],
+    refs: ["article:pedley-2017-purinosome", "article:ducker-2017-one-carbon-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "compound:creatinine",
+    type: "compound",
+    name: "Creatinine",
+    aliases: ["creatinina", "creatinine anhydride", "2-imino-1-methylimidazolidin-4-one", "produto de degradação da creatina", "creatinina sérica"],
+    summary: "Cyclic end product formed spontaneously from creatine and phosphocreatine and excreted in urine; its daily loss is what endogenous creatine synthesis and diet must replace.",
+    body: [
+      "Creatinine arises when [[compound:creatine]] (and phosphocreatine) loses water and cyclises without an enzyme ([[reaction:creatine-cyclisation]]). No human enzyme that converts it back to creatine is annotated, and it leaves in the urine, so the amount lost each day, which scales with muscle mass, sets the replacement need that diet and [[pathway:creatine-synthesis]] have to cover ([[system:kidney]]).",
+      "Creatinine is also the usual routine marker of kidney function and a normaliser for urine tests. Those clinical uses are outside this site's scope; here it matters as the sink of the creatine pool and, indirectly, of the methyl groups spent making creatine ([[pathway:methyl-budget]])."
+    ],
+    evidence: "established",
+    facts: { formula: "C4H7N3O", molarMass: "113.12 g/mol", chebi: "CHEBI:16737", pubchem: "CID 588", hmdb: "HMDB0000562" },
+    relations: [
+      { rel: "part-of", to: "pathway:creatine-synthesis", note: "Terminal loss from the creatine pool" },
+      { rel: "associated-with", to: "system:kidney", note: "Excreted in urine" },
+      { rel: "associated-with", to: "intervention:creatine-supplement", note: "Supplemented creatine is also lost as creatinine; the size of the extra output is not modelled" }
+    ],
+    refs: ["article:wyss-2000-creatine-creatinine-metabolism", "article:brosnan-2011-metabolic-burden-creatine-synthesis", "article:brosnan-2007-creatine-review"]
+  },
+  {
+    id: "compound:cob-i-alamin",
+    type: "compound",
+    name: "Cob(I)alamin (vitamin B12s)",
+    aliases: ["cob(I)alamina", "B12s", "vitamina B12s", "vitamin B12s", "cobalamina reduzida", "forma super-redutora da B12"],
+    summary: "Fully reduced cobalt state of cobalamin on methionine synthase: it takes the methyl of 5-methyl-THF to become methylcobalamin and is what remains after methylcobalamin methylates homocysteine.",
+    body: [
+      "Inside [[enzyme:mtr]] the cobalamin cofactor shuttles between methylcobalamin and cob(I)alamin: methylcobalamin gives its methyl to homocysteine, leaving cob(I)alamin ([[reaction:mtr-methylcobalamin-demethylation]]), and cob(I)alamin then takes a methyl from [[compound:5-mthf]] to become methylcobalamin again ([[reaction:mtr-cob-i-alamin-methylation]]). Together the two halves equal the single reaction written as [[reaction:mtr-methionine-synthase]].",
+      "Cob(I)alamin is easily oxidised. A measured escape rate is once every 200-1000 catalytic cycles, giving the inert cob(II)alamin that [[enzyme:mtrr]] re-reduces and re-methylates with NADPH and SAM ([[compound:cob-ii-alamin]], [[reaction:mtrr-cobalamin-reactivation]]). The oxidation itself is not written as a reaction here because neither Rhea nor Reactome describes it for human MTR with defined partners; Rhea has only a generic cob(I)alamin to cob(II)alamin entry (RHEA:17481).",
+      "The formula is the ChEBI 1- ion used by Rhea (CHEBI:60488); in the protein the cobalt is bound to the enzyme, so the free ion is a bookkeeping form."
+    ],
+    evidence: "established",
+    facts: { formula: "C62H88CoN13O14P-", molarMass: "1329.4 g/mol", chebi: "CHEBI:60488" },
+    relations: [
+      { rel: "precursor-of", to: "compound:methylcobalamin", note: "Methylated by 5-MTHF on MTR" },
+      { rel: "precursor-of", to: "compound:cob-ii-alamin", note: "By occasional oxidative escape on MTR (not modelled as a reaction)" },
+      { rel: "cofactor-of", to: "enzyme:mtr", note: "Enzyme-bound intermediate of the catalytic cycle" },
+      { rel: "part-of", to: "compound:vitamin-b12" }
+    ],
+    refs: ["article:wolthers-2007-methionine-synthase-reductase-complex", "article:selhub-1999-homocysteine-metabolism", "article:rhea-2022"]
+  },
+  {
+    id: "compound:dna-cytosine",
+    type: "compound",
+    name: "Cytosine in DNA (2'-deoxycytidine residue)",
+    aliases: ["citosina no DNA", "2'-deoxycytidine in DNA", "dC in DNA", "resíduo de desoxicitidina no DNA", "citosina do DNA", "dCMP residue"],
+    summary: "Class-level node for a cytosine nucleotide inside a DNA strand, the methyl acceptor of DNA cytosine methyltransferases; a bookkeeping entry, not one molecule.",
+    body: [
+      "This entry stands for 'a 2'-deoxycytidine in DNA' as Rhea and ChEBI write it (the dCMP 1- residue, CHEBI:85452): any cytosine within a polynucleotide, in practice mostly in CpG dinucleotides. It is a class-level bookkeeping node, like [[compound:hydrogen-acceptor]], so that [[reaction:dnmt-dna-cytosine-methylation]] can be drawn with a methyl donor ([[compound:sam]]) and a methyl acceptor.",
+      "The acceptor is part of a polymer and has no single formula or molar mass, so none is given. The methylated form is [[compound:dna-5-methylcytosine]]; the average level of that mark across the genome appears on this site as [[outcome:global-dna-methylation]]."
+    ],
+    evidence: "plausible",
+    facts: { class: "generic polymer residue (bookkeeping node)", chebi: "CHEBI:85452" },
+    relations: [
+      { rel: "substrate-of", to: "enzyme:dnmt" },
+      { rel: "precursor-of", to: "compound:dna-5-methylcytosine", note: "Methylated at carbon 5 by DNA methyltransferases" },
+      { rel: "associated-with", to: "outcome:global-dna-methylation" }
+    ],
+    refs: ["article:rhea-2022"]
+  },
+  {
+    id: "compound:dna-5-methylcytosine",
+    type: "compound",
+    name: "5-Methylcytosine in DNA (5-methyl-2'-deoxycytidine residue)",
+    aliases: ["5-metilcitosina no DNA", "5mC", "5-methyl-2'-deoxycytidine in DNA", "citosina metilada", "resíduo de 5-metil-desoxicitidina", "5-methyl dCMP residue"],
+    summary: "Class-level node for a methylated cytosine inside DNA, the product of DNA cytosine methyltransferases and the epigenetic mark; a bookkeeping entry, not one molecule.",
+    body: [
+      "This entry stands for 'a 5-methyl-2'-deoxycytidine in DNA' as Rhea and ChEBI write it (CHEBI:85454). It is produced when [[enzyme:dnmt]] transfers a methyl group from [[compound:sam]] to [[compound:dna-cytosine]], leaving [[compound:sah]] ([[reaction:dnmt-dna-cytosine-methylation]]). Like [[compound:hydrogen-acceptor]], it is a class-level bookkeeping node; no formula or molar mass is given because the residue belongs to a polymer.",
+      "DNA methylation is a modest methyl sink compared with phosphatidylcholine, creatine and glycine methylation ([[pathway:methyl-budget]]), but the mark carries information: its genome-wide level is tracked as [[outcome:global-dna-methylation]]."
+    ],
+    evidence: "plausible",
+    facts: { class: "generic polymer residue (bookkeeping node)", chebi: "CHEBI:85454" },
+    relations: [
+      { rel: "product-of", to: "enzyme:dnmt" },
+      { rel: "product-of", to: "pathway:methyl-budget", note: "DNA methylation is one, quantitatively small, SAM sink" },
+      { rel: "associated-with", to: "outcome:global-dna-methylation" }
+    ],
+    refs: ["article:rhea-2022", "article:caudill-2001-sah-dna-methylation"]
+  },
+  {
+    id: "compound:phosphatidic-acid",
+    type: "compound",
+    name: "Phosphatidic acid (phosphatidate, PA)",
+    aliases: ["PA", "phosphatidate", "ácido fosfatídico", "1,2-diacyl-sn-glycerol 3-phosphate", "fosfatidato", "diacilglicerol fosfato"],
+    summary: "Glycerolipid with a free phosphate head group; the product when phospholipase D cleaves choline from phosphatidylcholine, a signalling lipid and a precursor of diacylglycerol.",
+    body: [
+      "[[enzyme:pld]] splits phosphatidylcholine into phosphatidic acid and free [[compound:choline]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]). PA is best known as a lipid second messenger, and phospholipase D is the usual source of it in signalling ([[article:peng-2012-mammalian-pld]]). The acyl chains vary, so the entry is generic and has no formula.",
+      "PA is also the central intermediate of glycerolipid synthesis: it is built from [[compound:glycerol-3-phosphate]] by two acylations and can be dephosphorylated by phosphatidate phosphatases (LPIN) to [[compound:diacylglycerol]], the acceptor in the last step of the Kennedy route to phosphatidylcholine ([[pathway:kennedy-pathway]]). The choline-releasing cleavage and the synthetic route therefore meet at this lipid ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "established",
+    facts: { class: "glycerophospholipid (generic; acyl chains vary)", chebi: "CHEBI:16337" },
+    relations: [
+      { rel: "product-of", to: "enzyme:pld" },
+      { rel: "precursor-of", to: "compound:diacylglycerol", note: "Dephosphorylated by LPIN phosphatidate phosphatases (Reactome R-HSA-5221130)" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" }
+    ],
+    refs: ["article:peng-2012-mammalian-pld", "article:rhea-2022"]
+  },
+  {
+    id: "compound:glycerol-3-phosphate",
+    type: "compound",
+    name: "sn-Glycerol 3-phosphate (G3P)",
+    aliases: ["G3P", "glicerol-3-fosfato", "glycerol 3-phosphate", "sn-glicerol 3-fosfato", "alfa-glicerofosfato", "L-glycerol 3-phosphate"],
+    summary: "Three-carbon phosphate ester that forms the backbone of glycerolipids; released together with choline when GPCPD1 cleaves glycerophosphocholine.",
+    body: [
+      "[[enzyme:gpcpd1]] hydrolyses [[compound:glycerophosphocholine]] to G3P and [[compound:choline]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]), so the glycerol part of the phospholipid returns to the pool that glycerolipid synthesis uses. LPC deacylation by [[enzyme:pnpla6]] is the step that first makes glycerophosphocholine from [[compound:lysophosphatidylcholine]].",
+      "In the other direction G3P is acylated twice to give [[compound:phosphatidic-acid]], the starting point for new phospholipids, and it also links glycolysis to lipid metabolism through the glycerol phosphate shuttle (not modelled here). The entry shows the neutral acid; at cell pH it is the dianion (CHEBI:57597), as Rhea writes it."
+    ],
+    evidence: "established",
+    facts: { formula: "C3H9O6P", molarMass: "172.07 g/mol", chebi: "CHEBI:15978", pubchem: "CID 439162", hmdb: "HMDB0000126" },
+    relations: [
+      { rel: "product-of", to: "enzyme:gpcpd1" },
+      { rel: "precursor-of", to: "compound:phosphatidic-acid", note: "Two acylations (GPAT, AGPAT) in Reactome 'Synthesis of PA'" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" }
+    ],
+    refs: ["article:stewart-2012-edi3-gpc-phosphodiesterase", "article:rhea-2022", "article:hmdb-2022"]
+  },
+  {
+    id: "compound:lysophosphatidylcholine",
+    type: "compound",
+    name: "Lysophosphatidylcholine (1-acyl-sn-glycero-3-phosphocholine, LPC)",
+    aliases: ["LPC", "lisofosfatidilcolina", "lysolecithin", "1-acyl-sn-glycero-3-phosphocholine", "lisolecitina", "monoacilglicerofosfocolina"],
+    summary: "Phosphatidylcholine that has lost one fatty acid; made by phospholipase A2 and deacylated further by lysophospholipases to glycerophosphocholine.",
+    body: [
+      "Phospholipase A2 enzymes such as [[enzyme:pla2g4a]] remove the fatty acid from the sn-2 position of [[compound:phosphatidylcholine]], leaving LPC ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]); in the gut, pancreatic phospholipase A2 does the same to dietary PC ([[article:nilsson-2019-choline-phospholipid-digestion]]). Intracellularly [[enzyme:pnpla6]] removes the remaining acyl group to give [[compound:glycerophosphocholine]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]).",
+      "Lysophospholipids also act as signalling molecules and as precursors of lipid mediators ([[article:leslie-2015-cytosolic-pla2]]). The entry is generic because the acyl chain varies; the form in the Rhea equations is the 1-acyl isomer (CHEBI:58168)."
+    ],
+    evidence: "established",
+    facts: { class: "glycerophospholipid (generic; one acyl chain)", chebi: "CHEBI:58168" },
+    relations: [
+      { rel: "product-of", to: "enzyme:pla2g4a" },
+      { rel: "substrate-of", to: "enzyme:pnpla6" },
+      { rel: "precursor-of", to: "compound:glycerophosphocholine", note: "Deacylated by lysophospholipases such as PNPLA6" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" }
+    ],
+    refs: ["article:leslie-2015-cytosolic-pla2", "article:zaccheo-2004-nte-phosphatidylcholine-deacylation", "article:rhea-2022"]
+  },
+  {
+    id: "compound:fatty-acid",
+    type: "compound",
+    name: "Fatty acid (generic carboxylate, RCOO-)",
+    aliases: ["ácido graxo", "ácidos graxos", "fatty acids", "acil livre", "free fatty acid", "ácido graxo livre"],
+    summary: "Generic placeholder for the free fatty acid released when phospholipases remove an acyl chain; chain length and saturation vary, so the entry carries a class fact and no formula.",
+    body: [
+      "Rhea writes the product of phospholipase A2 and lysophospholipase reactions as 'a fatty acid', in its ionised form with one proton ([[reaction:pla2g4a-phosphatidylcholine-deacylation]], [[reaction:pnpla6-lysophosphatidylcholine-deacylation]]). The entry is a bookkeeping node for those equations, like [[compound:hydrogen-acceptor]]; the real species is any of dozens of acyl chains, for example arachidonate when [[enzyme:pla2g4a]] acts on arachidonoyl phosphatidylcholine.",
+      "The ChEBI id given is the neutral class 'fatty acid'; Rhea uses the anion (CHEBI:28868), which is why a proton accompanies it. Fate of the released acid (re-esterification, oxidation, conversion to mediators) is outside this entry ([[pathway:phosphatidylcholine-catabolism]])."
+    ],
+    evidence: "plausible",
+    facts: { class: "generic fatty acid (bookkeeping node; chain varies)", chebi: "CHEBI:35366" },
+    relations: [
+      { rel: "product-of", to: "enzyme:pla2g4a" },
+      { rel: "product-of", to: "enzyme:pnpla6" },
+      { rel: "part-of", to: "pathway:phosphatidylcholine-catabolism" }
+    ],
+    refs: ["article:rhea-2022", "article:leslie-2015-cytosolic-pla2"]
   }
 ]

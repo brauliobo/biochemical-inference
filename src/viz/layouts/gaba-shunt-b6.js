@@ -72,35 +72,45 @@ const generated = {
       reversible: false,
       substrates: [{ id: 'compound:pyridoxine-5-phosphate', n: 1 }],
       products: [{ id: 'compound:plp', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:oxygen', n: 1 }], products: [{ id: 'compound:hydrogen-peroxide', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:oxygen', n: 1 }], products: [{ id: 'compound:hydrogen-peroxide', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:pdxk-pyridoxal-phosphorylation': {
       enzymes: ['enzyme:pdxk'],
       reversible: false,
       substrates: [{ id: 'compound:pyridoxal', n: 1 }],
       products: [{ id: 'compound:plp', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:gad-glutamate-decarboxylation': {
       enzymes: ['enzyme:gad1', 'enzyme:gad2'],
       reversible: false,
       substrates: [{ id: 'compound:glutamate', n: 1 }],
       products: [{ id: 'compound:gaba', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:proton', n: 1 }], products: [{ id: 'compound:carbon-dioxide', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:proton', n: 1 }], products: [{ id: 'compound:carbon-dioxide', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:abat-gaba-transamination': {
       enzymes: ['enzyme:abat'],
       reversible: true,
       substrates: [{ id: 'compound:gaba', n: 1 }, { id: 'compound:2-oxoglutarate', n: 1 }],
       products: [{ id: 'compound:succinate-semialdehyde', n: 1 }, { id: 'compound:glutamate', n: 1 }],
-      pooled: { substrates: [], products: [] }
+      pooled: { substrates: [], products: [] },
+      parts: [],
+      partOf: []
     },
     'reaction:aldh5a1-succinate-semialdehyde-oxidation': {
       enzymes: ['enzyme:aldh5a1'],
       reversible: false,
       substrates: [{ id: 'compound:succinate-semialdehyde', n: 1 }],
       products: [{ id: 'compound:succinate', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:nad', n: 1 }, { id: 'compound:water', n: 1 }], products: [{ id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 2 }] }
+      pooled: { substrates: [{ id: 'compound:nad', n: 1 }, { id: 'compound:water', n: 1 }], products: [{ id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 2 }] },
+      parts: [],
+      partOf: []
     }
   }
 }

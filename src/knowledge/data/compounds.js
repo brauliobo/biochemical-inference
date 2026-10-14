@@ -285,7 +285,9 @@ export default [
         hypothesis: true,
         claim: "claim:pemt-pc-is-endogenous-choline-for-acetylcholine",
         strength: "weak"
-      }
+      },
+      { rel: "precursor-of", to: "compound:lysophosphatidylcholine", note: "PLA2 deacylation (cytosolic PLA2 alpha)" },
+      { rel: "precursor-of", to: "compound:phosphatidic-acid", note: "PLD hydrolysis releases choline" }
     ],
     refs: ["article:wang-2011-gut-flora-phosphatidylcholine-cvd"]
   },
@@ -775,7 +777,7 @@ export default [
     aliases: ["ácido fólico", "pteroylglutamic acid", "vitamin B9 synthetic"],
     summary: "Oxidised synthetic folate used in fortification and supplements; requires slow human DHFR for activation and can appear unmetabolised in plasma at higher doses.",
     body: [
-      "Folic acid is not a natural cofactor. After absorption it must be reduced to DHF and THF by dihydrofolate reductase, an activity that is low and variable in human liver (Bailey and Ayling 2009), so doses above roughly 200-400 micrograms can leave unmetabolised folic acid in circulation. The health significance of this is unresolved. Folic acid binds folate receptor alpha with high affinity, which is the basis of the speculation that it might compete with reduced folates; direct clinical evidence of impaired methylation is lacking, so treat that claim as plausible but unproven.",
+      "Folic acid is not a natural cofactor. After absorption it must be reduced to DHF and THF by dihydrofolate reductase ([[enzyme:dhfr]]), an activity that is low and variable in human liver (Bailey and Ayling 2009), so doses above roughly 200-400 micrograms can leave unmetabolised folic acid in circulation. The health significance of this is unresolved. Folic acid binds folate receptor alpha with high affinity, which is the basis of the speculation that it might compete with reduced folates; direct clinical evidence of impaired methylation is lacking, so treat that claim as plausible but unproven.",
       "Established facts: 400 micrograms preconception prevents neural-tube defects; fortification reduced their incidence; large doses can mask the haematological sign of B12 deficiency. UL is 1000 micrograms/day for folic acid (IOM and EU). Methotrexate and some antiepileptics antagonise folate metabolism. See [[intervention:folic-acid-supplement]]."
     ],
     evidence: "established",
@@ -1056,7 +1058,8 @@ export default [
     facts: { formula: "C4H9N3O2", molarMass: "131.13 g/mol", chebi: "CHEBI:16919", pubchem: "CID 586", hmdb: "HMDB0000064", "dosing-range": "3-5 g/day monohydrate", pathway: "pathway:creatine-synthesis" },
     relations: [
       { rel: "part-of", to: "pathway:creatine-synthesis" },
-      { rel: "decreases", to: "enzyme:gatm", note: "Feedback repression of AGAT expression; the basis for creatine supplements sparing glycine and methyl groups.", strength: "moderate" }    ],
+      { rel: "decreases", to: "enzyme:gatm", note: "Feedback repression of AGAT expression; the basis for creatine supplements sparing glycine and methyl groups.", strength: "moderate" },
+      { rel: "precursor-of", to: "compound:creatinine", note: "Spontaneous cyclisation, about 1.5-2 % of the pool per day" }    ],
     refs: ["article:stead-2006-methyl-balance-reevaluation", "article:mudd-2007-methyl-balance"]
   },
   {

@@ -85,8 +85,11 @@ export function deriveLayout(layout, byId) {
         else issues.push({ rule: 'participant-missing', id: node.id, message: `${role} ${item.id} has no node and is neither a currency metabolite nor in the layout's pool` })
       }
     }
-    reactions[node.id] = { enzymes, reversible: entity.reaction.reversible === true, substrates: drawn.substrates, products: drawn.products, pooled }
+    // a lumped reaction contains placed half-reactions (halves are `part-of` the whole): parts / partOf let a renderer draw one of them
+    const partOf = (entity.relations ?? []).filter((item) => item.rel === 'part-of' && placed.has(item.to) && byId.get(item.to)?.type === 'reaction').map((item) => item.to)
+    reactions[node.id] = { enzymes, reversible: entity.reaction.reversible === true, substrates: drawn.substrates, products: drawn.products, pooled, parts: [], partOf }
   }
+  for (const [id, details] of Object.entries(reactions)) for (const whole of details.partOf) reactions[whole].parts.push(id)
   return { edges, reactions, issues }
 }
 
@@ -149,7 +152,9 @@ export function renderGenerated({ edges, reactions }) {
     lines.push(`      reversible: ${item.reversible},`)
     lines.push(`      substrates: ${list(item.substrates)},`)
     lines.push(`      products: ${list(item.products)},`)
-    lines.push(`      pooled: { substrates: ${list(item.pooled.substrates)}, products: ${list(item.pooled.products)} }`)
+    lines.push(`      pooled: { substrates: ${list(item.pooled.substrates)}, products: ${list(item.pooled.products)} },`)
+    lines.push(`      parts: [${item.parts.map(q).join(', ')}],`)
+    lines.push(`      partOf: [${item.partOf.map(q).join(', ')}]`)
     lines.push(`    }${index < keys.length - 1 ? ',' : ''}`)
   })
   lines.push('  }', '}', END)

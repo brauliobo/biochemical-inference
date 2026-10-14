@@ -212,37 +212,41 @@ export const HUB_TOPICS = Object.freeze([
 export const SLICE_LIMIT = DEFAULT_LIMIT
 
 /**
- * Grow a seed set into a slice of at most `limit` nodes: seeds first (best connected if there are too many), then the
- * neighbours tied to most seeds. Returns the same shape as causalGraph.
+ * Grow a seed set into a slice of at most `limit` nodes: pinned nodes and seeds with causal edges first (best
+ * connected if there are too many), then the neighbours tied to most chosen nodes. `distance` is the number of steps
+ * from a seed. Returns the same shape as causalGraph.
  */
-function sliceFromSeeds(graph, seeds, { limit = DEFAULT_LIMIT, ...filters } = {}) {
+function sliceFromSeeds(graph, seeds, { limit = DEFAULT_LIMIT, pinned = [], ...filters } = {}) {
   const edges = causalEdges(graph, filters)
   const adj = adjacency(edges)
-  const present = [...new Set(seeds)].filter((id) => graph.has(id) && adj.has(id))
   const degree = (id) => (adj.get(id) ?? []).length
+  const fixed = [...new Set(pinned)].filter((id) => graph.has(id))
+  const rest = [...new Set(seeds)].filter((id) => graph.has(id) && adj.has(id) && !fixed.includes(id)).sort((a, b) => degree(b) - degree(a) || a.localeCompare(b))
   const chosen = new Map()
-  const pool = present.slice().sort((a, b) => degree(b) - degree(a) || a.localeCompare(b))
-  for (const id of pool.slice(0, limit)) chosen.set(id, 0)
-  const seedSet = new Set(chosen.keys())
+  for (const id of [...fixed, ...rest].slice(0, limit)) chosen.set(id, 0)
   while (chosen.size < limit) {
     const score = new Map()
-    for (const id of chosen.keys()) {
+    for (const [id, distance] of chosen) {
       for (const link of adj.get(id) ?? []) {
         if (chosen.has(link.id)) continue
-        score.set(link.id, (score.get(link.id) ?? 0) + 1)
+        const found = score.get(link.id) ?? { count: 0, distance: Infinity }
+        found.count += 1
+        found.distance = Math.min(found.distance, distance + 1)
+        score.set(link.id, found)
       }
     }
     if (!score.size) break
     // prefer candidates tied to several chosen nodes; break ties by degree then id so the slice is stable
-    const [best] = [...score.entries()].sort((a, b) => b[1] - a[1] || degree(b[0]) - degree(a[0]) || a[0].localeCompare(b[0]))[0]
-    chosen.set(best, seedSet.has(best) ? 0 : 1)
+    const [best, info] = [...score.entries()].sort((a, b) => b[1].count - a[1].count || degree(b[0]) - degree(a[0]) || a[0].localeCompare(b[0]))[0]
+    chosen.set(best, info.distance)
   }
   return assemble(graph, edges, chosen)
 }
 
 /**
  * Curated slices: one per guided path (seeded with the path's steps) and one per hub topic (seeded with the
- * topic itself). Each is [{ id, kind: 'path' | 'hub', title, summary, seeds }].
+ * topic itself, or for a pathway with its enzymes and compounds). Each is [{ id, kind: 'path' | 'hub', title,
+ * summary, seeds, pinned? }]; a pinned seed is always part of the slice.
  */
 export function causalSlices(graph, guidedPaths = []) {
   const slices = []
@@ -252,7 +256,12 @@ export function causalSlices(graph, guidedPaths = []) {
   }
   for (const id of HUB_TOPICS) {
     const entity = graph.get(id)
-    if (entity) slices.push({ id: `hub:${id}`, kind: 'hub', title: entity.name, summary: entity.summary, seeds: [id] })
+    if (!entity) continue
+    // a pathway hub is seeded with the enzymes and compounds that are part of it, since the pathway itself rarely has causal edges
+    const members = entity.type === 'pathway'
+      ? graph.incoming(id).filter((edge) => edge.rel === 'part-of' && ['enzyme', 'compound'].includes(graph.get(edge.from).type)).map((edge) => edge.from)
+      : []
+    slices.push({ id: `hub:${id}`, kind: 'hub', title: entity.name, summary: entity.summary, seeds: [id, ...members], pinned: [id] })
   }
   return slices
 }
@@ -261,8 +270,6 @@ export function causalSlices(graph, guidedPaths = []) {
 export function causalSlice(graph, guidedPaths, sliceId, options = {}) {
   const slice = causalSlices(graph, guidedPaths).find((item) => item.id === sliceId)
   if (!slice) return null
-  const { nodes, edges } = slice.kind === 'hub'
-    ? causalGraph(graph, { focus: slice.seeds, depth: 2, limit: options.limit ?? DEFAULT_LIMIT, ...options })
-    : sliceFromSeeds(graph, slice.seeds, options)
+  const { nodes, edges } = sliceFromSeeds(graph, slice.seeds, { pinned: slice.pinned, ...options })
   return { id: slice.id, kind: slice.kind, title: slice.title, summary: slice.summary, seeds: slice.seeds, nodes, edges }
 }

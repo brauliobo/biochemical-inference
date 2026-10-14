@@ -62,14 +62,18 @@ const generated = {
       reversible: false,
       substrates: [{ id: 'compound:choline', n: 1 }],
       products: [{ id: 'compound:trimethylamine', n: 1 }, { id: 'compound:acetaldehyde', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:fmo3-tma-n-oxidation': {
       enzymes: ['enzyme:fmo3'],
       reversible: false,
       substrates: [{ id: 'compound:trimethylamine', n: 1 }],
       products: [{ id: 'compound:tmao', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:nadph', n: 1 }, { id: 'compound:oxygen', n: 1 }, { id: 'compound:proton', n: 1 }], products: [{ id: 'compound:nadp', n: 1 }, { id: 'compound:water', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:nadph', n: 1 }, { id: 'compound:oxygen', n: 1 }, { id: 'compound:proton', n: 1 }], products: [{ id: 'compound:nadp', n: 1 }, { id: 'compound:water', n: 1 }] },
+      parts: [],
+      partOf: []
     }
   }
 }

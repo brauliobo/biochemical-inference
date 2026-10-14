@@ -115,105 +115,135 @@ const generated = {
       reversible: true,
       substrates: [{ id: 'compound:3-phosphoglycerate', n: 1 }],
       products: [{ id: 'compound:3-phosphohydroxypyruvate', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:nad', n: 1 }], products: [{ id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:nad', n: 1 }], products: [{ id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:psat1-phosphoserine-transamination': {
       enzymes: ['enzyme:psat1'],
       reversible: true,
       substrates: [{ id: 'compound:3-phosphohydroxypyruvate', n: 1 }],
       products: [{ id: 'compound:3-phosphoserine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:glutamate', n: 1 }], products: [{ id: 'compound:2-oxoglutarate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:glutamate', n: 1 }], products: [{ id: 'compound:2-oxoglutarate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:psph-phosphoserine-hydrolysis': {
       enzymes: ['enzyme:psph'],
       reversible: false,
       substrates: [{ id: 'compound:3-phosphoserine', n: 1 }],
       products: [{ id: 'compound:serine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [{ id: 'compound:phosphate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [{ id: 'compound:phosphate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:shmt-serine-glycine-interconversion': {
       enzymes: ['enzyme:shmt1', 'enzyme:shmt2'],
       reversible: true,
       substrates: [{ id: 'compound:serine', n: 1 }],
       products: [{ id: 'compound:glycine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:thf', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:water', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:thf', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:water', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:dmgdh-dimethylglycine-demethylation': {
       enzymes: ['enzyme:dmgdh'],
       reversible: false,
       substrates: [{ id: 'compound:dimethylglycine', n: 1 }],
       products: [{ id: 'compound:sarcosine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:etf-oxidized', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:etf-reduced', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:etf-oxidized', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:etf-reduced', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:sardh-sarcosine-demethylation': {
       enzymes: ['enzyme:sardh'],
       reversible: false,
       substrates: [{ id: 'compound:sarcosine', n: 1 }],
       products: [{ id: 'compound:glycine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:etf-oxidized', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:etf-reduced', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:etf-oxidized', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:etf-reduced', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:gnmt-glycine-methylation': {
       enzymes: ['enzyme:gnmt'],
       reversible: false,
       substrates: [{ id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:sarcosine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:sam', n: 1 }], products: [{ id: 'compound:sah', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:sam', n: 1 }], products: [{ id: 'compound:sah', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:glycine-cleavage-system': {
       enzymes: ['enzyme:gldc', 'enzyme:amt', 'enzyme:gcsh', 'enzyme:dld'],
       reversible: false,
       substrates: [{ id: 'compound:glycine', n: 1 }],
       products: [],
-      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:nad', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:ammonia', n: 1 }, { id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:nad', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:ammonia', n: 1 }, { id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:agat-guanidinoacetate-synthesis': {
       enzymes: ['enzyme:gatm'],
       reversible: true,
       substrates: [{ id: 'compound:arginine', n: 1 }, { id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:guanidinoacetate', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:ornithine', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:ornithine', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:gss-glutathione-synthesis': {
       enzymes: ['enzyme:gss'],
       reversible: false,
       substrates: [{ id: 'compound:gamma-glutamylcysteine', n: 1 }, { id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:glutathione', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:atp', n: 1 }], products: [{ id: 'compound:adp', n: 1 }, { id: 'compound:phosphate', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:collagen-chain-assembly': {
       enzymes: [],
       reversible: false,
       substrates: [{ id: 'compound:glycine', n: 1 }, { id: 'compound:proline', n: 2 }],
       products: [{ id: 'compound:collagen', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:water', n: 3 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:water', n: 3 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:baat-glycine-conjugation': {
       enzymes: ['enzyme:baat'],
       reversible: false,
       substrates: [{ id: 'compound:choloyl-coa', n: 1 }, { id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:glycocholic-acid', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:bsh-glycocholate-deconjugation': {
       enzymes: ['enzyme:bile-salt-hydrolase'],
       reversible: false,
       substrates: [{ id: 'compound:glycocholic-acid', n: 1 }],
       products: [{ id: 'compound:glycine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [{ id: 'compound:cholate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [{ id: 'compound:cholate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:bacterial-glycine-reductase': {
       enzymes: ['enzyme:bacterial-glycine-reductase'],
       reversible: false,
       substrates: [{ id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:acetyl-phosphate', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:phosphate', n: 1 }, { id: 'compound:thioredoxin-dithiol', n: 1 }], products: [{ id: 'compound:ammonia', n: 1 }, { id: 'compound:water', n: 1 }, { id: 'compound:thioredoxin-disulfide', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:phosphate', n: 1 }, { id: 'compound:thioredoxin-dithiol', n: 1 }], products: [{ id: 'compound:ammonia', n: 1 }, { id: 'compound:water', n: 1 }, { id: 'compound:thioredoxin-disulfide', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:bacterial-glycine-cleavage': {
       enzymes: ['enzyme:bacterial-glycine-cleavage-system'],
       reversible: false,
       substrates: [{ id: 'compound:glycine', n: 1 }],
       products: [],
-      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:nad', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:ammonia', n: 1 }, { id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:thf', n: 1 }, { id: 'compound:nad', n: 1 }], products: [{ id: 'compound:5-10-methylene-thf', n: 1 }, { id: 'compound:carbon-dioxide', n: 1 }, { id: 'compound:ammonia', n: 1 }, { id: 'compound:nadh', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     }
   }
 }

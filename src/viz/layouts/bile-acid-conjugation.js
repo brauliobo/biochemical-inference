@@ -61,28 +61,36 @@ const generated = {
       reversible: false,
       substrates: [{ id: 'compound:cholate', n: 1 }],
       products: [{ id: 'compound:choloyl-coa', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:atp', n: 1 }, { id: 'compound:coa', n: 1 }], products: [{ id: 'compound:amp', n: 1 }, { id: 'compound:pyrophosphate', n: 1 }] }
+      pooled: { substrates: [{ id: 'compound:atp', n: 1 }, { id: 'compound:coa', n: 1 }], products: [{ id: 'compound:amp', n: 1 }, { id: 'compound:pyrophosphate', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:baat-glycine-conjugation': {
       enzymes: ['enzyme:baat'],
       reversible: false,
       substrates: [{ id: 'compound:choloyl-coa', n: 1 }, { id: 'compound:glycine', n: 1 }],
       products: [{ id: 'compound:glycocholic-acid', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:baat-taurine-conjugation': {
       enzymes: ['enzyme:baat'],
       reversible: false,
       substrates: [{ id: 'compound:choloyl-coa', n: 1 }, { id: 'compound:taurine', n: 1 }],
       products: [{ id: 'compound:taurocholic-acid', n: 1 }],
-      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] }
+      pooled: { substrates: [], products: [{ id: 'compound:coa', n: 1 }, { id: 'compound:proton', n: 1 }] },
+      parts: [],
+      partOf: []
     },
     'reaction:bsh-glycocholate-deconjugation': {
       enzymes: ['enzyme:bile-salt-hydrolase'],
       reversible: false,
       substrates: [{ id: 'compound:glycocholic-acid', n: 1 }],
       products: [{ id: 'compound:cholate', n: 1 }, { id: 'compound:glycine', n: 1 }],
-      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [] }
+      pooled: { substrates: [{ id: 'compound:water', n: 1 }], products: [] },
+      parts: [],
+      partOf: []
     }
   }
 }

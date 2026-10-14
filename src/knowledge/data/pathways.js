@@ -766,5 +766,36 @@ export default [
       "article:carreras-1995-thymidylate-synthase",
       "article:stabler-2013-vitamin-b12-deficiency"
     ]
+  },
+{
+    id: "pathway:phosphatidylcholine-catabolism",
+    type: "pathway",
+    name: "Phosphatidylcholine catabolism: choline release",
+    aliases: ["catabolismo da fosfatidilcolina", "degradação da fosfatidilcolina", "liberação de colina", "hidrólise da fosfatidilcolina", "PC breakdown", "choline release from phosphatidylcholine", "desacilação da fosfatidilcolina"],
+    summary: "Routes by which cells break phosphatidylcholine down and free its choline: direct cleavage by phospholipase D, or deacylation to glycerophosphocholine followed by GPCPD1.",
+    body: [
+      "Phosphatidylcholine is both built and broken down, and this entry groups the breakdown steps. One route is a single cleavage: [[enzyme:pld]] removes choline and leaves [[compound:phosphatidic-acid]] ([[reaction:pld-phosphatidylcholine-hydrolysis]]). The other is stepwise deacylation: [[enzyme:pla2g4a]] removes one fatty acid to give [[compound:lysophosphatidylcholine]] ([[reaction:pla2g4a-phosphatidylcholine-deacylation]]), [[enzyme:pnpla6]] removes the second to give [[compound:glycerophosphocholine]] ([[reaction:pnpla6-lysophosphatidylcholine-deacylation]]), and [[enzyme:gpcpd1]] splits that into [[compound:choline]] and [[compound:glycerol-3-phosphate]] ([[reaction:gpcpd1-glycerophosphocholine-hydrolysis]]).",
+      "The freed choline can be re-phosphorylated and returned to phosphatidylcholine by the CDP-choline route ([[pathway:kennedy-pathway]]) or oxidised toward betaine ([[pathway:choline-oxidation]]); in liver, methylation of phosphatidylethanolamine is a second source of the lipid ([[pathway:pemt-pc-synthesis]]). Which fate prevails is cell-specific and was not quantified in the sources used here.",
+      "Reactome has no single pathway with this name. The steps sit in 'Glycerophospholipid catabolism' (R-HSA-6814848, which holds the PNPLA6 step), 'Hydrolysis of LPC' (R-HSA-1483115, which holds the GPCPD1 step) and, for the phospholipase D step, 'Synthesis of PA' (R-HSA-1483166). Digestion of dietary phosphatidylcholine in the gut lumen is a different process with different enzymes ([[article:nilsson-2019-choline-phospholipid-digestion]])."
+    ],
+    evidence: "established",
+    facts: {
+      reactome: "R-HSA-6814848; R-HSA-1483115; R-HSA-1483166",
+      compartment: "endoplasmic reticulum membrane, plasma membrane and cytosol",
+      tissue: "all cells; PNPLA6 in brain, kidney, muscle; PLD1 in pancreas, heart, brain"
+    },
+    relations: [
+      { rel: "interacts-with", to: "pathway:kennedy-pathway", note: "Choline released here can re-enter PC synthesis through choline kinase" },
+      { rel: "interacts-with", to: "pathway:choline-oxidation", note: "Released choline is a substrate of choline dehydrogenase" },
+      { rel: "decreases", to: "compound:phosphatidylcholine" },
+      { rel: "increases", to: "compound:choline" },
+      { rel: "associated-with", to: "intervention:alpha-gpc-supplement", note: "Glycerophosphocholine is an intermediate of the deacylation route; handling of supplemental alpha-GPC is not shown" }
+    ],
+    refs: [
+      "article:zaccheo-2004-nte-phosphatidylcholine-deacylation",
+      "article:stewart-2012-edi3-gpc-phosphodiesterase",
+      "article:leslie-2015-cytosolic-pla2",
+      "article:peng-2012-mammalian-pld"
+    ]
   }
 ]
