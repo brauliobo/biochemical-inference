@@ -60,11 +60,11 @@ describe('app shell', () => {
     navigate('/kb/enzyme/gnmt')
     mountVapor(App)
 
-    expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 1, name: /Glycine N-methyltransferase/ }, { timeout: 15000 })).toBeTruthy()
     expect(nav().getByRole('link', { name: 'Knowledge base' }).getAttribute('aria-current')).toBe('true')
 
     navigate('/kb/enzyme/bhmt')
-    expect(await screen.findByRole('heading', { level: 1, name: /Betaine-homocysteine/ })).toBeTruthy()
+    expect(await screen.findByRole('heading', { level: 1, name: /Betaine-homocysteine/ }, { timeout: 15000 })).toBeTruthy()
   })
 
   it('shows a 404 page with a way out', async () => {

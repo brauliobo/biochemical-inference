@@ -2,49 +2,61 @@
 import { computed, ref, watch, watchEffect } from 'vue'
 import Breadcrumbs from '../../components/kb/Breadcrumbs.vue'
 import EntityNotFound from '../../components/kb/EntityNotFound.vue'
-import GroupedList from '../../components/kb/GroupedList.vue'
-import { EVIDENCE_GRADES, EVIDENCE_KEYS, CLAIM_STATUS_KEYS, claimStatusInfo } from '../../knowledge/evidence.js'
-import { graph, hub } from '../../knowledge/index.js'
-import { DEFAULT_SORT, SORTS, countBy, enrichItems, filterItems, groupItems, readFilters, writeFilters } from '../../kb/listing.js'
+import EntityTable from '../../components/kb/EntityTable.vue'
+import { CLAIM_STATUS_KEYS, EVIDENCE_GRADES, EVIDENCE_KEYS, claimStatusInfo } from '../../knowledge/evidence.js'
+import { hub } from '../../knowledge/index.js'
+import { columnsFor, effectiveDirection, filterRows, firstDirection, readTable, rowsFor, sortRows, writeTable } from '../../kb/listing-table.js'
 import { resolveType } from '../../kb/paths.js'
 import { navigate, setPageTitle, useRoute } from '../../router.js'
 
-// /kb/:type. Filter, sort and group one type's entries. The controls live in the
-// URL query (?q=&grade=&status=&sort=) so a filtered list can be bookmarked or shared.
+// /kb/:type. One kind of entry as a sortable table with a small visual per row (evidence dots, count bars,
+// inline equations, status badges, relation sparklines). Filters and the sort live in the URL query (?q=&grade=&status=&sort=&dir=) so a view
+// can be bookmarked or shared.
 const route = useRoute()
 const type = computed(() => resolveType(route.params.type))
 const model = computed(() => (type.value ? hub(type.value) : null))
-const all = computed(() => (model.value ? enrichItems(graph, model.value) : []))
+const columns = computed(() => (type.value ? columnsFor(type.value) : []))
+const all = computed(() => (type.value ? rowsFor(type.value) : []))
 const isClaim = computed(() => type.value === 'claim')
 
 const q = ref('')
 const grade = ref('')
 const status = ref('')
-const sort = ref(DEFAULT_SORT)
+const sort = ref('name')
+const dir = ref('')
 
 function load() {
-  const filters = readFilters(route.query)
-  q.value = filters.q
-  grade.value = filters.grade
-  status.value = filters.status
-  sort.value = filters.sort
+  const state = readTable(route.query, columns.value)
+  q.value = state.q
+  grade.value = state.grade
+  status.value = state.status
+  sort.value = state.sort
+  dir.value = state.dir
 }
 watch(() => [route.params.type, JSON.stringify(route.query)], load, { immediate: true })
 
-watch([q, grade, status, sort], () => {
-  const query = writeFilters({ q: q.value, grade: grade.value, status: status.value, sort: sort.value })
-  if (JSON.stringify(query) === JSON.stringify(writeFilters(readFilters(route.query)))) return
+watch([q, grade, status, sort, dir], () => {
+  const query = writeTable({ q: q.value, grade: grade.value, status: isClaim.value ? status.value : '', sort: sort.value, dir: dir.value }, columns.value)
+  const current = writeTable(readTable(route.query, columns.value), columns.value)
+  if (JSON.stringify(query) === JSON.stringify(current)) return
   const text = new URLSearchParams(query).toString()
   navigate(text ? `${route.path}?${text}` : route.path, { replace: true })
 })
 
-const visible = computed(() => filterItems(all.value, { q: q.value, grade: grade.value, status: isClaim.value ? status.value : '' }))
-const groups = computed(() => groupItems(visible.value, { type: type.value, sort: sort.value }))
-const gradeCounts = computed(() => countBy(all.value, 'evidence'))
-const statusCounts = computed(() => countBy(all.value, 'status'))
+const visible = computed(() => sortRows(filterRows(all.value, { q: q.value, grade: grade.value, status: isClaim.value ? status.value : '' }), sort.value, effectiveDirection({ sort: sort.value, dir: dir.value }, columns.value)))
+const direction = computed(() => effectiveDirection({ sort: sort.value, dir: dir.value }, columns.value))
+const gradeCounts = computed(() => Object.fromEntries(EVIDENCE_KEYS.map((key) => [key, all.value.filter((row) => row.evidence === key).length])))
+const statusCounts = computed(() => Object.fromEntries(CLAIM_STATUS_KEYS.map((key) => [key, all.value.filter((row) => row.status === key).length])))
 const summary = computed(() => `Showing ${visible.value.length} of ${all.value.length} ${model.value?.plural.toLowerCase() ?? ''}`)
 const filtered = computed(() => Boolean(q.value || grade.value || status.value))
 
+function onSort(column) {
+  if (sort.value === column.id) dir.value = direction.value === 'asc' ? 'desc' : 'asc'
+  else {
+    sort.value = column.id
+    dir.value = firstDirection(column)
+  }
+}
 function clear() {
   q.value = ''
   grade.value = ''
@@ -58,10 +70,9 @@ watchEffect(() => setPageTitle(model.value ? model.value.plural : 'Page not foun
 EntityNotFound(v-if="!model" title="We have no entries of that kind" :what="route.params.type")
 .stack.stack--loose(v-else)
   Breadcrumbs(:crumbs="model.breadcrumbs")
-  header.stack
+  header.stack.stack--tight
     h1 {{ model.plural }}
     p.lede {{ model.description }}
-    p.muted(v-if="isClaim") This is the claims audit. Each claim carries a status and links to the evidence for and against it. A claim with no recorded source says so on its page.
 
   form.grid(role="search" :aria-label="'Filter ' + model.plural.toLowerCase()" @submit.prevent)
     .stack.stack--tight
@@ -77,16 +88,12 @@ EntityNotFound(v-if="!model" title="We have no entries of that kind" :what="rout
       select#filter-status(v-model="status")
         option(value="") Any status
         option(v-for="key in CLAIM_STATUS_KEYS" :key="key" :value="key") {{ claimStatusInfo(key).label }} ({{ statusCounts[key] ?? 0 }})
-    .stack.stack--tight
-      label(for="filter-sort") Sort and group by
-      select#filter-sort(v-model="sort")
-        option(v-for="option in SORTS" :key="option.id" :value="option.id") {{ option.label }}
 
   .repel
     p(role="status") {{ summary }}
     button.button.button--secondary(v-if="filtered" type="button" @click="clear") Clear filters
 
-  GroupedList(v-if="groups.length" :groups="groups" :show-type="false")
+  EntityTable(v-if="visible.length" :rows="visible" :all-rows="all" :columns="columns" :sort="sort" :dir="direction" :caption="`${model.plural}, sortable table`" @sort="onSort")
   p.notice(v-else-if="!all.length") There are no {{ model.plural.toLowerCase() }} in the knowledge base yet.
   p.notice.notice--warning(v-else) No entries match these filters.
 </template>
