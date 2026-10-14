@@ -12,6 +12,8 @@ import outcomes from './outcomes.js'
 import systems from './systems.js'
 import claims from './claims.js'
 import articles from './articles.js'
+import articlesSim1 from './articles-sim-1.js'
+import articlesSim2 from './articles-sim-2.js'
 
 export default [
   ...compounds,
@@ -25,5 +27,7 @@ export default [
   ...outcomes,
   ...systems,
   ...claims,
-  ...articles
+  ...articles,
+  ...articlesSim1,
+  ...articlesSim2
 ]
