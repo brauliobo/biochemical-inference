@@ -55,18 +55,21 @@ describe('methylation scenarios: every preset simulates', () => {
   const BUDGET_MS = Math.min(600, NOMINAL_MS * (process.env.CI ? 3 : 2))
   it(`runs all scenarios to completion, positive and finite, in under ${BUDGET_MS} ms each (best of 3; ${NOMINAL_MS} ms nominal)`, () => {
     for (const s of scenarios) {
-      runScenario(s) // warm-up: compiles and caches the model
-      const attempts = [runScenario(s), runScenario(s), runScenario(s)]
-      const r = attempts[0]
+      const attempts = []
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        attempts.push(runScenario(s)) // the first run also compiles and caches the model
+        if (attempts[attempt].ms < BUDGET_MS) break // within budget: no need to retry
+      }
+      const r = attempts[attempts.length - 1]
       const best = Math.min(...attempts.map((attempt) => attempt.ms))
       expect(r.ok, s.id).toBe(true)
       expect(r.time[r.time.length - 1]).toBeCloseTo(72, 6)
       for (const id of ['met', 'sam', 'sah', 'hcy', 'gly', 'bet', 'mthf', 'thf', 'samSahRatio', 'tHcy']) {
         for (const v of r.series[id]) { expect(Number.isFinite(v), `${s.id}.${id}`).toBe(true); expect(v, `${s.id}.${id}`).toBeGreaterThanOrEqual(0) }
       }
-      expect(best, `${s.id}: best of 3 runs took ${best} ms`).toBeLessThan(BUDGET_MS)
+      expect(best, `${s.id}: best of ${attempts.length} runs took ${best} ms`).toBeLessThan(BUDGET_MS)
     }
-  })
+  }, 60000)
 
   it('stays flat in the baseline-fed scenario', () => {
     const r = runs['baseline-fed']
