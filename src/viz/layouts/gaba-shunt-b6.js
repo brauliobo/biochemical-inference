@@ -10,7 +10,7 @@ const layout = {
   pathways: ['pathway:gaba-shunt', 'pathway:vitamin-b6-activation'],
   groups: [
     { id: 'b6', label: 'Vitamin B6 activation', x: 40, y: 100, width: 380, height: 580 },
-    { id: 'elsewhere', label: 'PLP enzymes elsewhere (core map)', x: 440, y: 100, width: 190, height: 200 },
+    { id: 'elsewhere', label: 'PLP enzymes (core map)', x: 440, y: 100, width: 190, height: 200 },
     { id: 'shunt', label: 'GABA shunt', x: 650, y: 100, width: 590, height: 580 }
   ],
   nodes: [
